@@ -111,6 +111,8 @@ private: //vera stuff.
   void ev_iter();
   void set_param();
   void transtep(unsigned init);
+  void transtep_reply();
+  void transtep_gc_reply();
 
   char* var_names_buf;
 
@@ -449,10 +451,15 @@ void SOCK::main_loop()
         break;
       case 102:
         transtep(arg0);
+        transtep_reply();
         break;
       case 103: untested();
         set_param();
         break;
+      case 104: itested();
+        transtep(arg0);
+        transtep_gc_reply();
+	break;
       default:
         ::error(bDANGER, "unknown opcode %i\n", opcode);
         throw Exception("unknown opcode");
@@ -676,9 +683,13 @@ void SOCK::verakons()
     ::error(bDANGER, "hot failed\n");
     throw e;
   }
-  if (!converged) { untested();
+  if (!converged) {
     ::error(bWARNING, "s_sock::verakons: solve did not converge\n");
-    error=1;
+    converged = solve_with_homotopy(itl,_trace);
+    if (!converged) {
+      ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
+      error=1;
+    }
   }
   ::status.accept.start();
   assert(_sim->_uic);
@@ -965,10 +976,6 @@ void SOCK::transtep(unsigned init)
   stream << ret;
   stream << dt;
 
-  for (unsigned i=1; i <= n_vars; i++) {
-    stream << _sim->_vdcstack.top()[i];
-  }
-  stream << SocketStream::eol;
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::tr_reject()
@@ -1031,6 +1038,33 @@ void SOCK::verakons_reply()
 //
 //  }
 
+}
+
+void SOCK::transtep_reply()
+{ untested();
+  for (unsigned i=1; i <= n_vars; i++) { itested();
+    stream << _sim->_vdcstack.top()[i];
+  }
+  stream << SocketStream::eol;
+}
+
+void SOCK::transtep_gc_reply()
+{ untested();
+  for (unsigned i=1; i <= n_vars; i++) { itested();
+    stream << _sim->_vdcstack.top()[i];
+  }
+
+  for (unsigned i=1; i <= n_vars; i++)
+  {
+    trace1("SOCK::transtep_gc_reply  dqdt", _sim->_i[i]);
+    stream << _sim->_i[i];
+  }
+
+  trace0("SOCK::transtep_gc_reply  ac_snap");
+  ac_snapshot(); // BUG: calls tr_begin
+  send_matrix();
+  assert(stream.bufsize() >= total);
+  stream << SocketStream::eol;
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::verainit_reply()
