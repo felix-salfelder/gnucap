@@ -178,7 +178,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /* contrl */ INTERFACE void	   initio(OMSTREAM&);
-//  void	   outreset();
+inline void	   outreset() {untested();IO::mstdout.outreset();}
 //  INTERFACE OMSTREAM*   outset(CS&,OMSTREAM*);
 /* findf */	       std::string findfile(const std::string&,const std::string&,int);
 /* xopen */	       void	   xclose(FILE**);
