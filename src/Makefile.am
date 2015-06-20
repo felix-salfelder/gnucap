@@ -46,9 +46,6 @@ d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
 d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
 d_rcd.cc d_bti.cc  d_branchvs.cc d_hci.cc
 
-#d_vcvs2.cc 
-
-
 RAW_HDRS=
 lib_LTLIBRARIES=
 
@@ -153,12 +150,6 @@ m_matrix_example_SOURCES = m_matrix_example.cc # io.cc io_error.cc
 m_matrix_example_CPPFLAGS = $(AM_CPPFLAGS)
 
 
-# gibsnich
-# LDFLAGS += FOOOO
-# tutnix
-# LDADD = FOOOO
-
-
 SRCS1= 
 SRCS2= ${RAW_SRCS} 
 #${RAW_HDRS}
@@ -200,17 +191,6 @@ libgnucap_la_SOURCES = ${SRCS1} ${MODELSRCS} ${SRCS2}
 #libgnucap_la_CFLAGS = $(AM_CFLAGS)
 
 #else
-
-
-# kills dispatcher (FIXME?!)
-# gnucap_LDFLAGS = -all-static
-#
-# use ./configure --enable-static instead
-# gnucap_LDFLAGS = -static
-
-#ifdef static_binaries
-#gnucap_LDFLAGS = -static-libtool-libs 
-#endif
 
 
 endif
