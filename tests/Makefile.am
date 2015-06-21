@@ -503,6 +503,9 @@ CKT_TESTS = \
 
 XFAIL_TESTS = list.1.sh
 
+# recheck
+XFAIL_TESTS += lang_verilog.3.sh
+
 # typename issue, some other bugs
 XFAIL_TESTS += lang_spectre.2.sh
 
