@@ -80,13 +80,13 @@ private:
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
 public:
- static PROBELIST alarm[sCOUNT]; // list of alarm probes
- static PROBELIST verify[sCOUNT]; // list of alarm probes
- static PROBELIST plot[sCOUNT];  // list of plot probes
- static PROBELIST print[sCOUNT]; // list of print probes
- static PROBELIST store[sCOUNT]; // list of probes to store for postproc
- static PROBELIST expr[sCOUNT]; // list of probes to store for postproc
- static void purge(CKT_BASE*);
+ PROBELIST alarm[sCOUNT]; // list of alarm probes
+ PROBELIST verify[sCOUNT]; // list of alarm probes
+ PROBELIST plot[sCOUNT];  // list of plot probes
+ PROBELIST print[sCOUNT]; // list of print probes
+ PROBELIST store[sCOUNT]; // list of probes to store for postproc
+ PROBELIST expr[sCOUNT]; // list of probes to store for postproc
+ void purge(CKT_BASE*);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
