@@ -97,7 +97,7 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstop  = arg2;
 	_tstep  = arg1;
       }
-    }else{untested();
+    }else{
       assert(arg1.has_hard_value());
       arg1.e_val(0.,_scope);
       if (arg1 > _sim->last_time()) {

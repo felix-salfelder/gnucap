@@ -1041,8 +1041,8 @@ void SOCK::verakons_reply()
 }
 
 void SOCK::transtep_reply()
-{ untested();
-  for (unsigned i=1; i <= n_vars; i++) { itested();
+{
+  for (unsigned i=1; i <= n_vars; i++) {
     stream << _sim->_vdcstack.top()[i];
   }
   stream << SocketStream::eol;
