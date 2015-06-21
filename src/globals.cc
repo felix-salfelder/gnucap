@@ -55,14 +55,6 @@ DISPATCHER<PROBELIST> probe_dispatcher;
 CARD_LIST CARD_LIST::card_list;	// root circuit 
 ADP_LIST ADP_LIST::adp_list;	// age parms. obsolete?
 ADP_NODE_LIST ADP_NODE_LIST::adp_node_list;	// age parms.
-PROBELIST PROBE_LISTS::alarm[sCOUNT]; /* list of alarm points */
-PROBELIST PROBE_LISTS::plot[sCOUNT];  /* list of plot points */
-PROBELIST PROBE_LISTS::print[sCOUNT]; /* list of print points */
-PROBELIST PROBE_LISTS::store[sCOUNT]; /* list of pts to store for postproc */
-PROBELIST PROBE_LISTS::verify[sCOUNT]; /* list of things to verify */
-
-PROBELIST PROBE_LISTS::expr[sCOUNT]; /* stupid hack. working around "PROBE
-													 parser is part of PROBELIST" */
 
 // the rest of this should not be here, is residue of old stuff
 STATUS status;

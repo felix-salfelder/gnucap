@@ -384,23 +384,25 @@ MATH_OP strtotype(std::string s)
 /* add_expr add things to list
  */
 PROBE* PROBELIST::add_expr(const std::string& , 
-			     const MATH_OP type,
-			     const CARD_LIST* scope,
-                             CS& cmd, PROBELIST& )
+			     const MATH_OP, // type,
+			     const CARD_LIST*, // scope,
+                             CS&, PROBELIST& )
 {
-  untested();
+  incomplete(); // obsolete
+  return NULL;
+#if 0
   assert(scope); USE(scope); // ?
   trace2( "PROBELIST::add_expr ", cmd.cursor(), cmd.tail() );
   //trace0(( std::string("PROBELIST::add_expr ") + cmd.fullstring()).c_str() );
   //trace0(( std::string("PROBELIST::add_expr arg0 ") + cmd.cursor()).c_str() );
 
-  PROBE* arg0 = PROBE_LISTS::expr[CKT_BASE::_sim->_mode].add_list(cmd);
+  PROBE* arg0 = _probe_lists->expr[CKT_BASE::_sim->_mode].add_list(cmd);
   trace2( "PROBELIST::add_expr added", typetochar(type), arg0->label()  );
 
   int komma = cmd.skip1b(',');		/* device, node, etc. */
   assert (komma); USE(komma); incomplete(); // throw exception
 
-  PROBE* arg1 = PROBE_LISTS::expr[CKT_BASE::_sim->_mode].add_list(cmd);
+  PROBE* arg1 = _probe_lists->expr[CKT_BASE::_sim->_mode].add_list(cmd);
   trace2( "PROBELIST::add_expr added1", typetochar(type), arg1->label()  );
 
   MATH_PROBE* ret = new MATH_PROBE(type);
@@ -412,10 +414,11 @@ PROBE* PROBELIST::add_expr(const std::string& ,
 
   // hack. better put probes to expr[mode] and have expressions with pointers
   // to those probes...
-//  PROBE_LISTS::expr[CKT_BASE::_sim->_mode].clear();
+//  _probe_lists->expr[CKT_BASE::_sim->_mode].clear();
 
 
   return ret;
+#endif
 }
 /*--------------------------------------------------------------------------*/
 /* add_branches: add net elements to probe list

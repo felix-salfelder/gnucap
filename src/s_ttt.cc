@@ -818,7 +818,7 @@ void TTT::probeexpand()
 {
 	trace0("TTT::probeexpand");
 	_sim->_mode = s_TRAN; // BUG: use phase.
-	PROBELIST* transtore = &PROBE_LISTS::store[s_TRAN];
+	PROBELIST* transtore = &_probe_lists->store[s_TRAN];
 
 	// append prior prints to store (aligned)
 	for (PROBELIST::const_iterator p=printlist().begin();
@@ -868,7 +868,7 @@ void TTT::allocate()
 	trace1("TTT::allocate allocating probes ", probes);
 	_tt_store = new double[probes]; // shadows the .print tt probes
 
-	PROBELIST* transtore = &PROBE_LISTS::store[s_TRAN];
+	PROBELIST* transtore = &_probe_lists->store[s_TRAN];
 
 	for (PROBELIST::const_iterator p=transtore->begin();
 			p!=transtore->end(); ++p) {
@@ -888,7 +888,7 @@ void TTT::allocate()
 		delete[] _wavep;
 	}else{
 	}
-	_wavep = new WAVE*[PROBE_LISTS::store[s_TRAN].size()];
+	_wavep = new WAVE*[_probe_lists->store[s_TRAN].size()];
 
 	unsigned ii = 0;
 	for (PROBELIST::const_iterator
@@ -901,7 +901,7 @@ void TTT::allocate()
 	}
 	_sim->set_command_tt();
 
-	trace1("TTT::allocate allocated transtore waves", PROBE_LISTS::store[s_TRAN].size());
+	trace1("TTT::allocate allocated transtore waves", _probe_lists->store[s_TRAN].size());
 }
 /*--------------------------------------------------------------------------*/
 /* unallocate:  unallocate space for tt
@@ -917,7 +917,7 @@ void TTT::finish()
 	delete[] _tt_store;
 	_tt_store = NULL;
 
-	PROBE_LISTS::store[s_TRAN].clear();
+	_probe_lists->store[s_TRAN].clear();
 	//FIXME: delete waves;
 
 	//  if (_fdata_tt) { untested();
@@ -933,7 +933,7 @@ void TTT::finish()
 	_sim->_lu.unallocate();
 	_sim->_aa.unallocate();
 
-	PROBELIST* transtore = &PROBE_LISTS::store[s_TRAN];
+	PROBELIST* transtore = &_probe_lists->store[s_TRAN];
 
 	transtore->clear();
 	// insert previous store probes
@@ -1194,7 +1194,7 @@ void TTT::head_tt(double start, double stop, const std::string& col1)
 {
 	trace2("TTT::head_tt", start, stop);
 	assert(_sim->_mode==s_TTT);
-	//PROBELIST* transtore = &PROBE_LISTS::store[s_TRAN];
+	//PROBELIST* transtore = &_probe_lists->store[s_TRAN];
 
 	print_tr_probe_number = printlist().size();
 	{

@@ -34,20 +34,20 @@
  */
 const PROBELIST& SIM::alarmlist()const
 {
-  return PROBE_LISTS::alarm[_sim->_mode];
+  return _probe_lists->alarm[_sim->_mode];
 }
 const PROBELIST& SIM::plotlist()const
 {
-  return PROBE_LISTS::plot[_sim->_mode];
+  return _probe_lists->plot[_sim->_mode];
 }
 const PROBELIST& SIM::printlist()const
 {
-  trace2("SIM::printlist", _sim->_mode, PROBE_LISTS::print[_sim->_mode].size() );
-  return PROBE_LISTS::print[_sim->_mode];
+  trace2("SIM::printlist", _sim->_mode, _probe_lists->print[_sim->_mode].size() );
+  return _probe_lists->print[_sim->_mode];
 }
 const PROBELIST& SIM::storelist()const
 {
-  return PROBE_LISTS::store[_sim->_mode];
+  return _probe_lists->store[_sim->_mode];
 }
 /*--------------------------------------------------------------------------*/
 void SIM::expect_results(double t){
