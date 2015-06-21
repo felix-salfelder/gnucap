@@ -973,3 +973,6 @@ saveload.sim \
 sweep.sim \
 tt_inv.gc \
 tw_trace.gc
+
+$(REF)/%.out:
+	touch $@
