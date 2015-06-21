@@ -1,11 +1,12 @@
-spice
-
-R1 vbg2 0 100k
-V1 vbg2 0 7
-
-.list
-.nodelist
-
-.print tran v(nodes) i(v1) R(r1) v(r1) i(r1)
-.tran 0 1 0.1
-.end
+'
+spectre
+v1 (1 0) vsource dc=2
+v2 (0 2) vsource dc=5
+v3 (3 4) vsource dc=3
+v4 (4 0) vsource dc=9
+- list
+- print op v(nodes)
+- op
+- end
+
+

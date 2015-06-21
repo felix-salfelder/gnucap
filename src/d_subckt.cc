@@ -198,7 +198,7 @@ void DEV_SUBCKT::expand()
   _params = model->subckt()->params(); // fake copy
   c->_params.set_try_again(&_params);
 
-  renew_subckt(model, this, scope(), &(c->_params));
+  renew_subckt(_parent, &(c->_params));
   assert(!c->_params.try_again() || c->_params.try_again() == &_params );
   _params.set_try_again(scope()->params());
 

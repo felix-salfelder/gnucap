@@ -87,56 +87,53 @@ SIM_DATA::SIM_DATA()
 /*--------------------------------------------------------------------------*/
 SIM_DATA::~SIM_DATA()
 { untested();
-  if (_nm) {untested();
+  if (_nm) {unreachable();
     delete [] _nm;
     _nm = NULL;
   }else{ untested();
   }
-  if (_i) {untested();
+  if (_i) {unreachable();
     delete [] _i;
     _i = NULL;
   }else{ untested();
   }
-  if (_v0) {untested();
+  if (_v0) {unreachable();
     delete [] _v0;
     _v0 = NULL;
   }else{ untested();
   }
-  if (_vt1) {untested();
+  if (_vt1) {unreachable();
     delete [] _vt1;
     _vt1 = NULL;
   }else{ untested();
   }
-  if (_ac) {untested();
+  if (_ac) {unreachable();
     delete [] _ac;
     _ac = NULL;
   }else{ untested();
   }
-  if (_nstat) {untested();
+  if (_nstat) {unreachable();
     delete [] _nstat;
     _nstat = NULL;
   }else{ untested();
   }
-  if (_vdcstack.size()) {untested();
+  if (_vdcstack.size()) {unreachable();
     delete [] _vdcstack.top();
     _vdcstack.pop();
     assert(_vdcstack.empty());
   }else{ untested();
   }
-  //assert(_eq.empty()); //BUG// should be empty here
+  //assert(_eq.empty()); //not empty means an analysis ended with an unhandled event
+			 // could be DC, could be tran with event time past the end
   assert(_loadq.empty());
   assert(_acceptq.empty());
   assert(_evalq1.empty());
   assert(_evalq2.empty());
   assert(_late_evalq.empty());
-  if (_evalq) { untested();
-    _evalq = NULL;
-  }else{untested();
-  }
-  if (_evalq_uc) { untested();
-    _evalq_uc = NULL;
-  }else{untested();
-  }
+  assert(_evalq);
+  assert(_evalq_uc);
+  _evalq = NULL;
+  _evalq_uc = NULL;
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::set_limit()
@@ -317,9 +314,8 @@ void SIM_DATA::map__nodes()
   trace2("SIM_DATA::map__nodes", _total_nodes, OPT::order);
   _nm = new unsigned[_total_nodes+1];
   ::status.order.reset().start();
-  switch (OPT::order) { untested();
-    default: untested();
-      error(bWARNING, "invalid order spec: %d\n", OPT::order);
+  switch (OPT::order) { //
+  default:       unreachable(); error(bWARNING, "invalid order spec: %d\n", OPT::order);
     case oAUTO:		       order_auto();    break;
     case oREVERSE:             order_reverse(); break;
     case oFORWARD:             order_forward(); break;
