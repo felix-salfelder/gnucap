@@ -128,8 +128,17 @@ public: // subckt
   void	  new_subckt(PARAM_LIST_MAP* p=NULL);
   void	  new_subckt(const CARD* model, PARAM_LIST* p);
   void	  renew_subckt(const CARD* model, PARAM_LIST* p);
-  //void     new_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
-  //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
+  void    new_subckt(const CARD* model, CARD* Owner, const CARD_LIST* Scope, PARAM_LIST* p){
+    USE(Scope); assert(Scope==scope());
+    USE(Owner); assert(Owner==this);
+    new_subckt(model, p);
+  }
+  void    renew_subckt(const CARD* model, CARD* Owner, const CARD_LIST* Scope, PARAM_LIST* p){
+    USE(Scope); assert(Scope==scope());
+    USE(Owner); assert(Owner==this);
+    renew_subckt(model, p);
+  }
+
   //--------------------------------------------------------------------
 public:	// type
   virtual std::string dev_type()const	{unreachable(); return "";}
