@@ -836,7 +836,7 @@ define testgen
 	@chmod +x $@
 endef
 
-$(CKT_TESTS): %.sh: $(REF)/%.ckt.out
+$(CKT_TESTS): %.sh: $(REF)/%.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
 $(GC_TESTS:%.sh=%.out): %.out: %.gc
@@ -882,8 +882,8 @@ CLEANFILES+= d_cccs.1.ckt c_lib.1.ckt bm_wrapper.so
 endif
 
 EXTRA_DIST = gnucap_run.sh \
-             $(CKT_TESTS:%.sh=%.ckt) $(CKT_TESTS:%.sh===out/%.ckt.out) \
-             $(LOGIC_TESTS:%.sh=%.ckt) $(LOGIC_TESTS:%.sh===out/%.ckt.out) \
+             $(CKT_TESTS:%.sh=%.ckt) $(CKT_TESTS:%.sh===out/%.ckt.ref) \
+             $(LOGIC_TESTS:%.sh=%.ckt) $(LOGIC_TESTS:%.sh===out/%.ckt.ref) \
              $(GC_TESTS:%.sh=%.gc) $(GC_TESTS:%.sh=%.ref) \
              c_attach.1.gc \
              bm_wrapper.cc \
@@ -973,6 +973,3 @@ saveload.sim \
 sweep.sim \
 tt_inv.gc \
 tw_trace.gc
-
-$(REF)/%.out:
-	touch $@
