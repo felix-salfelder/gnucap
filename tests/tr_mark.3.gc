@@ -1,0 +1,33 @@
+options debug
+
+spice
+
+.param iv=0.
+.param pv=1.
+.param delay=1m
+
+v1 nv 0 pulse iv=iv pv=pv rise=1m delay=delay ac 1
+r1 nv n1 .1
+rb nv nb .1
+cb 0 nb 4
+
+H1 0 p cb 1
+
+.print tran v(H1) i(cb)
+
+.tran 0 1 .1 trace=n basic
+
+.param delay=1.5
+.param iv=1
+.param pv=0
+
+.mark
+.tran 2 basic
+
+.param pv=-1
+
+.echo
+.tran 2 basic trace=n
+* .tran 2 basic trace=i > dbg.out
+
+.end
