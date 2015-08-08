@@ -116,7 +116,7 @@ bool DEV_CAPACITANCE::do_tr()
     _y[0].x = tr_input_limited();
     tr_eval();
   }else{
-    trace0("DEV_CAPACITANCE::do_tr, no tr_eval");
+    trace1("DEV_CAPACITANCE::do_tr, no tr_eval", tr_input());
     _y[0].x = tr_input(); // tr_involts();
     assert(_y[0].f1 == value());
     _y[0].f0 = _y[0].x * _y[0].f1;
@@ -234,6 +234,39 @@ bool DEV_VCCAP::do_tr()
   _m0.c1 = _i[0].f1;
   _m0.c0 = _i[0].f0 - _i[0].x * _i[0].f1;
   return converged();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CAPACITANCE::tr_restore()
+{ untested();
+
+  if(_sim->_time0 < _time[0]){ untested();
+    // recover from _freezetime ...
+
+    _y[0].x = tr_input();
+//    _i[0].x = tr_input();
+//    _i[0].f0 = 0.; // amps
+//    _i[0].f1 = 1./OPT::shortckt; // mhos
+//    _i[1] = _i[0];
+    if (using_tr_eval()) {
+      assert(_y[0].f1 == value());
+    }else{incomplete();
+    }
+    // BUG: compute _y[0].f1 from OP?
+    _y[0].f0 = _y[0].x * _y[0].f1; // charge
+    _y[1] = _y[0];
+    _y1 = _y[0];
+    _method_a = mINVALID;
+    // _i[0] = differentiate(_y, _i, _time, _method_a);
+    double G = 1./OPT::shortckt;
+    _i[0] = FPOLY1( CPOLY1( 0., -_y[0].x * G,         G  ) ); 
+    _m0 = CPOLY1(_i[0]);
+    trace3("DEV_CAPACITANCE::tr_restore from freeze", _y[0], _i[0], _i[1]);
+    STORAGE::tr_restore();
+    _time[1] = 0.; /// hmm hack.
+  }else{ untested();
+    STORAGE::tr_restore();
+  }
+
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

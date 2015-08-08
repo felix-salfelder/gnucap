@@ -25,6 +25,7 @@ protected: // override virtual
   CARD*	   clone()const		{return new DEV_CAPACITANCE(*this);}
   void	   tr_iwant_matrix()	{tr_iwant_matrix_passive();}
   bool	   do_tr();
+  void	   tr_restore();
   void	   tr_accept(); // uic. possibly a hack
   void	   tr_load()		{tr_load_passive();}
   void	   tr_unload()		{tr_unload_passive();}
@@ -38,7 +39,7 @@ public: //tt
   void tt_advance();
   void tt_regress();
   void tr_stress_last();
-  void tr_restore();
+//  void tr_restore();
   void do_tt();
 private: // another hack -> storag
   double _ttstate[4];

@@ -706,6 +706,8 @@ GC_TESTS = \
     tr_cont.3.sh \
     tr_cont.4.sh \
     tr_cont_dc.sh \
+    tr_mark.2.sh \
+    tr_mark.1.sh \
     tr_mark.sh \
     tr_nothing.sh \
     tt_twice.sh \

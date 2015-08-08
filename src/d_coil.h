@@ -50,6 +50,7 @@ public: // override virtual
   void     expand();
   void	   tr_iwant_matrix();
   void     tr_begin();
+  void     tr_restore();
   void tr_accept();
   bool	   do_tr();
   void	   tr_load();
