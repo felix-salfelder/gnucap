@@ -237,9 +237,9 @@ bool DEV_VCCAP::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CAPACITANCE::tr_restore()
-{ untested();
+{
 
-  if(_sim->_time0 < _time[0]){ untested();
+  if(_sim->_time0 < _time[0]){
     // recover from _freezetime ...
 
     _y[0].x = tr_input();
@@ -263,7 +263,7 @@ void DEV_CAPACITANCE::tr_restore()
     trace3("DEV_CAPACITANCE::tr_restore from freeze", _y[0], _i[0], _i[1]);
     STORAGE::tr_restore();
     _time[1] = 0.; /// hmm hack.
-  }else{ untested();
+  }else{
     STORAGE::tr_restore();
   }
 

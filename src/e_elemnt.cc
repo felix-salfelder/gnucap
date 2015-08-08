@@ -633,9 +633,9 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
   trace1("ELEMENT::tr_review_trunc_error", error_deriv);
   trace2("ELEMENT::tr_review_trunc_error", _time[0], error_deriv);
   // if (_time[0] <= _sim->_time0)
-  if (_sim->analysis_is_tran_restore()) { untested();
+  if (_sim->analysis_is_tran_restore()) {
     timestep = NEVER;
-  }else if (_time[0] == 0.) { untested();
+  }else if (_time[0] == 0.) {
     // DC, I know nothing
     timestep = NEVER;
   }else if (error_deriv - 1 - OPT::initsc < 0 || _time[error_deriv - 1 - OPT::initsc] <= 0 ) {

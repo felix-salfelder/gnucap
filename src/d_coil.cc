@@ -301,9 +301,9 @@ void DEV_INDUCTANCE::tr_begin()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_INDUCTANCE::tr_restore()
-{ untested();
+{
 
-  if(_sim->_time0 >= _time[0]){ untested();
+  if(_sim->_time0 >= _time[0]){
     // nothing.
     STORAGE::tr_restore();
   }else if(!_c_model){ incomplete();
