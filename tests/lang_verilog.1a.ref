@@ -1,3 +1,4 @@
+//* a comment 
 // testing spice bm access through wrapper
 
 vsource_sin #(.offset(NA( 0.)),.amplitude(1),.frequency(NA( NA)),.samples(12)) mysin (.p(1),.n(0));

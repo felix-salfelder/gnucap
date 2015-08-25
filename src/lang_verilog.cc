@@ -456,7 +456,7 @@ void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 {
   assert(x);
-  if ((x->comment().compare(0, 2, "//")) != 0) {untested();
+  if ((x->comment().compare(0, 2, "//")) != 0) {
     o << "//";
   }else{
   }
