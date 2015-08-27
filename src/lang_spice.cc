@@ -94,7 +94,7 @@ DISPATCHER<LANGUAGE>::INSTALL
 	ds(&language_dispatcher, lang_spice.name(), &lang_spice);
 /*--------------------------------------------------------------------------*/
 std::string LANG_SPICE::getlines(FILE *fileptr) const
-{
+{ untested();
   assert(fileptr);
   const int buffer_size = BIGBUFLEN;
   std::string s;

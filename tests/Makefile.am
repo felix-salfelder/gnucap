@@ -644,14 +644,17 @@ GC_TESTS = \
     lang_verilog.1a.sh \
     lang_verilog.1.sh \
     lang_verilog.2a.sh \
+    lang_verilog.2b.sh \
     lang_verilog.2.sh \
     lang_verilog.3.sh \
+    lang_verilog.comm.sh \
     lang_spectre.1.sh \
     lang_spectre.1a.sh \
     lang_spectre.2.sh \
     lang_spice.1.sh \
     lang_spice.1a.sh \
     lang_spice.1b.sh \
+    lang_spice.comm.sh \
     LogicAND.sh \
     lring.sh \
     mark_dc_cont.sh \

@@ -32,6 +32,5 @@ dumping bar:0
 
 error.
 wave build
-
-           ^ ? need name
+          ^ ? need name
 bar (1), *baz (0), foo (1), foo2 (4), foo3 (4)
