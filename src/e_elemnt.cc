@@ -180,11 +180,11 @@ void ELEMENT::tr_begin()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_restore()
 {
-  if (_time[0] > _sim->_time0) { itested();
+  if (_time[0] > _sim->_time0) {
     // _freezetime
     incomplete();
     //BUG// wrong values in _time[]
-    for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {itested();
+    for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {
       _time[i] = _time[i+1];
       _y[i] = _y[i+1];
     }
@@ -197,7 +197,7 @@ void ELEMENT::tr_restore()
   }
 
   //assert(_time[0] == _sim->_time0);
-  if (_time[0] != _sim->_time0) { itested();
+  if (_time[0] != _sim->_time0) {
     error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
         _time[0], _sim->_time0);
 
@@ -205,7 +205,7 @@ void ELEMENT::tr_restore()
     for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
       _time[i] = _sim->_time0;
     }
-    for (int i=1  ; i<OPT::_keep_time_steps-1; ++i) {itested();
+    for (int i=1  ; i<OPT::_keep_time_steps-1; ++i) {
       _y[i] = _y[0];
     }
     //BUG// happens when continuing after a ^c,

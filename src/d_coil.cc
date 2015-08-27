@@ -309,7 +309,7 @@ void DEV_INDUCTANCE::tr_restore()
   }else if(!_c_model){ incomplete();
     // impossible?
     STORAGE::tr_restore();
-  }else{ untested(); // _sim->_time0 < _time[0]
+  }else{ // _sim->_time0 < _time[0]
     // recover from _freezetime ...
 
     _y[0].x = tr_input();

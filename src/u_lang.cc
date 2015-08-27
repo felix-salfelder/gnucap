@@ -37,7 +37,7 @@ LANGUAGE::~LANGUAGE()
 }
 /*--------------------------------------------------------------------------*/
 std::string LANGUAGE::getlines(FILE *fileptr) const
-{ untested();
+{
   // probably missing getlines in your current lang.
   assert(fileptr);
   const int buffer_size = BIGBUFLEN;
@@ -47,12 +47,12 @@ std::string LANGUAGE::getlines(FILE *fileptr) const
 
   char* line = fgets(buffer, buffer_size, fileptr);
 
-  if(line==NULL){ untested();
+  if(line==NULL){
     throw Exception_End_Of_Input("");
   }else if(line[buffer_size]!='\n'){ incomplete();
     // join lines? just truncate for now.
     line[buffer_size] = '\0'; // might be already.
-  }else{ untested();
+  }else{
     assert(strlen(line)>0);
     line[strlen(line)-1] = '\0';
   }
