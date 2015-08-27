@@ -1,9 +1,6 @@
 >>>>>*.include inv_amp_p.mod
-
 >>>>>param vdd=5
-
 >>>>>spice
-
 >>>>>.MODEL cmosn NMOS (  LEVEL   = 49  ALPHA0 = 1e-7 BETA0 = 1  H0 = 1e11  ) 
 >>>>>.print tw  dvth(MN1)  hci_tr(MN1.HCI)  stress(MN1.HCI)  v(nout)  von(MN1)  v(nin)  hidden(0)  ttorder(MN1.HCI) 
 VDD: vdd is not a .model++++

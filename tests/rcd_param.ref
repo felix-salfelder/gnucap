@@ -1,6 +1,5 @@
 .model my_rcd rcd ( tnom=NA( 27.) anneal=NA(1) rem=NA( 1.Meg) Re=NA( 1.) Rc=NA( 1.))
 *// swapped
-
 z3 ( nin 0 )  my_rcd  weight=100 rc1=-3 rc0=12 re1=12 re0=12 mu=NA( 10.u)
 z2 ( nin 0 )  my_rcd  weight=10 rc1=-s*3 rc0=s*12 re1=12 re0=12 mu=NA( 10.u)
 #Time       v(nin)     P(z3)      P(z2)      tau(z3)    tau(z2)   
