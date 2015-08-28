@@ -745,8 +745,14 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
         unsigned k = CKT_BASE::_sim->_total_nodes;
         NODE_MAP* Map = nodes();
         CKT_NODE* n = Map->new_node(label, this); // should increase counter
-        map[i] = CKT_BASE::_sim->newnode_subckt(); // retrieve new global number
-        n->set_user_number(map[i]);
+
+        if (i==labelnumber){
+        }else{ itested();
+          // gnucap-geda gets here.
+        }
+        unsigned newnode = CKT_BASE::_sim->newnode_subckt();
+        map[labelnumber] = newnode;
+        n->set_user_number(newnode);
 
         assert (k+1 ==  CKT_BASE::_sim->_total_nodes); USE(k);
         labelnumber++;
