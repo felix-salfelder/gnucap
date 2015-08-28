@@ -280,9 +280,8 @@ inline void ELEMENT::ac_load_shunt()
 inline void ELEMENT::tr_load_source()
 {
 #if !defined(NDEBUG)
-  if (_loaditer == _sim->iteration_tag()){
-    // this is a HACK
-    error(bDANGER, "ELEMENT::tr_load_source. double load %s %i\n", long_label().c_str(), _loaditer);
+  if (_loaditer == _sim->iteration_tag()){ unreachable();
+    error(bDEBUG, "ELEMENT::tr_load_source. double load %s %i\n", long_label().c_str(), _loaditer);
   }
   _loaditer = _sim->iteration_tag();
 #endif

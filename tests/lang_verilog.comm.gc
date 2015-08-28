@@ -1,0 +1,7 @@
+verilog
+// comment
+// anothercomment
+list
+spice
+.list
+.end

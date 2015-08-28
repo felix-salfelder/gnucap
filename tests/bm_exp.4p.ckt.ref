@@ -56,7 +56,7 @@ parameter p has no value
 ".param p=50n "
 ".tran  trace all "
 #Time       v(1)       next(v1)   event(v1)  control(0)
- 100.n      0.11503    104.99n    102.5n     1.        
+ 100.n      0.11503    112.5n     102.5n     1.        
  101.n      0.10619    103.57n    102.5n     9.        
  102.5n     0.094181   104.44n    125.n      7.        
  104.n      0.19661    105.68n    125.n      6.        

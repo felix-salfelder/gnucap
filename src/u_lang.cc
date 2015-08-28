@@ -43,11 +43,20 @@ std::string LANGUAGE::getlines(FILE *fileptr) const
   const int buffer_size = BIGBUFLEN;
 
   char buffer[buffer_size+1];
-  char* got_something = fgets(buffer, buffer_size, fileptr);
+  buffer[buffer_size] = '\n';
 
-  if (got_something)
-	  return std::string(got_something);
-  throw Exception_End_Of_Input("");
+  char* line = fgets(buffer, buffer_size, fileptr);
+
+  if(line==NULL){
+    throw Exception_End_Of_Input("");
+  }else if(line[buffer_size]!='\n'){ incomplete();
+    // join lines? just truncate for now.
+    line[buffer_size] = '\0'; // might be already.
+  }else{
+    assert(strlen(line)>0);
+    line[strlen(line)-1] = '\0';
+  }
+  return std::string(line);
 }
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::parse_top_item(CS& cmd, CARD_LIST* Scope)

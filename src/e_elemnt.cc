@@ -180,11 +180,11 @@ void ELEMENT::tr_begin()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_restore()
 {
-  if (_time[0] > _sim->_time0) { itested();
+  if (_time[0] > _sim->_time0) {
     // _freezetime
     incomplete();
     //BUG// wrong values in _time[]
-    for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {itested();
+    for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {
       _time[i] = _time[i+1];
       _y[i] = _y[i+1];
     }
@@ -197,12 +197,16 @@ void ELEMENT::tr_restore()
   }
 
   //assert(_time[0] == _sim->_time0);
-  if (_time[0] != _sim->_time0) { itested();
+  if (_time[0] != _sim->_time0) {
     error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
         _time[0], _sim->_time0);
 
+    _trsteporder = -1;
     for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
       _time[i] = _sim->_time0;
+    }
+    for (int i=1  ; i<OPT::_keep_time_steps-1; ++i) {
+      _y[i] = _y[0];
     }
     //BUG// happens when continuing after a ^c,
     // when the last step was not printed
@@ -212,7 +216,7 @@ void ELEMENT::tr_restore()
   }
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
-    assert(_time[i] < _time[i-1] || _time[i] == 0.);
+    assert(_time[i] < _time[i-1] || _time[i] == 0. || _time[i] == _sim->_time0);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -235,7 +239,7 @@ void ELEMENT::tr_advance()
   assert(_time[0] < _sim->_time0); // moving forward
   
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
-    assert(_time[i] < _time[i-1] || _time[i] == 0.);
+    assert(_time[i] < _time[i-1] || _time[i] == 0. || _time[i] < _sim->_time0);
     _time[i] = _time[i-1];
     _y[i] = _y[i-1];
   }
@@ -266,7 +270,7 @@ void ELEMENT::tr_regress()
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
     trace1("i", i);
-    assert(_time[i] < _time[i-1] || _time[i] == 0.);
+    assert(_time[i] < _time[i-1] || _time[i] == 0. || _time[i] == _sim->_time0);
   }
   _time[0] = _sim->_time0;
 
@@ -515,12 +519,9 @@ double ELEMENT::tr_probe_num(const std::string& x)const
     return _y1.x-_y[0].x;
   }else if (Umatch(x, "res ")) {
     return _y1.f0-_y[0].f0;
-  }else if (Umatch(x, "conv ")) {
-    // assert(converged()==conv_check());
-    if (conv_check()) { 
-      return 10; } 
-    //  fprintf(stderr,"hi\n");
-    return 1993;
+  }else if (Umatch(x, "conv{erged} ")) {
+    // assert(converged()==conv_check()); no.
+    return converged() + 10*conv_check();
   }else if (Umatch(x, "nv ")) {
     return value();
   }else if (Umatch(x, "eiv ")) {untested();
@@ -631,7 +632,10 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
   double timestep;
   trace1("ELEMENT::tr_review_trunc_error", error_deriv);
   trace2("ELEMENT::tr_review_trunc_error", _time[0], error_deriv);
-  if (_time[0] <= 0.) {
+  // if (_time[0] <= _sim->_time0)
+  if (_sim->analysis_is_tran_restore()) {
+    timestep = NEVER;
+  }else if (_time[0] == 0.) {
     // DC, I know nothing
     timestep = NEVER;
   }else if (error_deriv - 1 - OPT::initsc < 0 || _time[error_deriv - 1 - OPT::initsc] <= 0 ) {

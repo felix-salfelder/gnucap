@@ -1,4 +1,6 @@
-verilog
+spice
+* a comment
+.verilog
 // testing spice bm access through wrapper
 
 load bm_wrapper.cc
