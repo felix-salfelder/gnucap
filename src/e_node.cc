@@ -803,7 +803,7 @@ node_t& node_t::map(){
     assert(_nnn);
     const NODE* n = prechecked_cast<const NODE*>(_nnn);
     assert(n); USE(n);
-    _m = to_internal(e_()); // hmm, better patch user_number?
+    _m = to_internal(t_());
     trace2("node_t::map", t_(), e_());
   }else{
     assert(_m == INVALID_NODE);
@@ -820,7 +820,6 @@ void node_t::map_subckt_node(uint_t* m, const CARD* owner)
   if (node_is_valid(m[e_()])) {
     _ttt = m[e_()];
     assert(_nnn);
-    if(_nnn)_nnn->set_user_number(_ttt); // hmmm
   }else{untested();
     throw Exception(owner->long_label() + ": need more nodes");
   }
