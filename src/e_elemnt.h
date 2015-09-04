@@ -24,6 +24,7 @@
 #ifndef E_ELEMNT_H
 #define E_ELEMNT_H
 #define HAVE_ELEMENT_ORDER
+#define HAVE_ELEMENT_PARAM
 #include "e_node.h"
 #include "m_cpoly.h"
 #include "l_denoise.h"
