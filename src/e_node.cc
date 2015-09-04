@@ -803,7 +803,7 @@ node_t& node_t::map(){
     assert(_nnn);
     const NODE* n = prechecked_cast<const NODE*>(_nnn);
     assert(n); USE(n);
-    _m = to_internal(e_()); // hmm, better patch user_number?
+    _m = to_internal(t_());
     trace2("node_t::map", t_(), e_());
   }else{
     assert(_m == INVALID_NODE);
