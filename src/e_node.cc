@@ -820,7 +820,6 @@ void node_t::map_subckt_node(uint_t* m, const CARD* owner)
   if (node_is_valid(m[e_()])) {
     _ttt = m[e_()];
     assert(_nnn);
-    if(_nnn)_nnn->set_user_number(_ttt); // hmmm
   }else{untested();
     throw Exception(owner->long_label() + ": need more nodes");
   }
