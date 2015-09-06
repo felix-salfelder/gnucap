@@ -69,7 +69,6 @@ c_help.cc
 S_SRCS = \
 s_ac.cc s_dc.cc s_fo.cc s_sens.cc \
 s_ddc.cc s_ttt.cc s_tt_set.cc \
-s_sock.cc \
 s_tr.cc s_tr_set.cc s_tr_swp.cc
 
 # netlist languages
