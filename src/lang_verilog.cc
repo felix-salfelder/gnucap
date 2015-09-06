@@ -179,7 +179,7 @@ static void parse_ports(CS& cmd, COMPONENT* x)
       }
       if (index < x->min_nodes()) {
 	cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
-	for (int iii = index;  iii < x->min_nodes();  ++iii) {
+	for (unsigned iii = index;  iii < x->min_nodes();  ++iii) {
 	  x->set_port_to_ground(iii);
 	}
       }else{
