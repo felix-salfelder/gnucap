@@ -266,7 +266,7 @@ public:
   Base* add(const String*)const		{	     return NULL;}
   Base* multiply(const String*)const	{untested(); return NULL;}
   Base* subtract(const String*)const	{untested(); return NULL;}
-  Base* r_subtract(const String*)const	{untested(); return NULL;}
+  Base* r_subtract(const String*)const	{itested(); return NULL;}
   Base* divide(const String*)const	{untested(); return NULL;}
   Base* r_divide(const String*)const	{untested(); return NULL;}
 

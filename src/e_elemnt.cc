@@ -800,13 +800,13 @@ void ELEMENT::set_param_by_name(string Name, string Value)
     COMMON_COMPONENT* c = mutable_common()->clone();
     try{
       c->set_param_by_name(Name,Value);
-    }catch(Exception_No_Match){ untested();
-      if(!isvalue){ untested();
+    }catch(Exception_No_Match){ itested();
+      if(!isvalue){ itested();
 	delete c;
 	throw;
       }
     }
-    if(isvalue){ untested();
+    if(isvalue){ itested();
       c->set_modelname(Value);
     }
     attach_common(c);
