@@ -1050,7 +1050,7 @@ void SOCK::transtep_reply()
 }
 
 void SOCK::transtep_gc_reply()
-{ untested();
+{ itested();
   for (unsigned i=1; i <= n_vars; i++) { itested();
     stream << _sim->_vdcstack.top()[i];
   }
