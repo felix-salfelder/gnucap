@@ -20,6 +20,7 @@
  *------------------------------------------------------------------
  * a remote control socket. used by verification tools
  */
+#include "globals.h"
 #include "u_status.h"
 #include <unistd.h>
 #include "u_prblst.h"
