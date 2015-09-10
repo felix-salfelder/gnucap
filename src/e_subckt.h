@@ -31,9 +31,9 @@ class CARD;
 class BASE_SUBCKT : public COMPONENT {
 protected:
   explicit BASE_SUBCKT()
-    :COMPONENT() { trace0("BASE_SUBCKT");}
+    :COMPONENT(), _frozen(false) { trace0("BASE_SUBCKT");}
   explicit BASE_SUBCKT(const BASE_SUBCKT& p)
-    :COMPONENT(p) {}
+    :COMPONENT(p), _frozen(false) {}
   ~BASE_SUBCKT() {}
 
   virtual  void tr_save_amps(int n){
@@ -54,10 +54,13 @@ protected: // override virtual
   //int	  num_nodes()const		//COMPONENT/null
   //int	  min_nodes()const		//COMPONENT/null
   uint_t     matrix_nodes()const	{return 0;}
+public:
   uint_t     net_nodes()const		{return _net_nodes;}
+protected:
   CARD*   clone()const			{unreachable(); return NULL;}
   //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
   //void  expand()			//COMPONENT
+  void  expand_last() { _frozen=true; }
   //void  precalc_last()	{assert(subckt()); subckt()->precalc();}
   //void  map_nodes();
   void	  tr_begin()	{assert(subckt()); subckt()->tr_begin();}
@@ -100,6 +103,10 @@ protected: // override virtual
     _time_by = subckt()->tt_review();
     return  _time_by;
   }
+private:
+  bool _frozen;
+public:
+  bool frozen()const {return _frozen;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

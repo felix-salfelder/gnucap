@@ -127,10 +127,10 @@ private: // override virtual
   bool		print_type_in_spice()const {return true;}
   std::string   value_name()const	{return "#";}
   // std::string   dev_type()const
-  int		max_nodes()const	{return PORTS_PER_SUBCKT;}
-  int		min_nodes()const	{return 0;}
-  int		matrix_nodes()const	{return 0;}
-  int		net_nodes()const	{return _net_nodes;}
+  uint_t	max_nodes()const	{return PORTS_PER_SUBCKT;}
+  uint_t	min_nodes()const	{return 0;}
+  uint_t	matrix_nodes()const	{return 0;}
+  uint_t	net_nodes()const;
 //  CARD*		clone_instance()const;
   void		precalc_first();
   bool		makes_own_scope()const  {itested(); return false;}
@@ -141,7 +141,7 @@ private:
   double	tr_probe_num(const std::string&)const;
   int param_count_dont_print()const {return common()->COMMON_COMPONENT::param_count();}
 
-  std::string port_name(int i)const {itested();
+  std::string port_name(uint_t i)const {itested();
     if (_parent) {itested();
       return _parent->port_value(i);
     }else{itested();
@@ -155,6 +155,7 @@ protected:
 private:
   node_t	_nodes[PORTS_PER_SUBCKT];
   static int	_count;
+  PARAM_LIST_COPY _params; // (a copy of the model params)
 };
 int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
@@ -170,10 +171,10 @@ public: // override virtual
   bool		print_type_in_spice()const {unreachable(); return false;}
   std::string   value_name()const	{incomplete(); return "";}
   std::string   dev_type()const		{untested(); return "";}
-  int		max_nodes()const	{return PORTS_PER_SUBCKT;}
-  int		min_nodes()const	{return 0;}
-  int		matrix_nodes()const	{untested();return 0;}
-  int		net_nodes()const	{return _net_nodes;}
+  uint_t 	max_nodes()const	{return PORTS_PER_SUBCKT;}
+  uint_t 	min_nodes()const	{return 0;}
+  uint_t 	matrix_nodes()const	{untested();return 0;}
+  uint_t 	net_nodes()const	{return _net_nodes;}
   CARD*		clone()const		{untested(); return new DEV_SUBCKT_PROTO(*this);}
   bool		is_device()const	{return false;}
   bool		makes_own_scope()const  {return true;}
@@ -197,7 +198,7 @@ private: // no-ops for prototype
   bool do_tr(){untested(); return true;}
   bool tr_needs_eval()const{untested(); return false;}
   void tr_queue_eval(){untested();}
-  std::string port_name(int)const {return "";}
+  std::string port_name(uint_t)const {return "";}
 public:
   static int	count()			{return _count;}
 
@@ -282,7 +283,7 @@ void DEV_SUBCKT::expand()
     assert(find_looking_out(c->modelname()) == _parent);
   }
 
-  
+  const BASE_SUBCKT* model = _parent;
   //assert(!c->_params._try_again);
   assert(model->subckt());
   assert(model->subckt()->params());

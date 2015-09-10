@@ -243,7 +243,7 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
     // not tested yet.
     // frozen = m->frozen();
   }
-  const MODEL_SUBCKT* s = dynamic_cast<const MODEL_SUBCKT*>(Model);
+  const BASE_SUBCKT* s = dynamic_cast<const BASE_SUBCKT*>(Model);
   if(s){
     frozen = s->frozen();
   }
