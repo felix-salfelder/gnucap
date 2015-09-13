@@ -190,21 +190,21 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
  * throws exception if can't find.
  */
 const CARD* CARD::find_looking_out(const std::string& name)const
-{
-  try {
+{ untested();
+  try { untested();
     return find_in_parent_scope(name);
-  }catch (Exception_Cant_Find&) {
-    if (owner()) {
+  }catch (Exception_Cant_Find&) { untested();
+    if (owner()) { untested();
       return owner()->find_looking_out(name);
-    }else if (makes_own_scope()) {
+    }else if (makes_own_scope()) { untested();
       // probably a subckt or "module"
       CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
-      if (i != CARD_LIST::card_list.end()) {
+      if (i != CARD_LIST::card_list.end()) { untested();
 	return *i;
-      }else{
+      }else{ untested();
 	throw;
       }
-    }else{
+    }else{ untested();
       throw;
     }
   }
@@ -222,10 +222,16 @@ void CARD::new_subckt(PARAM_LIST_MAP* p)
 }
 /*--------------------------------------------------------------------------*/
 void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
-{
-  trace2("CARD::new_subckt", long_label(), *Params);
+{ itested();
   delete _subckt;
-  _subckt = new CARD_LIST(Model, this, scope(), Params);
+  try{ itested();
+    _subckt = new CARD_LIST(Model, this, scope(), Params);
+  }catch(...){ itested();
+    // BUG?
+    // new CARD_LIST must not throw if it has been successful previously.
+    assert(!_subckt);
+    throw;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
@@ -237,7 +243,7 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
     // not tested yet.
     // frozen = m->frozen();
   }
-  const MODEL_SUBCKT* s = dynamic_cast<const MODEL_SUBCKT*>(Model);
+  const BASE_SUBCKT* s = dynamic_cast<const BASE_SUBCKT*>(Model);
   if(s){
     frozen = s->frozen();
   }
