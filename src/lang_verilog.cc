@@ -267,7 +267,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
 //BUG// strictly one device per line
 
 BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
-{ untested();
+{
   assert(x);
 
   // header
@@ -500,7 +500,7 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);
 /*--------------------------------------------------------------------------*/
 class CMD_MODULE : public CMD { //
   void do_it(CS& cmd, CARD_LIST* Scope)
-  { untested();
+  {
     CARD const* sckt = device_dispatcher["subckt"];
     assert(sckt);
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(sckt->clone());

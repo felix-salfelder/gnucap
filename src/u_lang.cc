@@ -185,8 +185,8 @@ CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
   // If you can think of a better way, tell me.
   // It must be in the LANGUAGE class, not CARD.
 
-  if (BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(c)) { untested();
-    if (c->is_device()){ untested();
+  if (BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(c)) {
+    if (c->is_device()){
       return parse_instance(cmd, s);
     }else{ untested();
       return parse_module(cmd, s);
@@ -217,10 +217,10 @@ void LANGUAGE::print_item(OMSTREAM& o, const CARD* c)
   assert(c);
   assert(dynamic_cast<const CARD*>(c));
 
-  if (const BASE_SUBCKT* s=dynamic_cast<const BASE_SUBCKT*>(c)) { untested();
-    if (s->is_device()){ untested();
+  if (const BASE_SUBCKT* s=dynamic_cast<const BASE_SUBCKT*>(c)) {
+    if (s->is_device()){
       print_instance(o, s);
-    }else{ untested();
+    }else{
       print_module(o, s);
     }
   }else if (dynamic_cast<const COMPONENT*>(c)) {

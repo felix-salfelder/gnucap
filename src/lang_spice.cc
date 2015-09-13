@@ -696,7 +696,7 @@ void LANG_SPICE_BASE::parse_module_body(CS& cmd, BASE_SUBCKT* x, CARD_LIST* Scop
 /*--------------------------------------------------------------------------*/
 COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
 {
-  try { untested();
+  try {
     assert(x);
     cmd.reset().umatch(ANTI_COMMENT);
     
@@ -977,7 +977,7 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, ".model", &p1);
 /*--------------------------------------------------------------------------*/
 class CMD_SUBCKT : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)
-  { untested();
+  {
     const CARD* s = device_dispatcher["subckt"];
     assert(s); // for now
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(s->clone());
