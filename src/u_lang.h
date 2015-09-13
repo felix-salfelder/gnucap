@@ -24,6 +24,8 @@
 #include "e_base.h"
 #include "u_opt.h"
 /*--------------------------------------------------------------------------*/
+#define MODEL_SUBCKT BASE_SUBCKT
+/*--------------------------------------------------------------------------*/
 class COMPONENT;
 class BASE_SUBCKT;
 class MODEL_CARD;
