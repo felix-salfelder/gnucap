@@ -141,8 +141,8 @@ private:
   double	tr_probe_num(const std::string&)const;
   int param_count_dont_print()const {return common()->COMMON_COMPONENT::param_count();}
 
-  std::string port_name(uint_t i)const {itested();
-    if (_parent) {itested();
+  std::string port_name(uint_t i)const {
+    if (_parent) {
       if (i<_parent->net_nodes()){
         return _parent->port_value(i);
       }else{

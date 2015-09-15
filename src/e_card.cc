@@ -222,11 +222,11 @@ void CARD::new_subckt(PARAM_LIST_MAP* p)
 }
 /*--------------------------------------------------------------------------*/
 void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
-{ itested();
+{
   delete _subckt;
-  try{ itested();
+  try{
     _subckt = new CARD_LIST(Model, this, scope(), Params);
-  }catch(...){ itested();
+  }catch(...){
     // BUG?
     // new CARD_LIST must not throw if it has been successful previously.
     assert(!_subckt);
