@@ -74,9 +74,9 @@ public:
         trace1( (" CMD_INCLUDE::do_it > " +file_name).c_str() , (OPT::language) );
 	OPT::language->parse_top_item(file, Scope);
       }
-    }catch (Exception_File_Open& e) { untested();
+    }catch (Exception_File_Open& e) { itested();
       cmd.warn(bDANGER, here, e.message() + '\n');
-    }catch (Exception_End_Of_Input& e) { untested();
+    }catch (Exception_End_Of_Input& e) { itested();
       // done
     }
     free(dirtmp);

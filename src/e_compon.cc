@@ -271,16 +271,16 @@ bool COMMON_COMPONENT::param_is_printable(int i)const
 std::string COMMON_COMPONENT::param_name(int i)const
 {
   switch (i) {
-  case 0:untested();  return "tnom";
-  case 1:untested();  return "dtemp";
-  case 2:untested();  return "temp";
+  case 0:itested();  return "tnom";
+  case 1:itested();  return "dtemp";
+  case 2:itested();  return "temp";
   case 3:  return "m";
   default:untested(); return "";
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_COMPONENT::param_name(int i, int j)const
-{untested();
+{itested();
   return (j==0) ? param_name(i) : "";
 }
 /*--------------------------------------------------------------------------*/
@@ -401,7 +401,6 @@ void COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 	}
       }
     }
-    untested();
     throw Exception_No_Match(Name);
   }
 }
@@ -461,7 +460,7 @@ COMPONENT::COMPONENT()
    _amps_new(0),
    _adp(0)
 {
-  trace0("COMPONENT::COMPONENT " + long_label() + ", " + dev_type() );
+  trace1("COMPONENT::COMPONENT", long_label());
   if (_sim) {
     _sim->uninit();
   } else {
@@ -697,7 +696,7 @@ void COMPONENT::map_nodes()
 {
   trace5("COMPONENT::map_nodes", long_label(), ext_nodes(), int_nodes(),
       max_nodes(), net_nodes());
-  if(!is_device()){ itested(); // DEV_PLACE etc.
+  if(!is_device()){ unreachable();
     return;
   }
   //assert(min_nodes() <= net_nodes());

@@ -478,7 +478,7 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
 				/* a transition state.		   */
     set_d_iter();
     set_last_change_time();
-    trace3(_failure_mode, _lastchange, _quality, _lv);
+    trace3(_failure_mode.c_str(), _lastchange, _quality, _lv);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -706,11 +706,11 @@ void node_t::new_node(const std::string& node_name, const CARD_LIST* scope)
 
   NODE_MAP* Map = scope->nodes();
   assert(Map);
-  if(_nnn) {
-    if(_nnn != (*Map)[node_name])
-      error(bDANGER, "%s is already a node: %s\n", node_name.c_str(), _nnn->long_label().c_str());
-    assert(_nnn == (*Map)[node_name]);
+  if(!_nnn) {
+  }else if(_nnn != (*Map)[node_name]){ untested();
+    error(bWARNING, "%s is already a node: %s\n", node_name.c_str(), _nnn->long_label().c_str());
   }
+
   _nnn = (CKT_NODE*) Map->new_node(node_name, scope);
   _ttt = _nnn->user_number();
   assert(_nnn);

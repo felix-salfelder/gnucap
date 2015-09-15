@@ -223,9 +223,15 @@ void CARD::new_subckt(PARAM_LIST_MAP* p)
 /*--------------------------------------------------------------------------*/
 void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
 {
-  trace2("CARD::new_subckt", long_label(), *Params);
   delete _subckt;
-  _subckt = new CARD_LIST(Model, this, scope(), Params);
+  try{
+    _subckt = new CARD_LIST(Model, this, scope(), Params);
+  }catch(...){
+    // BUG?
+    // new CARD_LIST must not throw if it has been successful previously.
+    assert(!_subckt);
+    throw;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
@@ -237,7 +243,7 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
     // not tested yet.
     // frozen = m->frozen();
   }
-  const MODEL_SUBCKT* s = dynamic_cast<const MODEL_SUBCKT*>(Model);
+  const BASE_SUBCKT* s = dynamic_cast<const BASE_SUBCKT*>(Model);
   if(s){
     frozen = s->frozen();
   }

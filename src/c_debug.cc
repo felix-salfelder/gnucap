@@ -290,12 +290,10 @@ void CMD_NL::print( OMSTREAM _out, const CARD_LIST* scope){
   }
 
   for (CARD_LIST::const_iterator i = scope->begin(); i != scope->end(); ++i) {
-    const MODEL_SUBCKT* m = dynamic_cast<const MODEL_SUBCKT*>(*i);
     const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i);
-    //const CARD* s=*i;
-    //FIXME: is_device should do the trick (no m needed);
-    if (!m && s)
-    if (s->subckt()) {
+    if (!s){
+    }else if (!s->is_device()){
+    }else if (s->subckt()) {
       _out << "-" << s->long_label() <<"\n";
       print(_out,s->subckt());
     }

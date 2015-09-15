@@ -225,7 +225,8 @@ void ELEMENT::dc_advance()
   assert(_sim->_time0 == 0.); // DC
 
   for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
-    if(!_time[i] == _sim->_time0){
+    if(_time[i] == _sim->_time0){
+    }else{
       // in _dc_cont case allow to skip dc analysis....
       _time[i] = _sim->_time0;
     }
@@ -800,13 +801,13 @@ void ELEMENT::set_param_by_name(string Name, string Value)
     COMMON_COMPONENT* c = mutable_common()->clone();
     try{
       c->set_param_by_name(Name,Value);
-    }catch(Exception_No_Match){ untested();
-      if(!isvalue){ untested();
+    }catch(Exception_No_Match){ itested();
+      if(!isvalue){ itested();
 	delete c;
 	throw;
       }
     }
-    if(isvalue){ untested();
+    if(isvalue){ itested();
       c->set_modelname(Value);
     }
     attach_common(c);

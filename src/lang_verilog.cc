@@ -70,13 +70,13 @@ public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*);
   DEV_DOT*	parse_command(CS&, DEV_DOT*);
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*);
-  MODEL_SUBCKT* parse_module(CS&, MODEL_SUBCKT*);
+  BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*);
   COMPONENT*	parse_instance(CS&, COMPONENT*);
   std::string	find_type_in_string(CS&) const;
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*);
-  void print_module(OMSTREAM&, const MODEL_SUBCKT*);
+  void print_module(OMSTREAM&, const BASE_SUBCKT*);
   void print_instance(OMSTREAM&, const COMPONENT*);
   void print_comment(OMSTREAM&, const DEV_COMMENT*);
   void print_command(OMSTREAM& o, const DEV_DOT* c);
@@ -179,7 +179,7 @@ static void parse_ports(CS& cmd, COMPONENT* x)
       }
       if (index < x->min_nodes()) {
 	cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
-	for (int iii = index;  iii < x->min_nodes();  ++iii) {
+	for (unsigned iii = index;  iii < x->min_nodes();  ++iii) {
 	  x->set_port_to_ground(iii);
 	}
       }else{
@@ -266,7 +266,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
  */
 //BUG// strictly one device per line
 
-MODEL_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, MODEL_SUBCKT* x)
+BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 {
   assert(x);
 
@@ -427,7 +427,7 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
   _mode = mDEFAULT;
 }
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::print_module(OMSTREAM& o, const MODEL_SUBCKT* x)
+void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
   assert(x);
   assert(x->subckt());
@@ -503,11 +503,12 @@ class CMD_MODULE : public CMD { //
   {
     CARD const* sckt = device_dispatcher["subckt"];
     assert(sckt);
-    MODEL_SUBCKT* new_module = dynamic_cast<MODEL_SUBCKT*>(sckt->clone());
+    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(sckt->clone());
     assert(new_module);
     assert(!new_module->owner());
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());
+    assert(!new_module->is_device());
     lang_verilog.parse_module(cmd, new_module);
     Scope->push_back(new_module);
   }

@@ -42,6 +42,7 @@ using std::endl;
 #undef trace7
 #undef trace8
 #undef untested
+#undef itested
 #undef untested0
 #undef unreachable
 #undef incomplete
