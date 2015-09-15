@@ -460,7 +460,7 @@ COMPONENT::COMPONENT()
    _amps_new(0),
    _adp(0)
 {
-  trace0("COMPONENT::COMPONENT " + long_label() + ", " + dev_type() );
+  trace1("COMPONENT::COMPONENT", long_label());
   if (_sim) {
     _sim->uninit();
   } else {
