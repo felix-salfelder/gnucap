@@ -696,7 +696,7 @@ void COMPONENT::map_nodes()
 {
   trace5("COMPONENT::map_nodes", long_label(), ext_nodes(), int_nodes(),
       max_nodes(), net_nodes());
-  if(!is_device()){ itested(); // DEV_PLACE etc.
+  if(!is_device()){ unreachable();
     return;
   }
   //assert(min_nodes() <= net_nodes());
