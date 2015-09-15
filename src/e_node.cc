@@ -706,11 +706,11 @@ void node_t::new_node(const std::string& node_name, const CARD_LIST* scope)
 
   NODE_MAP* Map = scope->nodes();
   assert(Map);
-  if(_nnn) {
-    if(_nnn != (*Map)[node_name])
-      error(bDANGER, "%s is already a node: %s\n", node_name.c_str(), _nnn->long_label().c_str());
-    assert(_nnn == (*Map)[node_name]);
+  if(!_nnn) { untested();
+  }else if(_nnn != (*Map)[node_name]){ untested();
+    error(bWARNING, "%s is already a node: %s\n", node_name.c_str(), _nnn->long_label().c_str());
   }
+
   _nnn = (CKT_NODE*) Map->new_node(node_name, scope);
   _ttt = _nnn->user_number();
   assert(_nnn);
