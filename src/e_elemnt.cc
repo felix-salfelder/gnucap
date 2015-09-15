@@ -225,7 +225,8 @@ void ELEMENT::dc_advance()
   assert(_sim->_time0 == 0.); // DC
 
   for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
-    if(!_time[i] == _sim->_time0){
+    if(_time[i] == _sim->_time0){ untested();
+    }else{ untested();
       // in _dc_cont case allow to skip dc analysis....
       _time[i] = _sim->_time0;
     }
