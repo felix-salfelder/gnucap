@@ -365,11 +365,12 @@ void SOCK::fillnames( const CARD_LIST* scope){
   }
 
   for (CARD_LIST::const_iterator i = scope->begin(); i != scope->end(); ++i) {
-    const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i);
-    assert(s);
-    if (!s->is_device()){ untested();
-    }else if ( s->subckt() ) {
-      fillnames( s->subckt() );
+    if(const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i)){ untested();
+      if (!s->is_device()){ untested();
+      }else if ( s->subckt() ) {
+        fillnames( s->subckt() );
+      }
+    }else{ untested();
     }
   }
 }
