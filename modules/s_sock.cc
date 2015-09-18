@@ -772,8 +772,7 @@ void SOCK::ev_iter()
   _sim->_aa.rmul(tmp-1,xiin-1);
   untested();
   tmp[n_vars] = 0;
-  untested();
-  for (unsigned i=0; i <= n_vars; i++){
+  for (unsigned i=0; i <= n_vars; i++){ untested();
     trace2("rhs",i,tmp[i]);
   }
 
@@ -912,7 +911,7 @@ void SOCK::transtep(unsigned init)
   assert(_sim->analysis_is_tran());
 
 
-  for (unsigned i = stepno; i>0; --i) {
+  for (unsigned i = stepno; i>0; --i) { untested();
     bool tr_converged = false;
     try {
       tr_converged = solve(OPT::TRHIGH, _trace);
