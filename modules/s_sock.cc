@@ -365,7 +365,7 @@ void SOCK::fillnames( const CARD_LIST* scope){
   }
 
   for (CARD_LIST::const_iterator i = scope->begin(); i != scope->end(); ++i) {
-    if(const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i)){ untested();
+    if(const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i)){
       if (!s->is_device()){ untested();
       }else if ( s->subckt() ) {
         fillnames( s->subckt() );
@@ -911,7 +911,7 @@ void SOCK::transtep(unsigned init)
   assert(_sim->analysis_is_tran());
 
 
-  for (unsigned i = stepno; i>0; --i) { untested();
+  for (unsigned i = stepno; i>0; --i) {
     bool tr_converged = false;
     try {
       tr_converged = solve(OPT::TRHIGH, _trace);
