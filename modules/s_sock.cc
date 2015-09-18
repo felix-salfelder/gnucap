@@ -103,7 +103,7 @@ private:
 
 private: //vera stuff.
   void main_loop();
-  void verainit();
+  void verainit(unsigned, unsigned, unsigned);
   void verakons();
   void veraop();
   void verainit_reply();
@@ -111,13 +111,13 @@ private: //vera stuff.
   void veraop_reply();
   void ev_iter();
   void set_param();
-  void transtep(unsigned init);
+  void transtep(unsigned init, double dt);
   void transtep_reply();
   void transtep_gc_reply();
 
   char* var_names_buf;
 
-  uint16_t verbose;
+  unsigned _verbose;
   size_t total;
   uint16_t n_inputs;
   vector<string> input_names;
@@ -143,6 +143,7 @@ private: //vera stuff.
   bool _client_mode;
   bool _server_mode;
   unsigned _bufsize;
+  bool _bigarg;
   string _host;
   int reuseaddr;
   struct sockaddr_in sin;
@@ -253,6 +254,7 @@ void SOCK::options(CS& Cmd, int Nest)
   _sim->_uic = _loop[Nest] = _reverse_in[Nest] = false;
   _port = "1400";
   _bufsize = BUFSIZE;
+  _bigarg = true;
   unsigned here = Cmd.cursor();
   do{
     ONE_OF
@@ -264,6 +266,7 @@ void SOCK::options(CS& Cmd, int Nest)
       || Get(Cmd, "c{ontinue}",   &_cont)
       || Get(Cmd, "port" ,        &_port)
       || Get(Cmd, "listen{port}", &_port)
+      || Get(Cmd, "bigarg",       &_bigarg)
       || Get(Cmd, "host" ,        &_host)
       || Get(Cmd, "tr{s}",        &_do_tran_step)
       || Get(Cmd, "dm",           &_dump_matrix)
@@ -408,34 +411,60 @@ static void register_status()
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
+static unsigned argc(unsigned opcode)
+{
+  switch(opcode){
+    case 51: untested();
+      return 3;
+    case 102: untested();
+    case 104: untested();
+      return 1;
+    default: untested();
+      return 0;
+  }
+}
 /*--------------------------------------------------------------------------*/
 void SOCK::main_loop()
 {
   trace0("SOCK::main_loop");
 
-  unsigned char opcode=-1;
-  unsigned char arg0=-1;
+  uint16_t opcode=-1;
+  uint16_t arg[3];
+  arg[0] = -1;
   bool init_done=false;
 
-  while(true)
-  {
-    trace0("SOCK::main_loop waiting for opcode");
-
+  while(true) {
     stream >> opcode;
-    stream >> arg0;
-    stream >> 6;
+
+    if(_bigarg){ untested();
+      stream >> 6;
+      for(unsigned i=0; i<argc(opcode); ++i){ untested();
+        stream >> arg[i];
+        stream >> 6;
+      }
+    }else{ untested();
+      stream >> arg[0];
+      stream >> arg[1];
+      stream >> arg[2];
+    }
 
     _sim->_mode = s_SOCK; // nonsense.
                           // use respective built-in mode!
-    ::error(bDEBUG, "sock opcode %d %d\n", opcode, arg0);
+                          //
+    if(_bigarg) { untested();
+      ::error(bDEBUG, "sock opcode %d\n", opcode);
+    }else{ untested();
+      ::error(bDEBUG, "sock opcode %d %d %d %d\n", opcode, arg[0], arg[1], arg[2]);
+    }
 
+    double dt;
     switch (opcode) {
       case '\0': // 0
         return;
         break;
       case '3': // 51
         if(init_done) throw Exception("init twice??");
-        verainit();
+        verainit(arg[0], arg[1], arg[2]);
         verainit_reply();
         init_done=true;
         break;
@@ -451,14 +480,16 @@ void SOCK::main_loop()
         ev_iter();
         break;
       case 102:
-        transtep(arg0);
+        stream >> dt;
+        transtep(arg[0], dt);
         transtep_reply();
         break;
       case 103: untested();
         set_param();
         break;
       case 104: itested();
-        transtep(arg0);
+        stream >> dt;
+        transtep(arg[0], dt);
         transtep_gc_reply();
 	break;
       default:
@@ -480,15 +511,9 @@ static void putstring8(SocketStream* s, const string x)
   }
 }
 /*--------------------------------------------------------------------------*/
-void SOCK::verainit()
-{
-  trace0("SOCK::verainit");
-  stream >> verbose >> 6;
-  stream >> n_inputs >> 6;
-  stream >> length >> 6;
-
-  trace3("SOCK::verainit", verbose, n_inputs, length );
-
+void SOCK::verainit(unsigned verbose, unsigned n_inputs, unsigned length)
+{ untested();
+  _verbose = verbose;
   char input_namen[length+1];
   unsigned here =0;
   unsigned n=0;
@@ -846,18 +871,15 @@ enum{
 // dt. positive timestep, use instead in next call.
 //
 //
-void SOCK::transtep(unsigned init)
+void SOCK::transtep(unsigned init, double dt)
 {
   uint64_t ret = sOK;
-  trace2("SOCK::transtep", n_vars, init);
+  trace3("SOCK::transtep", n_vars, init, dt);
   _sim->set_command_tran();
   _sim->restore_voltages(); //     _vt1[ii] = _v0[ii] = vdc[ii];
   _sim->_uic = false;
   _sim->_phase = p_RESTORE;
 
-
-  double dt;
-  stream >> dt;
   unsigned stepno=-1;
   double reftime = _sim->_time0;
 
