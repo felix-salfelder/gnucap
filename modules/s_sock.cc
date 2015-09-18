@@ -430,19 +430,20 @@ void SOCK::main_loop()
 
   uint16_t opcode=-1;
   uint16_t arg[3];
+  unsigned char tmp;
   arg[0] = -1;
   bool init_done=false;
 
   while(true) {
-    stream >> opcode;
 
     if(_bigarg){ untested();
-      stream >> 6;
+      stream >> tmp >> 7; // sic!
+      opcode = tmp;
       for(unsigned i=0; i<argc(opcode); ++i){ untested();
-        stream >> arg[i];
-        stream >> 6;
+        stream >> arg[i] >> 6;
       }
     }else{ untested();
+      stream >> opcode;
       stream >> arg[0];
       stream >> arg[1];
       stream >> arg[2];
