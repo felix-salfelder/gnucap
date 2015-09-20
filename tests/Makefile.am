@@ -685,6 +685,7 @@ GC_TESTS = \
     rcd_ueff.sh \
     ring.sh \
     s_sock.1.sh \
+    s_sock.1b.sh \
     s_sock.2.sh \
     s_tr.cont.sh \
     s_tr.lrc.sh \
