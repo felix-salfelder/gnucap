@@ -416,10 +416,10 @@ static unsigned argc(unsigned opcode)
   switch(opcode){
     case 51: untested();
       return 3;
-    case 102: untested();
     case 104: untested();
+    case 102:
       return 1;
-    default: untested();
+    default:
       return 0;
   }
 }
@@ -436,13 +436,13 @@ void SOCK::main_loop()
 
   while(true) {
 
-    if(_bigarg){ untested();
+    if(_bigarg){
       stream >> tmp >> 7; // sic!
       opcode = tmp;
-      for(unsigned i=0; i<argc(opcode); ++i){ untested();
+      for(unsigned i=0; i<argc(opcode); ++i){
         stream >> arg[i] >> 6;
       }
-    }else{ untested();
+    }else{
       stream >> opcode;
       stream >> arg[0];
       stream >> arg[1];
@@ -452,9 +452,9 @@ void SOCK::main_loop()
     _sim->_mode = s_SOCK; // nonsense.
                           // use respective built-in mode!
                           //
-    if(_bigarg) { untested();
+    if(_bigarg) {
       ::error(bDEBUG, "sock opcode %d\n", opcode);
-    }else{ untested();
+    }else{
       ::error(bDEBUG, "sock opcode %d %d %d %d\n", opcode, arg[0], arg[1], arg[2]);
     }
 
