@@ -380,15 +380,14 @@ void SOCK::fillnames( const CARD_LIST* scope){
 /*--------------------------------------------------------------------------*/
 void SOCK::findcaps( CARD_LIST* scope){
   for (CARD_LIST::iterator i = scope->begin(); i != scope->end(); ++i) {
-    if ( COMPONENT* c = dynamic_cast< COMPONENT*>(*i) )
-    {
+    if ( COMPONENT* c = dynamic_cast< COMPONENT*>(*i) ) { untested();
       if (c->is_device() && c->has_memory()){
         trace1("found cap", c->long_label());
         _caplist.push_back( c );
       }
     }
-    if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) )
-    {
+    if (!(*i)->is_device()){ untested();
+    } else if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) ) { untested();
       trace1("going down", s->long_label());
       findcaps( s->subckt() );
     }
