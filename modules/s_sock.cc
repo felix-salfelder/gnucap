@@ -676,6 +676,7 @@ void SOCK::verakons()
     _input_devs[i]->set_value(d);
   }
 
+  assert(_sim->_v0);
   for (unsigned i=1; i <= n_vars; i++) {
     stream >> _sim->_v0[i];
     //    trace2("SOCK::kons start ", i,  _sim->_v0[i] );
@@ -1182,16 +1183,16 @@ void SOCK::send_matrix()
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::cap_prepare(void)
-{
+{ untested();
   trace1("SOCK::cap_prepare", _caplist.size() );
   assert(!_capstash);
   _capstash = new CARDSTASH[_caplist.size()];
 
-  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) {
+  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) { untested();
     _caplist[ii]->inc_probes();			// we need to keep track of it
     _capstash[ii] = _caplist[ii];			// stash the std value
 
-    if(_caplist[ii]->has_common()){
+    if(_caplist[ii]->has_common()){ untested();
       trace1("SOCK::cap_prepare. have common", _caplist[ii]->value());
 //      _caplist[ii]->set_value(_caplist[ii]->value(), 0); // zap out extensions
 //      _caplist[ii]->set_constant(false);		 // update HACK?
@@ -1199,19 +1200,22 @@ void SOCK::cap_prepare(void)
 //    all devices need individual commons.
       _caplist[ii]->attach_common(_caplist[ii]->common()->clone());
       assert(_caplist[ii]->has_common());
-    }else{
-      trace1("SOCK::cap_prepare, attaching common", _caplist[ii]->long_label());
+    }else{ untested();
       //      _sweepval[ii] = _zap[ii]->set__value();	// point to value to patch
       COMMON_COMPONENT* c = bm_dispatcher.clone("eval_bm_value");
-      c->set_value( (double)_caplist[ii]->value() );
+      double capval = _caplist[ii]->value();
+      trace2("SOCK::cap_prepare, attaching common", _caplist[ii]->long_label(), capval);
+      c->set_value(capval);
       COMMON_COMPONENT* dc = c->deflate();
       assert(dc);
       //
       _caplist[ii]->set_value(_caplist[ii]->value(), dc);	// zap out extensions
       _caplist[ii]->set_constant(false);		// so it will be updated
-      trace1("SOCK::cap_prepare", _caplist[ii]->long_label());
+      trace1("SOCK::cap_prepare calling precalc_first", _caplist[ii]->long_label());
       _caplist[ii]->precalc_first();
+      trace0("SOCK::cap_prepare calling precalc_last");
       _caplist[ii]->precalc_last();
+      trace0("SOCK::cap_prepare calling trbegin");
       _caplist[ii]->tr_begin();
     }
   }
