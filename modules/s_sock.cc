@@ -119,8 +119,8 @@ private: //vera stuff.
 
   unsigned _verbose;
   size_t total;
-  uint16_t n_inputs;
-  vector<string> input_names;
+  size_t n_inputs() const{return _input_names.size();}
+  vector<string> _input_names;
   vector<ELEMENT*> _input_devs;
   unsigned n_vars;
   unsigned n_vars_square;
@@ -416,6 +416,10 @@ static unsigned argc(unsigned opcode)
   switch(opcode){
     case 51: untested();
       return 3;
+    case 52: untested();
+      return 0;
+    case 53: untested();
+      return 0;
     case 104: untested();
     case 102:
       return 1;
@@ -435,6 +439,7 @@ void SOCK::main_loop()
   bool init_done=false;
 
   while(true) {
+    trace0("SOCK::main_loop waiting for opcode");
 
     if(_bigarg){
       stream >> tmp >> 7; // sic!
@@ -512,14 +517,16 @@ static void putstring8(SocketStream* s, const string x)
   }
 }
 /*--------------------------------------------------------------------------*/
-void SOCK::verainit(unsigned verbose, unsigned n_inputs, unsigned length)
+void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
 { untested();
   _verbose = verbose;
   char input_namen[length+1];
   unsigned here =0;
   unsigned n=0;
-  input_names.resize(n_inputs);
-  _input_devs.resize(n_inputs);
+  _input_names.resize(n_in);
+  _input_devs.resize(n_in);
+  trace3("verainit: ", verbose,n_inputs(),length);
+  assert(n_inputs()==n_in);
 
   for (unsigned i=0; i < length; i++) {
     stream >> input_namen[i] >> 7;
@@ -527,18 +534,18 @@ void SOCK::verainit(unsigned verbose, unsigned n_inputs, unsigned length)
       input_namen[i] = 0;
       trace1("input_namen", string(input_namen+here));
       trace5("input_namen",input_namen[i-2],input_namen[i-1], input_namen[i-0],here,i );
-      input_names[n] = string(input_namen+here);
+      _input_names[n] = string(input_namen+here);
       here = i+1;
 
-      trace1("looking out for", input_names[n]);
-      CARD_LIST::fat_iterator ci = findbranch(input_names[n], &CARD_LIST::card_list);
+      trace1("looking out for", _input_names[n]);
+      CARD_LIST::fat_iterator ci = findbranch(_input_names[n], &CARD_LIST::card_list);
       if (ci.is_end()){
-        throw Exception("cannot find voltage source \"" +  input_names[n] +"\", giving up");
+        throw Exception("cannot find voltage source \"" + _input_names[n] +"\", giving up");
       }
       trace0("found input device");
       ELEMENT* d = prechecked_cast<ELEMENT*>(*ci);
       if (!d){
-        throw Exception("not something we can use as source, \"" +  input_names[n] +"\", giving up");
+        throw Exception("not something we can use as source, \"" +  _input_names[n] +"\", giving up");
       }
       _input_devs[n] = d;
       assert(_input_devs[n]);
@@ -588,7 +595,7 @@ void SOCK::veraop()
   dc_werteA = (double*) malloc(sizeof(double)*n_vars);
   trace1("fetching ",n_vars);
   assert(_sim->vdc()[0] == 0 );
-  for (unsigned i=0; i < n_inputs; i++) {
+  for (unsigned i=0; i < n_inputs(); i++) {
     double d;
     stream >> d;
     trace3("SOCK::veraop setting input", _input_devs[i]->long_label(), i, d);
@@ -662,7 +669,7 @@ void SOCK::verakons()
   _sim->_phase = p_INIT_DC;
   total =  n_eingaenge + n_vars + 1;
 
-  for (unsigned i=0; i < n_inputs; i++) {
+  for (unsigned i=0; i < n_inputs(); i++) {
     double d;
     stream >> d;
     trace3("SOCK::verakons setting input", _input_devs[i]->long_label(), i, d);
@@ -682,8 +689,8 @@ void SOCK::verakons()
   //	n_vars = A->n_var;
 
   for( unsigned i = 0; i < _caplist.size(); i++) {
+    trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->keep_ic(); // latch voltage applied to _v0
-    //    trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->set_constant(true);
     _caplist[i]->q_eval();		// so it will be updated
   }
