@@ -611,8 +611,10 @@ GC_TESTS = \
     d_hci.6.sh \
     d_hci.7.sh \
     d_hci_pd.sh \
+    d_mos.l0.sh \
     d_mos8.np.sh \
     d_res.sh \
+    d_subckt.parm.sh \
     d_switch.disc.sh \
     d_switch.ic.sh \
     d_switch.tt.sh \
@@ -695,7 +697,6 @@ GC_TESTS = \
     s_ttt.lc.sh \
     s_ttt.lrc.sh \
     s_ttt.vib.sh \
-    sckt_bug.sh \
     sens_inv.sh \
     sens_mos8.sh \
     sens_rr.sh \
@@ -743,7 +744,7 @@ XFAIL_TESTS+= ddc_v.1.sh
 XFAIL_TESTS+= ac_noise.sh
 
 # somethings wrong
-XFAIL_TESTS+= sckt_bug.sh
+XFAIL_TESTS+= d_mos.l0.sh
 
 # does not converge (why?)
 XFAIL_TESTS+= mosbug.2.sh
