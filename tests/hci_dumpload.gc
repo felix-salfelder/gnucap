@@ -1,0 +1,73 @@
+spice
+* p type inv amp w/hci
+* this is numerically unstable...
+
+.options TEMP=25
+.options initsc 1
+
+.param vdd=2.7
+
+.param cmosn_hci=1
+.param cmosp_hci=1
+.param cmosn_bti=none
+.param cmosp_bti=none
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.0E-08 BETA0 = 12
++ H0 = cmosp_hci
++ bti_model=cmosp_bti
++ )
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = cmosn_hci
++ bti_model=cmosn_bti
++ )
+
+MP1 ndd ng nout ndd cmosp l=1.5e-7 w=4.5e-6
+R1 0 nout 90k
+MN1 0 ng nout 0 cmosn l=1.5e-7 w=4.5e-6
+MN2 nout ng 0 0 cmosn l=1.5e-7 w=4.5e-6
+VDD ndd 0 vdd
+
+vgate ng 0 pulse (iv=0 pv=vdd rise=1u fall=1u width=2u delay=.5u)
+
+.verilog
+measm nomax(nout,0);
+spice
+
+.print tran stress(MN*.HCI) hci(MN*.HCI)
+* + v(ng) Isb(MP1) Isb(MN1) Idb(MP1) Idb(MN1)
+*+ dvth(MN1)
+*+ hidden(0)
+
+.tran 0 5u .01u age basic
+
+.print tran clear
+
+.print tw
++ hci(MN*.hci)
++ dvth(MN1.hci)
++ dvth(MN1)
++ v(nomax)
++ use_hci(M*1)
++ hidden(0)
++ age(0)
+
+.echo ttr
+.ttr 15u .1u 5u basic new tran basic
+.status notime
+.options numdgt 7
+.dumpnodes adp
+.options numdgt 5
+.ttr 25u .1u 5u basic tran basic >> hcitest_tr.out
+.status notime
+.echo simulating from 10u to 25u after nodeset
+.nodeset a(MP1.HCI.raw_hci)= 12.566907979632249148238543057E-18
+.nodeset a(MN1.HCI.raw_hci)= 142.75909211751034888493450125E-36
+.nodeset a(MN2.HCI.raw_hci)= 142.75909211751034888493450125E-36
+.ttr 10u 25u .1u 5u basic tran basic >> hcitest_tr.out
+.status notime
+.end

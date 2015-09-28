@@ -1,0 +1,22 @@
+spice
+* rc-element 
+
+V1 (1 0) DC 0.2
+R1 1 2 10
+C1 2 0 400m ic=3
+
+* 1          2
+* o---|R1|---o
+* |          |
+* O V1       = C1
+* |          |
+* o----o-----o 
+*      |
+*      V
+
+
+.PRINT DDC v(V1) v(c1)  dv(nodes)
+.DDC C1 1m 100m 1m
+
+.END
+

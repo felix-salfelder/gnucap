@@ -1,0 +1,40 @@
+
+param a=1
+param q=1
+
+build
+R1 1 0 100k
+.ttcap C1 1 0 .01m ic=1
+
+options ttsteporder=4
+options ttstepgrow 1e99
+
+param TTend={3*tend}
+param TTend=1m
+param tend=62.83u
+
+* hack. don't have frame detection.
+param tend=62.913u
+
+nodelist
+
+echo > out.out
+echo > tr.out
+
+print dc v(c1)
+print tran v(c1) v0dist(0)
+print tw v(c1) ttorder(c1) ttmethod(c1) gain(0) ttstep0(c1) ttstep1(c1) ttstep2(c1) ttstep3(c1)
+dc uic
+
+ttr 0 {TTend} {tend/50} {tend} * 5 new trace=a >> out.out tran cont >> tr.out
+
+status notime
+
+echo >> out.out
+echo >> tr.out
+
+dc uic
+ttr 10u {TTend} {tend/50} {tend} {tend} new trace=g > out.out tran cont >> tr.out
+
+status notime
+end

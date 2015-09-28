@@ -1,0 +1,17 @@
+spice
+
+* V1 0 in1 pulse iv=0 pv=1 delay=0 rise=1m
+
+.options initsc 1
+L1 0 in1 1 ic=1
+R1 in1 0 100
+
+.print tran v(in1) i(r1) i(L1) v(L1) vin(L1) y(L1) flux(L1) iof(L1) hidden(0) v(l1)
+.print dc   v(in1) i(r1) i(L1) v(L1) vin(L1) y(L1) flux(L1) iof(L1) hidden(0) v(l1)
+
+.dc uic
+
+.tran 0 10m 10m trace=a cont
+
+.status notime
+.end

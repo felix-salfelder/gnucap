@@ -1,4 +1,5 @@
-/*$Id: io_out.cc,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: io_out.cc,v 1.2 2010-07-09 12:14:23 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -32,6 +33,7 @@
  */
 //testing=script,sparse 2006.07.17
 #include "u_opt.h"
+#include "m_matrix.h"
 /*--------------------------------------------------------------------------*/
 	const char* octal(int x);
 //	OMSTREAM & OMSTREAM::tab(int count)
@@ -40,6 +42,11 @@
 //	OMSTREAM & OMSTREAM::operator<<(char chr)
 /*--------------------------------------------------------------------------*/
 unsigned OMSTREAM::_cpos[MAXHANDLE+1];         /* character counter    */
+/*--------------------------------------------------------------------------*/
+OMSTREAM::~OMSTREAM(){
+  trace0("OMSTREAM::~OMSTREAM");
+}
+
 /*--------------------------------------------------------------------------*/
 /* octal: make octal string for an int
  */
@@ -56,9 +63,9 @@ const char* octal(int x)
  */
 OMSTREAM & OMSTREAM::tab(unsigned count)
 {
-  for (int ii=0, mm=1;   ii<=MAXHANDLE;   ++ii, mm<<=1) {
-    if (_mask & mm) {
-      OMSTREAM this_file(_mask & mm);
+  for (unsigned ii=0, mm=1; ii<=MAXHANDLE; ++ii, mm<<=1) {
+    if (int(_mask) & int(mm)) {
+      OMSTREAM this_file(int(_mask) & int(mm));
       if (_cpos[ii] > count) {
 	this_file << '\n';
       }else{
@@ -88,6 +95,7 @@ OMSTREAM & OMSTREAM::form(const char *fmt, ...)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /* mputs: multiple puts.
  * puts to "m" style files.
  * also....
@@ -96,7 +104,7 @@ OMSTREAM & OMSTREAM::form(const char *fmt, ...)
  * (which are not currently handled by .options)
  * and it is possible that current contents of lines may be different
  */
-OMSTREAM & OMSTREAM::operator<<(const char *str)
+OMSTREAM & OMSTREAM::ostream_const_char_p(const char *str)
 {
   assert(str);
 
@@ -125,11 +133,11 @@ OMSTREAM & OMSTREAM::operator<<(const char *str)
   }
 
   /* auto line break, with a '+' to continue. */
-  for (int ii=0, mm=1;   ii<=MAXHANDLE;   ++ii, mm<<=1) {
-    if ((_mask & mm)
+  for (unsigned ii=0, mm=1; ii<=MAXHANDLE; ++ii, mm<<=1) {
+    if ((int(_mask) & int(mm))
 	&& (sl+_cpos[ii]) >= OPT::outwidth
 	&& _cpos[ii] != 0) {
-      OMSTREAM this_file(_mask & mm);
+      OMSTREAM this_file(int(_mask) & int(mm));
       this_file << '\n' << '+';
     }else{
     }				/* see if it fits .... */
@@ -157,7 +165,7 @@ OMSTREAM & OMSTREAM::operator<<(const char *str)
  * encripts, if selected
  * keeps track of character count
  */
-OMSTREAM & OMSTREAM::operator<<(char chr)
+OMSTREAM & OMSTREAM::ostream_char(char chr)
 {
   if (_mask & 1) {
     unreachable(); 
@@ -188,8 +196,11 @@ OMSTREAM & OMSTREAM::operator<<(char chr)
   }else{
   }
   
-  for (int ii=0, mm=1;   ii<=MAXHANDLE;   ++ii, mm<<=1) {
-    if (_mask & mm) {
+  for (unsigned ii=0, mm=1; ii<=MAXHANDLE; ++ii, mm<<=1) {
+    if (int(_mask) & int(mm)) {
+      if(!IO::stream[ii]){
+        error(bDANGER,"no stream?!%i printing %c\n", ii, chr);
+      }
       assert(IO::stream[ii]);
       if (chr=='\b') {untested();
 	--_cpos[ii];
@@ -200,8 +211,10 @@ OMSTREAM & OMSTREAM::operator<<(char chr)
       }
       
       if (chr=='\n') {
-	_cpos[ii] = 0;
+	fputc(chr,IO::stream[ii]);
 	fflush(IO::stream[ii]);
+        suppress = true;
+	_cpos[ii] = 0;
       }else if (chr=='\r') {itested();
 	if (_cpos[ii] == 0) {untested();
 	  suppress = true;
@@ -213,7 +226,7 @@ OMSTREAM & OMSTREAM::operator<<(char chr)
       }
       if (!suppress) {
 	fputc(chr,IO::stream[ii]);
-      }else{itested();
+      }else{
       }
     }else{
     }
@@ -222,3 +235,4 @@ OMSTREAM & OMSTREAM::operator<<(char chr)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

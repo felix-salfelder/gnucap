@@ -1,0 +1,49 @@
+spice
+.options TEMP=25
+*.options method traponly
+*.options nowarn
+.options nottcorr
+.param vdd=2.7
+
+.options reltol=1e-6
+.options abstol=1e-10
+
+.param cmosn_hci=1
+.param cmosn_bti=none
+.param cmosp_bti=none
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = 1
++ bti_model=cmosn_bti
++ )
+
+R1 ndd nout 9k
+MN1 0 ng nout 0 cmosn l=1.5e-7 w=4.5e-6
+VDD ndd 0 vdd
+
+* weird?
+* vgate ng 0 pulse (iv=0 pv=vdd rise=.1u fall=.1u width=.2u delay=.05u period=1u)
+vgate ng 0 pulse (iv=0 pv=vdd rise=.1u fall=.1u width=.2u delay=.01u period=1u)
+
+.verilog
+measm nomax(nout,0);
+spice
+
+
+*.print tw dvth(MN1) dvth(MN1.hci) tt(MN1.hci)  hidden(0)
+.print tran dvth(MN1) dvth(MN1.hci) tt(mn1.hci) hci_tr(MN1.hci) v(ng) stress(MN1.hci) hidden(0)
+
+.store tw dvth(MN1)
+.ttr 10u .1u 3u             trace=a label="tta" basic tran basic > hcitest_tr.out
+.ttr 0 10u .1u 1u 1u    new trace=a label="ttb" basic tran basic >> hcitest_tr.out
+.ttr 0 20u .1u 1u * 1.3 new trace=a basic tran basic >> hcitest_tr.out
+
+.measure a=at(probe="tta:dvth(MN1)")
+.measure a=at(probe="ttb:dvth(MN1)")
+.measure a=at(probe="dvth(MN1)",x=10u)
+.measure a=at(probe="dvth(MN1)")
+
+.status notime
+.end

@@ -1,4 +1,4 @@
-/*$Id: u_nodemap.h,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: u_nodemap.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2002 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,26 +26,40 @@
 #define U_NODEMAP_H
 #include "md.h"
 /*--------------------------------------------------------------------------*/
-class NODE;
+class NODE_BASE;
+class COMPONENT;
+class ADP_NODE; // fixme
+class CKT_NODE;
+class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
 private:
-  std::map<const std::string, NODE*> _node_map;
-  explicit  NODE_MAP(const NODE_MAP&);
+  std::map<const std::string, NODE_BASE*> _node_map;
+  unsigned ckt;
+  unsigned adp;
 
+  explicit  NODE_MAP(const NODE_MAP&);
 public:
+  //  NODE_MAP( const NODE_MAP& p) : _node_map(p._node_map) {}
   explicit  NODE_MAP();
 	   ~NODE_MAP();
-  NODE*     operator[](std::string);
-  NODE*     new_node(std::string);
+  NODE_BASE*     operator[](std::string);
+  NODE_BASE*     operator[](unsigned) const;
+  CKT_NODE*     new_node(string,const CARD_LIST* p=0);
+  ADP_NODE*     new_adp_node(string, const COMPONENT* p);
+  ADP_NODE*     new_adp_node(string, const CARD_LIST* p=0);
 
-  typedef std::map<const std::string, NODE*>::iterator iterator;
-  typedef std::map<const std::string, NODE*>::const_iterator const_iterator;
+  typedef std::map<const std::string, NODE_BASE*>::iterator iterator;
+  typedef std::map<const std::string, NODE_BASE*>::const_iterator const_iterator;
 
   const_iterator begin()const		{return _node_map.begin();}
   const_iterator end()const		{return _node_map.end();}
-  int		 how_many()const	{return static_cast<int>(_node_map.size()-1);}
+  uint_t how_many()const	{assert(_node_map.size()>0); return static_cast<uint_t>(_node_map.size()-1);}
+  uint_t how_many_ckt()const	{return ckt;}
+  uint_t how_many_adp()const	{return adp;}
+
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

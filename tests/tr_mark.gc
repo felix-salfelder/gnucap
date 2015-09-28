@@ -1,0 +1,13 @@
+spice
+
+V1 1 0 5
+
+.print tran v(nodes)
+.tran 0 10 1
+
+.mark
+
+* starts at zero voltages in 0.36
+.tran 0 1 1 trace=v
+
+.end

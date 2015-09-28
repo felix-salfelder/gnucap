@@ -1,4 +1,4 @@
-/*$Id: l_stlextra.h,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: l_stlextra.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -56,6 +56,13 @@ inline void to_lower(std::string* s)
   }
 }
 /*--------------------------------------------------------------------------*/
+inline std::string to_lower(const std::string s)
+{
+  std::string c(s);
+  to_lower(&c);
+  return c;
+}
+/*--------------------------------------------------------------------------*/
 inline void to_upper(std::string* s)
 {
   assert(s);
@@ -68,3 +75,4 @@ inline void to_upper(std::string* s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

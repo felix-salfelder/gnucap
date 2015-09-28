@@ -1,4 +1,4 @@
-/*$Id: m_base.h,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
+/*                                 -*- C++ -*-
  * Copyright (C) 2003 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -20,12 +20,12 @@
  * 02110-1301, USA.
  *------------------------------------------------------------------
  */
-//testing=script,sparse 2009.08.13
 #ifndef BASE_H_INCLUDED
 #define BASE_H_INCLUDED
 #include "l_lib.h"
 #include "ap.h"
 #include "constant.h"
+#include "io_.h"
 /*--------------------------------------------------------------------------*/
 class Float;
 class String;
@@ -41,6 +41,11 @@ protected:
 public:
   virtual void parse(CS&) = 0;
   virtual void dump(std::ostream& o)const = 0;
+  virtual void dump(OMSTREAM& o)const{ untested();
+    stringstream a;
+    dump(a);
+    o << a.str();
+  }
   virtual ~Base() {}
   virtual std::string val_string()const		{untested(); return "error";}
   virtual bool to_bool()const			{unreachable(); return false;}
@@ -84,14 +89,17 @@ public:
   virtual Base* r_divide(const Base*)const	{untested(); return NULL;}
   virtual Base* r_divide(const Float*)const	{untested(); return NULL;}
   virtual Base* r_divide(const String*)const	{untested(); return NULL;}
+  virtual Base* powerof(const Base*)const	{untested(); return NULL;}
+  virtual Base* powerof(const Float*)const	{untested(); return NULL;}
+  virtual Base* powerof(const String*)const	{untested(); return NULL;}
 
   Base* logic_not()const;
   Base* logic_or(const Base* X)const;
   Base* logic_and(const Base* X)const;
 };
 inline CS&	     operator>>(CS& f, Base& b)	{untested();b.parse(f); return f;}
-inline std::ostream& operator<<(std::ostream& out, const Base& d)
-					{d.dump(out); return out;}
+template<class S>
+inline S& operator<<(S& out, const Base& d) {d.dump(out); return out;}
 /*--------------------------------------------------------------------------*/
 template <class T>
 class List_Base
@@ -99,13 +107,18 @@ class List_Base
 {
 private:
   std::list<T*> _list;
+  bool copy;
 public:
   virtual void parse(CS& f) = 0;
-protected:
   virtual void dump(std::ostream& o)const;
+  virtual void dump(OMSTREAM& o)const{ untested();
+    stringstream a;
+    dump(a);
+    o << a.str();
+  }
   virtual ~List_Base();
-  explicit List_Base() {}
-  explicit List_Base(const List_Base& p) : Base(), _list(p._list) {untested();}
+  explicit List_Base():copy(0) {}
+  explicit List_Base(const List_Base& p) : Base(), _list(p._list), copy(1) {}
 public:
   typedef typename std::list<T*>::const_iterator const_iterator;
   bool		 is_empty()const {return _list.empty();}
@@ -149,9 +162,20 @@ private:
   void dump(std::ostream& o)const {itested();
     if (_data==NOT_INPUT) {untested();
       o<<"NA";
-    }else{itested();
+    }else{untested();
       o<<_data;
     }
+  }
+  virtual void dump(OMSTREAM& o)const{
+    if (_data==NOT_INPUT) {
+      o<<"NA";
+    }else{
+      o<<_data;
+    }
+  }
+protected:
+  OMSTREAM& _full_dump(OMSTREAM& s)const { untested();
+    return s << _data;
   }
 public:
   /*implicit*/ Float(const Float& p) :Base(), _data(p._data) {untested();}
@@ -161,7 +185,7 @@ public:
   void parse(CS&);
   double value()const			{return _data;}
   operator double()const		{untested();return _data;}
-  std::string val_string()const		{return ftos(_data, 0, 15, ftos_EXP);}
+  std::string val_string()const		{return ftos(_data, 0, 3, ftos_EXP);}
   bool to_bool()const			{return (_data != 0);}
 
   Base* minus()const			{return new Float(-_data);}
@@ -176,9 +200,10 @@ public:
   Base* add(const Float* X)const	{assert(X); return new Float(_data + X->_data);}
   Base* multiply(const Float* X)const	{assert(X); return new Float(_data * X->_data);}
   Base* subtract(const Float* X)const	{untested();assert(X); return new Float(_data - X->_data);}
-  Base* r_subtract(const Float* X)const	{assert(X); return new Float(X->_data - _data);}
+  Base* r_subtract(const Float* X)const	{           assert(X); return new Float(X->_data - _data);}
   Base* divide(const Float* X)const	{untested();assert(X); return new Float(_data / X->_data);}
   Base* r_divide(const Float* X)const	{assert(X); return new Float(X->_data / _data);}
+  Base* powerof(const Float* X)const	{assert(X); return new Float(pow (X->_data , _data));}
 
   Base* less(const Base* X)const	{return ((X) ? (X->greater(this))   : (NULL));}
   Base* greater(const Base* X)const	{return ((X) ? (X->less(this))      : (NULL));}
@@ -192,6 +217,7 @@ public:
   Base* r_subtract(const Base* X)const	{untested();return ((X) ? (X->subtract(this))  : (NULL));}
   Base* divide(const Base* X)const	{return ((X) ? (X->r_divide(this))  : (NULL));}
   Base* r_divide(const Base* X)const	{untested();return ((X) ? (X->divide(this))    : (NULL));}
+  Base* powerof(const Base* X)const	{return ((X) ? (X->powerof(this))    : (NULL));}
 
   Base* less(const String*)const	{untested();return NULL;}
   Base* greater(const String*)const	{untested();return NULL;}
@@ -199,12 +225,13 @@ public:
   Base* geq(const String*)const 	{untested();return NULL;}
   Base* not_equal(const String*)const	{untested();return NULL;}
   Base* equal(const String*)const	{untested();return NULL;}
-  Base* add(const String*)const 	{untested();return NULL;}
-  Base* multiply(const String*)const	{untested();return NULL;}
+  Base* add(const String*)const 	{           return NULL;}
+  Base* multiply(const String*)const	{ itested();return NULL;}
   Base* subtract(const String*)const	{untested();return NULL;}
-  Base* r_subtract(const String*)const	{untested();return NULL;}
+  Base* r_subtract(const String*)const	{return NULL;}
   Base* divide(const String*)const	{untested();return NULL;}
   Base* r_divide(const String*)const	{	    return NULL;}
+  Base* powerof(const String*)const	{	    return NULL;}
 
   bool  is_NA()const			{untested();return _data == NOT_INPUT;}
 };
@@ -217,7 +244,8 @@ protected:
 public:
   void parse(CS&) {unreachable(); incomplete();}
 private:
-  void dump(std::ostream& o)const {untested();o << _data;}
+  void dump(std::ostream& o)const {untested(); o << _data;}
+  void dump(OMSTREAM& o)const {o << _data;}
 public:
   explicit String(CS& file) {untested();parse(file);}
   explicit String()	    {}
@@ -235,7 +263,7 @@ public:
   Base* geq(const String* X)const	{untested();assert(X); return new Float((_data >= X->_data)?1.:0.);}
   Base* not_equal(const String* X)const	{untested();assert(X); return new Float((_data != X->_data)?1.:0.);}
   Base* equal(const String* X)const	{untested();assert(X); return new Float((_data == X->_data)?1.:0.);}
-  Base* add(const String* X)const	{untested();assert(X); return new String(_data + X->_data);}
+  Base* add(const String*)const		{	     return NULL;}
   Base* multiply(const String*)const	{untested(); return NULL;}
   Base* subtract(const String*)const	{untested(); return NULL;}
   Base* r_subtract(const String*)const	{untested(); return NULL;}
@@ -248,9 +276,9 @@ public:
   Base* geq(const Base* X)const		{untested();return ((X) ? (X->leq(this))       : (NULL));}
   Base* not_equal(const Base* X)const	{untested();return ((X) ? (X->not_equal(this)) : (NULL));}
   Base* equal(const Base* X)const	{untested();return ((X) ? (X->equal(this))	    : (NULL));}
-  Base* add(const Base* X)const 	{untested();return ((X) ? (X->add(this))       : (NULL));}
+  Base* add(const Base* X)const 	{	    return ((X) ? (X->add(this))       : (NULL));}
   Base* multiply(const Base* X)const	{untested();return ((X) ? (X->multiply(this))  : (NULL));}
-  Base* subtract(const Base* X)const	{untested();return ((X) ? (X->r_subtract(this)): (NULL));}
+  Base* subtract(const Base* X)const	{return ((X) ? (X->r_subtract(this)): (NULL));}
   Base* r_subtract(const Base* X)const	{untested();return ((X) ? (X->subtract(this))  : (NULL));}
   Base* divide(const Base* X)const	{	    return ((X) ? (X->r_divide(this))  : (NULL));}
   Base* r_divide(const Base* X)const	{untested();return ((X) ? (X->divide(this))    : (NULL));}
@@ -261,7 +289,7 @@ public:
   Base* geq(const Float*)const  	{untested();return NULL;}
   Base* not_equal(const Float*)const	{untested();return NULL;}
   Base* equal(const Float*)const	{untested();return NULL;}
-  Base* add(const Float*)const  	{untested();return NULL;}
+  Base* add(const Float*)const  	{           return NULL;}
   Base* multiply(const Float*)const	{untested();return NULL;}
   Base* subtract(const Float*)const	{untested();return NULL;}
   Base* r_subtract(const Float*)const	{untested();return NULL;}
@@ -303,6 +331,7 @@ public:
 template <class T>
 List_Base<T>::~List_Base()
 {
+  if(!copy)
   for (typename std::list<T*>::iterator
 	  i = _list.begin(); i != _list.end(); ++i) {
     assert(*i);
@@ -359,3 +388,4 @@ void Collection<T>::parse(CS& File)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

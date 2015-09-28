@@ -1,4 +1,5 @@
-/*$Id: measure_cross.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*                         -*- C++ -*-
+ *
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,22 +27,35 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class MEASURE : public FUNCTION {
+class CROSS : public WAVE_FUNCTION {
+  PARAMETER<double> before;
+  PARAMETER<double> after;
+  PARAMETER<double> cross;
+  int slope;
+  bool last;
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const
-  {
-    std::string probe_name;
-    PARAMETER<double> before(BIGBIG);
-    PARAMETER<double> after(-BIGBIG);
-    PARAMETER<double> cross(0.);
-    int slope = 1;
-    bool last = false;
-    
+  CROSS():
+    WAVE_FUNCTION(),
+    before(BIGBIG),
+    after(-BIGBIG),
+    cross(0),
+    slope(1),
+    last(false)
+  {}
+  virtual FUNCTION_BASE* clone()const { return new CROSS(*this);}
+  string label()const{return "cross";}
+  void expand(CS& Cmd, const CARD_LIST* Scope)
+  { 
+    before = BIGBIG;
+    after = -BIGBIG;
+    cross = 0;
+    slope = 1;
+    last = false;
     unsigned here = Cmd.cursor();
     Cmd >> probe_name;
-    WAVE* w = find_wave(probe_name);
+    _w = find_wave(probe_name);
 
-    if (!w) {
+    if (!_w) {
       Cmd.reset(here);
     }else{
     }
@@ -62,21 +76,26 @@ public:
 	;
     }while (Cmd.more() && !Cmd.stuck(&here));
 
-    if (!w) {
-      w = find_wave(probe_name);
+    if (!_w) {
+      _w = find_wave(probe_name);
     }else{
     }
 
-    if (w) {
-      before.e_val(BIGBIG, Scope);
-      after.e_val(-BIGBIG, Scope);
-      cross.e_val(0., Scope);
+    before.e_val(BIGBIG, Scope);
+    after.e_val(-BIGBIG, Scope);
+    cross.e_val(0., Scope);
+  }
 
+public:
+  fun_t wave_eval()const
+  {
+    trace3("cross", after, before, slope);
+    if (_w) {
       double cross1 = cross * slope;
       enum STAT {WAITING, READY, DONE} stat = WAITING;
       double x_time = (last) ? -BIGBIG : BIGBIG;
-      WAVE::const_iterator begin = lower_bound(w->begin(), w->end(), DPAIR(after, -BIGBIG));
-      WAVE::const_iterator end   = upper_bound(w->begin(), w->end(), DPAIR(before, BIGBIG));
+      WAVE::const_iterator begin = lower_bound(_w->begin(), _w->end(), DPAIR(after, -BIGBIG));
+      WAVE::const_iterator end   = upper_bound(_w->begin(), _w->end(), DPAIR(before, BIGBIG));
       WAVE::const_iterator lower = begin;
       for (WAVE::const_iterator i = begin; i < end && stat != DONE; ++i) {
 	double val = i->second * slope;
@@ -102,14 +121,16 @@ public:
 	  break;
 	};
       }
-      return to_string(x_time);
+
+      return to_fun_t(x_time);
     }else{
       throw Exception_No_Match(probe_name);
     }
   }
 } p4;
-DISPATCHER<FUNCTION>::INSTALL d4(&measure_dispatcher, "cross", &p4);
+DISPATCHER<FUNCTION_BASE>::INSTALL d4(&measure_dispatcher, "cross", &p4);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

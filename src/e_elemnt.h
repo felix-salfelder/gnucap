@@ -1,4 +1,4 @@
-/*$Id: e_elemnt.h,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,13 +21,14 @@
  *------------------------------------------------------------------
  * base class for simple elements
  */
-//testing=script 2006.07.12
 #ifndef E_ELEMNT_H
 #define E_ELEMNT_H
+#define HAVE_ELEMENT_ORDER
 #include "e_node.h"
 #include "m_cpoly.h"
 #include "l_denoise.h"
 #include "e_compon.h"
+#include "bm.h"
 /*--------------------------------------------------------------------------*/
 class INTERFACE ELEMENT : public COMPONENT {
 protected:
@@ -37,10 +38,31 @@ protected:
   
   void	   store_values()		{assert(_y[0]==_y[0]); _y1=_y[0];}
   //void   reject_values()		{ _y0 = _y1;}
+private: // a default for most elements
+  uint_t max_nodes()const     {return 2 + _input_order * ports_per_input();}
+  uint_t min_nodes()const     {return max_nodes();}
+  uint_t matrix_nodes()const  {return 2 + _input_order * 2;}
+  unsigned _input_order;
+protected:
+  uint_t net_nodes()const     {return max_nodes();}
+protected:
+  virtual uint_t	   ports_per_input()const {return 2;} // 1 for ccsrc
 public:
+  uint_t input_order()const{return _input_order;}
+  void set_input_order(unsigned x) {_input_order = x;}
+  // for cccs, we need to call do_tr_last instead...
+  virtual bool do_tr_hack() {return do_tr();}
+
   double*  set__value()			{return _value.pointer_hack();}
+//  void  set_value(double x)		{ *(_value.pointer_hack()) = x;}
+  virtual void  set_ic(double x);
+  virtual void  keep_ic();
 
   bool	   skip_dev_type(CS&);
+  string dev_type()const;
+  virtual string element_type()const {unreachable(); return "unknown";}
+
+  virtual  void tr_save_amps(int n);
 public: // override virtual
   bool	   print_type_in_spice()const {return false;}
   void	   precalc_last();
@@ -49,6 +71,9 @@ public: // override virtual
   void	   dc_advance();
   void	   tr_advance();
   void	   tr_regress();
+  void	   tr_accept();
+
+  virtual void expand();
   bool	   tr_needs_eval()const {/*assert(!is_q_for_eval());*/ return !is_constant();}
 #if 0
   void	   tr_queue_eval()	{
@@ -67,7 +92,8 @@ public: // override virtual
   XPROBE   ac_probe_ext(const std::string&)const;
 
 protected: // inline, below
-  double   dampdiff(double*, const double&);
+  template <class T>
+  T   dampdiff(T*, const T&);
 
   void	   tr_load_inode();
   void	   tr_unload_inode();
@@ -93,9 +119,11 @@ protected: // inline, below
   void	   tr_unload_active();
   void	   ac_load_active();
 
+  template <class T>
   void	   tr_load_extended(const node_t& no1, const node_t& no2,
 			    const node_t& ni1, const node_t& ni2,
-			    double* value, double* old_value);
+			    T* value, T* old_value);
+
   void	   ac_load_extended(const node_t& no1, const node_t& no2,
 			    const node_t& ni1, const node_t& ni2,
 			    COMPLEX value);
@@ -103,11 +131,14 @@ protected: // inline, below
   void	   tr_load_source_point(node_t& no1, double* value, double* old_value);
   void	   ac_load_source_point(node_t& no1, COMPLEX new_value);
 
-  void	   tr_load_diagonal_point(const node_t& no1, double* value, double* old_value);
+  template <class T>
+  void	   tr_load_diagonal_point(const node_t& no1, T* value, T* old_value);
+
   void	   ac_load_diagonal_point(const node_t& no1, COMPLEX value);
   
+  template <class T>
   void	   tr_load_point(const node_t& no1, const node_t& no2,
-			 double* value, double* old_value);
+			 T* value, T* old_value);
   void	   ac_load_point(const node_t& no1, const node_t& no2,
 			 COMPLEX value);
   
@@ -133,7 +164,7 @@ public:
 
   double   tr_outvolts()const	{return dn_diff(_n[OUT1].v0(), _n[OUT2].v0());}
   double   tr_outvolts_limited()const{return volts_limited(_n[OUT1],_n[OUT2]);}
-  COMPLEX  ac_outvolts()const	{return _n[OUT1]->vac() - _n[OUT2]->vac();}
+  COMPLEX  ac_outvolts()const	{return _n[OUT1].vac() - _n[OUT2].vac();}
 
   virtual  double  tr_involts()const		= 0;
   virtual  double  tr_input()const		{return tr_involts();}
@@ -142,10 +173,14 @@ public:
   virtual  double  tr_amps()const;
   virtual  COMPLEX ac_involts()const		= 0;
   virtual  COMPLEX ac_amps()const;
+  virtual void tt_advance();
+  virtual void tt_regress();
+//  virtual void tt_prepare(){ COMPONENT::tt_prepare(); }
 
-  virtual int order()const		{return OPT::trsteporder;}
-  virtual double error_factor()const	{return OPT::trstepcoef[OPT::trsteporder];}
-  int param_count()const {return (0 + COMPONENT::param_count());}
+  virtual int order()const		{return _trsteporder;}
+  virtual double error_factor()const	{return OPT::trstepcoef[_trsteporder];}
+private: // hack. should be private
+  int _trsteporder;
 protected:
   int      _loaditer;	// load iteration number
 private:
@@ -157,22 +192,33 @@ public:
   double   _loss1;
   COMPLEX  _acg;	// ac admittance matrix values
 public: // commons
-  COMPLEX  _ev;		// ac effective value (usually real)
+  hCOMPLEX  _ev;		// ac effective value (usually real)
   double   _dt;
+  DISCONT _discont;
 
   double   _time[OPT::_keep_time_steps];
   FPOLY1   _y1;		// iteration parameters, 1 iter ago
   FPOLY1   _y[OPT::_keep_time_steps]; /* charge or flux, and deriv.	*/
+  int param_count()const {return (0 + COMPONENT::param_count());}
+protected:
+  void     set_param_by_name(std::string Name, std::string Value);
+public: // required from bm_, hence public
+  ELEMENT* subdev();
+  bool has_ic() const;
+/*--------------------------------------------------------------------------*/
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-inline double ELEMENT::dampdiff(double* v0, const double& v1)
+template <class T>
+inline T ELEMENT::dampdiff(T* v0, const T& v1)
 {
   //double diff = v0 - v1;
   assert(v0);
-  assert(*v0 == *v0);
+  if(*v0 != *v0){ 
+    error(bWARNING,"nan in dampdiff: %s\n", short_label().c_str());
+  }
   assert(v1 == v1);
-  double diff = dn_diff(*v0, v1);
+  T diff = dn_diff(*v0, v1);
   assert(diff == diff);
   if (!_sim->is_advance_or_first_iteration()) {
     diff *= _sim->_damp;
@@ -184,6 +230,7 @@ inline double ELEMENT::dampdiff(double* v0, const double& v1)
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::tr_load_inode()
 {
+  assert(_loss0 == _loss0);
   double d = dampdiff(&_loss0, _loss1);
   if (d != 0.) {
     _sim->_aa.load_couple(_n[OUT1].m_(), _n[IN1].m_(), -d);
@@ -208,6 +255,7 @@ inline void ELEMENT::ac_load_inode()
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::tr_load_shunt()
 {
+  assert(_loss0 == _loss0);
   double d = dampdiff(&_loss0, _loss1);
   if (d != 0.) {
     _sim->_aa.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), d);
@@ -231,13 +279,17 @@ inline void ELEMENT::ac_load_shunt()
 inline void ELEMENT::tr_load_source()
 {
 #if !defined(NDEBUG)
-  assert(_loaditer != _sim->iteration_tag()); // double load
+  if (_loaditer == _sim->iteration_tag()){
+    // this is a HACK
+    error(bDANGER, "ELEMENT::tr_load_source. double load %s %i\n", long_label().c_str(), _loaditer);
+  }
   _loaditer = _sim->iteration_tag();
 #endif
 
+  assert(_m0.c0 == _m0.c0);
   double d = dampdiff(&_m0.c0, _m1.c0);
   if (d != 0.) {
-    if (_n[OUT2].m_() != 0) {
+    if (_n[OUT2].m_() != 0) { //gnd knoten
       _n[OUT2].i() += d;
     }else{
     }
@@ -260,17 +312,18 @@ inline void ELEMENT::tr_unload_source()
 inline void ELEMENT::ac_load_source()
 {
   if (_n[OUT2].m_() != 0) {
-    _n[OUT2]->iac() += mfactor() * _acg;
+    _n[OUT2].iac() += mfactor() * _acg;
   }else{
   }
   if (_n[OUT1].m_() != 0) {
-    _n[OUT1]->iac() -= mfactor() * _acg;
+    _n[OUT1].iac() -= mfactor() * _acg;
   }else{itested();
   }
 }
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::tr_load_couple()
 {
+  assert( _m0.c1 == _m0.c1 );
   double d = dampdiff(&_m0.c1, _m1.c1);
   if (d != 0.) {
     _sim->_aa.load_couple(_n[OUT1].m_(), _n[OUT2].m_(), d);
@@ -293,6 +346,10 @@ inline void ELEMENT::ac_load_couple()
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::tr_load_passive()
 {
+  // untested0( long_label().c_str() );
+  if( _m0.c1 != _m0.c1 ){
+    trace0("ELEMENT::tr_load_passive not numbers");
+  }
   double d = dampdiff(&_m0.c1, _m1.c1);
   if (d != 0.) {
     _sim->_aa.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), d);
@@ -315,6 +372,7 @@ inline void ELEMENT::ac_load_passive()
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::tr_load_active()
 {
+  assert( _m0.c1 == _m0.c1 );
   double d = dampdiff(&_m0.c1, _m1.c1);
   if (d != 0.) {
     _sim->_aa.load_asymmetric(_n[OUT1].m_(), _n[OUT2].m_(),
@@ -337,11 +395,14 @@ inline void ELEMENT::ac_load_active()
 		      _n[IN1].m_(), _n[IN2].m_(), mfactor() * _acg);
 }
 /*--------------------------------------------------------------------------*/
+template <class T>
 inline void ELEMENT::tr_load_extended(const node_t& no1, const node_t& no2,
 				      const node_t& ni1, const node_t& ni2,
-				      double* new_value, double* old_value)
+				      T* new_value, T* old_value)
 {
-  double d = dampdiff(new_value, *old_value);
+  // untested();
+  assert( new_value == new_value);
+  T d = dampdiff(new_value, *old_value);
   if (d != 0.) {
     _sim->_aa.load_asymmetric(no1.m_(), no2.m_(), ni1.m_(), ni2.m_(), d);
   }else{
@@ -359,6 +420,7 @@ inline void ELEMENT::ac_load_extended(const node_t& no1, const node_t& no2,
 inline void ELEMENT::tr_load_source_point(node_t& no1,
 				   double* new_value, double* old_value)
 {
+  assert( new_value == new_value);
   double d = dampdiff(new_value, *old_value);
   if (d != 0.) {
     if (no1.m_() != 0) {
@@ -373,15 +435,16 @@ inline void ELEMENT::tr_load_source_point(node_t& no1,
 inline void ELEMENT::ac_load_source_point(node_t& no1, COMPLEX new_value)
 {itested();
   if (no1.m_() != 0) {itested();
-    no1->iac() += mfactor() * new_value;
+    no1.iac() += mfactor() * new_value;
   }else{itested();
   }
 }
 /*--------------------------------------------------------------------------*/
+template <class T>
 inline void ELEMENT::tr_load_diagonal_point(const node_t& no1,
-					    double* new_value, double* old_value)
+					    T* new_value, T* old_value)
 {
-  double d = dampdiff(new_value, *old_value);
+  T d = dampdiff(new_value, *old_value);
   if (d != 0.) {
     _sim->_aa.load_diagonal_point(no1.m_(), d);
   }else{
@@ -394,10 +457,12 @@ inline void ELEMENT::ac_load_diagonal_point(const node_t& no1, COMPLEX new_value
   _sim->_acx.load_diagonal_point(no1.m_(), mfactor() * new_value);
 }
 /*--------------------------------------------------------------------------*/
+template <class T>
 inline void ELEMENT::tr_load_point(const node_t& no1, const node_t& no2,
-				   double* new_value, double* old_value)
+				   T* new_value, T* old_value)
 {
-  double d = dampdiff(new_value, *old_value);
+  itested();
+  T d = dampdiff(new_value, *old_value);
   if (d != 0.) {
     _sim->_aa.load_point(no1.m_(), no2.m_(), d);
   }else{
@@ -420,6 +485,7 @@ inline bool ELEMENT::conv_check()const
 /*--------------------------------------------------------------------------*/
 inline bool ELEMENT::has_tr_eval()const
 {
+  //  untested0(long_label().c_str());
   return (has_common() && common()->has_tr_eval());
 }
 /*--------------------------------------------------------------------------*/
@@ -460,5 +526,24 @@ inline void ELEMENT::ac_eval()
   }
 }
 /*--------------------------------------------------------------------------*/
+inline ELEMENT* ELEMENT::subdev()
+{
+  if (!subckt()) return NULL;
+  assert(subckt()->size()==1);
+  CARD* c = *(subckt()->begin());
+  ELEMENT* e = prechecked_cast<ELEMENT*>(c);
+  assert(e);
+  return e;
+}
+/*--------------------------------------------------------------------------*/
+inline bool ELEMENT::has_ic() const
+{
+  if ( const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common()) ){
+    if (x->_ic != NOT_INPUT) return 1;
+  }
+  return false;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

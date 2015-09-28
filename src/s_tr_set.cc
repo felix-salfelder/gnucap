@@ -1,4 +1,4 @@
-/*$Id: s_tr_set.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                                -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,7 +21,6 @@
  *------------------------------------------------------------------
  * set up transient and fourier analysis
  */
-//testing=script 2007.11.21
 #include "u_sim_data.h"
 #include "u_prblst.h"
 #include "ap.h"
@@ -39,13 +38,16 @@ void TRANSIENT::setup(CS& Cmd)
   _tstop.e_val(NOT_INPUT, _scope);
   _tstep.e_val(NOT_INPUT, _scope);
 
-  _cont = true;
+  _cont=false;
   if (Cmd.match1("'\"({") || Cmd.is_pfloat()) {
+    trace1("TRANSIENT::setup parsing args", printlist().size());
     PARAMETER<double> arg1, arg2, arg3;
     Cmd >> arg1;
+    arg1.e_val(0.0,_scope);
     if (Cmd.match1("'\"({") || Cmd.is_float()) {
       Cmd >> arg2;
-    }else{itested();
+      arg2.e_val(0.0,_scope);
+    }else{
     }
     if (Cmd.match1("'\"({") || Cmd.is_float()) {
       Cmd >> arg3;
@@ -65,6 +67,8 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstart = arg1;			    /* _tstart _tstop _tstep */
 	_tstop  = arg2;				
 	_tstep  = arg3;
+        // BUG
+        // std::cout << "\n"; // gnuplot. no newline command yet.
       }else if (arg1 > arg3) {untested();   /* eca (logical) order: */
 	_tstart = arg1;			    /* _tstart _tstop _tstep */
 	_tstop  = arg2;				
@@ -78,12 +82,14 @@ void TRANSIENT::setup(CS& Cmd)
       assert(arg1.has_hard_value());
       arg1.e_val(0.,_scope);
       arg2.e_val(0.,_scope);
-      if (arg1 == 0.) {untested(); 	    /* 2 args: _tstart, _tstop */
+      if (arg1 == 0.) {
+        /* 2 args: _tstart, _tstop */
 	_tstart = arg1;
 	_tstop  = arg2;
 	/* _tstep unchanged */
-      }else if (arg1 >= arg2) {		    /* 2 args: _tstop, _tstep */
-	_tstart = _sim->_last_time;
+      }else if (arg1 >= arg2) {
+        /* 2 args: _tstop, _tstep */
+	_tstart = _sim->last_time();
 	_tstop  = arg1;
 	_tstep  = arg2;
       }else{ /* arg1 < arg2 */		    /* 2 args: _tstep, _tstop */
@@ -91,29 +97,30 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstop  = arg2;
 	_tstep  = arg1;
       }
-    }else{itested();
+    }else{
       assert(arg1.has_hard_value());
       arg1.e_val(0.,_scope);
-      if (arg1 > _sim->_last_time) {untested();	    /* 1 arg: _tstop */
-	_tstart = _sim->_last_time;
+      if (arg1 > _sim->last_time()) {
+        /* 1 arg: _tstop */
+	_tstart = _sim->last_time();
 	_tstop  = arg1;
 	/* _tstep unchanged */
-      }else if (arg1 == 0.) {itested();	    /* 1 arg: _tstart */
+      }else if (arg1 == 0.) {untested();itested();	    /* 1 arg: _tstart */
 	double oldrange = _tstop - _tstart;
 	_tstart = 0.;
 	_tstop  = oldrange;
 	/* _tstep unchanged */
-      }else{untested(); /* arg1 < _sim->_last_time, but not 0 */  /* 1 arg: _tstep */
+      }else{untested(); /* arg1 < _sim->last_time(), but not 0 */  /* 1 arg: _tstep */
 	double oldrange = _tstop - _tstart;
-	_tstart = _sim->_last_time;
-	_tstop  = _sim->_last_time + oldrange;
+	_tstart = _sim->last_time();
+	_tstop  = _sim->last_time() + oldrange;
 	_tstep  = arg1;
       }
     }
   }else{ /* no args */
     double oldrange = _tstop - _tstart;
-    _tstart = _sim->_last_time;
-    _tstop  = _sim->_last_time + oldrange;
+    _tstart = _sim->last_time();
+    _tstop  = _sim->last_time() + oldrange;
     /* _tstep unchanged */
   }
   if (Cmd.match1("'\"({") || Cmd.is_pfloat()) {
@@ -126,18 +133,18 @@ void TRANSIENT::setup(CS& Cmd)
   _tstop.e_val(NOT_INPUT, _scope);
   _tstep.e_val(NOT_INPUT, _scope);
 
-  if  (_cold || _tstart < _sim->_last_time  ||  _sim->_last_time <= 0.) {
+  if  ((_cold || _tstart < _sim->last_time()  ||  _sim->last_time() <= 0.) && !_cont ) {
     _cont = false;
-    time1 = _sim->_time0 = 0.;
+    _time1 = _sim->_time0 = 0.;
   }else{
     _cont = true;
-    time1 = _sim->_time0 = _sim->_last_time;
+    _time1 = _sim->_time0 = _sim->last_time();
   }
   _sim->_freq = ((_tstop > _tstart) ? (1 / (_tstop - _tstart)) : (0.));
 
-  if (!_tstep.has_good_value()) {
+  if (!_tstep.has_good_value()) {untested();
     throw Exception("transient: time step is required");
-  }else if (_tstep==0.) {itested();
+  }else if (_tstep==0.) {untested();itested();
     throw Exception("time step = 0");
   }else{
   }
@@ -150,14 +157,15 @@ void TRANSIENT::setup(CS& Cmd)
     _dtmax = std::min(_dtmax_in, _tstep);
   }
 
-  if (_dtmin_in.has_hard_value()) {
+  if (_dtmin_in.has_hard_value()) {untested();
     _sim->_dtmin = _dtmin_in;
-  }else if (_dtratio_in.has_hard_value()) {
+  }else if (_dtratio_in.has_hard_value()) {untested();
     _sim->_dtmin = _dtmax / _dtratio_in;
   }else{
     // use larger of soft values
     _sim->_dtmin = std::max(double(_dtmin_in), _dtmax/_dtratio_in);
   }
+  trace3("TRANSIENT::setup done", _cont, _sim->_time0, _time1);
 }
 /*--------------------------------------------------------------------------*/
 /* tr_options: set options common to transient and fourier analysis
@@ -166,22 +174,32 @@ void TRANSIENT::options(CS& Cmd)
 {
   _out = IO::mstdout;
   _out.reset(); //BUG// don't know why this is needed
+
+  bool _dump_matrix = false;
+  _edge_detect = edNONE;
+  _cont_dc = false;
+
   _sim->_temp_c = OPT::temp_c;
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
   _sim->_uic = _cold = false;
+  _sim->_age = false;
   _trace = tNONE;
   unsigned here = Cmd.cursor();
   do{
     ONE_OF
       || Get(Cmd, "c{old}",	   &_cold)
+      || Get(Cmd, "cont",	   &_cont_dc)
       || Get(Cmd, "dte{mp}",	   &_sim->_temp_c,  mOFFSET, OPT::temp_c)
       || Get(Cmd, "dtma{x}",	   &_dtmax_in)
       || Get(Cmd, "dtmi{n}",	   &_dtmin_in)
+      || Get(Cmd, "p{rint}",	   &_print_only)
       || Get(Cmd, "dtr{atio}",	   &_dtratio_in)
       || Get(Cmd, "pl{ot}",	   &ploton)
       || Get(Cmd, "sk{ip}",	   &_skip_in)
       || Get(Cmd, "te{mperature}", &_sim->_temp_c)
       || Get(Cmd, "uic",	   &_sim->_uic)
+      || Get(Cmd, "age",           &_sim->_age)
+      || Get(Cmd, "dm",            &_dump_matrix)
       || (Cmd.umatch("tr{ace} {=}") &&
 	  (ONE_OF
 	   || Set(Cmd, "n{one}",      &_trace, tNONE)
@@ -195,10 +213,28 @@ void TRANSIENT::options(CS& Cmd)
 		       "rejected, iterations, verbose")
 	   )
 	  )
-      || outset(Cmd,&_out)
+      || (Cmd.umatch("edge{detect} {=}") &&
+	  (ONE_OF
+	   || Set(Cmd, "n{one}",     &_edge_detect, unsigned(edNONE))
+	   || Set(Cmd, "off",        &_edge_detect, unsigned(edNONE))
+	   || Set(Cmd, "y{es}",      &_edge_detect, unsigned(edYES))
+	   || Set(Cmd, "e{vt}",      &_edge_detect, unsigned(edYES | edEVT))
+	   || Set(Cmd, "b{reak}",    &_edge_detect, unsigned(edBREAK | edYES | edEVT))
+	   || Cmd.warn(bWARNING, "need none, off, yes, evt, break")
+	   )
+	  )
+      || _out.outset(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
-  Cmd.check(bWARNING, "what's this?");
+  Cmd.check(bWARNING, "TRopt what's this?");
+
+  if(_dump_matrix) {
+    _trace = (TRACE) (_trace | (int)tMATRIX);
+  }
+
+  if (_sim->_age) {
+  }else{
+  }
 
   IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
   initio(_out);
@@ -207,6 +243,8 @@ void TRANSIENT::options(CS& Cmd)
   _dtmin_in.e_val(OPT::dtmin, _scope);
   _dtratio_in.e_val(OPT::dtratio, _scope);
   _skip_in.e_val(1, _scope);
+
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

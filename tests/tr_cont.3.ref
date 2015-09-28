@@ -1,0 +1,27 @@
+#           v(1)       v(c1)      ic(c1)     q(c1)     
+ 0.         0.         0.         0.        -Inf       
+-1.         0.         0.         0.         0.        
+-2.         0.         0.         0.         0.        
+ 0.         0.         0.         0.         0.        
+#Time       method(c1) ord(c1)    v(1)       control(0) dq(c1)    
+ 0.        -1.        -1.         0.         1.         0.        
+ 0.         4.         0.         0.         9.         0.        
+-1.         4.         0.         0.         9.         0.        
+ 10.n       4.         0.         0.         9.         0.        
+ 0.         2.         1.         0.         6.         0.        
+-1.         2.         1.         0.         6.         0.        
+ 20.n       2.         1.         0.         6.         0.        
+ 0.         2.         2.         0.         6.         0.        
+-1.         2.         2.         0.         6.         0.        
+ 30.n       2.         2.         0.         6.         0.        
+ 0.         2.         2.         0.         6.         0.        
+-1.         2.         2.         0.         6.         0.        
+ 40.n       2.         2.         0.         6.         0.        
+ 0.         2.         2.         0.         1.         0.        
+-1.         2.         2.         0.         1.         0.        
+ 1.u        2.         2.         0.         1.         0.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=10, fourier=0, total=19
+transient timesteps: accepted=6, rejected=0, total=6
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

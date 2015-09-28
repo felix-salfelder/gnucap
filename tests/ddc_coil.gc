@@ -1,0 +1,12 @@
+spice
+
+.parameter a=1
+
+R1 n1 0 100
+L1 n1 0 1.001 ic=a
+
+* dv doesnt work for coil. need branch coil.
+.print ddc v(nodes) ddv(nodes) dv(nodes)
+
+.ddc a -1 1 .5 tr
+.end

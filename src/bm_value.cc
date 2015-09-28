@@ -1,4 +1,4 @@
-/*$Id: bm_value.cc,v 26.130 2009/11/15 21:51:59 al Exp $ -*- C++ -*-
+/*$Id: bm_value.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -58,7 +58,10 @@ bool EVAL_BM_VALUE::is_trivial()const
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_VALUE::precalc_first(const CARD_LIST* Scope)
 {
-  if (modelname() != "") {
+  if (_value.has_hard_value()) {
+    trace2("EVAL_BM_VALUE::precalc_first hard.", _value, modelname());
+  }else if (modelname() != "") {
+    trace2("EVAL_BM_VALUE::precalc_first", _value, modelname());
     _value = modelname();
   }else{
   }
@@ -67,6 +70,7 @@ void EVAL_BM_VALUE::precalc_first(const CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_VALUE::tr_eval(ELEMENT* d)const
 {
+  trace1("EVAL_BM_VALUE::tr_eval", _value);
   tr_finish_tdv(d, _value);
 }
 /*--------------------------------------------------------------------------*/
@@ -83,12 +87,23 @@ bool EVAL_BM_VALUE::parse_numlist(CS& cmd)
   }
 }
 /*--------------------------------------------------------------------------*/
+void EVAL_BM_VALUE::set_param_by_name(string Name, string Value)
+{
+
+	EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+}
+/*--------------------------------------------------------------------------*/
 bool EVAL_BM_VALUE::parse_params_obsolete_callback(CS& cmd)
 {
-  return ONE_OF
-    || Get(cmd, "=", &_value)
-    || EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(cmd)
-    ;
+  trace2("hmm", cmd.fullstring(), cmd.tail());
+  if (Get(cmd, "=", &_value)){
+	  return true;
+  } else if (EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(cmd)) {
+	  return true;
+  } else {
+	  return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,4 +1,4 @@
-/*$Id: m_divdiff.h,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: m_divdiff.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -56,3 +56,4 @@ inline void derivatives(T1 c[], int n, const T2 t[])
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

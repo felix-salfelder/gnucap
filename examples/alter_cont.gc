@@ -1,0 +1,15 @@
+spice
+
+.param b=5
+
+V1 1 0 b
+R1 1 2 40k
+C1 2 0 10u
+
+.print tran v(1) v(2)
+.tran 0 1 1e-1
+
+.param b=1
+.tran 2 cont trace=a
+
+.end

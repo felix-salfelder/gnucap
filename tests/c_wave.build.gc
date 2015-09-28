@@ -1,0 +1,63 @@
+load c_wave.so
+
+wave build foo3
+#a b c d e
+0 1 2 ?? 2
+2 2 3 ?? 4
+
+wave list foo3
+wave dump foo3:b
+wave dump foo3:c
+wave dump foo3:d
+wave dump foo3:e
+
+wave build foo
+#a b
+0 1
+2 2
+
+wave list
+wave list foo
+echo foo:b
+wave dump foo:b
+
+wave build foo2
+#a v(1) v(2)
+0 1 2
+2 2 3
+
+wave build foo2
+#a b c
+0 1 2
+2 2 3
+
+wave list
+wave list foo2
+echo dumping foo2:b
+wave dump "foo2:V(1)"
+echo dumping foo2:c
+wave dump foo2:c
+
+* no header. enumerate
+wave build bar
+1 2
+300 4
+444 5
+
+wave list bar
+echo dumping bar:0
+wave dump bar:0
+
+wave build baz
+1
+2
+3
+.
+
+wave list baz
+
+echo error.
+wave build
+
+wave list
+end

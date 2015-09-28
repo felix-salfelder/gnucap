@@ -1,0 +1,8 @@
+* comment 
+test bla(.n(1), .p(0), .q(2));
+
+                        ^ ? mismatch, ignored
+module test (n,p);
+endmodule // test
+
+test #() bla (.n(1),.p(0));

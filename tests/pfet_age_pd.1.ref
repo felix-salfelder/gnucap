@@ -1,0 +1,33 @@
+* p type inv amp w/bti 
+*.options numdgt=7 
+.model my_rcdmodel rcd ( tnom=NA( 27.) anneal=NA(1) rem=NA( 1.Meg) Re=NA( 1.) Rc=NA( 1.))
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 5.0001     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0002     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0003     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0007     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0015     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0031     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0063     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0127     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0255     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.0511     0.00171~   0.00171~   0.         100.       2.1757K    0.         0.         0.        
+ 5.1023     0.00171~   0.001715~  0.         100.       2.1757K    0.         0.         0.        
+ 5.2047     0.00171~   0.001715~  0.         100.       2.1757K    0.         0.         0.        
+ 5.4095     0.00171~   0.001715~  0.         100.       2.1757K    0.         0.         0.        
+ 5.8191     0.00171~   0.001715~  0.         100.       2.1757K    0.         0.         0.        
+ 6.6383     0.00171~   0.001714~  0.         100.       2.1757K    0.         0.         0.        
+ 8.2767     0.00171~   0.001713~  0.         100.       2.1757K    0.         0.         0.        
+ 10.        0.00171~   0.001712~  0.         100.       2.1757K    0.         0.         0.        
+sim= 0.001712083
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 5.         0.001712~  0.001712~  0.         100.       ??        -Inf       -Inf        Inf       
+ 10.        0.001708~  0.001708~  0.         100.       2.1757K   -Inf        0.         Inf       
+pd= 0.0017082~ 
+(sim - pd)= 3.8~u  
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=229304
+transient timesteps: accepted=50789, rejected=0, total=50786
+twotime timesteps: accepted=182, rejected=0, total=474
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=87.5%, ac density=87.5%

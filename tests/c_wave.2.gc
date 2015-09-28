@@ -1,0 +1,30 @@
+spice
+.load c_wave.so
+
+.param p=0
+v1 1 0 pwl 0 -1 .01 1 9.99 1 10 -1
+v2 0 2 pwl 0 -1 .01 1 9.99 1 10 -1
+
+.store tran v(nodes)
+.tran 0 10 10 trace=a > /dev/null
+
+.wstash 'v(1)' w1
+.wstash 'v(2)' w2
+
+.wave select stash
+.wave list
+
+.echo w1
+.wave dump w1
+.echo w2
+.wave dump w2
+
+*.echo hdd w1 w2 discrete (.01)
+*.wcmp w1 w2 directed method=dis
+.echo hdd w1 w2 (2)
+.wave cmp w1 w2 directed
+
+.echo hdd w1 w2 (2)
+.wave cmp w1 w2 directed v
+
+.end

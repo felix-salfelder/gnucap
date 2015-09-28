@@ -1,0 +1,6 @@
+spice
+.options numdgt 10
+.param a=3.141592653
+.eval a
+.options numdgt 5
+.eval a

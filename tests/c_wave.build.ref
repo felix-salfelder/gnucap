@@ -1,0 +1,37 @@
+B (2),
+C (2),
+D (0),
+E (2)
+ 0.         1.        
+ 2.         2.        
+ 0.         2.        
+ 2.         3.        
+ 0.         2.        
+ 2.         4.        
+*foo (1), foo3 (4)
+B (2)
+foo:b
+ 0.         1.        
+ 2.         2.        
+foo (1), *foo2 (4), foo3 (4)
+B (2),
+C (2),
+V(1) (2),
+V(2) (2)
+dumping foo2:b
+ 0.         1.        
+ 2.         2.        
+dumping foo2:c
+ 0.         2.        
+ 2.         3.        
+0 (3)
+dumping bar:0
+ 1.         2.        
+ 300.       4.        
+ 444.       5.        
+
+error.
+wave build
+
+           ^ ? need name
+bar (1), *baz (0), foo (1), foo2 (4), foo3 (4)

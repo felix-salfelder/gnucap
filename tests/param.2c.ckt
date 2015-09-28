@@ -1,0 +1,8 @@
+spice
+
+*bm_cond parser is broken.
+
+E1 1 0 0 0 dc a ac b
+v1 1 0 dc a ac b
+.list
+.end

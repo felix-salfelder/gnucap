@@ -1,0 +1,14 @@
+spice
+
+*c1 1 0 1n ic=17
+c1 1 0 1n ic=0
+r1 1 0 1k
+
+.print dc v(1) v(c1) ic(c1) q(c1)
+.dc uic trace=i
+
+.print tran method(c1) ord(c1) v(1) control(0) dq(c1)
+.tran 0 1u 1u trace=i cont
+
+.status notime
+.end

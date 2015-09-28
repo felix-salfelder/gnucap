@@ -1,0 +1,55 @@
+
+param a=1
+param q=1
+
+* options log
+
+build
+.brl L1 0 nl .01m ic=0.001
+R1 nosc nl .001
+.ttcap C1 nosc 0 .01m ic=1
+
+list
+
+options ttsteporder=4
+options ttstepgrow 1e99
+
+param TTend={3*tend}
+param TTend=.05
+param tend=62.83u
+
+
+nodelist
+
+echo > out.out
+echo > tr.out
+
+print dc v(c1) i(l1)
+print tran q(c1) v(c1) v(nosc) i(l1) v0dist(0) v0t(0)
+print tw v(c1) i(l1) ttorder(c1) ttmethod(c1) ttgain(0)
+
+* test frame detection
+param tend=70u
+dc uic
+echo ttr
+ttr 10u {TTend} {tend/50} {tend} * 1.5 new trace=g > outf.out tran cont edge=b > trf.out
+status notime
+
+end
+
+* without frame detection.
+param tend=62.913u
+dc uic
+ttr 0 {TTend} {tend/50} {tend} * 1.5 new trace=a >> out.out tran cont >> tr.out
+status notime
+
+end
+
+echo >> out.out
+echo >> tr.out
+
+dc uic
+ttr 10u {TTend} {tend/50} {tend} new trace=g >> out.out tran cont >> tr.out
+status notime
+
+end

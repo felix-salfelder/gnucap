@@ -1,0 +1,14 @@
+spice
+.param a=1
+
+.echo hello world
+
+.echo > for.tmp.out
+.sweep 10 a 0 1
+.printf "%f" a, >> for.tmp.out
+.printf "%f" a
+.echo
+.echo >> for.tmp.out
+go
+
+.end

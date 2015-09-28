@@ -1,4 +1,4 @@
-/*$Id: c_status.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                            -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,7 +25,6 @@
  *
  *   If "allocate" is changed, this must also be changed.
  */
-//testing=script 2006.07.17
 #include "u_sim_data.h"
 #include "u_status.h"
 #include "c_comand.h"
@@ -39,6 +38,17 @@ public:
   {
     IO::mstdout << "Gnucap   System status\n";
     
+    string what;
+    cmd >> what;
+    trace1("status", what);
+    if(CKT_BASE* c = status_dispatcher[what]){ itested();
+      IO::mstdout << c->status();
+      return;
+    }else{
+      cmd.reset();
+      cmd >> what;
+    }
+
     if (!cmd.umatch("n{otime} ")) {
       ::status.compute_overhead();
       IO::mstdout
@@ -63,7 +73,7 @@ public:
 	<< ::status.accept
 	<< ::status.output
 	<< ::status.overhead;
-      if (OPT::showall) {itested();
+      if (OPT::showall) {
 	IO::mstdout 
 	  << ::status.aux1
 	  << ::status.aux2
@@ -104,3 +114,4 @@ DISPATCHER<CMD>::INSTALL d(&command_dispatcher, "status", &p);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

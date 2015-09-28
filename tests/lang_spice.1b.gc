@@ -1,0 +1,11 @@
+simulator lang=spectre
+
+subckt fc_component vbias3  inn inp out ngnd vdd!
+ends fc_component
+
+OP (vbias3 ninn ninp nout 0 ndd) fc_component w=9
+simulator lang=spice
+.options insensitive=false
+
+.op trace=a
+.end

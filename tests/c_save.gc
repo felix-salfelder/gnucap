@@ -1,0 +1,7 @@
+spice
+R1 2 3 4
+R2 3 4 5
+
+.save /dev/stdout
+.acs
+save /dev/stdout R1

@@ -1,0 +1,119 @@
+* polarity symmetry check
+*>spice
+
+*.load force bsim330.so
+
+.model NMOS NMOS
++Level = 8
++Vth0= 0.42
++Capmod=3
++u0 = 0.05
+
+.model PMOS PMOS
++Level= 8
++Vth0= -0.42
++Capmod=3
++u0 = 0.05
+
+Mp noutp ninp 0 0 PMOS W='100E-6' L='1E-6'
+Mn noutn ninn 0 0 NMOS W='100E-6' L='1E-6'
+
+vn nddn 0 2
+vp nddp 0 -2
+
+vinn ninn 0 PWL (0  2 2n  2 5n 0 20n 0 22n  2 30n  2)
+vinp ninp 0 PWL (0 -2 2n -2 5n 0 20n 0 22n -2 30n -2)
+
+Rn noutn nddn 10k
+Rp noutp nddp 10k
+
+*E1 0 noutn noutp 0 1
+*E2 0 noutp noutn 0 1
+
+.options numdgt 9
+
+.print tr v(nodes) von(m*)
+* + amps(m*.Cqgd)
+* + vy00(m*.Cqgd)
+* + qgs(m*)
+* + qgate(m*)
+* + vi00(m*.Cqgd)
+* + in1(m*.Cqgd)
+* + vi01(m*.Cqgd)
+* + in2(m*.Cqgd)
+* + vi02(m*.Cqgd)
+* + in3(m*.Cqgd)
+* + vi03(m*.Cqgd)
+* + in4(m*.Cqgd)
+* + vi04(m*.Cqgd)
+* + n(m*.Cqgd)
+* + vin(m*.Cqgd)
+* + c(m*.Cqgd)
+* + vi00(m*.Cqgs)
+* + qgd(m*)
+* + ohms(m*.Cqgd)
+* + q(m*.Cqgd)
+* + c(m*.Cqgd)
+* + v(nou*) id(m*) ids(m*)
+* + gds(m*)
+* + gmf(m*)
+* + gmb(m*)
+* + cgsgb(m*)
+* + cgssb(m*)
+* + cgsdb(m*)
+* + vy1(m*.Cqgd)
+* + vi1(m*.Cqgd)
+* + qdrn(m*)
+* + cgdgb(m*)
+* + cgs(m*)
+* + cgdsb(m*)
+* + i(m*.cgs)
+* + v(m*.cgs)
+* + v(nin*)
+* + i(m*.Cqgd)
+* + is(m*)
+* + ig(m*)
+* + ib(m*)
+* + c(m*.c*)
+* + i(m*.cgd)
+* + cbdgb(m*)
+* + cbgb(m*)
+* + cgate(m*)
+* + cgd(m*)
+* + cgs(m*)
+* + gmb(m*)
+* + gmf(m*)
+* + gm(m*)
+* + idb(m*)
+* + idbxxx(m*)
+* + ig(m*)
+* + i(m*.cgb)
+* + i(m*.idb)
+* + i(m*.ids)
+* + i(m*.isb)
+* + isb(mb)
+* + isbxxx(m*)
+* + region(m*)
+* + reversed(m*)
+* + vgs(m*)
+* + von(m*)
+* + vdsat(m*)
+* + gtau(m*)
+* + v(nodes)
+* + vth(m*)
+*>.print dc v(nodes)
+*>.tr 0 40n 40n basic trace=a > test_np_tr.out echo
+.echo >> test_np_tr.out
+*>.tr 0 40n 1n basic trace=a >> test_np_tr.out echo
+.echo >> test_np_tr.out
+*>.tr 0 40n .1n basic trace=a >> test_np_tr.out echo
+
+**>.dc vsu 0 2 .1 basic
+*>.end
+
+
+
+*ngspice>.tran .1n 1n
+*ngspice>.print tran v(nin) v(nout) i(v1) vth(X1.MP) vbs(X1.MP)
+*ngspice>.dc vsu 0 2 .1
+*ngspice>.print dc v(nin) v(nout)

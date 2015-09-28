@@ -1,0 +1,18 @@
+L1 ( 0 nl )  10.u ic= 0.001
+R1 ( nosc nl )  0.001
+C1 ( nosc 0 )  10.u ic= 1.
+name   ...
+have 3 nodes. model: 1 sckt: 0 adp 0
+
+.l1.i    .l1.i matrix_number 1, user_number 3 nm[t]  vdc  0.
+nl       nl matrix_number 3, user_number 1 nm[t]  vdc  0.
+nosc     nosc matrix_number 2, user_number 2 nm[t]  vdc  0.
+#           v(C1)      i(L1)     
+ 0.         1.         0.001     
+ttr
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=6617
+transient timesteps: accepted=1321, rejected=83, total=1404
+twotime timesteps: accepted=21, rejected=1, total=22
+nodes: user=2, subckt=0, model=1, total=3
+dctran density=77.8%, ac density=77.8%

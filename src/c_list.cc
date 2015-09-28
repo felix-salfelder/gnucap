@@ -1,4 +1,4 @@
-/*$Id: c_list.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: c_list.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -42,8 +42,9 @@ void list_save(CS& cmd, OMSTREAM out, CARD_LIST* scope)
   case rPRESET:
     /* do nothing */
     return;
-  case rBATCH:		itested();
-  case rINTERACTIVE:	itested();
+  case rPIPE:		untested();
+  case rBATCH:
+  case rINTERACTIVE:
   case rSCRIPT:
     /* keep going */
     break;
@@ -66,7 +67,7 @@ void list_save(CS& cmd, OMSTREAM out, CARD_LIST* scope)
       ? CARD_LIST::fat_iterator(scope, scope->begin())
       : findbranch(cmd, scope);
     if (ci.is_end()) {itested();
-      throw Exception_CS("can't find", cmd);
+      throw Exception_CS("list_save: can't find", cmd);
     }else{
     }
     
@@ -80,7 +81,7 @@ void list_save(CS& cmd, OMSTREAM out, CARD_LIST* scope)
 	CARD_LIST::fat_iterator stop = ci;
 	stop = findbranch(cmd, ++stop);
 	if (stop.is_end()) {itested();
-	  throw Exception_CS("can't find", cmd);
+	  throw Exception_CS("list_save:  can't find", cmd);
 	}else{
 	  do {
 	    OPT::language->print_item(out, *ci);
@@ -115,10 +116,12 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "list", &p1);
 class CMD_SAVE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {itested();
+  {
     cmd.reset(); /* back up to beginning of input line */
+    cmd.skip1('.'); // HACK. are we in spice mode?
     OMSTREAM out; // = IO::mstdout;
-    list_save(cmd, *outset(cmd,&out), Scope);
+    OMSTREAM* o = out.outset(cmd);
+    list_save(cmd, *o, Scope);
   }
 } p2;
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "save", &p2);
@@ -126,3 +129,4 @@ DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "save", &p2);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

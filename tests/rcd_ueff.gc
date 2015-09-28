@@ -1,0 +1,44 @@
+spice
+.options numdgt 4
+.load rcd_sym.so
+
+.model my_rcd rcd_exp
+
+.verilog
+my_rcd #(.weight(100) .re0(10) .re1(10).rc0(11) .rc1(-3) ) z3( nin, 0); // swapped
+
+
+spice
+.list
+
+.param amplitude=0.8
+*V1 nin 0 pulse ( iv=0 pv=amplitude delay=delay rise=.3 fall=.7 width=0 period=period )
+V1 nin 0 sin amplitude=1.2 offset=1.5 frequency=1
+*V2 nin2 0 sin amplitude=0 offset=3 frequency=1
+.param period=1
+.param width=1
+.param delay=1n
+
+.print tw
++ueff(z*)
++P(z*)
+.print tran v(nin)
++P(z*) E(z*) E0(z*)
++tau(z*) hidden(0)
+
+.store tw ueff(z*) P(z*)
+.ttr 2000 .5 10 new basic
++ tran > rcd_ueff_tr.out
+* .tw .5 10 2000 1 new basic
+
+.measure u at(probe="ueff(z3)")
+.measure p at(probe="P(z3)")
+
+.measure u at(probe="ueff(z3)" at=500)
+.measure p at(probe="P(z3)" at=500)
+
+.measure u at(probe="ueff(z3)")
+.measure p at(probe="P(z3)")
+
+.status notime
+.end

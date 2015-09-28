@@ -1,0 +1,15 @@
+spice
+* a coil with branch
+
+.verilog
+brl #(.l(0.98) .ic(1)) lb(n1,0);
+spice
+
+
+R1 n1 0 100
+R2 n2 0 100
+L2 n2 0 0.98 ic=1
+
+.print ddc v(nodes) dv(nodes) i(l*) ddv(nodes) ic(l*)
+.ddc tr
+.end

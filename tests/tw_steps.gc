@@ -1,0 +1,46 @@
+spice
+
+.options ttstepgrow=1000
+.options numdgt=8
+
+R1 0 1 1
+V1 0 1 sin amplitude=1
+
+.print tw ttime(0) control(0) hidden(0)
+.print tran control(0) v(nodes)
+
+.echo * linear stepping 1.1 trace=a
+.tw 1 0.5 5 1.1 new trace=a
+.echo * linear stepping 1.1
+.tw 1 0.5 5 1.1 new
+
+.options ttstepgrow=1.2
+
+.echo * linear stepping 1.1 trace=a
+.tw 1 0.5 20 1.1 new trace=a
+.echo * linear stepping 1.1
+.tw 1 0.5 20 1.1 new
+
+.echo * mult stepping, 1.1 (below ttstepgrow)
+.tw 1 0.5 10 * 1.1 new
+.echo * mult stepping, 1.2 trace=a
+.tw 1 0.5 10 * 1.1 new trace=a
+
+.echo * mult stepping, 1.3 (above ttstepgrow)
+.tw 1 0.5 10 * 1.3 new
+
+.echo * mult stepping, 1.3 trace=a
+.tw 1 0.5 10 * 1.3 new trace=a
+
+.echo * default stepping (mul, 1.3)
+.tw 1 0.5 10 new
+
+.echo * default stepping (mul, 1.3), trace=a
+.tw 1 0.5 10 new trace=a
+
+* doesnt work. + is_float()
+*.echo * explicit linear stepping
+*.tw 1 0.1 10 + 1.4 new
+
+.status notime
+.end

@@ -1,0 +1,18 @@
+spice
+
+.options ttstepgrow=1000
+.options numdgt=8
+
+R1 0 1 1
+V1 0 1 a
+.param a=1
+
+.print tw ttime(0) control(0) V(v1)
+*.print tran control(0) v(nodes)
+
+.echo * ttr 0 10
+.ttr 0 10 1 0.5 * 1.4 new
+.param a=0
+.echo * ttr 20
+.ttr 20
+.end

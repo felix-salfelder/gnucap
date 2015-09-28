@@ -1,0 +1,29 @@
+spice
+
+.model nmos nmos level=1
+
+.subckt foo 1 2
+M1 1 1 2 2 nmos w=wid l=1
+.ends
+
+.subckt bar 1 2
+.model nmos2 nmos level=1
+M1 1 1 2 2 nmos2 w=wid l=1
+.ends
+
+v1 0 1 5
+r1 1 2 1k
+r2 1 3 1k
+
+X1 0 2 foo wid=10
+X2 0 3 foo wid=1
+X3 0 2 bar wid=10
+X4 0 3 bar wid=1
+
+
+.list
+
+.print dc w(X*.M1) i(r*)
+.dc trace=i
+.end
+

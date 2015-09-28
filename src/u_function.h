@@ -1,4 +1,5 @@
-/*$Id: u_function.h,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: u_function.h,v 1.3 2010-09-07 07:46:26 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,17 +22,51 @@
  *------------------------------------------------------------------
  */
 //testing=none
+#ifndef _U_FUNC
+#define _U_FUNC
 #include "md.h"
+#include "e_base.h"
+using std::string;
 /*--------------------------------------------------------------------------*/
 class CS;
 class CARD_LIST;
 class WAVE;
 /*--------------------------------------------------------------------------*/
-class FUNCTION {
+// more general function... 
+class FUNCTION_BASE : public CKT_BASE {
 public:
-  virtual std::string eval(CS&, const CARD_LIST*)const = 0;
-protected:
-  WAVE* find_wave(const std::string& probe_name)const;
+  virtual void expand(CS&, const CARD_LIST*) = 0;
+  virtual fun_t eval(CS&, const CARD_LIST*)const =0; // const {return 888;}
+  virtual string label() const =0;
+  virtual FUNCTION_BASE* clone()const=0;
+};
+/*--------------------------------------------------------------------------*/
+// ordinary function. as in gnucap-2009-12
+class FUNCTION : public FUNCTION_BASE {
+public:
+  virtual void expand(CS&, const CARD_LIST*){ } // ordinary functions dont need to be expanded.
+  virtual fun_t eval(CS&, const CARD_LIST*)const =0; // const {return 888;}
+  virtual string label() const {return "ordinary";}
+  virtual FUNCTION_BASE* clone()const {assert(0); return 0;}
+};
+/*--------------------------------------------------------------------------*/
+class WAVE_FUNCTION : public FUNCTION_BASE {
+  protected:
+    WAVE* _w;
+  public:
+//    virtual FUNCTION* clone()const {return NULL;}
+    WAVE_FUNCTION():_w(0),probe_name("unset"){}
+    // virtual fun_t eval(CS&, const CARD_LIST*)const{ incomplete(); return 0; }
+    virtual fun_t wave_eval() const = 0;
+    string probe_name;
+    void set_wave(WAVE* w) {_w = w;}
+
+    fun_t eval(CS&, const CARD_LIST*) const {return wave_eval();} 
+
+  protected:
+    WAVE* find_wave(const std::string& probe_name)const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+#endif

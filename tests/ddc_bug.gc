@@ -1,0 +1,15 @@
+spice
+
+.param a=0
+V1 u0 0 a
+R1 u0 u1 1
+C1 u1 0 .1
+
+.print ddc v(nodes)
+.print dc v(nodes)
+
+.ddc V1 -1 1 1
+.dc V1 -1 1 1
+.ddc a -1 1 1
+
+.end

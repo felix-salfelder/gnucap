@@ -1,0 +1,7 @@
+paramset foo
+
+             ^ ? paramset: base has incorrect type
+paramset diode d;
+ .tnom=NA( 27.); .is=5; .rs=NA( 0.); .n=NA( 1.); .tt=NA( 0.); .cjo=NA( 0.); .pb=NA( 1.); .mj=NA( 0.5); .egap=NA( 1.11); .xti=NA( 3.); .fc=NA( 0.5);
+endparmset
+

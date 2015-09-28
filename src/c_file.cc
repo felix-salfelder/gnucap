@@ -1,4 +1,4 @@
-/*$Id: c_file.cc,v 26.86 2008/07/07 22:31:11 al Exp $ -*- C++ -*-
+/*                                 -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -24,33 +24,64 @@
  * >   == all output to a file (redirect stdout)
  * bare command closes the file
  */
-//testing=none 2006.07.16
 #include "u_lang.h"
 #include "c_comand.h"
 #include "globals.h"
+#include "u_parameter.h"
+#include <libgen.h>
 /*--------------------------------------------------------------------------*/
 extern OMSTREAM mout;		/* > file bitmap		*/
 extern OMSTREAM mlog;		/* log file bitmap		*/
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class CMD_INCLUDE : public CMD {
+class CMD_INCLUDE : public CMD { //
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
+    trace0("CMD_INCLUDE::do_it");
     unsigned here = cmd.cursor();
+    char* dirtmp=NULL;
+    char* basetmp=NULL;
+    char buf[PATH_MAX];
+    char* cwd;
+    cwd = getcwd(buf, PATH_MAX);
     try {
       std::string file_name;
       cmd >> file_name;
-      CS file(CS::_INC_FILE, file_name);
+      trace1("include", file_name);
+
+      if (file_name.c_str()[0]){
+        if (file_name.c_str()[0] == '$'){ untested();
+          trace1("have dollar", file_name);
+          PARAMETER<string> a(file_name.c_str()+1);
+          a.e_val("", Scope);
+          if(!(a=="")) file_name=a;
+        }
+      }else{ untested();
+        trace1("no dollar", file_name);
+      }
+      dirtmp = strdup(file_name.c_str());
+      basetmp = strdup(file_name.c_str());
+
+      char* dir = dirname(dirtmp);
+      char* base = basename(basetmp);
+      trace1("chdir", dir);
+      chdir(dir);
+
+      CS file(CS::_INC_FILE, std::string(base));
       for (;;) {
+        trace1( (" CMD_INCLUDE::do_it > " +file_name).c_str() , (OPT::language) );
 	OPT::language->parse_top_item(file, Scope);
       }
-    }catch (Exception_File_Open& e) {
+    }catch (Exception_File_Open& e) { untested();
       cmd.warn(bDANGER, here, e.message() + '\n');
-    }catch (Exception_End_Of_Input& e) {
+    }catch (Exception_End_Of_Input& e) { untested();
       // done
     }
+    free(dirtmp);
+    free(basetmp);
+    chdir(cwd);
   }
 } p0;
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "include", &p0);
@@ -140,3 +171,4 @@ DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, ">", &p2);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

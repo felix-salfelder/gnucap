@@ -1,4 +1,4 @@
-/*$Id: bmm_semi.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -22,10 +22,10 @@
  * behavioral modeling
  * Spice3 compatible "semiconductor resistor and capacitor"
  */
-//testing=script 2006.07.13
 #include "u_lang.h"
 #include "e_model.h" 
 #include "bm.h"
+#include "e_elemnt.h"
 /*--------------------------------------------------------------------------*/
 class EVAL_BM_SEMI_BASE : public EVAL_BM_ACTION_BASE {
 protected:
@@ -37,6 +37,7 @@ private:
   static double const _default_width;
   static double const _default_value;
 protected:
+  const CARD* component_proto() const;
   explicit EVAL_BM_SEMI_BASE(const EVAL_BM_SEMI_BASE& p);
   explicit EVAL_BM_SEMI_BASE(int c=0);
   ~EVAL_BM_SEMI_BASE() {}
@@ -48,10 +49,16 @@ protected: // override virtual
   void		precalc_first(const CARD_LIST*);
   void  	expand(const COMPONENT*);
   void		tr_eval(ELEMENT*)const;
-  std::string	name()const	{untested();return modelname().c_str();}
+  std::string	name()const	{return modelname().c_str();}
   bool		ac_too()const		{untested();return false;}
   bool  	parse_params_obsolete_callback(CS&);
+  bool		parse_numlist(CS& cmd);
+  bool		is_constant()const{return true;}
 };
+/*--------------------------------------------------------------------------*/
+const CARD* EVAL_BM_SEMI_BASE::component_proto() const{
+  throw Exception("cannot instanciate spice model canonically");
+}
 /*--------------------------------------------------------------------------*/
 class EVAL_BM_SEMI_CAPACITOR : public EVAL_BM_SEMI_BASE {
 private:
@@ -76,6 +83,7 @@ public:
   explicit EVAL_BM_SEMI_RESISTOR(int c=0)
     :EVAL_BM_SEMI_BASE(c) {}
   ~EVAL_BM_SEMI_RESISTOR() {}
+  void print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const;
 private: // override virtual
   bool		operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const {return new EVAL_BM_SEMI_RESISTOR(*this);}
@@ -96,7 +104,7 @@ private:
   static double const _default_tc1;
   static double const _default_tc2;
 protected:
-  explicit MODEL_SEMI_BASE();
+  explicit MODEL_SEMI_BASE(const COMPONENT*);
   explicit MODEL_SEMI_BASE(const MODEL_SEMI_BASE& p);
 protected: // override virtual
   void  precalc_first();
@@ -120,7 +128,7 @@ private:
 private:
   explicit MODEL_SEMI_CAPACITOR(const MODEL_SEMI_CAPACITOR& p);
 public:
-  explicit MODEL_SEMI_CAPACITOR();
+  explicit MODEL_SEMI_CAPACITOR(const COMPONENT*);
 private: // override virtual
   std::string dev_type()const		{return "c";}
   void  precalc_first();
@@ -143,7 +151,7 @@ private:
 private:
   explicit MODEL_SEMI_RESISTOR(const MODEL_SEMI_RESISTOR& p);
 public:
-  explicit MODEL_SEMI_RESISTOR();
+  explicit MODEL_SEMI_RESISTOR(const COMPONENT*);
 private: // override virtual
   std::string dev_type()const		{return "r";}
   void  precalc_first();
@@ -162,8 +170,24 @@ double const EVAL_BM_SEMI_BASE::_default_length = NOT_INPUT;
 double const EVAL_BM_SEMI_BASE::_default_width = NOT_INPUT;
 double const EVAL_BM_SEMI_BASE::_default_value = NOT_INPUT;
 /*--------------------------------------------------------------------------*/
-static MODEL_SEMI_RESISTOR  p1;
-static MODEL_SEMI_CAPACITOR p2;
+class NOTHING : public COMPONENT { //
+public:
+  NOTHING():COMPONENT() {
+  }
+  CARD* clone() const { untested();
+    return new(NOTHING);
+  }
+private:
+  std::string value_name()const {return "error";}
+  uint_t max_nodes()const {return 0;}
+  std::string dev_type()const {return "error";}
+  std::string port_name(uint_t)const {untested(); return "error";}
+  bool print_type_in_spice()const {return 0;}
+};
+/*--------------------------------------------------------------------------*/
+static NOTHING p0;
+static MODEL_SEMI_RESISTOR  p1(&p0);
+static MODEL_SEMI_CAPACITOR p2(&p0);
 static DISPATCHER<MODEL_CARD>::INSTALL
   d1(&model_dispatcher, "r|res", &p1),
   d2(&model_dispatcher, "c|cap", &p2);
@@ -198,6 +222,19 @@ bool EVAL_BM_SEMI_BASE::operator==(const COMMON_COMPONENT& x)const
   return rv;
 }
 /*--------------------------------------------------------------------------*/
+void EVAL_BM_SEMI_RESISTOR::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
+{
+  const MODEL_SEMI_RESISTOR* m = prechecked_cast<const MODEL_SEMI_RESISTOR*>(model());
+  assert(m);
+  assert(lang);
+  if(!has_hard_value(m->_rsh)){
+    o << modelname();
+    o << " r=" << value();
+  } else {
+    EVAL_BM_SEMI_BASE::print_common_obsolete_callback(o, lang);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void EVAL_BM_SEMI_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
 {
   assert(lang);
@@ -219,11 +256,29 @@ void EVAL_BM_SEMI_BASE::precalc_first(const CARD_LIST* Scope)
   EVAL_BM_ACTION_BASE::precalc_first(Scope);
   _length.e_val(_default_length, Scope);
   _width.e_val(_default_width, Scope);
+  _value = value();
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_SEMI_BASE::tr_eval(ELEMENT* d)const
 {
+  trace3("EVAL_BM_SEMI_BASE::tr_eval", d->long_label(), _value, value());
   tr_finish_tdv(d, _value);
+}
+/*--------------------------------------------------------------------------*/
+bool EVAL_BM_SEMI_BASE::parse_numlist(CS& cmd)
+{
+  unsigned start = cmd.cursor();
+  unsigned here = cmd.cursor();
+  trace2("EVAL_BM_SEMI_BASE::parse_numlist", cmd.fullstring(), here);
+  PARAMETER<double> val(NOT_VALID);
+  cmd >> val;
+  if (cmd.stuck(&here)) {
+    trace1("stuck", here);
+  }else{
+    trace2("EVAL_BM_SEMI_BASE::parse_numlist", cmd.fullstring(), val);
+    set_value(val);
+  }
+  return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_SEMI_BASE::parse_params_obsolete_callback(CS& cmd)
@@ -320,23 +375,28 @@ void EVAL_BM_SEMI_RESISTOR::precalc_last(const CARD_LIST* Scope)
   double width = (_width == NOT_INPUT) ? m->_defw : _width;
   double eff_width = width - m->_narrow;
   double eff_length = _length - m->_narrow;
-
-  if (eff_width != 0.) {
+  trace4("EVAL_BM_SEMI_RESISTOR::precalc_last", value(), eff_width, eff_length, m->_rsh);
+  if( !has_hard_value(m->_rsh)) {
+    _value = (value());
+  }else if (eff_width != 0.) {
     _value = m->_rsh * eff_length / eff_width;
-  }else{untested();
+  }else{itested();
     _value = BIGBIG;
   }
   double tempdiff = (_temp_c - m->_tnom_c);
   _value *= 1 + m->_tc1*tempdiff + m->_tc2*tempdiff*tempdiff;
 
-  if (eff_width <= 0.) {untested();
-    throw Exception_Precalc(modelname() + ": effective width is negative or zero\n");
-  }else{
+  if( has_hard_value(m->_rsh)) {
+    if (eff_width <= 0.) {itested();
+      throw Exception_Precalc(modelname() + ": effective width is negative or zero\n");
+    }else{
+    }
+    if (eff_length <= 0.) {
+      throw Exception_Precalc(modelname() + ": effective length is negative or zero\n");
+    }else{
+    }
   }
-  if (eff_length <= 0.) {
-    throw Exception_Precalc(modelname() + ": effective length is negative or zero\n");
-  }else{
-  }
+  trace4("EVAL_BM_SEMI_RESISTOR::precalc_last done", value(), eff_width, m->_rsh, _value);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -345,13 +405,14 @@ double const MODEL_SEMI_BASE::_default_defw = 1e-6;
 double const MODEL_SEMI_BASE::_default_tc1 = 0.;
 double const MODEL_SEMI_BASE::_default_tc2 = 0.;
 /*--------------------------------------------------------------------------*/
-MODEL_SEMI_BASE::MODEL_SEMI_BASE()
-  :MODEL_CARD(NULL),
+MODEL_SEMI_BASE::MODEL_SEMI_BASE(const COMPONENT* p)
+  :MODEL_CARD(p),
    _narrow(_default_narrow),
    _defw(_default_defw),
    _tc1(_default_tc1),
    _tc2(_default_tc2)
 {
+  assert(_component_proto);
 }
 /*--------------------------------------------------------------------------*/
 MODEL_SEMI_BASE::MODEL_SEMI_BASE(const MODEL_SEMI_BASE& p)
@@ -361,10 +422,12 @@ MODEL_SEMI_BASE::MODEL_SEMI_BASE(const MODEL_SEMI_BASE& p)
    _tc1(p._tc1),
    _tc2(p._tc2)
 {
+  assert(_component_proto);
 }
 /*--------------------------------------------------------------------------*/
 void MODEL_SEMI_BASE::set_param_by_index(int i, std::string& value, int offset)
 {
+  trace2("MODEL_SEMI_BASE::set_param_by_index", i, value);
   switch (MODEL_SEMI_BASE::param_count() - 1 - i) {
   case 0: _narrow = value; break;
   case 1: _defw = value; break;
@@ -435,8 +498,8 @@ void MODEL_SEMI_BASE::precalc_first()
 double const MODEL_SEMI_CAPACITOR::_default_cj = 0.;
 double const MODEL_SEMI_CAPACITOR::_default_cjsw = 0.;
 /*--------------------------------------------------------------------------*/
-MODEL_SEMI_CAPACITOR::MODEL_SEMI_CAPACITOR()
-  :MODEL_SEMI_BASE(),
+MODEL_SEMI_CAPACITOR::MODEL_SEMI_CAPACITOR(const COMPONENT* p)
+  :MODEL_SEMI_BASE(p),
    _cj(_default_cj),
    _cjsw(_default_cjsw)
 {
@@ -510,20 +573,22 @@ void MODEL_SEMI_CAPACITOR::precalc_first()
 /*--------------------------------------------------------------------------*/
 double const MODEL_SEMI_RESISTOR::_default_rsh = NOT_INPUT;
 /*--------------------------------------------------------------------------*/
-MODEL_SEMI_RESISTOR::MODEL_SEMI_RESISTOR()
-  :MODEL_SEMI_BASE(),
+MODEL_SEMI_RESISTOR::MODEL_SEMI_RESISTOR(const COMPONENT* p)
+  :MODEL_SEMI_BASE(p),
    _rsh(_default_rsh)
 {
+	assert(_component_proto);
 }
 /*--------------------------------------------------------------------------*/
 MODEL_SEMI_RESISTOR::MODEL_SEMI_RESISTOR(const MODEL_SEMI_RESISTOR& p)
-  :MODEL_SEMI_BASE(),
+  :MODEL_SEMI_BASE(p),
    _rsh(p._rsh)
 {
 }
 /*--------------------------------------------------------------------------*/
 void MODEL_SEMI_RESISTOR::set_param_by_index(int i, std::string& value, int offset)
 {
+  trace2("MODEL_SEMI_RESISTOR::set_param_by_index", i, value);
   switch (MODEL_SEMI_RESISTOR::param_count() - 1 - i) {
   case 0: _rsh = value; break;
   default: MODEL_SEMI_BASE::set_param_by_index(i, value, offset); break;
@@ -576,3 +641,4 @@ void MODEL_SEMI_RESISTOR::precalc_first()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

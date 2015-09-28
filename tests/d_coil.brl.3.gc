@@ -1,0 +1,26 @@
+* a tunnel diode, poly model. strange (?) reltol bug in brl
+spice
+
+.param r=.4
+.param c=.2
+.param l=1
+.param vsupp=2.6
+
+.subckt td nd n1
+g1 nd n1 nd n1 poly(1) 0 4.56 -2.69 .43
+.ends
+
+
+*>.options reltol=1e-5
+
+v1 nin 0 pulse 0 vsupp 0 1n
+
+r1 nin ni r
+.brl l1 ni nout 1
+
+xtd nout 0 td
+
+*>.print dc v(nodes) i(v1) v(v1)
+*>.dc v1 -1 0 .1 basic
+
+*>.end

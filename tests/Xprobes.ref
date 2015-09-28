@@ -1,0 +1,59 @@
+cmosn: rd input, but not rs. setting rs = 0.
+#Time       v(3)       v(5)       v(6)       v(8)       v(ne1)     v(ne3)     v(ne4)    
+ 0.         0.         0.         0.         0.         1.         2.         0.4       
+ 1.         0.         0.         0.         0.         1.         2.         0.4       
+ 2.         0.         0.         0.         0.         1.         2.         0.4       
+ 3.         0.         0.         0.         0.         1.         2.         0.4       
+ 4.         0.         0.         0.         0.         1.         2.         0.4       
+ 5.         0.         0.         0.         0.         1.         2.         0.4       
+#Time       v(X1.ni)   v(X1.nii) 
+ 0.         0.75       0.5       
+ 1.         0.75       0.5       
+ 2.         0.75       0.5       
+ 3.         0.75       0.5       
+ 4.         0.75       0.5       
+ 5.         0.75       0.5       
+#Time       v(X2.nii)  v(X2.niii)
+ 0.         1.2        0.8       
+ 1.         1.2        0.8       
+ 2.         1.2        0.8       
+ 3.         1.2        0.8       
+ 4.         1.2        0.8       
+ 5.         1.2        0.8       
+#Time       v(X1.ni)   v(X1.nii)  v(X1.niii)
+ 0.         0.75       0.5        0.25      
+ 1.         0.75       0.5        0.25      
+ 2.         0.75       0.5        0.25      
+ 3.         0.75       0.5        0.25      
+ 4.         0.75       0.5        0.25      
+ 5.         0.75       0.5        0.25      
+#Time       v(X1.ni)   v(X1.nii)  v(X1.niii) v(X2.ni)   v(X2.nii)  v(X2.niii)
+ 0.         0.75       0.5        0.25       1.6        1.2        0.8       
+ 1.         0.75       0.5        0.25       1.6        1.2        0.8       
+ 2.         0.75       0.5        0.25       1.6        1.2        0.8       
+ 3.         0.75       0.5        0.25       1.6        1.2        0.8       
+ 4.         0.75       0.5        0.25       1.6        1.2        0.8       
+ 5.         0.75       0.5        0.25       1.6        1.2        0.8       
+NODELIST 
+name   ...
+have 14 nodes. model: 1 sckt: 6 adp 0
+
+3        3 matrix_number 11, user_number 4 nm[t]  vdc  0.
+5        5 matrix_number 9, user_number 6 nm[t]  vdc  0.
+6        6 matrix_number 10, user_number 5 nm[t]  vdc  0.
+8        8 matrix_number 8, user_number 7 nm[t]  vdc  0.
+ne1      ne1 matrix_number 14, user_number 1 nm[t]  vdc  1.
+ne3      ne3 matrix_number 13, user_number 2 nm[t]  vdc  2.
+ne4      ne4 matrix_number 12, user_number 3 nm[t]  vdc  0.4
+-X1
+ni    X1.ni matrix_number 7, user_number 8 nm[t]  vdc  0.75
+nii   X1.nii matrix_number 6, user_number 9 nm[t]  vdc  0.5
+niii  X1.niii matrix_number 5, user_number 10 nm[t]  vdc  0.25
+-X2
+ni    X2.ni matrix_number 4, user_number 11 nm[t]  vdc  1.6
+nii   X2.nii matrix_number 3, user_number 12 nm[t]  vdc  1.2
+niii  X2.niii matrix_number 2, user_number 13 nm[t]  vdc  0.8
+-m1
+id    m1.id matrix_number 1, user_number 14 nm[t]  vdc  0.
+-m1.Dsb
+-m1.Ddb

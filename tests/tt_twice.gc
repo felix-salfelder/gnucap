@@ -1,0 +1,7 @@
+spice
+
+* .print tran v(0) lt(0)
+.print tw lt(0)
+.ttr 10 1 1 * 2
+.ttr 20
+.end

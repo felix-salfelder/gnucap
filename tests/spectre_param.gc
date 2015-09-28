@@ -1,0 +1,42 @@
+
+simulator language=spice
+
+.MODEL pfet PMOS ( LEVEL   = 49 )
+.MODEL nfet NMOS ( H0=3 LEVEL   = 49 )
+
+.simulator lang=spectre
+
+subckt nch ( d g s b )
+nch (d g s b) nfet w=w l=4
+ends pch
+
+
+simulator lang=spectre
+
+parameters global_w=2
+parameters GLOBAL_W=4
+parameters LBias=1.88902541474722e-06
+
+subckt fc_component vbias3  inn inp out ngnd vdd!
+    N1 (net1 vbias4 ngnd 0) nch w=global_w l=1
+    N2 (net1 vbias4 ngnd 0) nch w=3 l=2
+    N3 (net1 vbias4 ngnd 0) nch w=GLOBAL_W l=3
+    N4 (net1 vbias4 ngnd 0) nch w=w l=4
+ends fc_component
+
+OPAMP (vbias3 ninn ninp nout 0 ndd) fc_component w=9
+simulator lang=spice
+.options insensitive=false
+
+R1 vbias3 0 1
+R2 ninn 0 1
+R3 ninp 0 1
+R4 nout 0 1
+R5 ndd 0 1
+
+.print op v(nodes)
++ w(OPAMP.N*.nch)
++ l(OPAMP.N*.nch)
+
+.op trace=a
+.end

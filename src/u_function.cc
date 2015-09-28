@@ -1,4 +1,4 @@
-/*$Id: u_function.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: u_function.cc,v 1.1 2009-12-14 10:41:30 felix Exp $ -*- C++ -*-
  * Copyright (C) 2009 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -23,9 +23,10 @@
 #include "e_base.h"
 #include "u_function.h"
 /*--------------------------------------------------------------------------*/
-WAVE* FUNCTION::find_wave(const std::string& probe_name)const
+WAVE* WAVE_FUNCTION::find_wave(const std::string& probe_name)const
 {
   return CKT_BASE::find_wave(probe_name);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

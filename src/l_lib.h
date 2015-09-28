@@ -1,4 +1,4 @@
-/*$Id: l_lib.h,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: l_lib.h,v 1.3 2010-08-16 12:23:30 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -23,13 +23,26 @@
 #ifndef L_LIB_H
 #define L_LIB_H
 #include "md.h"
+#define HAVE_GETENV_DEFAULTS
+// #include "u_parameter.h"
 /*--------------------------------------------------------------------------*/
 	  char*		trim(char*);
 INTERFACE bool		Umatch(const std::string&, const std::string&);
 INTERFACE bool		wmatch(const std::string& s1,const std::string& s2);
-INTERFACE std::string	to_string(unsigned);
-INTERFACE std::string	to_string(int);
-INTERFACE std::string	to_string(double);
+
+//template doesnt work?
+INTERFACE std::string to_string(std::string);
+INTERFACE std::string to_string(int);
+INTERFACE std::string to_string(unsigned long int);
+INTERFACE std::string to_string(long int);
+INTERFACE std::string to_string(unsigned);
+INTERFACE std::string to_string(double);
+INTERFACE std::string to_string(long double);
+
+//FIXME: template?
+INTERFACE std::string to_string(std::vector<double>);
+INTERFACE std::string to_string(std::list<double>);
+
 INTERFACE char*		ftos(double,int,int,int);
 /*--------------------------------------------------------------------------*/
 //ftos stuff
@@ -76,7 +89,31 @@ namespace OS {
       return "";
     }
   }
-};
+
+  template<class T>
+  T getenv(const std::string&, T def);
+
+  template<class T>
+  inline T getenv(const std::string& s, T def) {
+    char* ev = ::getenv(s.c_str());
+    if(!ev){
+      return def;
+    }else{
+      return T(ev);
+    }
+  }
+
+  template<>
+  inline bool getenv(const std::string& s, bool def) {
+    char* ev = ::getenv(s.c_str());
+    if(!ev){ untested();
+      return def;
+    } else { untested();
+      return strcmp(ev,"no") && strcmp(ev,"0");
+    }
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

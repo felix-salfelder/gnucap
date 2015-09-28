@@ -1,4 +1,4 @@
-/*$Id: m_base_in.cc,v 26.125 2009/10/15 20:58:21 al Exp $ -*- C++ -*-
+/*$Id: m_base_in.cc,v 1.2 2009-11-18 20:53:18 felix Exp $ -*- C++ -*-
  * Copyright (C) 2003 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -121,3 +121,4 @@ void Text_Block::parse(CS& File)
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

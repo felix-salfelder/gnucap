@@ -1,0 +1,7 @@
+.print sens wr(M*) lr(M*) gmr(M*) rr(R1) 
+                                     ^ ? no match
+#           v(ndd)     v(nin)     v(noutn)   v(noutp)   ids(MN1)   idsxxx(MN1) vgs(MN1)   gm(MN1)    vds(MN1)   vbs(MN1)  
+ 0.         2.         1.         1.1        1.         3.u        3.u       -0.099999   6.u       -1.1       -1.1       
+*param     #@freq      wr(MN1)    wr(MP1)    lr(MN1)    lr(MP1)    gmr(MN1)   gmr(MP1)  
+v(noutn)   0.        -66.K      -2.u        19.8K      1.u       -330.K     -10.u      
+v(noutp)   0.        -4.4u       40.K       1.32u     -20.K      -22.u       200.K     

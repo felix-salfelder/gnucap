@@ -1,0 +1,37 @@
+v1 ( vdd 0 ) 1.111
+vlast ( lastp 0 ) 2.222
+vzero ( hmm 0 ) 0
+*R1 vbg2 0 100k 
+gload ( vbg2 0 lastp 0 )  1.5
+V2 ( vbg2 0 )  DC  7.
+name   ...
+have 7 nodes. model: 3 sckt: 0 adp 0
+
+hmm      hmm matrix_number 5, user_number 3 nm[t]  vdc  0.
+lastp    lastp matrix_number 6, user_number 2 nm[t]  vdc  0.
+vbg2     vbg2 matrix_number 4, user_number 4 nm[t]  vdc  0.
+vdd      vdd matrix_number 7, user_number 1 nm[t]  vdc  0.
+-v1
+br    v1.br matrix_number 3, user_number 5 nm[t]  vdc  0.
+-vlast
+br vlast.br matrix_number 2, user_number 6 nm[t]  vdc  0.
+-vzero
+br vzero.br matrix_number 1, user_number 7 nm[t]  vdc  0.
+.print tran v(nodes) r(gload) i(v2) R(r1) v(r1) i(r1) vin(v2) v(v2) 
+                                      ^ ? no match
+.print tran v(n ... load) i(v2) R(r1) v(r1) i(r1) vin(v2) v(v2) 
+                                        ^ ? no match
+.print tran v(n ... i(v2) R(r1) v(r1) i(r1) vin(v2) v(v2) 
+                                        ^ ? no match
+#Time       v(hmm)     v(lastp)   v(vbg2)    v(vdd)     r(gload)   i(V2)      vin(V2)    v(V2)     
+ 0.         0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.1        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.2        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.3        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.4        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.5        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.6        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.7        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.8        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 0.9        0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        
+ 1.         0.         2.222      7.         1.111      0.66667   -3.333      0.         7.        

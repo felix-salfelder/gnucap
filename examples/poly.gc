@@ -1,0 +1,10 @@
+spice
+
+E1 0 nout 0 nin1 0 nin2 poly 1 2
+V1 nin1 0 1
+V2 nin2 0 0.4
+.print dc v(nodes)
+
+.dc
+
+.end

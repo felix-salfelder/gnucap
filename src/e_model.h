@@ -1,4 +1,4 @@
-/*$Id: e_model.h,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: e_model.h 2015/01/27 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,11 +21,11 @@
  *------------------------------------------------------------------
  * base class for all models
  */
-//testing=script 2007.07.13
 #ifndef E_MODEL_H
 #define E_MODEL_H
 #include "u_parameter.h"
 #include "e_card.h"
+#include "e_adp.h"
 /*--------------------------------------------------------------------------*/
 // external
 class COMPONENT;
@@ -41,6 +41,8 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE MODEL_CARD : public CARD{
+  bool _frozen; // indicate no change since last _sim->init
+  explicit	MODEL_CARD() {unreachable();}
 protected:
   explicit	MODEL_CARD(const MODEL_CARD& p);
 public:
@@ -50,28 +52,49 @@ public:
 public: // override virtuals
   char	id_letter()const	{untested();return '\0';}
   CARD*	clone_instance()const   
-		{itested(); assert(_component_proto); return _component_proto->clone();}
+		{assert(_component_proto); return _component_proto->clone();}
   void	precalc_first();
-  void	set_param_by_index(int, std::string&, int);
+  void expand_last(){_frozen=true;}
+  void set_param_by_index(int, string&, int);
+  void set_param_by_name(string Name, string Value);
   bool  param_is_printable(int)const;
-  std::string value_name()const {return "";}
+  std::string value_name()const {untested();return "";}
   std::string param_name(int)const;
   std::string param_name(int,int)const;
   std::string param_value(int)const;
   int param_count()const {return (1 + CARD::param_count());}
 public:
+  bool frozen()const{return _frozen;}
   virtual void	tr_eval(COMPONENT*)const{unreachable();}
   virtual void	ac_eval(COMPONENT*)const{unreachable();}
   virtual COMMON_COMPONENT* new_common()const {return 0;}
   virtual SDP_CARD* new_sdp(COMMON_COMPONENT*)const {unreachable();return 0;};
   virtual bool parse_params_obsolete_callback(CS&) {unreachable(); return false;}
   virtual bool is_valid(const COMPONENT*)const {return true;}
-  const CARD* component_proto()const {itested(); return _component_proto;}
+  const CARD* component_proto()const {untested(); return _component_proto;}
 protected:
   const CARD* _component_proto;
 public:
   PARAMETER<double> _tnom_c;
+public:
+
+  virtual void do_tt_commit(COMPONENT*)const{ untested();}
+  virtual void do_stress_apply(COMPONENT*)const{ trace0("model.h stress apply(C)") ;}
+  void do_stress_apply()const{unreachable();} // not used for models.
+
+		 // void      stress_calc(COMPONENT*)const{   ;} //sollte eval heissen...
+		 //   void      stress_calc( )const{   ;} //sollte eval heissen...?
+		 //
+  virtual ADP_CARD* new_adp( COMPONENT* d)const
+  {
+	  trace1("MODEL_CARD::new_adp. empty adpcard", d->short_label());
+	  return NULL;
+	  ///return( new ADP_CARD(d) ); // empty adpcard...
+  };
+		 //
+		 //
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

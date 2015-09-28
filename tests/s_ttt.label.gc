@@ -1,0 +1,9 @@
+load c_wave.so
+spice
+
+.store tw hidden(0)
+.tw 1 10 100 * 2 label=test
+.wave list
+.tw 1 10 100 * 2
+.wave list
+.end

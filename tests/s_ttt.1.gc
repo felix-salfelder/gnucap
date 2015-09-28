@@ -1,0 +1,14 @@
+spice
+
+.print tw ttime(0) control(0)
+.tw 1 10 100 * 2
+.status notime
+
+.tw 1 10 100 * 2 trace=a
+.status notime
+
+.options ttstepgrow=1e99
+.tw 1 5 100 10
+.status notime
+
+.end

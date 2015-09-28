@@ -1,4 +1,4 @@
-/*$Id: m_expression_dump.cc,v 26.115 2009/08/17 22:49:30 al Exp $ -*- C++ -*-
+/*$Id: m_expression_dump.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2003 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,15 +21,15 @@
  *------------------------------------------------------------------
  * Reconstructs an infix expression from the RPN.
  */
-//testing=script,sparse 2009.08.12
 #include "m_expression.h"
 /*--------------------------------------------------------------------------*/
 void Token::dump(std::ostream& out)const
-{itested();
+{untested();
   out << _name << ' ';
 }
 /*--------------------------------------------------------------------------*/
-void Expression::dump(std::ostream& out)const
+template<class S>
+void Expression::_dump(S& out)const
 {
   std::vector<const Token*> locals; // a way of faking garbage collection.
   std::vector<const Token*> stack;  // actually use this
@@ -107,7 +107,7 @@ void Expression::dump(std::ostream& out)const
   if (stack.empty()) {untested();
     out << "empty";
   }else{
-    out << stack.back()->full_name();
+    stack.back()->full_dump(out);
     assert(stack.size() == 1);
   }
   while (!locals.empty()) {
@@ -117,3 +117,7 @@ void Expression::dump(std::ostream& out)const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+template void Expression::_dump(OMSTREAM& out)const;
+template void Expression::_dump(std::ostream& out)const;
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

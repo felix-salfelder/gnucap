@@ -1,0 +1,30 @@
+spice
+* RC-Glied
+
+.OPTIONS abstol=1e-6
+.OPTIONS reltol=1e-16
+.OPTIONS short=1e-9
+.OPTIONS vntol=1e-15
+.OPTIONS dtmin=1e-10
+.OPTIONS dtddc=1e-8
+
+
+.param icc1=1
+V1 (1 0) DC 1
+R1 1 2 1
+C1 2 0 1m IC=icc1
+
+.options numdgt=10
+
+.PRINT DDC V(nodes) dv(nodes) ddv(nodes)
+
+.ddc R1 1k 2k 1k icc1 -1 2 1 tr trstep=1e-8
+.ddc R1 1k 2k 1k icc1 -1 2 1 tr trstep=1e-3
+
+
+* this is still broken?
+* .ddc R1 1k 2k 1k C1 1m 2m 1m tr trstep=1e-6
+
+.END
+
+

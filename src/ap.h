@@ -1,4 +1,5 @@
-/*$Id: ap.h,v 26.130 2009/11/15 21:51:59 al Exp $  -*- C++ -*-
+/*$Id: ap.h,v 1.4 2010-09-17 12:25:54 felix Exp $  -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,6 +26,10 @@
 #ifndef AP_H
 #define AP_H
 #include "md.h"
+#include <vector>
+/*--------------------------------------------------------------------------*/
+// using namespace std;
+using std::vector;
 /*--------------------------------------------------------------------------*/
 char* getcmd(const char*,char*,int);
 /*--------------------------------------------------------------------------*/
@@ -54,8 +59,8 @@ private:
   unsigned  _length;
   unsigned  _begin_match;
   unsigned  _end_match;
-  bool _ok;
-  int _line_number;
+  bool _ok; // FIXME: throw exceptions
+  unsigned _line_number;
 public:
   // construction, destruction, and re-construction
   explicit    CS(STDIN);
@@ -66,19 +71,22 @@ public:
   CS&	      operator=(const std::string& s);
   CS&	      operator=(const CS& p);
   CS&	      get_line(const std::string& prompt);
-	      ~CS()		{if (is_file()) {fclose(_file);}}
+  ~CS();
   
   // status - non-consuming
   unsigned cursor()const	{return _cnt;}
   bool	stuck(unsigned* last)	{bool ok=*last<_cnt; *last=_cnt; return !ok;}
   bool	gotit(unsigned last)	{return last<_cnt;}
-	operator bool()const	{return _ok;}
+      operator bool()const    {return _ok;}
+  operator std::string()const {return _cmd;}
 
   // get -- non-consuming
   const std::string fullstring()const		{return _cmd;}
   const std::string substr(unsigned i)const {return ((_cmd.length()>=i) ? _cmd.substr(i) : "");}
   const std::string substr(unsigned i, unsigned n)const	{return _cmd.substr(i,n);}
   const std::string tail()const			{return substr(_cnt);}
+  unsigned tailsize()const
+   { assert( _cmd.length()>=_cnt); return unsigned(_cmd.length()-_cnt); }
   char		    peek()const			{return _cmd[_cnt];}
 
   // status - may consume whitespace only
@@ -104,15 +112,18 @@ public:
 
   // character tests - non-consuming, no _ok
   bool	      match1(char c)const{return (peek()==c);}
-  bool	      match1(const std::string& c)const
-		{return ns_more() && strchr(c.c_str(),peek());}
+  bool	      match1(const std::string& s)const // next char is one of those in s
+		{return ns_more() && strchr(s.c_str(),peek());}
   size_t      find1(const std::string& c)const
 	{return ((ns_more()) ? c.find_first_of(peek()) : std::string::npos);}
   bool	      is_xdigit()const
 		{untested(); return (match1("0123456789abcdefABCDEF"));}
   bool	      is_digit()const	{return (match1("0123456789"));}
   bool	      is_pfloat()const	{return (match1(".0123456789"));}
-  bool	      is_float()const	{return (match1("+-.0123456789"));}
+  bool	      eat_lines();
+  // inf support is a hack, but hackish anyway
+  bool	      is_float()const	{return (match1("+-.0123456789"));} // || match1("iI") );} // BUG // FIXME: implement inf as constant global param
+  //bool	      is_float()const	{return (match1("+-.0123456789"));}
   bool	      is_argsym()const	{return (match1("*?$%_&@"));}
   bool	      is_alpha()const	{return !!isalpha(toascii(peek()));}
   bool	      is_alnum()const   {return !!isalnum(toascii(peek()));}
@@ -140,8 +151,12 @@ public:
   CS&	      operator>>(char& x)	 {untested(); x=ctoc();return *this;}
   CS&         operator>>(int& x)	 {x=ctoi();return *this;}
   CS&         operator>>(unsigned& x)	 {x=ctou();return *this;}
+  CS&         operator>>(short unsigned& x)
+              {x=(short unsigned int)ctou();return *this;}
   CS&         operator>>(double& x)	 {x=ctof();return *this;}
   CS&	      operator>>(std::string& x) {x=ctos();return *this;}
+  template<class T>
+  CS&	      operator>>(vector<T>& x);
 
   // skip (ap_skip.cc) possibly consuming, sets _ok
   CS&	      skip(int c=1) 
@@ -157,6 +172,9 @@ public:
   CS&	      skipcom()			{return skip1b(",");}
   CS&	      operator>>(const char& x)	{return skip1b(x);}
   CS&	      operator>>(const char* x)	{return umatch(x);}
+public:
+  unsigned line_number()const{return _line_number;}
+  string file_name()const{return _name;}
 };	
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -164,10 +182,13 @@ public:
 // like the templates to follow
 INTERFACE bool Get(CS& cmd, const std::string&, bool*);
 INTERFACE bool Get(CS& cmd, const std::string&, int*,    AP_MOD=mNONE, int=0);
+INTERFACE bool Get(CS& cmd, const std::string&, short int*,    AP_MOD=mNONE, short int=0);
+// INTERFACE bool Get(CS& cmd, const std::string&, short unsigned int*);
+INTERFACE bool Get(CS& cmd, const std::string&, unsigned*, AP_MOD=mNONE, unsigned=0);
 INTERFACE bool Get(CS& cmd, const std::string&, double*, AP_MOD, double=0.);
 /*--------------------------------------------------------------------------*/
 template <class T>
-bool Get(CS& cmd, const std::string& key, T* val)
+inline bool Get(CS& cmd, const std::string& key, T* val)
 {
   if (cmd.umatch(key + " {=}")) {
     cmd >> *val;
@@ -206,5 +227,11 @@ inline CS& operator>>(CS& cmd, T& val)
   return cmd;
 }
 /*--------------------------------------------------------------------------*/
+template<class T>
+inline CS&     CS::operator>>(vector<T>& x){
+  incomplete(); USE(x);
+  return *this;
+}
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

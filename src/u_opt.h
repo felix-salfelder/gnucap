@@ -1,4 +1,5 @@
-/*$Id: u_opt.h,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
+/*$Id: u_opt.h,v 1.8 2010-09-17 12:26:02 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -34,21 +35,32 @@ enum method_t {meUNKNOWN=0,	// no method set
 	       meEULER,		// backware Euler, unless forced to other
 	       meEULERONLY,	// backward Euler only
 	       meTRAP,		// usually trap, but euler where better
-	       meTRAPONLY,	// always trapezoid
+	       meTRAPONLY,	// trap where possible. euler otherwise.
 	       meGEAR2,		// usually gear2, but euler where better
 	       meGEAR2ONLY,	// always gear2 (except breakpoints)
 	       meTRAPGEAR,	// alt trap & gear2
 	       meTRAPEULER,	// alt trap & euler
-	       meNUM_METHODS};	// number of methods (array dimension)
+	       meNUM_METHODS};	// number of methods (array size)
 inline OMSTREAM& operator<<(OMSTREAM& o, method_t t) {
   const std::string s[] = {"unknown", "euler", "euleronly", "trap", "traponly",
 		     "gear2", "gear2only", "trapgear", "trapeuler"};
   return (o << s[t]);
 }
+enum disc_t   {dNONE=0, 	// no discontinuities
+	       dLOCAL,		// no propagation
+	       dREJECT,		// propagate during reject
+	       dEVAL,		// propagate during evaluation
+	       dIMM		// propagate immediately
+	      };
+inline OMSTREAM& operator<<(OMSTREAM& o, disc_t t) {
+  const std::string s[] = {"none", "local", "reject", "eval", "immediate", };
+  return (o << s[t]);
+}
 /*--------------------------------------------------------------------------*/
-enum order_t {oREVERSE=1, oFORWARD, oAUTO};
+enum order_t {oREVERSE=1, oFORWARD, oAUTO, oTREE_BF, oTREE_DF, oCOMP, oSINK_R, oSINK_F };
 inline OMSTREAM& operator<<(OMSTREAM& o, order_t t) {
-  const std::string s[] = {"", "reverse", "forward", "auto"};
+  const std::string s[] = {"", "reverse", "forward", "auto","treebf","treedf","comp",
+                           "sinkf","sinkr"};
   return (o << s[t]);
 }
 /*--------------------------------------------------------------------------*/
@@ -81,6 +93,7 @@ public:
 	WCASE=7, TRACE=8, ITL_COUNT=9};
   enum {_keep_time_steps = 5};
 public:
+  static bool quiet;	    // flag: no advertisments
   static bool acct;	    // flag: print accounting info
   static bool listing;	    // flag: print listing
   static bool mod;	    // flag: print models
@@ -88,11 +101,22 @@ public:
   static bool node;	    // flag: print node table
   static bool opts;	    // flag: print options
   static double gmin;	    // minimum conductance allowed
+  static double cmin;	    // minimum capacity allowed
   static double bypasstol;  // bypass tolerance multiplier
   static double loadtol;    // trace load tolerance multiplier
   static double reltol;	    // relative error tolerance
   static double abstol;	    // absolute current error tolerance
   static double vntol;	    // absolute voltage error tolerance
+  static double tttol;	    // transient error overestimation factor
+  static int threads;	    // number of threads, 0=#cpus
+  static std::string libpath;	 // sharedobject searchpath
+  static std::string includepath;	 // searchpath for .include command
+  static double adpreltol;	    // adp allowed relative aging misprediction
+  static double behreltol;	    // beh allowed relative
+  static double adpkorr;	    // adp correction
+  static bool trage;	       // ageing during tr
+  static double adpabstol;	    // adp ?
+  static bool behave;	    // use behaviour...
   static double trtol;	    // transient error overestimation factor
   static double chgtol;	    // charge tolerance
   static double pivtol;	    // minimum acceptable pivot
@@ -105,6 +129,7 @@ public:
   static int lvlcod;	    // enum: if == 2, solve fast
   static int lvltim;	    // enum: how to control time step
   static method_t method;   // enum: integration method
+  static disc_t disc;       // enum: discontinuity handling
   static int maxord;	    // max order of integration
   static double defl;	    // MOS default channel length
   static double defw;	    // MOS default channel width
@@ -119,8 +144,10 @@ public:
   static double dampmin;    // Newton-Raphson damping coefficient min
   static int dampstrategy;  // bit flags, damping strategy options
   static double roundofftol;// rel tolerance for zeroing after subtraction
-  static double temp_c;    // ambient temperature
+  static double temp_c;     // ambient temperature
   static double shortckt;   // short resistance
+#define HAVE_KEEPCOEFF
+  static double keepcoeff;  // coefficient used to freeze ddt's
   static int picky;	    // error picky-ness
   static unsigned outwidth; // width of output devices
   static double ydivisions; // plot divisions, y axis
@@ -135,30 +162,42 @@ public:
   static bool lubypass;	    // bypass parts of LU decomposition, if appropriate
   static bool fbbypass;	    // bypass fwd & back sub when last iter converged
   static bool traceload;    // load only elements that need it, using queue
+  static bool tracewdtt;    // trace wanted dT
   static int itermin;	    // forced min iteration count.
   static double vmax;	    // + voltage limit for nonlinear calculations
   static double vmin;	    // - voltage limit for nonlinear calculations
   static double dtmin;	    // smallest internal step in transient analysis
+  static double dtddc;      // very small time step used for ddc analysis
+  static double dTmin;	    // smallest internal step in transient analysis
   static double dtratio;    // ratio of max / min dt in transient analysis
+  static short int initsc;  // step control for initial steps
   static bool rstray;	    // include stray resistors in models
   static bool cstray;	    // include stray capacitors in models
+  static bool trnoise;	    // tr noise
+  static bool filtercomp;   // compress filter history.
   static int harmonics;	    // number of harmonics in fourier analysis
+  static double ttstepgrow; // limit of step size growth in transient analysis
   static double trstepgrow; // limit of step size growth in transient analysis
   static double trstephold; // hold step size growth, converges slowly
   static double trstepshrink;// amt to shrink step size on convergence failure
   static double trreject;   // how bad trunc error has to be to reject a step
-  static int trsteporder;   // interpolation order for step size control
+  static uint_t trsteporder;// interpolation order for step size control
   static double trstepcoef[_keep_time_steps]; // coefficient for step size control
+  static uint_t ttsteporder;// interpolation order for step size control
+  static bool ttcorr;       // flag: enable corrector
+  static double ttreject;   // how bad trunc error has to be to reject a step
   static bool showall;	    // flag: show development flags
   static int foooo;	    // a reusable value to aid development
   static int diodeflags;    // convergence heuristic flags for diode
   static int mosflags;      // convergence heuristic flags for mosfet
   static bool quitconvfail; // quit on convergence failure
+  static int history;	    // history length
   static bool edit;	    // use readline - command editing
   static int recursion;	    // max recursion depth
   static LANGUAGE* language; // simulation language
   static bool case_insensitive;
   static UNITS units;
+  static bool bogus;        // allow bogus instanciations
   
   static double lowlim;	    // 1 - reltol
   static double uplim;	    // 1 + reltol
@@ -171,6 +210,9 @@ public:
 			    // 6=source stepping iteration limit
 			    // 7=worst case iteration limit
 			    // 8=trace nonconvergence start iteration
+  static int rndseed; // random seed.
+  static int err;
+  static double edgedist; // hack related to edge detection.
 };
 /*--------------------------------------------------------------------------*/
 class SET_RUN_MODE {
@@ -181,13 +223,24 @@ public:
   explicit SET_RUN_MODE(RUN_MODE rm)
     :_old_run_mode(ENV::run_mode) 
   {
+	 if (rm==rPIPE){
+
+		 //good idea?
+		// setvbuf(std::cin,(char*)0,_IONBF,0);
+		 //std::cin.rdbuf()->pubsetbuf(0,0);
+	 }
+
     ENV::run_mode = rm;
   }
   ~SET_RUN_MODE()
   {
+	 if (ENV::run_mode==rPIPE){
+		// FIXME: reset buffer.
+	 }
     ENV::run_mode = _old_run_mode;
   }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

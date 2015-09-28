@@ -1,0 +1,16 @@
+spice
+
+V1 1 0 pulse iv=0 pv=1 duty=.3 freq=1000 rise=.1m fall=.1m
+V2 2 0 pulse iv=0 pv=1 duty=.5 rise=.1m fall=.1m
+V2b 2b 0 pulse iv=0 pv=1 duty=.5 rise=.1m fall=.1m phase=-3.1415
+V2c 2c 0 pulse iv=0 pv=1 duty=.5 rise=.1m fall=.1m phase=6.28
+
+V3 3 0 pulse iv=0 pv=1 duty=.4 freq=2000 rise=.1m fall=.1m
+V4 4 0 pulse iv=0 pv=1 rise=.1m width=.5m fall=.1m
+
+.list
+
+.print tran v(V*)
+.tran 0 1m 50u trace=n
+.status notime
+.end

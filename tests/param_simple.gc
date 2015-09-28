@@ -1,0 +1,26 @@
+spice
+.options insensitive=0
+
+.spectre
+parameters volts=1
+parameters off=5
+
+subckt compon 1 2
+  parameters p
+  V2 (1 3) vsource dc={volts+off}
+  V1 (1 2) vsource dc=volts
+ends
+
+ding0 (0 1) compon arg=3
+ding1 (0 2) compon off=1
+
+
+simulator lang=spice
+.options insensitive=0
+
+.print dc v(ding*.V*)
+.parameters
+.list
+.dc trace=v
+
+.end

@@ -1,4 +1,4 @@
-/*$Id: l_timer.h,v 26.83 2008/06/05 04:46:59 al Exp $ -*- C++ -*-
+/*$Id: l_timer.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -44,7 +44,7 @@ public:
   TIMER&	start();
   TIMER&	stop();
   TIMER&	check();
-  double	elapsed()const		{itested();return _last;}
+  double	elapsed()const		{return _last;}
   bool		is_running()const	{return _running;}
 
   TIMER&	print(OMSTREAM& s = IO::mstdout);
@@ -56,3 +56,4 @@ T& operator<<(T & s, TIMER & t) {t.print(s); return s;}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

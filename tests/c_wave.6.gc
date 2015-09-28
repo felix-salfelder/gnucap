@@ -1,0 +1,25 @@
+spice
+.load c_wave.so
+
+.param p=0
+v1 1 0 1
+v2 2 1 1
+R1 gnd 0 1
+
+.store dc v(nodes)
+.dc v1 0 1 0.5 >/dev/null
+
+.wstash 'v(gnd)' gnd
+.wstash 'v(2)' w2
+.wave select stash
+.echo gnd
+.wstash  gnd
+.echo w2
+.wstash  w2
+
+.echo gnd w2
+.wave cmp gnd w2 directed verbose
+.echo w2 gnd
+.wave cmp w2 gnd directed verbose
+
+.end

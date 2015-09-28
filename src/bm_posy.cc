@@ -1,4 +1,4 @@
-/*$Id: bm_posy.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_posy.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -94,9 +94,6 @@ bool EVAL_BM_POSY::operator==(const COMMON_COMPONENT& x)const
     && _even == p->_even
     && _table == p->_table
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -243,3 +240,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "posy", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

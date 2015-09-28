@@ -1,4 +1,4 @@
-/*$Id: bm_poly.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_poly.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -31,13 +31,16 @@ namespace {
 const double _default_max(BIGBIG);
 const double _default_min(-BIGBIG);
 const bool   _default_abs(false);
+const bool   _default_degree(0);
 /*--------------------------------------------------------------------------*/
 class EVAL_BM_POLY : public EVAL_BM_ACTION_BASE {
 private:
   PARAMETER<double> _min;
   PARAMETER<double> _max;
   PARAMETER<bool>   _abs;
+  static map<string, PARA_BASE EVAL_BM_POLY::*> param_dict;
   std::vector<PARAMETER<double> > _c;
+  PARAMETER<unsigned> _degree;
   explicit	EVAL_BM_POLY(const EVAL_BM_POLY& p);
 public:
   explicit      EVAL_BM_POLY(int c=0);
@@ -52,6 +55,7 @@ private: // override vitrual
   std::string	name()const		{return "poly";}
   bool		ac_too()const		{untested();return false;}
   bool		parse_numlist(CS&);
+  void      set_param_by_name(string Name, string Value);
   bool		parse_params_obsolete_callback(CS&);
   void		skip_type_tail(CS& cmd)const {cmd.umatch("(1)");}
 };
@@ -61,7 +65,8 @@ EVAL_BM_POLY::EVAL_BM_POLY(int c)
   :EVAL_BM_ACTION_BASE(c),
    _min(_default_min),
    _max(_default_max),
-   _abs(_default_abs)
+   _abs(_default_abs),
+   _degree(_default_degree)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -70,7 +75,8 @@ EVAL_BM_POLY::EVAL_BM_POLY(const EVAL_BM_POLY& p)
    _min(p._min),
    _max(p._max),
    _abs(p._abs),
-   _c(p._c)
+   _c(p._c),
+   _degree(p._degree)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -82,11 +88,8 @@ bool EVAL_BM_POLY::operator==(const COMMON_COMPONENT& x)const
     && _max == p->_max
     && _abs == p->_abs
     && _c == p->_c
+    && _degree == p->_degree
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    incomplete();
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -123,6 +126,7 @@ void EVAL_BM_POLY::tr_eval(ELEMENT* d)const
   double x = ioffset(d->_y[0].x);
   double f0 = 0.;
   double f1 = 0.;
+  assert(_c.size());
   for (size_t i=_c.size()-1; i>0; --i) {
     f0 += _c[i];
     f0 *= x;
@@ -176,6 +180,23 @@ bool EVAL_BM_POLY::parse_numlist(CS& cmd)
   return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
+map<string, PARA_BASE EVAL_BM_POLY::*> EVAL_BM_POLY::param_dict = 
+  boost::assign::map_list_of
+    ("min",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_min)
+    ("max",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_max)
+    ("abs",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_abs);
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_POLY::set_param_by_name(string Name, string Value)
+{
+  PARA_BASE EVAL_BM_POLY::* x = (param_dict[Name]);
+  if(x) {
+    PARA_BASE* p = &(this->*x);
+    *p = Value;
+  } else {
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool EVAL_BM_POLY::parse_params_obsolete_callback(CS& cmd)
 {
   return ONE_OF
@@ -186,9 +207,21 @@ bool EVAL_BM_POLY::parse_params_obsolete_callback(CS& cmd)
     ;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
+void EVAL_BM_POLY::parse_type_tail(CS& cmd) {
+  untested();
+  if(cmd.umatch("(1)")){
+    _degree = 1;
+  }else{
+    untested();
+  }
+}
+#endif
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 EVAL_BM_POLY p1(CC_STATIC);
 DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "poly", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

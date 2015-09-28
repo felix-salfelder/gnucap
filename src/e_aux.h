@@ -1,4 +1,4 @@
-/*$Id: e_aux.h,v 26.83 2008/06/05 04:46:59 al Exp $ -*- C++ -*-
+/*$Id: e_aux.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,6 +25,7 @@
 #ifndef E_AUX_H
 #define E_AUX_H
 #include "e_node.h"
+#include "u_status.h"
 /*--------------------------------------------------------------------------*/
 template <class T>
 T port_impedance(const node_t& n1, const node_t& n2,
@@ -32,7 +33,7 @@ T port_impedance(const node_t& n1, const node_t& n2,
 {
   T* zapit = new T[mat.size()+2];
 
-  for (int ii = 0;  ii < mat.size()+2;  ++ii) {
+  for (unsigned ii = 0;  ii < mat.size()+2;  ++ii) {
     zapit[ii] = 0.;
   }
   if (n1.m_() != 0) {
@@ -52,5 +53,26 @@ T port_impedance(const node_t& n1, const node_t& n2,
     : raw_z;
 }
 /*--------------------------------------------------------------------------*/
+inline void set_sens_port(const node_t& n1, const node_t& n2)
+{
+  std::fill_n(CKT_BASE::_sim->_sens, 1*CKT_BASE::_sim->_total_nodes+1, 0);
+  CKT_BASE::_sim->_sens[n1.m_()] = 1;
+  if(n2.m_()){
+    CKT_BASE::_sim->_sens[n2.m_()] = -1;
+  } else {
+    // weird, _sens[0] shouldnt do anything
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline COMPLEX port_noise(const node_t& n1, const node_t& n2){
+  set_sens_port(n1,n2);
+  ::status.back.start();
+  CKT_BASE::_sim->_acx.fbsubt(CKT_BASE::_sim->_sens);
+  ::status.back.stop();
+  double a = CARD_LIST::card_list.do_noise();
+  return a;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

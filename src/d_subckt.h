@@ -1,4 +1,5 @@
-/*$Id: d_subckt.h,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: d_subckt.h,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -32,6 +33,7 @@
 /*--------------------------------------------------------------------------*/
 class INTERFACE MODEL_SUBCKT : public COMPONENT {
 private:
+  bool _frozen;
   explicit	MODEL_SUBCKT(const MODEL_SUBCKT&p);
 public:
   explicit	MODEL_SUBCKT();
@@ -41,29 +43,31 @@ public: // override virtual
   CARD*	clone_instance()const;
   bool		print_type_in_spice()const {unreachable(); return false;}
   std::string   value_name()const	{incomplete(); return "";}
-  std::string   dev_type()const		{untested(); return "";}
-  int		max_nodes()const	{return PORTS_PER_SUBCKT;}
-  int		min_nodes()const	{return 0;}
-  int		matrix_nodes()const	{untested();return 0;}
-  int		net_nodes()const	{return _net_nodes;}
+  std::string   dev_type()const		{itested(); return "";}
+  uint_t		max_nodes()const	{return PORTS_PER_SUBCKT;}
+  uint_t		min_nodes()const	{return 0;}
+  uint_t		matrix_nodes()const	{untested();return 0;}
+  uint_t		net_nodes()const	{return _net_nodes;}
   CARD*		clone()const		{return new MODEL_SUBCKT(*this);}
   bool		is_device()const	{return false;}
   void		precalc_first()		{}
   void		expand()		{}
+  void		expand_last()		{ _frozen=1;}
   void		precalc_last()		{}
   bool		makes_own_scope()const  {return true;}
   void		map_nodes()		{}
   CARD_LIST*	   scope()		{return subckt();}
   const CARD_LIST* scope()const		{return subckt();}
 
-  std::string port_name(int)const {
+  std::string port_name(uint_t)const {
     return "";
   }
 public:
   static int	count()			{return _count;}
+  bool frozen() const {return _frozen;}
 
 private:
-  node_t	_nodes[PORTS_PER_SUBCKT];
+  node_t	_nodes[PORTS_PER_SUBCKT]; // hack??
   static int	_count;
 };
 /*--------------------------------------------------------------------------*/
@@ -78,10 +82,16 @@ private: // override virtual
   char		id_letter()const	{return 'X';}
   bool		print_type_in_spice()const {return true;}
   std::string   value_name()const	{return "#";}
-  int		max_nodes()const	{return PORTS_PER_SUBCKT;}
-  int		min_nodes()const	{return 0;}
-  int		matrix_nodes()const	{return 0;}
-  int		net_nodes()const	{return _net_nodes;}
+  uint_t		max_nodes()const {
+    if(_parent){
+      return _parent->net_nodes();
+    }else{
+      return PORTS_PER_SUBCKT;
+    }
+  }
+  uint_t		min_nodes()const	{return 0;}
+  uint_t		matrix_nodes()const	{return 0;}
+  uint_t		net_nodes()const;
   CARD*		clone()const		{return new DEV_SUBCKT(*this);}
   void		precalc_first();
   void		expand();
@@ -89,8 +99,8 @@ private: // override virtual
   double	tr_probe_num(const std::string&)const;
   int param_count_dont_print()const {return common()->COMMON_COMPONENT::param_count();}
 
-  std::string port_name(int i)const {itested();
-    if (_parent) {itested();
+  std::string port_name(uint_t i)const {
+    if (_parent) {
       return _parent->port_value(i);
     }else{itested();
       return "";
@@ -102,6 +112,7 @@ private:
   const MODEL_SUBCKT* _parent;
   node_t	_nodes[PORTS_PER_SUBCKT];
   static int	_count;
+  PARAM_LIST_COPY _params; // (a copy of the model params)
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_SUBCKT : public COMMON_COMPONENT {
@@ -134,3 +145,4 @@ public:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

@@ -1,4 +1,4 @@
-/*$Id: m_interp.h,v 26.83 2008/06/05 04:46:59 al Exp $ -*- C++ -*-
+/*$Id: m_interp.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * interpolation on a sorted array
  *
  * Copyright (C) 2001 Albert Davis
@@ -41,7 +41,6 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
   }
   --end;
   if (begin == end) { // only 1 entry -- constant
-    untested();
     f1 = (x < (*begin).first)
       ? ((below != NOT_INPUT) ? below : 0.)
       : ((above != NOT_INPUT) ? above : 0.);
@@ -94,3 +93,4 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

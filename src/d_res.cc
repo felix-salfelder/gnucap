@@ -1,4 +1,4 @@
-/*$Id: d_res.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*                        -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -23,8 +23,8 @@
  * y.x = amps,  y.f0 = volts, ev = y.f1 = ohms
  * m.x = volts, m.c0 = amps, acg = m.c1 = mhos.
  */
-//testing=script,complete 2006.07.17
 #include "e_elemnt.h"
+#include "u_xprobe.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -37,10 +37,10 @@ private: // override virtual
   char	   id_letter()const	{return 'R';}
   std::string value_name()const {return "r";}
   std::string dev_type()const	{return "resistor";}
-  int	   max_nodes()const	{return 2;}
-  int	   min_nodes()const	{return 2;}
-  int	   matrix_nodes()const	{return 2;}
-  int	   net_nodes()const	{return 2;}
+  uint_t	   max_nodes()const	{return 2;}
+  uint_t	   min_nodes()const	{return 2;}
+  uint_t	   matrix_nodes()const	{return 2;}
+  uint_t	   net_nodes()const	{return 2;}
   bool	   has_iv_probe()const  {return true;}
   bool	   use_obsolete_callback_parse()const {return true;}
   CARD*	   clone()const		{return new DEV_RESISTANCE(*this);}
@@ -49,19 +49,22 @@ private: // override virtual
   void     tr_begin();
   bool	   do_tr();
   void	   tr_load()		{tr_load_passive();}
-  void	   tr_unload()		{untested();tr_unload_passive();}
+  void	   tr_unload()		{tr_unload_passive();}
   double   tr_involts()const	{return tr_outvolts();}
   double   tr_input()const	{untested(); return _m0.c0 + _m0.c1 * tr_involts();}
   double   tr_involts_limited()const {return tr_outvolts_limited();}
   double   tr_input_limited()const {return _m0.c0+_m0.c1*tr_involts_limited();}
+  void	   tr_regress();
   void	   ac_iwant_matrix()	{ac_iwant_matrix_passive();}
-  void     ac_begin()           {_ev = _y[0].f1; _acg = 1. / _ev;} 
+  void     ac_begin()           {_ev = _y[0].f1; _acg = 1. / _ev; assert(_y[0].f1);}
   void	   do_ac();
   void	   ac_load()		{ac_load_passive();}
   COMPLEX  ac_involts()const	{return ac_outvolts();}
+  double do_noise()const;
+  XPROBE sens_probe_ext(const std::string& x)const;
 
-  std::string port_name(int i)const {itested();
-    assert(i >= 0);
+  std::string port_name(uint_t i)const {
+    assert(i != INVALID_NODE);
     assert(i < 2);
     static std::string names[] = {"p", "n"};
     return names[i];
@@ -71,8 +74,8 @@ private: // override virtual
 void DEV_RESISTANCE::precalc_last()
 {
   ELEMENT::precalc_last();
-  set_constant(!has_tr_eval());
-  set_converged(!has_tr_eval());
+  set_constant(!has_tr_eval() || (has_common() && common()->is_constant()));
+  set_converged(!has_tr_eval() || (has_common() && common()->is_constant()));
 }
 /*--------------------------------------------------------------------------*/
 void DEV_RESISTANCE::tr_begin()
@@ -85,20 +88,25 @@ void DEV_RESISTANCE::tr_begin()
   _m1 = _m0;
   assert(_loss0 == 0.);
   assert(_loss1 == 0.);
-  if (value() == 0. && !has_common()) {
+  if (is_constant() && using_tr_eval()) {
+    do_tr();
+  }else if (value() == 0. && !has_common()) {
     error(bPICKY, long_label() + ": short circuit\n");
   }else{
   }
+  _n[0].register_prop(_n[1]);
+  _n[1]->register_prop(_n[0].operator->());
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_RESISTANCE::do_tr()
 {
+  trace1("DEV_RESISTANCE::do_tr", using_tr_eval());
   if (using_tr_eval()) {
     _m0.x = tr_involts_limited();
     _y[0].x = tr_input_limited();;
     tr_eval();
     assert(_y[0].f0 != LINEAR);
-    if (_y[0].f1 == 0.) {
+    if (_y[0].f1 == 0.) { // leq short??
       error(bPICKY, long_label() + ": short circuit\n");
       _y[0].f1 = OPT::shortckt;
       set_converged(conv_check());
@@ -119,6 +127,19 @@ bool DEV_RESISTANCE::do_tr()
   return converged();
 }
 /*--------------------------------------------------------------------------*/
+void DEV_RESISTANCE::tr_regress()
+{
+  ELEMENT::tr_regress();
+  if (OPT::disc==dREJECT){
+    for (unsigned i=0;i < 2; ++i) {
+      if (DISCONT d=_n[i]->discont()) {
+        _n[1-i]->discont(d);
+      } else {
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void DEV_RESISTANCE::do_ac()
 {
   if (using_ac_eval()) {
@@ -135,9 +156,59 @@ void DEV_RESISTANCE::do_ac()
   }
 }
 /*--------------------------------------------------------------------------*/
+double DEV_RESISTANCE::do_noise()const
+{
+// Assumed that everything is evaluated as AC was called just before
+// invariant ?? :
+  double opower = 0;
+  // assert(_ev == double(value()));
+  assert(_ev == _y[0].f1);
+  assert(_acg == 1./_ev);
+
+  double temp = OPT::temp_c + P_CELSIUS0;   // 300.15;
+  double g = real(_acg);
+  double i_noise_r = sqrt(4*P_K*temp*mfactor()*g);
+  uint_t n1 = _n[OUT1].m_();
+  uint_t n2 = _n[OUT2].m_();
+  COMPLEX v = _sim->_sens[n1] - _sim->_sens[n2];
+  double noisepow = abs(v*i_noise_r);
+  noisepow *= noisepow;
+
+  opower = noisepow;
+
+  trace4("DEV_RESISTANCE::do_noise", long_label(), opower, i_noise_r, g);
+  return opower;
+}
+/*--------------------------------------------------------------------------*/
+XPROBE DEV_RESISTANCE::sens_probe_ext(const std::string& x)const
+{
+  trace1("DEV_RESISTANCE::sens_probe_ext", x);
+  unsigned n1 = _n[OUT1].m_();
+  unsigned n2 = _n[OUT2].m_();
+  COMPLEX a = CKT_BASE::_sim->_sens[n1];
+  COMPLEX b = CKT_BASE::_sim->_sens[n2];
+  double vp = CKT_BASE::_sim->vdc()[n1];
+  double vn = CKT_BASE::_sim->vdc()[n2];
+  double dv = vp - vn;
+  double G( real(_acg) );
+
+  if (Umatch(x, "r{es} ")) {	
+    COMPLEX ddr = (a-b) * G*G ;
+    return XPROBE( ddr*dv );
+  } else if (Umatch(x, "g ")) {	
+    return XPROBE( -(a-b) * dv );
+  }
+
+  if (Umatch(x, "d1 ")) {	 // debug...
+    return XPROBE( dv );
+  }
+  return ELEMENT::sens_probe_ext(x);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 DEV_RESISTANCE p1;
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "R|resistor", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

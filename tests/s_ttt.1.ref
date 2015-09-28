@@ -1,0 +1,48 @@
+#TTime      ttime(0)   control(0)
+ 0.         0.         100.      
+ 10.        0.         100.      
+ 20.        10.        100.      
+ 31.        21.        100.      
+ 71.        61.        100.      
+ 100.       90.        1.5K      
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=274
+transient timesteps: accepted=97, rejected=0, total=96
+twotime timesteps: accepted=8, rejected=0, total=8
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%
+#TTime      ttime(0)   control(0)
+ 0.         0.         100.      
+ 10.        0.         100.      
+ 20.        10.        100.      
+ 31.        21.        100.      
+ 43.1       33.1       1.4K      
+ 56.41      46.41      1.4K      
+ 71.        61.        100.      
+ 87.049     77.049     1.4K      
+ 100.       90.        1.5K      
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=548
+transient timesteps: accepted=194, rejected=0, total=192
+twotime timesteps: accepted=8, rejected=0, total=16
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%
+#TTime      ttime(0)   control(0)
+ 0.         0.         100.      
+ 5.         0.         100.      
+ 10.        5.         100.      
+ 20.        15.        100.      
+ 30.        25.        100.      
+ 40.        35.        100.      
+ 50.        45.        100.      
+ 60.        55.        100.      
+ 70.        65.        100.      
+ 80.        75.        100.      
+ 90.        85.        100.      
+ 100.       95.        1.5K      
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=759
+transient timesteps: accepted=272, rejected=0, total=269
+twotime timesteps: accepted=11, rejected=0, total=27
+nodes: user=0, subckt=0, model=0, total=0
+dctran density=0.0%, ac density=0.0%

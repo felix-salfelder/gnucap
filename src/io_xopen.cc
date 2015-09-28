@@ -1,4 +1,4 @@
-/*$Id: io_xopen.cc,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*                                     -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -23,7 +23,6 @@
  * fill in extension, if necessary
  * open file
  */
-//testing=script,sparse 2006.07.17
 #include "u_opt.h"
 #include "constant.h"
 #include "ap.h"
@@ -34,6 +33,7 @@
 void xclose(FILE **fn)
 {
   if (*fn) {
+    trace1("closing", *fn);
     fclose(*fn);
     *fn = NULL;
   }
@@ -47,6 +47,7 @@ void xclose(FILE **fn)
  */
 FILE *xopen(CS& cmd, const char *ext, const char *how)
 {
+  trace3("xopen",(string)cmd, how, ext);
   char fname[BIGBUFLEN];
   
   cmd.skipbl();
@@ -71,7 +72,6 @@ FILE *xopen(CS& cmd, const char *ext, const char *how)
 	if (c == '.') {		/* as determined by a '.'	    */
 	  defalt = false;		/* not before the directory	    */
 	}else if (strchr(ENDDIR,c)) {	/* separator-terminator character   */
-	  itested();
 	  defalt = true;		/* '\' or '/' for msdos,	    */
 	}
       }  				/* ']' or '/' for vms,		    */
@@ -103,11 +103,12 @@ FILE *xopen(CS& cmd, const char *ext, const char *how)
       return NULL;
     }
   }else{
+    trace1("opening", fname);
     code = fopen(fname,how);
   }
   
-  if (code && fileno(code)>MAXHANDLE) {untested(); 
-    error(bWARNING, "internal error: files: %d\n", fileno(code));
+  if (code && fileno(code)>(int)MAXHANDLE) {untested();
+    error(bWARNING, "internal error: too many files: %d\n", fileno(code));
     fclose(code);
     code = NULL;
   }
@@ -120,3 +121,4 @@ FILE *xopen(CS& cmd, const char *ext, const char *how)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

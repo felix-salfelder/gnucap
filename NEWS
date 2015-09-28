@@ -1,0 +1,14 @@
+sep 2014 gnucap-uf 0.0.2
+
+* param support in sock
+* tt improved
+* sensitivity continued
+* some state space analysis plugins
+* fold in some upstream fixes
+* wave stash and command
+
+feb 2014 gnucap-uf 0.0.0
+
+* this is a development 'release' forking off from upstream gnucap
+* see CHANGES.uf for an incomplete list of changes
+* see README for features/usage

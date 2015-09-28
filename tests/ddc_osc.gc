@@ -1,0 +1,29 @@
+spice
+
+.options initsc 1
+
+.param P -1
+.param I 1
+.param qc1=1
+.param il1=0
+
+* test input
+* L1 0 n2 1m ic={il1/1k}
+.verilog
+brl #(.l(1.01m) .ic({il1})) lb(n2,0);
+spice
+C1 n1 0 1u ic=qc1
+R1 n1 n2 10
+
+.print ddc v(C1) i(lb) dv(n1) v(n2) ddv(n1)
+.ddc qc1 -1 2 0.2 il1 -25m 25m 5m tr
+
+.param qc1=1
+* bug? must reset params after ddc sweep?
+.param il1=0
+.print tran v(c1) i(lb)
+.dc uic
+.tran 0 1m 1u trace=n cont
+.stat notime
+
+.end

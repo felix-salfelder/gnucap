@@ -1,4 +1,4 @@
-/*$Id: bm_sin.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_sin.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -29,6 +29,9 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+using std::map;
+using std::string;
+/*--------------------------------------------------------------------------*/
 const double _default_offset	(0);
 const double _default_amplitude	(1);
 const double _default_frequency (NOT_INPUT);
@@ -49,11 +52,19 @@ private:
   PARAMETER<double> _samples;
   PARAMETER<bool>   _zero;
   PARAMETER<bool>   _peak;
+  void set_param_by_name(string Name, string Value);
+
   mutable double _actual_frequency;
+  static std::map<string, PARA_BASE EVAL_BM_SIN::*> _param_dict;
   explicit	EVAL_BM_SIN(const EVAL_BM_SIN& p);
 public:
   explicit      EVAL_BM_SIN(int c=0);
 		~EVAL_BM_SIN()		{}
+  int param_count()const {return 8 + EVAL_BM_ACTION_BASE::param_count();}
+  string param_name(int i)const;
+  string param_name(int i,int)const{return param_name(i);}
+  string param_value(int)const;
+  bool param_is_printable(int i)const;
 private: // override vitrual
   bool		operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_SIN(*this);}
@@ -61,7 +72,7 @@ private: // override vitrual
 
   void		precalc_first(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
-  TIME_PAIR	tr_review(COMPONENT*);
+  TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "sin";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
@@ -112,9 +123,6 @@ bool EVAL_BM_SIN::operator==(const COMMON_COMPONENT& x)const
     && _zero == p->_zero
     && _peak == p->_peak
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {untested();
-  }else{
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -169,9 +177,13 @@ void EVAL_BM_SIN::tr_eval(ELEMENT* d)const
   tr_finish_tdv(d, ev);
 }
 /*--------------------------------------------------------------------------*/
-TIME_PAIR EVAL_BM_SIN::tr_review(COMPONENT* d)
+TIME_PAIR EVAL_BM_SIN::tr_review(COMPONENT* d)const
 {
-  double reltime = ioffset(d->_sim->_time0) + d->_sim->_dtmin * .01;
+  double eps = d->_sim->_dtmin * .01;
+  double time = ioffset(d->_sim->_time0);
+  double reltime = time + eps;
+  ELEMENT* e = prechecked_cast<ELEMENT*>(d);
+  assert(e);
 
   if (reltime > _delay) {
     if (_peak && _zero) {
@@ -183,6 +195,10 @@ TIME_PAIR EVAL_BM_SIN::tr_review(COMPONENT* d)
     }else{
     }
     d->_time_by.min_error_estimate(d->_sim->_time0 + 1. / (_samples * _actual_frequency));
+    if (time < _delay+eps) {
+      e->_discont |= disSECOND;
+      d->q_accept();
+    }
   }else{
     d->_time_by.min_event(_delay);
   }
@@ -221,9 +237,85 @@ bool EVAL_BM_SIN::parse_params_obsolete_callback(CS& cmd)
     ;
 }
 /*--------------------------------------------------------------------------*/
+bool EVAL_BM_SIN::param_is_printable(int i)const
+{
+  switch (EVAL_BM_SIN::param_count() - 1 - i) { untested();
+  case 0:  return (true);
+  case 1:  return (true);
+  case 2:  return (true);
+  case 3:  return _delay.has_hard_value();
+  case 4:  return _damping.has_hard_value();
+  case 5:  return _samples.has_hard_value();
+  case 6:  return _zero.has_hard_value();
+  case 7:  return _peak.has_hard_value();
+  default: return EVAL_BM_ACTION_BASE::param_is_printable(i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+string EVAL_BM_SIN::param_name(int i)const
+{
+  switch (EVAL_BM_SIN::param_count() - 1 - i) { untested();
+  case 0:  return "offset";
+  case 1:  return "amplitude";
+  case 2:  return "frequency";
+  case 3:  return "delay";
+  case 4:  return "damping";
+  case 5:  return "samples";
+  case 6:  return "zero";
+  case 7:  return "peak";
+  default: return EVAL_BM_ACTION_BASE::param_name(i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+string EVAL_BM_SIN::param_value(int i)const
+{
+  switch (EVAL_BM_SIN::param_count() - 1 - i) { untested();
+  case 0:  return _offset.string();
+  case 1:  return _amplitude.string();
+  case 2:  return _frequency.string();
+  case 3:  return _delay.string();
+  case 4:  return _damping.string();
+  case 5:  return _samples.string();
+  case 6:  return _zero.string();
+  case 7:  return _peak.string();
+  default: return EVAL_BM_ACTION_BASE::param_value(i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+map<string, PARA_BASE EVAL_BM_SIN::*> EVAL_BM_SIN::_param_dict =
+  boost::assign::map_list_of
+    ("offset",   (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_offset)
+    ("o",        (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_offset)
+    ("amplitude",(PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_amplitude)
+    ("a",        (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_amplitude)
+    ("frequency",(PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_frequency)
+    ("f",        (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_frequency)
+    ("delay",    (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_delay)
+    ("de",       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_delay)
+    ("damping",  (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_damping)
+    ("da",       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_damping)
+    ("samples",  (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_samples)
+    ("sa",       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_samples)
+    ("zero",     (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_zero)
+    ("ze",       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_zero)
+    ("peak",     (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_peak)
+    ("pe",       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_peak);
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_SIN::set_param_by_name(std::string Name, std::string Value)
+{
+  PARA_BASE EVAL_BM_SIN::* x = (_param_dict[Name]);
+  if (x) {
+    PARA_BASE* p = &(this->*x);
+    *p = Value;
+  }else{ untested();
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 EVAL_BM_SIN p1(CC_STATIC);
 DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "sin|sine", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

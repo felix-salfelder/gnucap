@@ -1,4 +1,4 @@
-/*$Id: bm_generator.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_generator.cc 2015.01.08 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -23,6 +23,7 @@
  * used with tc, etc, and conditionals
  */
 //testing=script,complete 2005.10.06
+#include "globals.h"
 #include "e_elemnt.h"
 #include "bm.h"
 /*--------------------------------------------------------------------------*/
@@ -33,7 +34,9 @@ private:
   explicit	EVAL_BM_GENERATOR(const EVAL_BM_GENERATOR& p);
 public:
   explicit      EVAL_BM_GENERATOR(int c=0);
-		~EVAL_BM_GENERATOR()	{}
+		~EVAL_BM_GENERATOR()	{
+		trace0("~EVAL_BM_GENERATOR");
+		}
 private: // override virtual
   bool		operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_GENERATOR(*this);}
@@ -59,11 +62,12 @@ EVAL_BM_GENERATOR::EVAL_BM_GENERATOR(const EVAL_BM_GENERATOR& p)
 bool EVAL_BM_GENERATOR::operator==(const COMMON_COMPONENT& x)const
 {
   const EVAL_BM_GENERATOR* p = dynamic_cast<const EVAL_BM_GENERATOR*>(&x);
-  bool rv = p
-    && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    incomplete();
-    untested();
+  if (p) {
+  }else{untested();
+  }
+  bool rv = p && EVAL_BM_ACTION_BASE::operator==(x);
+  if (rv) {untested();
+  }else{
   }
   return rv;
 }
@@ -105,3 +109,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "gen|generator", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

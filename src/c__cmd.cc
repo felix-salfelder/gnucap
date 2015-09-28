@@ -1,4 +1,5 @@
-/*$Id: c__cmd.cc,v 26.130 2009/11/15 21:51:59 al Exp $ -*- C++ -*-
+/*$Id: c__cmd.cc,v 1.7 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -43,7 +44,7 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
   timecheck.stop().reset().start();
 
   cmd.umatch(ANTI_COMMENT);
-  while (cmd.umatch(I_PROMPT)) {itested();
+  while (cmd.umatch(I_PROMPT)) { itested();
     /* skip any number of these */
   }
 
@@ -53,8 +54,8 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
   // Map possible short names to full ones.
   // If this if/else block is removed, the only loss is the short names.
   // Although it looks like it can be used to make aliases, don't.
-  if (cmd.umatch("'|*|#|//|\""))	{itested(); s = "xxxxcomment";}
-  else if (cmd.umatch("b{uild} "))      {itested();  s = "build";}
+  if (cmd.umatch("'|*|#|//|\""))	{            s = "xxxxcomment";}
+  else if (cmd.umatch("b{uild} "))      {            s = "build";}
   else if (cmd.umatch("del{ete} "))     {            s = "delete";}
   else if (cmd.umatch("fo{urier} "))    {            s = "fourier";}
   else if (cmd.umatch("gen{erator} "))  {	     s = "generator";}
@@ -68,36 +69,37 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
   else if (cmd.umatch("st{atus} "))     {            s = "status";}
   else if (cmd.umatch("te{mperature} ")){itested();  s = "temperature";}
   else if (cmd.umatch("tr{ansient} "))  {            s = "transient";}
+  else if (cmd.umatch("tw{otimetran} ")){            s = "twotimetran";}
   else if (cmd.umatch("!"))		{	     s = "system";}
   else if (cmd.umatch("<"))		{untested(); s = "<";}
-  else if (cmd.umatch(">"))		{untested(); s = ">";}
+  else if (cmd.umatch(">"))		{ itested(); s = ">";}
   else{ /* no shortcut available */
     cmd >> s;
     didsomething = false;
   }
 
-  if (s == "xxxxcomment") {itested();
+  if (s == "xxxxcomment") {
     // nothing
   }else if (s != "") {
     CMD* c = command_dispatcher[s];
     if (c) {
       c->do_it(cmd, scope);
       didsomething = true;
-    }else{itested();
-      cmd.warn(bWARNING, here, "what's this?");
+    }else{ itested();
+      cmd.warn(bWARNING, here, "cmd: what's this?");
     }
-  }else if (!didsomething) {itested();
+  }else if (!didsomething) {
     cmd.check(bWARNING, "bad command");
     didsomething = false;
-  }else{itested();
+  }else{ itested();
   }
   
-  if (OPT::acct  &&  didsomething) {itested();
+  if (OPT::acct  &&  didsomething) {
     IO::mstdout.form("time=%8.2f\n", timecheck.check().elapsed());
   }else{
   }
   plclose();
-  outreset();
+  IO::mstdout.outreset();
 
   if (get_timer_was_running) {
     ::status.get.start();
@@ -111,12 +113,15 @@ void CMD::command(const std::string& cs, CARD_LIST* scope)
   std::string s;
   cmd >> s;
 
+  //std::cerr << "CMD::command " << s << " " <<cs << "\n";
+
   CMD* c = command_dispatcher[s];
   if (c) {
     c->do_it(cmd, scope);
-  }else{itested();
+  }else{ itested();
     throw Exception("bad internal command: " + s);
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

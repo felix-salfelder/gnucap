@@ -1,0 +1,15 @@
+spice
+
+v1 1 0 pulse iv=0 pv=2m    rise=.1m  fall=.1m  period=15m width=1m  delay=1m
+v2 2 0 pulse iv=0 pv={-1m} rise=.05m fall=.05m period=15m width=.5m delay=1.25m
+r1 1 3 .1k
+r2 3 2 .1k
+c1 0 3 1n
+
+.print tran
++ hidden(0) v(3) disc(1) disc(2) ord(v*) ord(c1)
+
+.alarm tran method(c1)(2,2)
+.tran 0 40m 40m trace=a
+.status notime
+.end

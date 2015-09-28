@@ -1,0 +1,21 @@
+spice
+
+.param vdd 1.7
+.options numdgt=10
+
+V1 nin 0 pulse iv=-1 pv=1 rise=1 delay=-.75 width=1 fall=.5
+* V1 nin 0 -1
+
+.load rcd_sym.so
+.model my_rcd rcd_exp
+
+.verilog
+my_rcd #(.weight(1), .re0(4), .re1(3), .rc0(5), .rc1(-2), .positive(1)) rcdpos(nin,0);
+my_rcd #(.weight(1), .re0(4), .re1(3), .rc0(5), .rc1(-2), .positive(0)) rcdneg(nin,0);
+spice
+
+.list
+.print tran P(rcd*) v(nin) stress(rcd*)
+
+.tr 0 4 .2 trace=a > ager_tr.out echo
+.end

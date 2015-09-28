@@ -1,4 +1,4 @@
-/*$Id: l_wmatch.cc,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: l_wmatch.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -49,7 +49,7 @@ bool wmatch_by_ptr(const char *s2, const char *s1)
   }else if (*s1 == '*') {		// * (repeat) wild card match
     if (wmatch_by_ptr(s2+1, s1)) {	// match 1, try for 2
       return true;
-    }else if (wmatch_by_ptr(s2, s1+1)) {itested();	// match 0 - continue
+    }else if (wmatch_by_ptr(s2, s1+1)) { // match 0 - continue
       return true;
     }else{				// match 1, only 1
       return wmatch_by_ptr(s2+1, s1+1);
@@ -65,3 +65,4 @@ bool wmatch(const std::string& s1,const std::string& s2)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

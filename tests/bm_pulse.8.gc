@@ -1,0 +1,15 @@
+spice
+
+i1 0 1 pulse iv=0 pv=2m    rise=.1m fall=.1m period=5m width=1m
+i2 0 1 pulse iv=0 pv={-1m} rise=.05m fall=.05m period=5m width=.5m delay=.25m
+r1 1 2 1k
+r2 0 2 1k
+c1 0 2 1n
+
+.print tran
++ method(c1)
++ hidden(0) v(1) v(2) disc(1) disc(2)
+
+.tran 0 5m 5m trace=a
+.status notime
+.end

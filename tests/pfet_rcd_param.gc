@@ -1,0 +1,48 @@
+spice
+
+* param processing in parameter vector list
+* rcd's need to end up with same parameters
+.load rcd_sym.so
+
+.param pulse_iv=0
+.param pulse_rise=1n
+
+.param voff=0.4
+.model my_rcdmodel rcd_exp
+
+.list
+
+.param s=.5
+.param w=1
+
+.model rcd1 bti_sum (
++ parms = (
++  (65734.764403498935, -1, 7.6851098109742111, 33.944029750879885, 20.802215970322095)
++  (w*65734.764403498935, {-1*s}, {7.6851098109742111}, 33.944029750879885, 20.802215970322095)
++ )
++ rcd_model_name=my_rcdmodel
++ weight=w
++)
+
+.model cmosp1 pmos(
++level=8
++bti_model=rcd1
++)
+
+.list
+
+.param vdd=3
+V1 nin ndd sin ( delay=-0.025m amplitude={vdd/3} frequency=1e4 offset={-vdd/2})
+R2 nin ng 10k
+MP1 nout ng ndd ndd cmosp1 l=3.5e-5 w=4.5e-6
+R1 0 nout 9k
+VDD ndd 0 vdd
+
+.print tw dvth(MP1.BTI)
++ tau(MP1.BTI.rcd*)
+
+
+.echo tt init run
+*.store tran v(nout)
+.tw 1u .1m 1m new tran > debug_pfet_age_tr.out
+.end

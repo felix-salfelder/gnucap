@@ -1,0 +1,7 @@
+#!/bin/sh
+dir=`dirname $0`
+top="@abs_top_builddir@"
+export LD_LIBRARY_PATH=$top/src/.libs:$top/modules/.libs \
+       GNUCAP_CPPFLAGS='-I@abs_builddir@ -I@abs_srcdir@' \
+       GNUCAP_MAKE="$top/gnucap.mk";
+$dir/gnucap.real $*

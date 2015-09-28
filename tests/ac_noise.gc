@@ -1,0 +1,19 @@
+spice
+
+.param vdd=1
+V1 nin 0 vdd
+R1 nout 0 1
+R2 nin nout 2
+R3 nin 0 1
+
+.print ac v(n*) n(n*) n(V1) n(R*) y(R*)
+
+.op
+.ac
+.param vdd 2
+.op
+.ac
+.param vdd 3
+.op
+.ac
+.end

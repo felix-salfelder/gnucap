@@ -1,0 +1,17 @@
+spice
+
+.options disc=imm
+
+v1 n1 0 pulse iv=0 pv=1 delay=1 rise=1m
+r1 n1 n2 .25k
+r1 n2 n3 .25k
+r1 n3 n4 .25k
+r1 n4 n5 .25k
+c1 n5 0 10n
+
+.print tran v(nodes) i(r1) method(c1) hidden(0)
++ dis(n5) v(r1) ord(v1) ord(c1)
+.tran 0 10 10 trace=r
+.stat notime
+.end
+

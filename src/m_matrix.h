@@ -1,4 +1,4 @@
-/*$Id: m_matrix.h,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*                                -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -33,7 +33,7 @@
  * 4. If you want, you can add an offset to the diagonal ...
  *	a.dezero(gmin);
  * 5. You probably should set a minimum pivot value ...
- *	a.setminpivot(gmin);
+ *	a.set_min_pivot(gmin);
  * 6. Fill in the matrix ...
  *	for (all pairs i,j you want to fill in)
  *	   a.m(i,j) += data;
@@ -93,7 +93,7 @@
  *	Changing it will corrupt the matrix.
  *	All others have no bounds checking.
  * m(r,c) -- "matrix" -- known to be within the allocated band
- * u(r,c) -- "upper" -- known to be in the upper triangle. (c>=r)
+ * r,c) -- "upper" -- known to be in the upper triangle. (c>=r)
  * l(r,c) -- "lower" -- known to be in the lower triangle. (r>=c)
  * d(r,c) -- "diagonal" -- known to be on the diagonal. (r==c)
  * Using s() will always work, but will be slower than the other methods.
@@ -111,64 +111,124 @@
 #define M_MATRIX_H
 /*--------------------------------------------------------------------------*/
 #include "l_stlextra.h"
+#include "io_.h"
+#include <iostream>
+#include <fstream>
+#include <set>
+using std::set;
+using std::vector;
+using std::deque;
 /*--------------------------------------------------------------------------*/
+enum needed_t  {nNO=0, nYES, nFILL};
+/*--------------------------------------------------------------------------*/
+class OMSTREAM;
 template <class T>
 class BSMATRIX {
+  // hack.
+  friend class BSMATRIX<double>; 
+  friend class BSMATRIX<std::complex<double> >;
 private:
-  mutable bool* _changed;// flag: this node changed value
-  int*	_lownode;	// lowest node connecting to this one
+  mutable bool* _changed;  // flag: this node changed value
+  unsigned*	_lownode;  // lowest node connecting to this one
   T*	_space;		// ptr to actual memory space used
   T**	_rowptr;	// ptrs to col 0 of every row
   T**	_colptr;	// ptrs to row 0 of every col
   T**	_diaptr;	// ptrs to diagonal
-  int	_nzcount;	// count of non-zero elements
-  int	_size;		// # of rows and columns
+  unsigned _nzcount;	// count of non-zero elements
+  unsigned _size;	// # of rows and columns
   T	_zero;		// always 0 but not const
   T	_trash;		// depository for row and col 0, write only
   T	_min_pivot;	// minimum pivot value
-private:
-  explicit	BSMATRIX(const BSMATRIX<T>&) {incomplete();unreachable();}
-  void		uninit();
-  void		init(int s=0);
-  T&		subtract_dot_product(int r, int c, int d);
-  T&		subtract_dot_product(int r, int c, int d, const T& in);
-  int		lownode(int i)const	{return _lownode[i];}
-  bool		is_changed(int n)const	{return _changed[n];}
-  void		set_changed(int n, bool x = true)const {_changed[n] = x;}
+  unsigned _bandwidth;  // (0=diagonal)
+  vector<set<unsigned> > _adj;
+  vector<set<unsigned> > _adj_ordered;
 public:
-  explicit	BSMATRIX(int ss=0);
+  enum REAL {_REAL};
+  enum IMAG {_IMAG};
+  enum SUM {_SUM};
+  BSMATRIX(const BSMATRIX<T>&);
+private:
+  explicit	BSMATRIX(REAL, const BSMATRIX<std::complex<double> >&);
+  explicit	BSMATRIX(IMAG, const BSMATRIX<std::complex<double> >&);
+  explicit	BSMATRIX(SUM, const BSMATRIX<std::complex<double> >&);
+  void		uninit();
+  void		init(unsigned s=0);
+  T&		subtract_dot_product(uint_t r, uint_t c, uint_t d);
+  T&		subtract_dot_product(uint_t r, uint_t c, uint_t d, const T& in);
+  unsigned	lownode(unsigned i)const {return _lownode[i];}
+  bool		is_changed(unsigned n)const {return _changed[n];}
+  void		set_changed(uint_t n, bool x = true)const {_changed[n] = x;}
+public:
+  explicit	BSMATRIX(unsigned ss=0);
   		~BSMATRIX()		{uninit();}
-  void		reinit(int ss=0)	{uninit(); init(ss);}
+  void		reinit(unsigned ss=0)	{uninit(); init(ss);}
   //void	clone(const BSMATRIX<T>&);
-  void		iwant(int, int);
+  BSMATRIX<T>*  copy()const // also copy contents
+  { return new BSMATRIX(*this); }
+  BSMATRIX<double> real()const
+  { return( BSMATRIX<double>(BSMATRIX< double >::_REAL, *this) ) ; }
+  BSMATRIX<double> imag()const
+  { return( BSMATRIX<double>(BSMATRIX< double >::_IMAG, *this) ) ; }
+  BSMATRIX<double> sum()const
+  { return( BSMATRIX<double>(BSMATRIX< double >::_SUM, *this) ) ; }
+  T* row(T*, unsigned);
+  T* col(T*, unsigned);
+  void		iwant(unsigned, unsigned);
+  void		iwant(unsigned*); 
+private:
+  void          i_do_want(unsigned, unsigned);
+  int* _rcm;
+  void rcm(); // used by allocate.
+public:
   void		unallocate();
-  void		allocate();
+  void		allocate(unsigned*nm=NULL);
   void		reallocate()		{unallocate(); allocate();}
   void		set_min_pivot(double x)	{_min_pivot = x;}
   void		zero();
   void		dezero(T& o);
-  int		size()const		{return _size;}
+  unsigned	size()const		{return _size;}
   double 	density();
-  T 	d(int r, int  )const	{return *(_diaptr[r]);}
+  inline T*    rmul(T* b, const T* x)const; // returns A*x
+  T 	d(unsigned r, unsigned  )const	{return *(_diaptr[r]);}
+  T     s(unsigned r, unsigned c)const; 
+  needed_t n(unsigned row, unsigned col)const;
 private:
-  T 	u(int r, int c)const	{return _colptr[c][r];}
-  T 	l(int r, int c)const	{return _rowptr[r][-c];}
-  T&	d(int r, int c);
-  T&	u(int r, int c);
-  T&	l(int r, int c);
-  T&	m(int r, int c);
-  //T&	s(int r, int c);
+  T 	u(unsigned r, unsigned c)const	{ return _colptr[c][r];}
+  T 	l(unsigned r, unsigned c)const	{ return *(_rowptr[r]-c);}
+  T&	d(unsigned r, unsigned c);
+  T&	u(unsigned r, unsigned c);
+  T&	l(unsigned r, unsigned c);
+  T&	m(unsigned r, unsigned c);
+  T&	s(unsigned r, unsigned c);
 public:
-  void		load_diagonal_point(int i, T value);
-  void		load_point(int i, int j, T value);
-  void		load_couple(int i, int j, T value);
-  void		load_symmetric(int i, int j, T value);
-  void		load_asymmetric(int r1, int r2, int c1, int c2, T value);
+  template <class S,class X>
+  friend S& operator<< ( S &o, const BSMATRIX<X>& m);
+
+  BSMATRIX& operator*=( const T& s);
+  BSMATRIX& operator+=( const BSMATRIX& s);
+  BSMATRIX& operator=( const BSMATRIX& s);
+//  BSMATRIX& operator-( BSMATRIX& s);
+//  template <class X>
+//  friend OMSTREAM& operator<< ( OMSTREAM &o, const BSMATRIX<X>& m);
+  void		load_diagonal_point(uint_t i, T value);
+  void		load_point(uint_t i, uint_t j, T value);
+  void		load_couple(uint_t i, uint_t j, T value);
+  void		load_symmetric(uint_t i, uint_t j, T value);
+  void		load_asymmetric(uint_t r1, uint_t r2, uint_t c1, uint_t c2, T value);
   
-  void		lu_decomp(const BSMATRIX<T>&, bool do_partial);
+  void		lu_decomp(const BSMATRIX<T>&, bool do_partial=false);
   void		lu_decomp();
   void		fbsub(T* v) const;
-  void		fbsub(T* x, const T* b, T* c = NULL) const;
+  void		fbsub(std::complex<T>* v) const;
+  void		fbsub(T* x, const T* b, T* c ) const;
+  T*		fbsub(T* x, const T* b ) const { fbsub(x,b,x); return x; }
+  void		fbsubt(T* v) const;
+public:
+  void sink_forward(unsigned* nm);
+  void sink_reverse(unsigned* nm);
+public: //eigenvalue stuff
+  void augment(T*, T*row=0);
+  void deaugment();
 };
 /*--------------------------------------------------------------------------*/
 // private implementations
@@ -184,7 +244,7 @@ void BSMATRIX<T>::uninit()
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::init(int ss)
+void BSMATRIX<T>::init(unsigned ss)
 {
   assert(!_lownode);
   assert(!_colptr);
@@ -196,31 +256,35 @@ void BSMATRIX<T>::init(int ss)
   _min_pivot = _trash = 0.;
   _nzcount = 0;
   _size = ss;
-  _lownode = new int[size()+1];
+  _lownode = new unsigned[size()+1];
   assert(_lownode);
-  for (int ii = 0;  ii <= size();  ++ii) {
+  for (unsigned ii = 0;  ii <= size();  ++ii) {
     _lownode[ii] = ii;
   }
   _changed = new bool[size()+1];
   assert(_changed);
-  for (int ii = 0;  ii <= size();  ++ii) {
+  for (unsigned ii = 0;  ii <= size();  ++ii) {
     set_changed(ii, false);
   }
+
+  _adj.clear();
+  _adj.resize(size()+1);
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd)
+T& BSMATRIX<T>::subtract_dot_product(uint_t rr, uint_t cc, uint_t dd)
 {
   assert(_lownode);
-  int kk = std::max(_lownode[rr], _lownode[cc]);
-  int len = dd - kk;
+  uint_t kk = std::max(_lownode[rr], _lownode[cc]);
+  assert(dd>=kk);
+  unsigned len = unsigned(dd - kk);
   T& dot = m(rr, cc);
   if (len > 0) {
-    T* row = &(l(rr,kk));
-    T* col = &(u(kk,cc));
+    T* row_ = &(l(rr,kk));
+    T* col_ = &(u(kk,cc));
     /* for (ii = kk;   ii < dd;   ++ii) */
-    for (int ii = 0;   ii < len;   ++ii) {
-      dot -= row[-ii] * col[ii];
+    for (unsigned ii = 0;   ii < len;   ++ii) {
+      dot -= *(row_-ii) * col_[ii];
     }
   }else{
   }
@@ -228,19 +292,19 @@ T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd)
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd, const T& in)
+T& BSMATRIX<T>::subtract_dot_product(uint_t rr, uint_t cc, uint_t dd, const T& in)
 {
   assert(_lownode);
-  int kk = std::max(_lownode[rr], _lownode[cc]);
-  int len = dd - kk;
+  unsigned kk = std::max(_lownode[rr], _lownode[cc]);
+  int len = int(dd) - int(kk);
   T& dot = m(rr, cc);
   dot = in;
   if (len > 0) {
-    T* row = &(l(rr,kk));
-    T* col = &(u(kk,cc));
+    T* row_ = &(l(rr,kk));
+    T* col_ = &(u(kk,cc));
     /* for (ii = kk;   ii < dd;   ++ii) */
     for (int ii = 0;   ii < len;   ++ii) {
-      dot -= row[-ii] * col[ii];
+      dot -= *(row_-ii) * col_[ii];
     }
   }else{
   }
@@ -250,7 +314,7 @@ T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd, const T& in)
 // public implementations
 /*--------------------------------------------------------------------------*/
 template <class T>
-BSMATRIX<T>::BSMATRIX(int ss)
+BSMATRIX<T>::BSMATRIX(unsigned ss)
   :_changed(NULL),
    _lownode(NULL),
    _space(NULL),
@@ -261,7 +325,8 @@ BSMATRIX<T>::BSMATRIX(int ss)
    _size(ss),
    _zero(0.),
    _trash(0.),
-   _min_pivot(0.)
+   _min_pivot(0.),
+   _bandwidth(0)
 {
   init(ss);
 }
@@ -283,12 +348,41 @@ void BSMATRIX<T>::clone(const BSMATRIX<T> & aa)
 /* iwant: indicate that "iwant" to allocate this spot in the matrix
  */
 template <class T>
-void BSMATRIX<T>::iwant(int node1, int node2)
+void BSMATRIX<T>::iwant(unsigned node1, unsigned node2)
 {
+  trace2("BSMATRIX::iwant", node1, node2);
   assert(_lownode);
   assert(node1 <= size());
   assert(node2 <= size());
 
+//   _adj.resize( std::max(std::max(node1, node2), unsigned(_adj.size())));
+  assert(node1 < _adj.size());
+  assert(node2 < _adj.size());
+  _adj[node1].insert(node2);
+  _adj[node2].insert(node1);
+
+}
+/*--------------------------------------*/
+template <class T>
+void BSMATRIX<T>::iwant(unsigned* nm)
+{
+  _adj_ordered.clear();
+  _adj_ordered.resize(_adj.size());
+  for( unsigned j=0; j<size(); ++j ){
+    for( set<unsigned>::const_iterator ii=_adj[j].begin();
+        ii != _adj[j].end(); ++ii )
+    {
+      i_do_want(nm[j],nm[*ii]);
+      _adj_ordered[nm[j]].insert(nm[*ii]);
+      _adj_ordered[nm[*ii]].insert(nm[j]);
+    }
+  }
+}
+/*--------------------------------------*/
+// i really want the nodes (former iwant)
+template <class T>
+void BSMATRIX<T>::i_do_want(unsigned node1, unsigned node2)
+{
   if (node1 <= 0  ||  node2 <= 0) {
     // node 0 is ground, and doesn't count as a connection
     // negative is invalid, not used but still may be in a node list
@@ -314,10 +408,12 @@ void BSMATRIX<T>::unallocate()
 }
 /*--------------------------------------------------------------------------*/
 /* allocate: really get the space to work
+ * hmm maybe pass nm here?
  */
 template <class T>
-void BSMATRIX<T>::allocate()
+void BSMATRIX<T>::allocate(unsigned* nm)
 {
+  if(nm)incomplete();
   assert(_lownode);
   assert(!_colptr);
   assert(!_rowptr);
@@ -325,13 +421,15 @@ void BSMATRIX<T>::allocate()
   assert(!_space);
 
   _nzcount = 0;
-  for (int ii = 0;   ii <= size();   ++ii) {
-    _nzcount += 2 * (ii - _lownode[ii]) + 1;
+  for (unsigned ii = 0;   ii <= size();   ++ii) {
+    assert (ii >= _lownode[ii]);
+    _nzcount += 2 * unsigned(ii - _lownode[ii]) + 1;
   }
 
   _colptr = new T*[size()+1];
   _rowptr = new T*[size()+1];
   _diaptr = new T*[size()+1];
+  trace1("BSMATRIX::allocate", _nzcount);
   _space  = new T[_nzcount];
 
   assert(_colptr);
@@ -342,11 +440,11 @@ void BSMATRIX<T>::allocate()
 
   {
     T* point = _space;
-    for (int ii = 0;   ii <= size();   ++ii) {
-      _colptr[ii] = point - _lownode[ii];
+    for (unsigned ii = 0; ii <= size(); ++ii) {
+      _colptr[ii] = point - (int)_lownode[ii];
       _rowptr[ii] = _colptr[ii] + 2*ii;
       _diaptr[ii] = _colptr[ii] + ii;
-      point += 2 * (ii - _lownode[ii]) + 1;
+      point += 2 * ((int)ii - (int)_lownode[ii]) + 1;
     }
   }
 }
@@ -367,7 +465,7 @@ void BSMATRIX<T>::zero()
 template <class T>
 void BSMATRIX<T>::dezero(T& offset)
 {
-  for (int ii = 1;  ii <= size();  ++ii) {
+  for (unsigned ii = 1;  ii <= size();  ++ii) {
     d(ii,ii) += offset;
   }
 }
@@ -378,7 +476,7 @@ double BSMATRIX<T>::density()
   if (size() > 0) {
     assert(_lownode);
     _nzcount = 0;
-    for (int ii = 0;   ii <= size();   ++ii) {
+    for (unsigned ii = 0;   ii <= size();   ++ii) {
       _nzcount += 2 * (ii - _lownode[ii]) + 1;
     }
     return static_cast<double>(_nzcount-1)/(static_cast<double>(size())*size());
@@ -391,27 +489,27 @@ double BSMATRIX<T>::density()
  * It is known that the entry is valid and on the diagonal
  */
 template <class T>
-T& BSMATRIX<T>::d(int r, int c)
+T& BSMATRIX<T>::d(unsigned r, unsigned c)
 {
   assert(_diaptr);
-  assert(r == c);
-  assert(0 <= r);
+  assert(r == c); USE(c);
+  assert(r);
   assert(r <= _size);
 
   return *(_diaptr[r]);
 }
 /*--------------------------------------------------------------------------*/
 /* u: fast matrix entry access
- * It is known that the entry is valid and in the upper triangle
+ * It is known that the entry is valid and in the upper triangle (or diagonal)
  */
 template <class T>
-T& BSMATRIX<T>::u(int r, int c)
+T& BSMATRIX<T>::u(unsigned r, unsigned c)
 {
   assert(_colptr);
   assert(_lownode);
-  assert(0 < r);
+  assert(r);
   assert(r <= c);
-  assert(c <= _size);
+  //assert(c <= _size);
   assert(1 <= _lownode[c]);
   assert(_lownode[c] <= r);
 
@@ -419,20 +517,20 @@ T& BSMATRIX<T>::u(int r, int c)
 }
 /*--------------------------------------------------------------------------*/
 /* l: fast matrix entry access
- * It is known that the entry is valid and in the lower triangle
+ * It is known that the entry is valid and in the lower triangle not diagonal
  */
 template <class T>
-T& BSMATRIX<T>::l(int r, int c)
+T& BSMATRIX<T>::l(unsigned r, unsigned c)
 {
   assert(_rowptr);
   assert(_lownode);
   assert(0 < c);
-  assert(c <= r);
+  assert(c < r);
   assert(r <= _size);
   assert(1 <= _lownode[r]);
   assert(_lownode[r] <= c);
 
-  return _rowptr[r][-c];
+  return *(_rowptr[r]-c);
 }
 /*--------------------------------------------------------------------------*/
 /* m: semi-fast matrix entry access
@@ -440,9 +538,13 @@ T& BSMATRIX<T>::l(int r, int c)
  * but it is not known whether lower, upper, or diagonal
  */
 template <class T>
-T& BSMATRIX<T>::m(int r, int c)
+T& BSMATRIX<T>::m(unsigned r, unsigned c)
 {
-  return (c>=r) ? u(r,c) : l(r,c);
+  if (c>=r) {
+    return u(r,c);
+  }else{
+    return l(r,c);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* s: general matrix entry access.
@@ -457,43 +559,113 @@ T& BSMATRIX<T>::m(int r, int c)
  *   Writing to trash is allowed and encouraged,
  *   but reading it gives a number not useful for anything.
  */
-#if 0
 template <class T>
-T& BSMATRIX<T>::s(int row, int col)
-{untested();
+T BSMATRIX<T>::s(unsigned row, unsigned col)const
+{
   assert(_lownode);
-  assert(0 <= col);
+  // assert(0 <= col);
   assert(col <= size());
-  assert(0 <= row);
+  // assert(0 <= row);
   assert(row <= size());
   assert(_zero == 0.);
 
-  if (col == row) {untested();
+  if (col == row) {
     return d(row,col);
-  }else if (col > row) {untested();	/* above the diagonal */
-    if (row == 0) {untested();
+  }else if (col > row) {	/* above the diagonal */
+    if (row == 0) {
       return _trash;
-    }else if (row < _lownode[col]) {untested();
+    }else if (row < _lownode[col]) {
       return _zero;
-    }else{untested();
-      return u(row,col);
+    }else{
+      return (u(row,col));
     }
-  }else{untested();			/* below the diagonal */
+  }else{			/* below the diagonal */
     assert(col < row);
-    if (col == 0) {untested();
+    if (col == 0) {
       return _trash;
-    }else if (col < _lownode[row]) {untested();
+    }else if (col < _lownode[row]) {
       return _zero;
-    }else{untested();
-      return l(row,col);
+    }else{
+      return (l(row,col));
     }
   }
   unreachable();
 }
-#endif
+/*--------------------------------------------------------------------------*/
+// the entry is allocated (non-zero)
+template <class T>
+needed_t BSMATRIX<T>::n(unsigned row, unsigned col)const
+{
+  assert(_lownode);
+  // assert(0 <= col);
+  assert(col <= size());
+  // assert(0 <= row);
+  assert(row <= size());
+  assert(_zero == 0.);
+
+  if (_adj_ordered[row].find(col) != _adj_ordered[row].end()){
+    return nYES;
+  }
+
+  if (col == row) {
+    return nYES;
+  }else if (col > row) {	/* above the diagonal */
+    if (row == 0) {
+      return nNO;
+    }else if (row < _lownode[col]) {
+      return nNO;
+    }else{
+      return nFILL;
+    }
+  }else{			/* below the diagonal */
+    assert(col < row);
+    if (col == 0) {
+      return nNO;
+    }else if (col < _lownode[row]) {
+      return nNO;
+    }else{
+      return nFILL; 
+    }
+  }
+  unreachable();
+}
+/*--------------------------------------------------------------------------*/
+// rw access.
+template <class T>
+T& BSMATRIX<T>::s(unsigned row, unsigned col)
+{
+  assert(_lownode);
+// assert(0 <= col);
+  assert(col <= size());
+//  assert(0 <= row);
+  assert(row <= size());
+  assert(_zero == 0.);
+
+  if (col == row) {
+    return d(row,col);
+  }else if (col > row) {	/* above the diagonal */
+    if (row == 0) {
+      return _trash;
+    }else if (row < _lownode[col]) {
+      return _zero;
+    }else{
+      return (u(row,col));
+    }
+  }else{			/* below the diagonal */
+    assert(col < row);
+    if (col == 0) {
+      return _trash;
+    }else if (col < _lownode[row]) {
+      return _zero;
+    }else{
+      return (l(row,col));
+    }
+  }
+  unreachable();
+}
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::load_point(int i, int j, T value)
+void BSMATRIX<T>::load_point(uint_t i, uint_t j, T value)
 {
   if (i > 0 && j > 0) {
     set_changed(j);
@@ -505,7 +677,7 @@ void BSMATRIX<T>::load_point(int i, int j, T value)
 /*--------------------------------------------------------------------------*/
 // load_point(i, i, value);
 template <class T>
-void BSMATRIX<T>::load_diagonal_point(int i, T value)
+void BSMATRIX<T>::load_diagonal_point(uint_t i, T value)
 {
   if (i > 0) {
     set_changed(i);
@@ -517,7 +689,7 @@ void BSMATRIX<T>::load_diagonal_point(int i, T value)
 // load_point(i, j, -value);
 // load_point(j, i, -value);
 template <class T>
-void BSMATRIX<T>::load_couple(int i, int j, T value)
+void BSMATRIX<T>::load_couple(uint_t i, uint_t j, T value)
 {
   if (j > 0) {
     set_changed(j);
@@ -536,7 +708,7 @@ void BSMATRIX<T>::load_couple(int i, int j, T value)
 // load_point(i, j, -value);
 // load_point(j, i, -value);
 template <class T>
-void BSMATRIX<T>::load_symmetric(int i, int j, T value)
+void BSMATRIX<T>::load_symmetric(uint_t i, uint_t j, T value)
 {
   if (j > 0) {
     set_changed(j);
@@ -560,7 +732,7 @@ void BSMATRIX<T>::load_symmetric(int i, int j, T value)
 // load_point(r1, c2, -value);
 // load_point(r2, c1, -value);
 template <class T>
-void BSMATRIX<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
+void BSMATRIX<T>::load_asymmetric(uint_t r1,uint_t r2,uint_t c1,uint_t c2,T value)
 {
   set_changed(c1);
   set_changed(c2);
@@ -593,31 +765,31 @@ void BSMATRIX<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
 template <class T>
 void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
 {
-  int prop = 0;   /* change propagation indicator */
+  unsigned prop = 0;   /* change propagation indicator */
   assert(_lownode);
   assert(aa._lownode);
   assert(aa.size() == size());
-  for (int mm = 1;   mm <= size();   ++mm) {
+  for (unsigned mm = 1;   mm <= size();   ++mm) {
     assert(aa.lownode(mm) == _lownode[mm]);
-    int bn = _lownode[mm];
+    unsigned bn = _lownode[mm];
     if (!do_partial  ||  aa.is_changed(mm)  ||  bn <= prop) {
       aa.set_changed(mm, false);
       prop = mm;
       if (bn < mm) {
 	prop = mm;
 	u(bn,mm) = aa.u(bn,mm) / d(bn,bn);
-	for (int ii = bn+1;  ii<mm;  ii++) {
+	for (unsigned ii = bn+1;  ii<mm;  ii++) {
 	  /* u(ii,mm) = (aa.u(ii,mm) - dot(ii,mm,ii)) / d(ii,ii); */
 	  subtract_dot_product(ii,mm,ii,aa.u(ii,mm)) /= d(ii,ii);
 	}
 	l(mm,bn) = aa.l(mm,bn);
-	for (int jj = bn+1;  jj<mm;  jj++) {
+	for (unsigned jj = bn+1;  jj<mm;  jj++) {
 	  /* l(mm,jj) = aa.l(mm,jj) - dot(mm,jj,jj); */
 	  subtract_dot_product(mm,jj,jj,aa.l(mm,jj));
 	}
 	{ /* jj == mm */
 	  /* d(mm,mm) = aa.d(mm,mm) - dot(mm,mm,mm); then test */
-	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {untested();
+	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {
 	    error(bWARNING, "open circuit: internal node %u\n", mm);
 	    d(mm,mm) = _min_pivot;
 	  }else{
@@ -639,21 +811,21 @@ template <class T>
 void BSMATRIX<T>::lu_decomp()
 {
   assert(_lownode);
-  for (int mm = 1;   mm <= size();   ++mm) {
-    int bn = _lownode[mm];
+  for (unsigned mm = 1;   mm <= size();   ++mm) {
+    unsigned bn = _lownode[mm];
     if (bn < mm) {
       u(bn,mm) /= d(bn,bn);
-      for (int ii =bn+1;  ii<mm;  ii++) {
+      for (unsigned ii =bn+1;  ii<mm;  ii++) {
 	/* (m(ii,mm) -= dot(ii,mm,ii)) /= d(ii,ii); */
 	subtract_dot_product(ii,mm,ii) /= d(ii,ii);
       }
-      for (int jj = bn+1;  jj<mm;  jj++) {
+      for (unsigned jj = bn+1;  jj<mm;  jj++) {
 	/* m(mm,jj) -= dot(mm,jj,jj); */
 	subtract_dot_product(mm,jj,jj);
       }
       { /* jj == mm */
 	/* m(mm,mm) -= dot(mm,mm,mm); then test */
-	if (subtract_dot_product(mm,mm,mm) == 0.) {untested();
+	if (subtract_dot_product(mm,mm,mm) == 0.) {
 	  error(bWARNING, "open circuit: internal node %u\n", mm);
 	  d(mm,mm) = _min_pivot;
 	}else{
@@ -677,24 +849,24 @@ void BSMATRIX<T>::fbsub(T* v) const
   assert(_lownode);
   assert(v);
 
-  for (int ii = 1; ii <= size(); ++ii) {	/* forward substitution */
-    for (int jj = _lownode[ii]; jj < ii; ++jj) {
+  for (unsigned ii = 1; ii <= size(); ++ii) {	/* forward substitution */
+    for (unsigned jj = _lownode[ii]; jj < ii; ++jj) {
       v[ii] -= l(ii,jj) * v[jj];
     }
     v[ii] /= d(ii,ii);
   }
 
-  for (int jj = size(); jj > 1; --jj) {		/* back substitution    */
-    for (int ii = _lownode[jj]; ii < jj; ++ii) {
+  for (unsigned jj = size(); jj > 1; --jj) {		/* back substitution    */
+    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {
       v[ii] -= u(ii,jj) * v[jj];
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 /* fbsub: forward and back sub, separate storage
+ * x = solution vector
  * b = right side vector
  * c = intermediate vector after fwd sub
- * x = solution vector
  */
 template <class T>
 void BSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
@@ -705,7 +877,7 @@ void BSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
   assert(c);
 
   {
-    int ii = 1;
+    unsigned ii = 1;
     for (   ; ii <= size(); ++ii) {
       if (b[ii] != 0.) {
 	break;
@@ -714,11 +886,11 @@ void BSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
       c[ii] = 0.;
     }
 
-    int first_nz = ii;
+    unsigned first_nz = ii;
     for (   ; ii <= size(); ++ii) {		/* forward substitution */
-      int low_node = std::max(_lownode[ii], first_nz);
+      unsigned low_node = std::max(_lownode[ii], first_nz);
       c[ii] = b[ii];
-      for (int jj = low_node; jj < ii; ++jj) {
+      for (unsigned jj = low_node; jj < ii; ++jj) {
 	c[ii] -= l(ii,jj) * c[jj];
       }
       c[ii] /= d(ii,ii);
@@ -727,15 +899,102 @@ void BSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
 
   notstd::copy_n(c, size()+1, x);
 
-  for (int jj = size(); jj > 1; --jj) {		/* back substitution    */
-    for (int ii = _lownode[jj]; ii < jj; ++ii) {
+  for (unsigned jj = size(); jj > 1; --jj) {		/* back substitution    */
+    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {
       x[ii] -= u(ii,jj) * x[jj];
     }
   }
   x[0] = 0.;
-  //BUG// some things don't work unless there is a zero here.
+  // index starts at 1, but node 0 is ground
+  // x[0]==0 eliminates a lot of "if" statements
+}
+/*--------------------------------------------------------------------------*/
+template<class T>
+BSMATRIX<T>::BSMATRIX(const BSMATRIX<T>& m) :
+	_changed(new bool[m.size()+1]),
+	_lownode(new unsigned[m.size()+1]),
+	_space(new T[m._nzcount]),
+	_rowptr(new T*[m._size+1]),
+	_colptr(new T*[m._size+1]),
+	_diaptr(new T*[m._size+1]),
+	_nzcount(m._nzcount),
+	_size(m._size),
+	_zero(0),
+	_trash(m._trash),
+	_min_pivot(m._min_pivot)
+{
+	memcpy(_changed,m._changed, (_size+1) * sizeof(bool) );
+	memcpy(_lownode,m._lownode, (_size+1) * sizeof(unsigned) );
+	memcpy(_space,m._space, (_nzcount)  * sizeof(T));
+
+	for(unsigned i=0; i<=_size; i++){
+		_rowptr[i]= _space - intptr_t(m._space - m._rowptr[i]);
+		_colptr[i]= _space - intptr_t(m._space - m._colptr[i]);
+		_diaptr[i]= _space - intptr_t(m._space - m._diaptr[i]);
+	}
+
+}
+
+/*--------------------------------------------------------------------------*/
+// template <class X, class Y>
+//Y& operator<< ( Y &o, const BSMATRIX<X>& m);
+
+//template <class X>
+//OMSTREAM& operator<< ( OMSTREAM &o, const BSMATRIX<X>& m);
+template<>
+void BSMATRIX<double>::sink_forward(unsigned* nm);
+template<>
+void BSMATRIX<double>::sink_reverse(unsigned* nm);
+/*--------------------------------------------------------------------------*/
+/* fbsubt: forward and back substitution with implicitly transposed matrix Ut Lt x = v
+ * v = right side vector, changed in place to solution vector
+ * GS:
+ * this method s used to solve system A_t X = B (_t - transposed)
+ * which corresponds to adjoint system
+ * (LU)_t then transforms to U_t L_t
+ *  added: Gennadiy Serdyuk <gserdyuk@gserdyuk.com>
+ */
+template <class T>
+void BSMATRIX<T>::fbsubt(T* v) const
+{
+  assert(_lownode);
+  assert(v);
+
+  for (unsigned ii = 1; ii <= size(); ++ii) {	// forward substitution
+    for (unsigned jj = _lownode[ii]; jj < ii; ++jj) {
+      v[ii] -= u(jj,ii) * v [jj];
+    }
+  }
+
+  for (unsigned jj = size(); jj > 1; --jj) {		// back substitution
+	v[jj] /= d(jj,jj);
+    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {
+      v[ii] -= l(jj,ii) * v[jj];			
+    }
+  }
+  v[1]/=d(1,1);
+}
+/*--------------------------------------------------------------------------*/
+// apply real matrix to complex vector.
+template<class T>
+void BSMATRIX<T>::fbsub(std::complex<T>* v)const
+{
+  T part[size()+1];
+  for(unsigned i=0; i<=size(); ++i){
+    part[i] = v[i].real();
+  }
+  fbsub(part);
+  for(unsigned i=0; i<=size(); ++i){
+    v[i].real(part[i]);
+    part[i] = v[i].imag();
+  }
+  fbsub(part);
+  for(unsigned i=0; i<=size(); ++i){
+    v[i].imag(part[i]);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 
+// vim:ts=8:sw=2:noet:

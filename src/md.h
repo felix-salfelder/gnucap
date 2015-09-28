@@ -1,4 +1,4 @@
-/*$Id: md.h,v 26.112 2009/07/24 00:10:32 al Exp $ -*- C++ -*-
+/*                               -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,14 +21,27 @@
  *------------------------------------------------------------------
  * Machine dependent, configuration, and standard includes
  */
-//testing=trivial 2006.07.17
 #ifndef MD_H_INCLUDED
 #define MD_H_INCLUDED
 /*--------------------------------------------------------------------------*/
-/* autoconf stuff */
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+// float type to use for currents, voltages & stuff
+// typedef double double; // has to be double
+//typedef long double hp_float_t;
+#define HAVE_DOUBLE_TYPES
+typedef double voltage_t;
+typedef double current_t;
+typedef double charge_t;
+typedef double conductance_t;
+typedef double hp_float_t;
+#define HAVE_UINT_T
+typedef unsigned int uint_t;
+/*--------------------------------------------------------------------------*/
+// some functions are not const in upstream yet.
+#define GCUF_CONST const
+/*--------------------------------------------------------------------------*/
+// FIXME!!
+typedef double fun_t;
+inline double to_fun_t(double x){return x;}
 /*--------------------------------------------------------------------------*/
 /* std collection of includes */
 // system
@@ -78,8 +91,9 @@ enum {
 #define PATHSEP		';'
 #define SYSTEMSTARTFILE	"gnucap.rc"
 #define SYSTEMSTARTPATH	OS::getenv("PATH")
+#define CWDSTARTFILE	"gnucap.rc"
 #define USERSTARTFILE	"gnucap.rc"
-#define	USERSTARTPATH	OS::getenv("HOME")
+#define USERSTARTPATH	OS::getenv("HOME")
 #define STEPFILE   	"/tmp/SXXXXXX"
 #define SHELL		OS::getenv("COMSPEC")
 /*--------------------------------------------------------------------------*/
@@ -87,12 +101,17 @@ enum {
 #define	ENDDIR		"/"
 #define PATHSEP		':'
 #define SYSTEMSTARTFILE	"gnucap.rc"
-#define SYSTEMSTARTPATH	OS::getenv("PATH")
+#define SYSTEMSTARTPATH	"/etc"
+#define CWDSTARTFILE	"gnucap.rc"
 #define USERSTARTFILE	".gnucaprc"
-#define	USERSTARTPATH	OS::getenv("HOME")
+#define USERSTARTPATH	OS::getenv("HOME")
 #define STEPFILE   	"/tmp/SXXXXXX"
 #define SHELL		OS::getenv("SHELL")
 #endif
+/*--------------------------------------------------------------------------*/
+
+// for pointer hashing.
+#define PRIME 2001
 /*--------------------------------------------------------------------------*/
 /* machine and compiler patches */
 #if defined(__MINGW32__)
@@ -101,8 +120,14 @@ enum {
 #endif
 /*--------------------------------------------------------------------------*/
 /* some convenient names */
+typedef std::complex<hp_float_t> hCOMPLEX;
+typedef std::pair<hp_float_t,hp_float_t> hDPAIR;
+#ifdef COMPLEX
+# error COMPLEX mess
+#endif
 typedef std::complex<double> COMPLEX;
 typedef std::pair<double,double> DPAIR;
+const double inf = std::numeric_limits<float>::infinity( );
 /*--------------------------------------------------------------------------*/
 // dynamic cast kluge.
 // Strictly, this should always be dynamic_cast, but if it has already
@@ -113,6 +138,14 @@ typedef std::pair<double,double> DPAIR;
 #else
   #define prechecked_cast dynamic_cast
 #endif
+
+
+template <class T, class S>
+inline T asserted_cast(S s){
+  T x = prechecked_cast<T>(s);
+  assert(x);
+  return x;
+}
 
 /*--------------------------------------------------------------------------*/
 /* portability hacks */
@@ -136,6 +169,7 @@ typedef std::pair<double,double> DPAIR;
 
 inline void* dlopen(const char* f, int)
 {
+  trace0("Loadlibrary wrapper");
   return LoadLibrary(const_cast<char*>(f));
 }
 
@@ -196,16 +230,41 @@ enum RUN_MODE {
 		/* simulation command will do it this way.	*/
   rINTERACTIVE,	/* run the commands, interactively		*/
   rSCRIPT,	/* execute now, as a command, then restore mode	*/
-  rBATCH	/* execute now, as a command, then exit		*/
+  rBATCH,	/* execute now, as a command, then exit		*/
+  rPIPE // unbuffered, like script.
 };
 class INTERFACE ENV {
 public:
   static RUN_MODE run_mode; // variations on handling of dot commands
+  static int error; // error return code
 };
 /*--------------------------------------------------------------------------*/
 /* my standard collection of includes */
 #include "io_trace.h"
 #include "io_error.h"
 /*--------------------------------------------------------------------------*/
+
+using std::string;
+using std::ostream;
+/*--------------------------------------------------------------------------*/
+inline double fmin(double x, double y, double z){
+  return ( fmin(fmin(x,y),z));
+}
+inline double fmax(double x, double y, double z){
+  return ( fmax(fmax(x,y),z));
+}
+#define HAVE_IS_NUMBER
+inline bool is_number(long double x){
+  return (( x != inf ) && (x != -inf ) && (x == x)) ;
+}
+inline bool is_number(double x){
+  return (( x != inf ) && (x != -inf ) && (x == x)) ;
+}
+inline bool is_almost(double x, double y){
+  return ( fabs(x-y) / ( fmax(fabs(x),fabs(y))+1e-20) < 1e-10 || fabs(x-y)<1e-12);
+}
+inline double square(double x){return x*x;}
+inline long double square(long double x){return x*x;}
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

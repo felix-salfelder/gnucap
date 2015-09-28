@@ -1,4 +1,4 @@
-/* $Id: s__init.cc,v 26.135 2009/12/02 09:26:53 al Exp $
+/* $Id: s__init.cc,v 1.4 2009-12-13 17:55:02 felix Exp $
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,7 +21,6 @@
  *------------------------------------------------------------------
  * initialization (allocation, node mapping, etc)
  */
-//testing=obsolete
 #include "u_status.h"
 #include "u_sim_data.h"
 #include "s__.h"
@@ -32,6 +31,7 @@ void SIM::command_base(CS& cmd)
   _sim->reset_iteration_counter(iPRINTSTEP);
   
   _sim->init();
+  trace1("init done", _sim->_temp_c);
   _sim->alloc_vectors();  
   _sim->_aa.reallocate();
   _sim->_aa.dezero(OPT::gmin);
@@ -43,15 +43,17 @@ void SIM::command_base(CS& cmd)
   assert(_sim->_nstat);
   try {
     setup(cmd);
+    CARD_LIST::card_list.precalc_last();
     ::status.set_up.stop();
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();	break;
-    case rBATCH:	itested();
-    case rINTERACTIVE:	itested();
-    case rSCRIPT:	sweep();	break;
+    case rPIPE:         untested();
+    case rBATCH:
+    case rINTERACTIVE:
+    case rSCRIPT:	trace0("SIM::command_base calling sweep");	sweep(); break;
     case rPRESET:	/*nothing*/	break;
     }
-   }catch (Exception& e) {untested();
+   }catch (Exception& e) {
     error(bDANGER, e.message() + '\n');
     _sim->count_iterations(iTOTAL);
     _sim->_lu.unallocate();
@@ -65,7 +67,10 @@ void SIM::command_base(CS& cmd)
 /*--------------------------------------------------------------------------*/
 SIM::~SIM()
 {
-  _sim->uninit();
+  if (_sim) {
+    _sim->uninit();
+  }else { untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SIM::reset_timers()
@@ -86,4 +91,16 @@ void SIM::reset_timers()
   ::status.total.reset().start();
 }
 /*--------------------------------------------------------------------------*/
+bool SIM::common_options(CS& Cmd)
+{
+  string label;
+  if (Get(Cmd, "label", &label)){
+    assert(CKT_BASE::_sim);
+    CKT_BASE::_sim->_label = label;
+    return true;
+  }
+  return false;
+}
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

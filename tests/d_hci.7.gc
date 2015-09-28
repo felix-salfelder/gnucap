@@ -1,0 +1,47 @@
+* bias runaway...
+
+options TEMP=25
+options numdgt 10
+options trace
+
+* hmmm
+options nocstray
+
+
+*.include inv_amp_p.mod
+param vdd=5
+spice
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 1e-7 BETA0 = 1
++ H0 = 1e11
++ )
+
+R1 nout ndd 600
+MN1 nout ng 0 0 cmosn l=1.5e-7 w=4.5e-5
+Rg ng nin 1k
+VDD ndd 0 vdd
+vin nin 0 {vdd*.6}
+
+* .print tran
+* + dvth(MN1) hci_tr(MN1.HCI)
+* + hidden(0)
+
+.print tw
++ dvth(MN1)
++ tt(MN1.HCI)
++ stress(MN1.HCI)
++ v(nout)
++ von(MN1)
++ v(nin)
++ hidden(0)
++ ttorder(MN1.HCI)
+.options ttsteporder=2
+.param ttend 2.5e8
+
+.ttr 0 {ttend} 10u 1u * 1.2 new trace=n > hci7tt.out echo agemode=once tran age
+.echo >> hci7tt.out
+.ttr 0 {ttend} 10u 1u * 1.2 new trace=n >> hci7tt.out echo tran age
+.status notime
+.end

@@ -1,0 +1,41 @@
+spice
+
+R1 1 2 1
+L1 0 2 1
+I1 0 1 pulse iv=0 pv=1 rise=.1
+
+.print tran v(nodes) hidden(0) event(I1) i(L1) method(L1)
+
+.options initsc 0
+.tran 0 1 1 trace=a
+.stat notime
+
+.options initsc 0
+.tran 0 1 1 trace=a
+.stat notime
+
+.options initsc -1
+.tran 0 1 trace=a
+.stat notime
+
+.echo traponly
+.options method=traponly
+.tran 0 1 trace=a
+.stat notime
+
+.echo initsc 0, traponly
+.options initsc 0
+.tran 0 1 trace=a
+.stat notime
+
+.echo euleronly
+.options method=euleronly
+.tran 0 1 trace=a
+.stat notime
+
+.echo initsc 1
+.options initsc 1
+.tran 0 1 trace=a
+.stat notime
+
+.end

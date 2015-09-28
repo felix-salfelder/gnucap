@@ -1,4 +1,4 @@
-/*$Id: constant.h,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -85,15 +85,18 @@ double const ICM2M3 = 1e6;		/* inverse  ...........  cubed   */
 double const MICRON2METER = 1e-6;	/*	microns to meters	 */
 
 #ifdef HAS_NUMERIC_LIMITS
-double const MAXDBL    = std::numeric_limits<double>::max();
+# define MAXDBL    std::numeric_limits<double>::max()
 #else
-double const MAXDBL    = DBL_MAX;
+# define MAXDBL    (DBL_MAX)
 #endif
+
+// WAAH HACK
 
 double const BIGBIG    =  (MAXDBL)*(.9247958);	/* unlikely number	  */
 //double const OVERDUE   = -(MAXDBL)*(.9347958);/* unlikely number	  */
 double const NEVER     =  (MAXDBL)*(.9447958);	/* unlikely number	  */
-double const NOT_INPUT = -(MAXDBL)*(.9547658);	/* unlikely number	  */
+#define NOT_INPUT (-(MAXDBL)*(.9547658))	/* unlikely number	  */
+int32_t   const NOT_INPUT_INT  = (1<<30)-5; 	/* unlikely number (ha ha )	  */
 double const NOT_VALID = -(MAXDBL)*(.9647958);	/* unlikely number	  */
 double const LINEAR    = -(MAXDBL)*(.9747958);	/* unlikely number	  */
 
@@ -108,3 +111,4 @@ enum {FILE_OK=0, FILE_BAD=-1};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

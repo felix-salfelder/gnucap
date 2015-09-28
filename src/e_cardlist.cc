@@ -1,4 +1,4 @@
-/*$Id: e_cardlist.cc,v 26.136 2009/12/08 02:03:49 al Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -22,28 +22,36 @@
  * Base class for "cards" in the circuit description file
  * This file contains functions that process a list of cards
  */
-//testing=script 2006.07.10
 #include "u_time_pair.h"
 #include "e_node.h"
 #include "u_nodemap.h"
 #include "e_model.h"
+#include "io_misc.h"
 /*--------------------------------------------------------------------------*/
-#define trace_func_comp() trace0((__func__ + (":" + (**ci).long_label())).c_str())
+#define trace_func_comp() trace2(__func__, (*ci)->long_label(), CKT_BASE::_sim->iteration_tag())
 /*--------------------------------------------------------------------------*/
-CARD_LIST::CARD_LIST()
+CARD_LIST::CARD_LIST(const CARD* owner, PARAM_LIST_MAP* p)
   :_parent(NULL),
    _nm(new NODE_MAP),
-   _params(NULL),
-   _language(NULL)
+   _params(p),
+   _language(NULL),
+   _owner(owner),
+   _origin(NULL)
 {
+  if (p) { // register owner, to disable param delete in ~
+    assert(owner);
+    _parent = owner->scope();
+  }
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
-		     const CARD_LIST* scope, PARAM_LIST* p)
+		     const CARD_LIST* scope, PARAM_LIST_BASE* p)
   :_parent(NULL),
    _nm(new NODE_MAP),
    _params(NULL),
-   _language(NULL)
+   _language(NULL),
+   _owner(owner),
+   _origin(model->subckt())
 {
   assert(model);
   assert(model->subckt());
@@ -54,6 +62,11 @@ CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
   shallow_copy(model->subckt());
   set_owner(owner);
   map_subckt_nodes(model, owner);
+  // rewire_nodenames(model->subckt());
+  // _origin = scope; // hack?
+
+  trace2("CARD_LIST::CARD_LIST owner", owner->short_label(), _nm->how_many() );
+  trace2("CARD_LIST::CARD_LIST owner", owner->short_label(), model->subckt()->nodes()->how_many() );
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::~CARD_LIST()
@@ -68,6 +81,9 @@ CARD_LIST::~CARD_LIST()
 /*--------------------------------------------------------------------------*/
 PARAM_LIST* CARD_LIST::params()
 {
+  if (_parent) {
+    trace1("hmm", *(_parent->params()));
+  }
   if (!_params) {
     assert(!_parent);
     _params = new PARAM_LIST;
@@ -80,6 +96,8 @@ PARAM_LIST* CARD_LIST::params()const
 {
   if (_params) {
     return _params;
+  }else if(_parent) { untested();
+    return _parent->_params;
   }else{ //BUG//const
     static PARAM_LIST empty_params;
     return &empty_params;
@@ -103,6 +121,12 @@ CARD_LIST& CARD_LIST::erase(iterator ci)
   assert(ci != end());
   delete *ci;
   _cl.erase(ci);
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::remove(CARD* c)
+{ untested();
+  _cl.remove(c);
   return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -131,6 +155,7 @@ CARD_LIST& CARD_LIST::set_owner(CARD* owner)
     trace_func_comp();
     (**ci).set_owner(owner);
   }
+  _owner = owner;
   return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -180,6 +205,15 @@ CARD_LIST& CARD_LIST::precalc_first()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+//CARD_LIST& CARD_LIST::tt_next()
+//{
+//  for (iterator ci=begin(); ci!=end(); ++ci) {
+//    trace_func_comp();
+//    (**ci).tt_next();
+//  }
+//  return *this;
+//}
+/*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::precalc_last()
 {
   for (iterator ci=begin(); ci!=end(); ++ci) {
@@ -198,6 +232,61 @@ CARD_LIST& CARD_LIST::map_nodes()
     (**ci).map_nodes();
   }
   return *this;
+}
+/*--------------------------------------------------------------------------*/
+unsigned CARD_LIST::adp_nodes()const{
+  unsigned ret = nodes()->how_many_adp();
+  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+    if ((*ci)->is_device()) {
+      if ((*ci)->subckt()){
+        ret+=(*ci)->subckt()->adp_nodes();
+      }else{
+        // untested();
+      }
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+// FIXME: store nodecound in static CARDLIST::nodecount
+// don't recalculate
+unsigned CARD_LIST::total_nodes()const{
+  unsigned ret = nodes()->how_many_ckt();
+  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+    if ((*ci)->is_device()) {
+      if ((*ci)->subckt()){
+        ret+=(*ci)->subckt()->total_nodes();
+      }else{
+        // untested();
+      }
+    }
+  }
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
+//void CARD_LIST::init_node_count( unsigned* user_nodes, unsigned* subckt_nodes,
+//    unsigned* _model_nodes, unsigned* _adp_nodes) const{
+//
+//  unsigned ret = nodes()->how_many_ckt();
+//  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+//    if ((*ci)->is_device()) {
+//      if ((*ci)->subckt()){
+//        ret+=(*ci)->subckt()->total_nodes();
+//      }else{
+//        untested();
+//      }
+//    }
+//  }
+//
+//}
+/*--------------------------------------------------------------------------*/
+NODE_BASE* CARD_LIST::node(string s) const{
+  trace1("CARD_LIST::node", s);
+
+  NODE_MAP* NM = nodes();
+  NODE_BASE* ret = (*NM)[s];
+  trace1("CARD_LIST::node", hp(ret));
+  return(ret);
 }
 /*--------------------------------------------------------------------------*/
 /* tr_iwant_matrix: allocate solution matrix
@@ -234,6 +323,28 @@ CARD_LIST& CARD_LIST::tr_restore()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+/* keep_ic: latch node voltages into device state
+ */
+CARD_LIST& CARD_LIST::keep_ic()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    (**ci).keep_ic();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+/*
+ */
+CARD_LIST& CARD_LIST::tt_behaviour_commit()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+//    trace_func_comp();
+    (**ci).tt_behaviour_commit();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 /* dc_advance: first pass on a new step in a dc sweep
  */
 CARD_LIST& CARD_LIST::dc_advance()
@@ -245,6 +356,50 @@ CARD_LIST& CARD_LIST::dc_advance()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::do_tt() 
+{
+  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+    (*ci)->do_tt();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+const CARD_LIST& CARD_LIST::tr_stress_last(  ) const
+{
+  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+    (*ci)->tr_stress_last();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+/* apply things to all cards
+ */
+const CARD_LIST& CARD_LIST::do_forall( void (CARD::*thing)( ) const  ) const
+{
+  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+    ((*ci)->*thing)( );
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+/* apply things to all cards
+ */
+CARD_LIST& CARD_LIST::do_forall( void (CARD::*thing)( )  )
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    ((*ci)->*thing)( );
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::do_forall( void (CARD::*thing)( int ), int i  )
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    ((*ci)->*thing)( i );
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 /* tr_advance: first pass on a new time step
  */
 CARD_LIST& CARD_LIST::tr_advance()
@@ -252,6 +407,33 @@ CARD_LIST& CARD_LIST::tr_advance()
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
     (**ci).tr_advance();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::tt_accept()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    (**ci).tt_accept();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::tt_regress()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    (**ci).tt_regress();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::tt_advance()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    (**ci).tt_advance();
   }
   return *this;
 }
@@ -275,10 +457,9 @@ bool CARD_LIST::tr_needs_eval()const
     trace_func_comp();
     if ((**ci).tr_needs_eval()) {
       return true;
-    }else{itested();
+    }else{
     }
   }
-  untested();
   return false;
 }
 /*--------------------------------------------------------------------------*/
@@ -345,9 +526,30 @@ CARD_LIST& CARD_LIST::tr_load()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-TIME_PAIR CARD_LIST::tr_review()
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::tt_begin()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    (**ci).tt_begin();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+TIME_PAIR CARD_LIST::tt_review()
 {
   TIME_PAIR time_by;
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    time_by.min((**ci).tt_review());
+  }
+  return time_by;
+}
+/*--------------------------------------------------------------------------*/
+TIME_PAIR CARD_LIST::tr_review()
+{
+  TIME_PAIR time_by(NEVER,NEVER);
+
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
     time_by.min((**ci).tr_review());
@@ -424,17 +626,43 @@ CARD_LIST& CARD_LIST::ac_load()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-void CARD_LIST::attach_params(PARAM_LIST* p, const CARD_LIST* scope)
+double CARD_LIST::do_noise() const
+{
+  double o_power = 0;
+  for (const_iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    o_power += (**ci).do_noise();
+  }
+  return o_power;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::do_sens()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    if( (**ci).has_probes() ){
+      (**ci).do_sens();
+    }
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+// fill _params with params p evaluated in scope.
+// this is used to evauluate argument lists
+void CARD_LIST::attach_params(PARAM_LIST_BASE* p, const CARD_LIST* scope)
 {
   if (p) {
+    trace2("CARD_LIST::attach_params", *p, *(scope->params()));
     assert(scope);
     if (_params) {
-      delete _params;
-      _params = NULL;
+      // delete _params;
+      // _params = NULL;
     }else{
+      _params = new PARAM_LIST;
     }
-    _params = new PARAM_LIST;
     _params->eval_copy(*p, scope);
+    _params->set_try_again(p);
+    trace1("CARD_LIST::attach_params done", *_params);
   }else{
   }
 }
@@ -446,66 +674,132 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
   for (const_iterator ci = p->begin(); ci != p->end(); ++ci) {
     trace_func_comp();
     if ((**ci).is_device() || dynamic_cast<MODEL_CARD*>(*ci)) {
+      trace0("CARD_LIST::shallow_copy cloning " + (*ci)->long_label() );
       CARD* copy = (**ci).clone();
       push_back(copy);
     }else{
+      trace0("CARD_LIST::shallow_copy not cloning " + (*ci)->long_label() );
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 // set up the map of external to expanded node numbers
-void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
+void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
 {
+  trace2("CARD_LIST::map_subckt_nodes", here->long_label(), hp(model));
   assert(model);
   assert(model->subckt());
   assert(model->subckt()->nodes());
-  assert(owner);
-  //assert(owner->subckt());
-  //assert(owner->subckt() == this);
-  trace0(model->long_label().c_str());
-  trace0(owner->long_label().c_str());
+  assert(here);
+  trace1("model nodenames", *(model->subckt()->nodes()));
+  trace0("model: "+model->long_label());
 
-  int num_nodes_in_subckt = model->subckt()->nodes()->how_many();
-  int* map = new int[num_nodes_in_subckt+1];
+  uint_t num_nodes_in_subckt = model->subckt()->nodes()->how_many();
+  trace3("CARD_LIST::map_subckt_nodes ", here->long_label(), num_nodes_in_subckt, model->net_nodes());
+  uint_t map[num_nodes_in_subckt+1];
+  for (uint_t ii = 1;  ii < 1+num_nodes_in_subckt; ++ii) {
+    map[ii] = unsigned(-1);
+  }
+  set<unsigned>external; //collect numbers of external nodes
   {
     map[0] = 0;
     // self test: verify that port node numbering is correct
-    for (int port = 0; port < model->net_nodes(); ++port) {
+    for (uint_t port = 0; port < model->net_nodes(); ++port) {
       assert(model->n_(port).e_() <= num_nodes_in_subckt);
       //assert(model->n_(port).e_() == port+1);
-      trace3("ports", port, model->n_(port).e_(), owner->n_(port).t_());
+      trace3("CARD_LIST::map_subckt_nodes ports",
+          port, model->n_(port).e_(), here->n_(port).t_());
+      assert(model->n_(port).e_()!=INVALID_NODE);
     }
     {
       // take care of the "port" nodes (external connections)
       // map them to what the calling circuit wants
-      int i=0;
+      //
+      uint_t i=0;
       for (i=1; i <= model->net_nodes(); ++i) {
-	map[i] = owner->n_(i-1).t_();
-	trace3("ports", i, map[i], owner->n_(i-1).t_());
+        unsigned usernumber = model->n_(i-1).e_();
+        external.insert(usernumber);
+        assert(usernumber<num_nodes_in_subckt+1);
+        map[usernumber] = i; // here->n_(i-1).t_(); // already connected!
+        assert(model->n_(i-1).e_() == model->n_(i-1).t_());
       }
-    
+      //
       // get new node numbers, and assign them to the remaining
+      unsigned labelnumber = 1;
       for (assert(i==model->net_nodes() + 1); i <= num_nodes_in_subckt; ++i) {
 	// for each remaining node in card_list
-	map[i] = CKT_BASE::_sim->newnode_subckt();
-	trace2("internal", i, map[i]);
+        // these are the internal nodes.
+
+        //the labels are in (*(model->subckt()->nodes())). its hard to tell, which is which.
+        //but the order should correspond to i + gap
+        while( external.size() && external.find(labelnumber) != external.end() ){
+          labelnumber++;
+        }
+        NODE_BASE* node = (*(model->subckt()->nodes()))[labelnumber];
+        string label = node->short_label();
+        if (!node){
+          label = "errornode";
+        }
+
+        assert(this);
+        unsigned k = CKT_BASE::_sim->_total_nodes;
+        NODE_MAP* Map = nodes();
+        CKT_NODE* n = Map->new_node(label, this); // should increase counter
+        map[i] = CKT_BASE::_sim->newnode_subckt(); // retrieve new global number
+        n->set_user_number(map[i]);
+
+        assert (k+1 ==  CKT_BASE::_sim->_total_nodes); USE(k);
+        labelnumber++;
       }
+      trace1("CARD_LIST::map_subckt_nodes done map", *nodes());
     }
   }
+  for (uint_t ii = 1;  ii < 1+num_nodes_in_subckt; ++ii) {
+    trace2("map", ii, map[ii]);
+  }
+  trace0("map done");
+  trace1("map done", *(nodes()));
+  trace1("map done", *(model->subckt()->nodes()));
+
   // "map" now contains a translation list,
   // from subckt local numbers to matrix index numbers
 
-  // The node list (_nm) in an instance of a subckt does not exist.
   // Device nodes (type node_t) points to the NODE in the parent.
   // Mapping is done in node_t.
 
   // scan the list, map the nodes
   for (CARD_LIST::iterator ci = begin(); ci != end(); ++ci) {
-    // for each card in card_list
     if ((**ci).is_device()) {
-      for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
-	// for each connection node in card
-	(**ci).n_(ii).map_subckt_node(map, owner);
+      const CARD* c = *ci;
+      trace2("CARD_LIST::map_subckt_nodes subdevice node ", c->long_label(), here->long_label());
+      for (uint_t ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+        unsigned n = c->n_(ii).t_();
+        // n is the usernumber of the node, where c->n_(ii) connected to.
+        // that usernumber is NOT the number in owner->_n[]
+
+        CKT_NODE* nn;
+        if( !c->n_(ii).n_() ){ untested();
+          error(bDANGER, "somethings wrong " + here->long_label() + " " +
+              c->long_label() + ": " + to_string(ii) + "\n");
+        } else if( external.find(n) != external.end()) {
+          // external
+          trace4("CARD_LIST::map_subckt_nodes ext", ii, n, map[n], here->n_( map[n]-1 ).n_());
+          assert( map[n] != (uint_t)-1 );
+          trace1("CARD_LIST::map_subckt_nodes mod", c->n_(ii).n_());
+          c->n_(ii) = here->n_( map[n]-1 );
+          trace1("CARD_LIST::map_subckt_nodes now", c->n_(ii).n_());
+        } else { // internal node
+          string nodelabel =  c->n_(ii).n_()->short_label() ;
+          trace4("CARD_LIST::map_subckt_nodes int", ii, n, nodelabel, here->net_nodes());
+        // if a string is the key, a string is the key :|
+          nn = prechecked_cast<CKT_NODE*>((*(nodes()))[nodelabel]);
+          assert(nn);
+          c->n_(ii) = node_t( nn );
+        }
+        if(!c->n_(ii).n_()) {
+          throw Exception(here->long_label() + ": need more nodes");
+        }
+        assert(c->n_(ii).e_() != INVALID_NODE);
       }
     }else{
       assert(dynamic_cast<MODEL_CARD*>(*ci));
@@ -513,4 +807,16 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   }
 }
 /*--------------------------------------------------------------------------*/
+///ADP_NODE* CARD_LIST::new_adp_node{
+///  assert(d);
+///  assert(d->scope());
+///
+///  NODE_MAP* Map = nodes();
+///  assert(Map);
+///  ADP_NODE* a Map->new_adp_node(node_name);
+///  trace2("CARDLIST::new_adp_node", node_name, _nnn->user_number());
+///  assert(_nnn);
+///}
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

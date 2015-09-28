@@ -1,0 +1,19 @@
+spice
+
+
+v1 n1 0 pulse iv=0 pv=1 delay=1 rise=.1
+r1 n1 n2 1k
+c1 n2 0 1u
+
+.print tran v(nodes) i(r1) method(c1) hidden(0) dis(n*) v(r1)
+
+* here the questionable step gets accepted, so no discontinuity propagation
+.options disc=reject
+.tran 0 10 10 trace=a
+.stat notime
+
+* here we know in advance...
+.options disc=imm
+.tran 0 10 10 trace=a
+.stat notime
+.end

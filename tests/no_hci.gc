@@ -1,0 +1,20 @@
+spice
+
+.MODEL nohci NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = 0
++ )
+
+.MODEL nhci NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = 1
++ )
+
+M1 1 2 3 4 nhci
+M2 1 2 3 4 nohci
+
+.print tran stress(M2.HCI) stress(M1.HCI)
+.tran 0 1 .1
+.end

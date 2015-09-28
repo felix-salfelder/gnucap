@@ -1,4 +1,5 @@
-/*$Id: m_expression_in.cc,v 26.115 2009/08/17 22:49:30 al Exp $ -*- C++ -*-
+/*$Id: m_expression_in.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
+ * vim:sw=2:ts=8:et
  * Copyright (C) 2003 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -100,7 +101,8 @@ void Expression::leaf(CS& File)
     arglist(File);
     push_back(new Token_SYMBOL(name, ""));
   }else{itested();
-    throw Exception_CS("what's this?", File);
+    trace0(("Expression::leaf, problem with " + std::string(File)).c_str());
+    throw Exception_CS("what's this? (leaf)", File);
   }
 }
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -119,8 +121,15 @@ void Expression::factor(CS& File)
     }else{
     }
   }else{
-    leaf(File);
+    try{
+      leaf(File);
+    } catch(Exception_CS e){
+      trace1("Expression::factor exception from leaf()", File.fullstring());
+      throw e;
+    }
   }
+  factortail(File); // taken from gnucap-a.
+
   if (t) {
     push_back(t);
   }else{
@@ -206,6 +215,20 @@ void Expression::exptail(CS& File)
   }
 }
 /*--------------------------------------------------------------------------*/
+void Expression::factortail(CS& File){
+	  if (File >> "**") {
+		      factor (File);
+				    push_back(new Token_BINOP("**"));
+					     }
+	    else if (File >> "^") {
+		      factor (File);
+				    push_back(new Token_BINOP("**"));
+					     }
+	    else
+		 {
+			   }
+}
+/*--------------------------------------------------------------------------*/
 void Expression::expression(CS& File)
 {
   andarg(File);
@@ -214,7 +237,9 @@ void Expression::expression(CS& File)
 /*--------------------------------------------------------------------------*/
 void Expression::parse(CS& File)
 {
+  trace0("Expression::parse(CS& File)");
   expression(File);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

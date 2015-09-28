@@ -1,4 +1,4 @@
-/*$Id: e_base.h,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                                  -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,16 +21,18 @@
  *------------------------------------------------------------------
  * real base for anything to do with a circuit
  */
-//testing=obsolete
 #ifndef E_BASE_H
 #define E_BASE_H
 #include "md.h"
+#include "u_sim_data.h"
 /*--------------------------------------------------------------------------*/
 // external
 class XPROBE;
 class WAVE;
 class OMSTREAM;
-class SIM_DATA;
+class PROBE_LISTS;
+typedef std::map<std::string, WAVE> WAVE_LIST;
+// class SIM_DATA;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
 private:
@@ -38,6 +40,7 @@ private:
   std::string	_label;
 public:
   static SIM_DATA* _sim;
+  static PROBE_LISTS* _probe_lists;
   //--------------------------------------------------------------------
 protected: // create and destroy
   explicit CKT_BASE()			  :_probes(0), _label() {}
@@ -46,28 +49,50 @@ protected: // create and destroy
   virtual  ~CKT_BASE();
   //--------------------------------------------------------------------
 public: // user stuff
-  virtual void	      help(CS&, OMSTREAM&)const {untested();}
-  virtual std::string status()const {return "";}
+  virtual std::string help_text()const {return "";}
+  virtual bool	      help(CS&, OMSTREAM&)const;
+  virtual std::string status()const {untested();return "";}
   //--------------------------------------------------------------------
 public: // probes
 	  double      probe_num(const std::string&)const;
 	  double      ac_probe_num(const std::string&)const;
   virtual double      tr_probe_num(const std::string&)const;
   virtual XPROBE      ac_probe_ext(const std::string&)const;
+  virtual XPROBE      sens_probe_ext(const std::string&)const;
 	  void	      inc_probes()const	{++_probes;}
 	  void	      dec_probes()const	{assert(_probes>0); --_probes;}
 	  bool	      has_probes()const	{return _probes > 0;}
+	  int	      probes()const	{return _probes;}
   static  double      probe(const CKT_BASE*,const std::string&);
+public: // waves
+  static  WAVE_LIST&    create_waves(const std::string& coll_name);
+  static  WAVE_LIST*    find_waves(const std::string& coll_name);
+  static  WAVE&         create_wave(const std::string& wave_name, std::string coll_name="");
   static  WAVE*	      find_wave(const std::string& probe_name);
   //--------------------------------------------------------------------
+virtual void sens_load(const std::string&) {} // nodes and cards.
+                                              // set _sim->_sens ...
+  //--------------------------------------------------------------------
 public: // label
-  bool operator!=(const std::string& n)const {return strcasecmp(_label.c_str(),n.c_str())!=0;}
+  bool operator!=(const std::string& n)const;
   virtual const std::string long_label()const;
   const std::string&  short_label()const {return _label;}
   void	set_label(const std::string& s) {_label = s;}
+public:
+  static double tr_behaviour_del;
+  static double tr_behaviour_rel;
+  static double tt_behaviour;
+  static double tt_behaviour_del;
+  static double tt_behaviour_rel;
+  void tt_prepare();
+  virtual void   tr_stress_last() {}
+  virtual double tt_probe_num(const std::string&)const;
+
+  int iteration_number()const   {return _sim->_iter[iSTEP];}
+  unsigned tt_iteration_number()const   {return _sim->_tt_iter;} // accepted steps
 };
 /*--------------------------------------------------------------------------*/
-inline bool exists(const CKT_BASE* c) {return c!=0;}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

@@ -1,4 +1,4 @@
-/*$Id: s__.h,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: s__.h,v 1.9 2009-12-16 17:22:07 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -39,15 +39,25 @@ class INTERFACE SIM : public CMD {
 protected:
   enum TRACE { // how much diagnostics to show
     tNONE      = 0,	/* no extended diagnostics			*/
-    tUNDER     = 1,	/* show underlying analysis, important pts only	*/
-    tALLTIME   = 2,	/* show every time step, including hidden 	*/
-    tREJECTED  = 3,	/* show rejected time steps			*/
-    tITERATION = 4,	/* show every iteration, including nonconverged	*/
-    tVERBOSE   = 5	/* show extended diagnostics			*/
+    tUNDER     ,	/* show underlying analysis, important pts only	*/
+    tALLTIME   ,	/* show every time step, including hidden 	*/
+    tGUESS     ,	/* show guesses (from predictor) */
+    tREJECTED  ,	/* show rejected time steps			*/
+    tITERATION ,	/* show every iteration, including nonconverged	*/
+    tVERBOSE   ,	/* show extended diagnostics			*/
+    tMATRIX    = 16,	/* dump matrix.			*/
+    tDEBUG     = 32
+  };
+  enum ALARM { // how much diagnostics to show
+    aNONE      = 0,	/* ignore range violations */
+    aREPORT    = 1,	/* report range violations */
+    aREDIR     = 2,	/* redirect to stderr */
+    aABORT     = 4	/* abort simulation */
   };
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   CARD_LIST* _scope;
   OMSTREAM   _out;		/* places to send the results		*/
+  bool _dump_matrix;
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 private:
@@ -66,6 +76,7 @@ public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:
   	 void	command_base(CS&);	/* s__init.cc */
+	 bool common_options(CS& Cmd);
 	 void	reset_timers();	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:
@@ -78,21 +89,25 @@ protected:
   virtual void	print_results(double);
   virtual void	alarm();
   virtual void	store_results(double);
+  virtual void	expect_results(double);
+protected: // hack?
+  WAVE** _wavep;
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__solve.cc */
   bool	solve(OPT::ITL,TRACE);
   bool	solve_with_homotopy(OPT::ITL,TRACE);
+  void	advance_time();
 protected:
 	void	finish_building_evalq();
-	void	advance_time();
 	void	set_flags();
 	void	clear_arrays();
 	void	evaluate_models();
 	void	set_damp();
 	void	load_matrix();
-	void	solve_equations();
+	void	solve_equations(TRACE);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

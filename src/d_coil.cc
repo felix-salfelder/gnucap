@@ -1,4 +1,4 @@
-/*$Id: d_coil.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*                               -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,64 +25,16 @@
  * i.x = amps,  i.f0 = volts,      i.f1 = ohms
  * m.x = volts, m.c0 = amps, acg = m.c1 = mhos
  */
-//testing=script 2008.10.09
 #include "e_subckt.h"
 #include "e_ccsrc.h"
 #include "e_storag.h"
+#include "d_coil.h"
 /*--------------------------------------------------------------------------*/
-namespace {
+using std::string;
 /*--------------------------------------------------------------------------*/
-class DEV_INDUCTANCE : public STORAGE {
-protected:
-  explicit DEV_INDUCTANCE(const DEV_INDUCTANCE& p) 
-    :STORAGE(p), _c_model(p._c_model) {}
-public:
-  explicit DEV_INDUCTANCE()
-    :STORAGE(), _c_model(false) {}
-public: // override virtual
-  char	   id_letter()const	{return 'L';}
-  std::string value_name()const {return "l";}
-  std::string dev_type()const	{return "inductor";}
-  int	   max_nodes()const	{return 2;}
-  int	   min_nodes()const	{return 2;}
-  int	   net_nodes()const	{return 2;}
-  int	   int_nodes()const     {return (!_c_model) ? 0 : 1;}
-  int	   matrix_nodes()const	{return net_nodes() + int_nodes();}
-
-  bool	   has_inode()const	{return _c_model;}
-  bool	   has_iv_probe()const  {return true;}
-  bool	   use_obsolete_callback_parse()const {return true;}
-  CARD*	   clone()const		{return new DEV_INDUCTANCE(*this);}
-  void     expand();
-  void	   tr_iwant_matrix();
-  void     tr_begin();
-  bool	   do_tr();
-  void	   tr_load();
-  void	   tr_unload();
-  double   tr_involts()const	{return tr_outvolts();}
-  double   tr_input()const;
-  double   tr_involts_limited()const {return tr_outvolts_limited();}
-  double   tr_input_limited()const;
-  double   tr_amps()const;
-  double   tr_probe_num(const std::string&)const;
-  void	   ac_iwant_matrix();
-  void	   ac_begin()		{_loss1 = _loss0 = ((!_c_model) ? 0. : 1.); _ev = _y[0].f1;}
-  void	   do_ac();
-  void	   ac_load();
-  COMPLEX  ac_involts()const	{return ac_outvolts();}
-  COMPLEX  ac_amps()const;
-
-  std::string port_name(int i)const {itested();
-    assert(i >= 0);
-    assert(i < 2);
-    static std::string names[] = {"p", "n"};
-    return names[i];
-  }
-
-  bool _c_model;
-};
+namespace INDUCTANCE {
 /*--------------------------------------------------------------------------*/
-class DEV_MUTUAL_L : public DEV_INDUCTANCE {
+class DEV_MUTUAL_L : public DEV_INDUCTANCE { //
 private:
   std::string	  _output_label;
   DEV_INDUCTANCE* _output;
@@ -108,11 +60,11 @@ private: // override virtual
   bool	   print_type_in_spice()const {return false;}
   std::string value_name()const {return "k";}
   std::string dev_type()const	{untested(); return "mutual_inductor";}
-  int	   max_nodes()const	{return 2;}
-  int	   min_nodes()const	{return 2;}
-  int	   matrix_nodes()const	{return 2;}
-  int	   net_nodes()const	{return 0;}
-  int	   num_current_ports()const {return 2;}
+  uint_t	   max_nodes()const	{return 2;}
+  uint_t	   min_nodes()const	{return 2;}
+  uint_t	   matrix_nodes()const	{return 2;}
+  uint_t	   net_nodes()const	{return 0;}
+  uint_t	   num_current_ports()const {return 2;}
   bool	   has_iv_probe()const  {untested(); return false;}
   bool	   use_obsolete_callback_parse()const {return false;}
   CARD*	   clone()const		{return new DEV_MUTUAL_L(*this);}
@@ -135,13 +87,13 @@ private: // override virtual
 
   void	   ac_iwant_matrix()	{ac_iwant_matrix_passive();}
   void	   ac_load();
-  COMPLEX  ac_amps()const	{untested(); return _loss0 * ac_outvolts();}
+  COMPLEX  ac_amps()const	{untested(); return (double)_loss0 * ac_outvolts();}
 
   void	   set_port_by_name(std::string& Name, std::string& Value)
 		{untested(); COMPONENT::set_port_by_name(Name,Value);}
-  void	   set_port_by_index(int Index, std::string& Value)
+  void	   set_port_by_index(uint_t Index, std::string& Value)
 		{set_current_port_by_index(Index, Value);}
-  bool	   node_is_connected(int i)const {
+  bool	   node_is_connected(uint_t i)const {
     switch (i) {
     case 0:  return _output_label != "";
     case 1:  return _input_label != "";
@@ -149,23 +101,23 @@ private: // override virtual
     }
   }
 
-  std::string port_name(int)const {untested();
+  std::string port_name(uint_t)const {untested();
     return "";
   }
-  std::string current_port_name(int i)const {untested();
-    assert(i >= 0);
+  std::string current_port_name(uint_t i)const {untested();
+    assert(i != INVALID_NODE);
     assert(i < 2);
     static std::string names[] = {"l1", "l2"};
     return names[i];
   }
-  const std::string current_port_value(int i)const {
+  const std::string current_port_value(uint_t i)const {
     switch (i) {
     case 0:  return _output_label;
     case 1:  return _input_label;
     default: unreachable(); return COMPONENT::current_port_value(i);
     }
   }
-  void set_current_port_by_index(int i, const std::string& s) {
+  void set_current_port_by_index(uint_t i, const std::string& s) {
     switch (i) {
     case 0:  _output_label = s;	break;
     case 1:  _input_label = s;	break;
@@ -174,6 +126,37 @@ private: // override virtual
   }
 };
 /*--------------------------------------------------------------------------*/
+class DEV_BRANCH_L : public DEV_INDUCTANCE { //
+public:
+  DEV_BRANCH_L() :DEV_INDUCTANCE() { _c_model = true; }
+  DEV_BRANCH_L(const DEV_BRANCH_L&p) :DEV_INDUCTANCE(p) { _c_model = true; }
+  CARD*	   clone()const		{return new DEV_BRANCH_L(*this);}
+};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// quick hack. dont know how to do this in general.
+void DEV_INDUCTANCE::set_param_by_name(string Name, string Value)
+{
+  trace2("DEV_INDUCTANCE::set_param_by_name", Name, Value);
+  if (Umatch(Name, value_name()) && !has_common()) {
+    set_value(Value);
+  } else if (Umatch(Name, value_name())) { untested();
+    ELEMENT::set_param_by_name(value_name(), value());
+  } else if (has_common()) { untested();
+    ELEMENT::set_param_by_name(Name, Value);
+  } else {
+    COMMON_COMPONENT* c = bm_dispatcher["eval_bm_value"]->clone();
+    c->set_param_by_name("=",value());
+    c->set_param_by_name(Name, Value);
+    assert(c);
+    attach_common(c);
+    assert(has_common());
+  }
+  if (const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common())) {
+    USE(x);
+    trace2("DEV_INDUCTANCE::set_param_by_name", long_label(), x->_ic);
+  }
+}
 /*--------------------------------------------------------------------------*/
 DEV_MUTUAL_L::DEV_MUTUAL_L()
   :DEV_INDUCTANCE(),
@@ -220,7 +203,7 @@ void DEV_INDUCTANCE::expand()
     if (!_c_model) {
       _n[IN1].set_to_ground(this);
     }else{
-      _n[IN1].new_model_node(long_label() + ".i", this);
+      _n[IN1].new_model_node("." + long_label() + ".i", this);
     }
   }else{untested();
   }
@@ -281,9 +264,9 @@ void DEV_INDUCTANCE::tr_iwant_matrix()
   }else{
     assert(matrix_nodes() == 3);
     
-    assert(_n[OUT1].m_() != INVALID_NODE);
-    assert(_n[OUT2].m_() != INVALID_NODE);
-    assert(_n[IN1].m_() != INVALID_NODE);
+    assert(_n[OUT1].m_() != (uint_t) INVALID_NODE);
+    assert(_n[OUT2].m_() != (uint_t) INVALID_NODE);
+    assert(_n[IN1].m_() != (uint_t) INVALID_NODE);
     
     _sim->_aa.iwant(_n[OUT1].m_(),_n[IN1].m_());
     _sim->_aa.iwant(_n[OUT2].m_(),_n[IN1].m_());
@@ -295,8 +278,48 @@ void DEV_INDUCTANCE::tr_iwant_matrix()
 /*--------------------------------------------------------------------------*/
 void DEV_INDUCTANCE::tr_begin()
 {
+  trace6("DEV_INDUCTANCE::tr_begin", _i[0].f0, long_label(), _sim->_cont, tr_involts(), _i[0].x, tr_outvolts());
+  if (0&& _sim->_cont) {
+    _i[0].f0 = tr_involts();
+  }
   STORAGE::tr_begin();
-  _loss1 = _loss0 = ((!_c_model) ? 0. : 1.);
+  if (0 && _sim->_cont) {
+ // i.x = amps,  i.f0 = volts,      i.f1 = ohms
+ //  BUG: move to tr accept (if !uic?)
+    _i[0].f0 = tr_involts();
+    assert(_i[0].x != 0);
+    _i[0].f1 = tr_involts() / _i[0].x;
+    _m0.x = _i[0].f0;
+    _m0.c0 = _i[0].x; // amps. iof?
+    _m0.c1 = 0; // _i[0].x / tr_involts();
+  }
+  if (_c_model) {
+    _loss1 = _loss0 = 1.;
+  } else {
+    _loss1 = _loss0 = 0.;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_INDUCTANCE::tr_accept()
+{
+  if (_sim->_uic) {
+    _i[0].f0 = tr_involts();
+  }
+  STORAGE::tr_accept();
+  if(_sim->_uic){
+    _i[0].f0 = tr_involts();
+    // assert(_i[0].x != 0);
+    _i[0].f1 = tr_involts() / (_i[0].x+1e-20);
+    _m0.x = _i[0].f0;
+    _m0.c0 = _i[0].x; // amps. iof?
+    _m0.c1 = 0; // _i[0].x / tr_involts();
+    if (_c_model) {
+      double idot = - tr_involts() / (_y[0].f1 + 1e-20);
+      _m0.c0 = idot * _y[0].f1;
+      trace2("coil",  _y[0].f1, _loss0);
+    }
+    set_converged(false);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_MUTUAL_L::tr_begin()
@@ -335,6 +358,20 @@ void DEV_MUTUAL_L::tr_advance()
   }
 }
 /*--------------------------------------------------------------------------*/
+bool DEV_INDUCTANCE::has_ic() const
+{
+  if (const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common())) {
+    if (x->_ic != NOT_INPUT) {
+      return true;
+    } else { untested();
+      trace2("has_ic", long_label(), x->_ic);
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool DEV_INDUCTANCE::do_tr()
 {
   if (using_tr_eval()) {
@@ -354,22 +391,56 @@ bool DEV_INDUCTANCE::do_tr()
   }
   store_values();
   q_load();
-  
+
   // i is really voltage ..
-  // _i[0].x = current, _i[0].f0 = voltage, _i[0].f1 = ohms
-  _i[0] = differentiate(_y, _i, _time, _method_a);
-  
+  if (_sim->uic_now() && has_ic()) {
+    trace4("imitating cs", _y[0].x, value(), _y[0].f1, tr_involts());
+    // imitate current src...
+     // i.x = amps,  i.f0 = volts,      i.f1 = ohms
+    _i[0].x = _y[0].x;
+    _i[0].f1 = 0;
+    if (!_c_model) {
+      _m0.x = 0.;
+      _m0.c0 = _y[0].x;
+      _m0.c1 = 0.;
+    } else {
+      assert(_loss0==1);
+    }
+  } else {
+    trace4("q", _y[1].x, _y[1].f0, _y[1].f1, _sim->_time0);
+    trace4("q", _y[0].x, _y[0].f0, _y[0].f1, _sim->_time0);
+    trace3("b4", _i[0].x, _i[0].f0, _i[0].f1);
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+    trace3("d ", _i[0].x, _i[0].f0, _i[0].f1);
+  }
+
   if (!_c_model) {
     _m0.x = NOT_VALID;
     _m0.c1 = 1 / ((_i[0].c1()==0) ? OPT::shortckt : _i[0].c1());
-    _m0.c0 = -_i[0].c0() * _m0.c1;
-  }else{
-    //_m0 = -CPOLY1(_i[0]);
-    _m0.x = NOT_VALID;
-    _m0.c1 = -_loss0 * _loss0 * _i[0].c1();
-    _m0.c0 =  _loss0 * _loss0 * _i[0].c0();
+    if (_sim->uic_now() && has_ic()) {
+      _m0.c0 = _y[0].x;
+      _y[0].f0 = _y[0].x * _y[0].f1;
+      _m0.c1 = 0;
+    } else {
+      _m0.c0 = -_i[0].c0() * _m0.c1;
+    }
+  } else {
+    if (_sim->uic_now() && has_ic()) {
+      // i.x = amps,  i.f0 = volts,      i.f1 = ohms
+      _i[0].f0 = tr_involts();
+      _i[0].f1 = 1. / OPT::shortckt;
+      // m.x = volts, m.c0 = amps, acg = m.c1 = mhos
+      _m0.x = 0; //_y[0].x;
+      _m0.c1 = -_loss0 * _loss0 * _i[0].c1();
+      _m0.c0 =  _loss0 * _loss0 * _i[0].c0(); //  + tr_involts(); // hmm
+    } else {
+      _m0.x = NOT_VALID;
+      _m0.c1 = -_loss0 * _loss0 * _i[0].c1();
+      _m0.c0 =  _loss0 * _loss0 * _i[0].c0();
+    }
   }
 
+  trace7("L::do_tr", _i[0].c0(), _i[0].c1(), _y[0].f1, tr_amps(), tr_involts(), _m0.c0, _m0.c1);
   return converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -420,9 +491,10 @@ void DEV_INDUCTANCE::tr_load()
   if (!_c_model) {
     tr_load_passive();
   }else{
-    tr_load_inode();
+    trace6("DEV_INDUCTANCE::tr_load", _m0.c1, _m1.c1, _m0.c0, _m1.c0, _loss0, _loss1);
+    tr_load_inode(); // load loss.
     tr_load_diagonal_point(_n[IN1], &_m0.c1, &_m1.c1);
-    tr_load_source_point(_n[IN1], &_m0.c0, &_m1.c0);
+    tr_load_source_point(_n[IN1], &_m0.c0, &_m1.c0); // load i
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -467,6 +539,7 @@ double DEV_INDUCTANCE::tr_input_limited()const
 double DEV_INDUCTANCE::tr_amps()const
 {
   if (!_c_model) {
+    // m0c0 is "flux"
     return fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   }else{
     return _loss0 * _n[IN1].v0();
@@ -498,13 +571,13 @@ void DEV_INDUCTANCE::do_ac()
     assert(dynamic_cast<DEV_MUTUAL_L*>(this) || has_tr_eval() || _ev == double(value()));
   }
   if (!_c_model) {
-    if (_ev * _sim->_jomega == 0.) {untested();
+    if ((COMPLEX)_ev * _sim->_jomega == 0.) {untested();
       _acg = 1. / OPT::shortckt;
     }else{
-      _acg = 1. / (_ev * _sim->_jomega);
+      _acg = 1. / ((COMPLEX)_ev * _sim->_jomega);
     }
   }else{
-    _acg =  -_loss0 * _loss0 * _ev * _sim->_jomega;
+    _acg = -(double)_loss0 *(double) _loss0 * (COMPLEX)_ev * _sim->_jomega;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -513,7 +586,7 @@ void DEV_INDUCTANCE::ac_load()
   if (!_c_model) {
     ac_load_passive();
   }else{
-    ac_load_inode();
+    ac_load_inode(); // 4x \pm loss.
     ac_load_diagonal_point(_n[IN1], _acg);
   }
 }
@@ -528,23 +601,25 @@ COMPLEX DEV_INDUCTANCE::ac_amps()const
   if (!_c_model) {
     return (ac_involts() * _acg);
   }else{
-    return  _loss0 * _n[IN1].vac();
+    return (  (double)_loss0 * (COMPLEX)(_n[IN1].vac()) );
   }
 }
 /*--------------------------------------------------------------------------*/
 double DEV_INDUCTANCE::tr_probe_num(const std::string& x)const
 {
-  if (Umatch(x, "flux ")) {untested();
+  if (Umatch(x, "flux ")) {
     return _y[0].f0;
-  }else if (Umatch(x, "ind{uctance} |l ")) {untested();
+  }else if (Umatch(x, "ind{uctance} |l ")) { itested();
     return _y[0].f1;
-  }else if (Umatch(x, "dldt ")) {untested();
+  }else if (Umatch(x, "dldt ")) { untested();
     return (_y[0].f1 - _y[1].f1) / _dt;
-  }else if (Umatch(x, "dl ")) {untested();
+  }else if (Umatch(x, "dl ")) { untested();
     return (_y[0].f1 - _y[1].f1);
-  }else if (Umatch(x, "dfdt ")) {untested();
+  }else if (Umatch(x, "dfdt ")) { untested();
     return (_y[0].f0 - _y[1].f0) / _dt;
-  }else if (Umatch(x, "dflux ")) {untested();
+  }else if (Umatch(x, "inode ")) {
+    return has_inode();
+  }else if (Umatch(x, "dflux ")) { untested();
     return (_y[0].f0 - _y[1].f0);
   }else{
     return STORAGE::tr_probe_num(x);
@@ -552,16 +627,16 @@ double DEV_INDUCTANCE::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 double DEV_MUTUAL_L::tr_probe_num(const std::string& x)const
-{untested();
-  if (Umatch(x, "fflux ")) {untested();
+{ untested();
+  if (Umatch(x, "fflux ")) { untested();
     return _yf[0].f0;
-  }else if (Umatch(x, "rflux ")) {untested();
+  }else if (Umatch(x, "rflux ")) { untested();
     return _yr[0].f0;
-  }else if (Umatch(x, "fiof{fset} ")) {untested();
+  }else if (Umatch(x, "fiof{fset} ")) { untested();
     return _mf0_c0;
-  }else if (Umatch(x, "riof{fset} ")) {untested();
+  }else if (Umatch(x, "riof{fset} ")) { untested();
     return _mr0_c0;
-  }else{untested();
+  }else{ untested();
     return DEV_INDUCTANCE::tr_probe_num(x);
   }
 }
@@ -569,9 +644,12 @@ double DEV_MUTUAL_L::tr_probe_num(const std::string& x)const
 /*--------------------------------------------------------------------------*/
 DEV_MUTUAL_L   p1;
 DEV_INDUCTANCE p2;
+DEV_BRANCH_L p3;
 DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "K|mutual_inductor", &p1),
-  d2(&device_dispatcher, "L|inductor",        &p2);
+  d2(&device_dispatcher, "L|inductor", &p2),
+  d3(&device_dispatcher, "brl|branchl", &p3);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,4 +1,4 @@
-/*$Id: m_expression_reduce.cc,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
+/*$Id: m_expression_reduce.cc,v 1.2 2009-11-18 20:53:18 felix Exp $ -*- C++ -*-
  * Copyright (C) 2003 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -47,6 +47,8 @@ Token* Token_BINOP::op(const Token* T1, const Token* T2)const
     b = (T1->data())->subtract(T2->data());
   }else if (name() == "/") {
     b = (T1->data())->divide(T2->data());
+  }else if (name() == "**" || name() == "^") {
+    b = (T1->data())->powerof(T2->data());
   }else if (name() == "==") {
     b = (T1->data())->equal(T2->data());
   }else if (name() == "!=") {
@@ -121,9 +123,9 @@ void Token_SYMBOL::stack_op(Expression* E)const
       const Token* T1 = E->back(); // arglist
       E->pop_back();
       CS cmd(CS::_STRING, T1->name());      
-      std::string value = f->eval(cmd, E->_scope);
+      fun_t value = f->eval(cmd, E->_scope);
       const Float* v = new Float(value);
-      E->push_back(new Token_CONSTANT(value, v, ""));
+      E->push_back(new Token_CONSTANT( to_string(value), v, ""));
       delete T1;
     }else{
       throw Exception_No_Match(name()); //BUG// memory leak
@@ -173,7 +175,7 @@ void Token_BINOP::stack_op(Expression* E)const
 	delete t1;
       }else{
 	// fail - one arg is unknown, push back args
-	if (strchr("+*", name()[0]) && !dynamic_cast<const Float*>(t1->data())) {untested();
+	if (strchr("+*", name()[0]) && !dynamic_cast<const Float*>(t1->data())) {
 	  // change order to enable later optimization
 	  E->push_back(t1);
 	  E->push_back(t2);
@@ -185,19 +187,19 @@ void Token_BINOP::stack_op(Expression* E)const
 	delete t;
       }
     }else if (((*t2) == (*this)) && strchr("+*", name()[0])
-	      && dynamic_cast<Token_CONSTANT*>(E->back())) {untested();
+	      && dynamic_cast<Token_CONSTANT*>(E->back())) {
       // have # + # + .. becomes result + (previous unknown, try to optimize)
       Token* t3 = E->back();
       E->pop_back();
       Token* t = op(t3, t1);
       assert(t);
-      if (t->data()) {untested();
+      if (t->data()) {
 	// success
 	E->push_back(t);
 	E->push_back(t2);
 	delete t3;
 	delete t1;
-      }else{untested();
+      }else{
 	// fail - push all
 	E->push_back(t3);
 	E->push_back(t2);
@@ -276,7 +278,7 @@ void Token_UNARY::stack_op(Expression* E)const
 void Token_CONSTANT::stack_op(Expression* E)const
 {
   unreachable();
-  assert(E);
+  assert(E); USE(E);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -300,3 +302,4 @@ Expression::Expression(const Expression& Proto, const CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

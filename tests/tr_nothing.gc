@@ -1,0 +1,8 @@
+spice
+
+v1 0 1 1
+r1 0 1 1
+
+.print tran hidden(0) next(*1)
+.tran 0 1 1 trace=a
+.end

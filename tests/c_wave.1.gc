@@ -1,0 +1,53 @@
+spice
+.load c_wave.so
+
+.param p=0
+v1 1 0 pulse iv=0 pv=p rise=1
+r1 0 gnd 1
+
+.store tran v(1) v(gnd)
+.param p=1
+.tran 0 1 1 trace=a > /dev/null
+
+.wstash 'v(1)' w1
+.wave list tran
+
+.param p=2
+.tran 0 1 1 trace=a > /dev/null
+
+.wstash 'v(1)' w2
+.wstash 'v(gnd)' w0
+
+.wave list
+
+.store dc v(gnd)
+.dc > 2.out
+.wstash 'v(gnd)' w00
+
+.wave select stash
+.echo stash
+.wave list stash
+
+.echo w00
+.wstash w00
+.echo w0
+.wstash w0
+.echo w1
+.wstash w1
+.echo w2
+.wstash w2
+
+.echo hdd w00 w0 (0)
+.wave cmp w00 w0 directed verbose
+.echo hdd w0 w00 (1)
+.wave cmp w0 w00 directed verbose
+.echo hdd w1 w0 (1)
+.wave cmp w1 w0 directed verbose
+.echo hdd w0 w1 (.7..)
+.wave cmp w0 w1 directed verbose
+.echo hdd w1 w2 (.44?)
+.wave cmp w1 w2 directed verbose
+.echo hdd w2 w1 (1)
+.wave cmp w2 w1 directed verbose
+
+.end

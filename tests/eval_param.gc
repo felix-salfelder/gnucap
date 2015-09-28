@@ -1,0 +1,9 @@
+
+options numdgt=18
+
+param a={1/9}
+eval a
+options numdgt=10
+eval a
+end
+

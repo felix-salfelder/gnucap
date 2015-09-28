@@ -1,4 +1,5 @@
-/*$Id: io_contr.cc,v 26.110 2009/05/28 15:32:04 al Exp $ -*- C++ -*-
+/*$Id: io_contr.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -33,8 +34,8 @@
 	OMSTREAM* outset(CS&,OMSTREAM*);
 static	FILE*	file_open(CS&,const char*,const char*,FILE*);
 /*--------------------------------------------------------------------------*/
-static FILE* fn;		/* write file				    */
-static FILE* to_pipe;
+//static FILE* fn;		/* write file				    */
+//static FILE* to_pipe;
 /*--------------------------------------------------------------------------*/
 /* initio: initialize file encryption, etc
  */
@@ -83,25 +84,28 @@ void decipher(char *buf)
 /*--------------------------------------------------------------------------*/
 /* outreset: close files and set i/o flags to standard values
  */
-void outreset(void)
+/*--------------------------------------------------------------------------*/
+void OMSTREAM::outreset(void)
 {
-  if (to_pipe) {
-    untested();
-    pclose(to_pipe);
-    to_pipe = NULL;
-  }else{
-  }
-  xclose(&fn);
-  IO::formaat = 0;
-  IO::incipher = false;
-  IO::mstdout.reset();
+   if (to_pipe) {
+      untested();
+      pclose(to_pipe);
+      to_pipe = NULL;
+   }else{
+   }
+   xclose(&fn);
+   IO::formaat = 0;
+   IO::incipher = false;
+   IO::mstdout.reset();
 }
 /*--------------------------------------------------------------------------*/
 /* outset: set up i/o for a command
  * return whether or not it did anything
  */
-OMSTREAM* outset(CS& cmd, OMSTREAM* out)
+OMSTREAM* OMSTREAM::outset(CS& cmd)
 {
+  trace0("OMSTREAM::outset" + cmd.fullstring());
+  OMSTREAM* out=this;
   bool echo = false;
   for (;;) {
     if (cmd.umatch("basic ")) {
@@ -114,16 +118,19 @@ OMSTREAM* outset(CS& cmd, OMSTREAM* out)
     }else if (cmd.umatch("quiet ")) {itested();
       echo = false;
       (*out).detach(IO::mstdout);
-    }else if (cmd.umatch("echo ") || cmd.umatch("list ")) {itested();
+    }else if (cmd.umatch("echo ") || cmd.umatch("list ")) {
       echo = true;
       (*out).attach(IO::mstdout);
-    }else if (cmd.umatch("save ")) {itested();
+    }else if (cmd.umatch("save ")) {
       fn = file_open(cmd,"","w",fn);
       (*out).attach(fn);
-    }else if (cmd.umatch("\\|")) {untested();
+    }else if (cmd.umatch("\\|")) {
       // open a pipe
       std::string command;
       cmd >> command;
+      if (to_pipe) { itested();
+        pclose(to_pipe);
+      }
       to_pipe = popen(command.c_str(), "w");
       assert(to_pipe);
 
@@ -132,27 +139,36 @@ OMSTREAM* outset(CS& cmd, OMSTREAM* out)
 
       IO::formaat = ftos_EXP;
       (*out).setformat(ftos_EXP);
-      if (!echo) {untested();
+      if (!echo) {
 	(*out).detach(IO::mstdout);
       }else{untested();
       }
-    }else if (cmd.umatch(">")) {itested();
+    }else if (cmd.umatch(">")) {
+      trace1("outset, redirect\n", (intptr_t) fn);
       // open a file for write or append
       const char *rwaflag;
       rwaflag = (cmd.umatch(">")) ? "a" : "w";
+      trace1("OMSTREAM::outset", (string)cmd.tail());
       fn = file_open(cmd,"",rwaflag,fn);
       (*out).attach(fn);
       IO::formaat = ftos_EXP;
       (*out).setformat(ftos_EXP);
-      if (!echo) {itested();
+      if (!echo) {
 	(*out).detach(IO::mstdout);
       }else{untested();
       }
     }else{
+       trace0(( "OMSTREAM::outset rest ||| " +cmd.tail() ).c_str());
       break;
+
     }
   }
   return out;
+}
+/*--------------------------------------------------------------------------*/
+OMSTREAM* outset(CS& cmd, OMSTREAM* out)
+{
+   return out->outset(cmd);
 }
 /*--------------------------------------------------------------------------*/
 /* file_open: a different interface for xopen
@@ -162,14 +178,15 @@ static FILE *file_open(
 	const char *ext,
 	const char *rwaflag,
 	FILE *fileptr)
-{itested();
+{
   xclose(&fileptr);
   fileptr = xopen(cmd,ext,rwaflag);
   if (!fileptr) {itested();
     throw Exception_File_Open("");
-  }else{itested();
+  }else{
   }
   return fileptr;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

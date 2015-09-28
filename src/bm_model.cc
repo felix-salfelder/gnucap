@@ -1,4 +1,4 @@
-/*$Id: bm_model.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_model.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -32,6 +32,8 @@ class EVAL_BM_MODEL : public EVAL_BM_ACTION_BASE {
 private:
   std::string	_arglist;
   COMMON_COMPONENT* _func;
+  // static map<string, PARA_BASE EVAL_BM_SIN::*> param_dict;
+  void set_param_by_name(string /*Name*/, string /*Value*/){incomplete();}
   explicit	EVAL_BM_MODEL(const EVAL_BM_MODEL& p);
 public:
   explicit      EVAL_BM_MODEL(int c=0);
@@ -45,7 +47,7 @@ private: // override virtual
   COMMON_COMPONENT* deflate()		{return (_func) ? _func->deflate() : this;}
   void		tr_eval(ELEMENT*d)const {assert(_func); _func->tr_eval(d);}
   void		ac_eval(ELEMENT*d)const {assert(_func); _func->ac_eval(d);}
-  std::string	name()const		{itested();return modelname();}
+  std::string	name()const		{return modelname();}
   bool		ac_too()const		{return true;}
 };
 /*--------------------------------------------------------------------------*/
@@ -62,6 +64,7 @@ EVAL_BM_MODEL::EVAL_BM_MODEL(const EVAL_BM_MODEL& p)
    _arglist(p._arglist),
    _func(0)
 {
+  trace1("EVAL_BM_MODEL::EVAL_BM_MODEL attaching...", _arglist);
   attach_common(p._func, &_func);
 }
 /*--------------------------------------------------------------------------*/
@@ -80,10 +83,12 @@ bool EVAL_BM_MODEL::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_MODEL::parse_common_obsolete_callback(CS& cmd) //used
 {
+  trace1("EVAL_BM_MODEL::parse_common_obsolete_callback", cmd.tail());
   assert(!_func);
   assert(!has_model());
   parse_modelname(cmd);
   _arglist = cmd.ctos("", "(", ")");
+  trace2("EVAL_BM_MODEL::parse_common_obsolete_callback", modelname(), _arglist);
   assert(!_func);
 }
 /*--------------------------------------------------------------------------*/
@@ -94,7 +99,7 @@ void EVAL_BM_MODEL::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)c
     _func->print_common_obsolete_callback(o, lang);
   }else{
     o << modelname();
-    if (_arglist != "") {untested();
+    if (_arglist != "") {
       o << "(" << _arglist << ")";
     }else{
     }
@@ -103,6 +108,7 @@ void EVAL_BM_MODEL::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)c
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_MODEL::expand(const COMPONENT* d)
 {
+  trace2("EVAL_BM_MODEL::expand", _arglist, d->long_label());
   EVAL_BM_ACTION_BASE::expand(d);
   // not sure what kind of model it is yet.
   // see what we find.
@@ -131,6 +137,7 @@ void EVAL_BM_MODEL::expand(const COMPONENT* d)
   c->set_modelname(modelname());
   CS args(CS::_STRING, _arglist);
   c->parse_common_obsolete_callback(args);
+  c->precalc_first(d->scope());
   c->expand(d);
   attach_common(c, &_func);
   assert(_func);
@@ -142,3 +149,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "eval_bm_model", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

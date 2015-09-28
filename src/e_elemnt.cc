@@ -1,4 +1,4 @@
-/*$Id: e_elemnt.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,7 +21,6 @@
  *------------------------------------------------------------------
  * Base class for elements of a circuit
  */
-//testing=script 2006.07.12
 #include "m_divdiff.h"
 #include "u_xprobe.h"
 #include "e_aux.h"
@@ -29,6 +28,8 @@
 /*--------------------------------------------------------------------------*/
 ELEMENT::ELEMENT()
   :COMPONENT(),
+   _input_order(1),
+   _trsteporder(-1),
    _loaditer(0),
    _m0(),
    _m1(),
@@ -36,7 +37,8 @@ ELEMENT::ELEMENT()
    _loss1(0.),
    _acg(0.),
    _ev(0.),
-   _dt(0.)
+   _dt(0.),
+   _discont(disNONE)
 {
   _n = _nodes;
   assert(_y[0].x == 0. && _y[0].f0 == 0. && _y[0].f1 == 0.);
@@ -47,6 +49,8 @@ ELEMENT::ELEMENT()
 /*--------------------------------------------------------------------------*/
 ELEMENT::ELEMENT(const ELEMENT& p)
   :COMPONENT(p),
+   _input_order(p._input_order),
+   _trsteporder(-1),
    _loaditer(0),
    _m0(),
    _m1(),
@@ -54,7 +58,8 @@ ELEMENT::ELEMENT(const ELEMENT& p)
    _loss1(p._loss1),
    _acg(0.),
    _ev(0.),
-   _dt(0.)
+   _dt(0.),
+   _discont(disNONE)
 {
   trace0(long_label().c_str());
   _n = _nodes;
@@ -77,6 +82,70 @@ bool ELEMENT::skip_dev_type(CS& cmd)
   return cmd.umatch(dev_type() + ' ');
 }
 /*--------------------------------------------------------------------------*/
+void ELEMENT::expand()
+{
+  trace3("ELEMENT::expand", long_label(), input_order(), hp(common()));
+  assert(!subckt() || subckt()->size() < 2);
+  COMPONENT::expand();
+
+#if 0
+  if(input_order()>1){
+    if (!subckt()) new_subckt();
+    trace3("DEV_VCVS::expand branch", long_label(), hp(common()), input_order());
+    ELEMENT* more = prechecked_cast<ELEMENT*>(clone());
+    node_t nodes[input_order()*2];
+    nodes[0] = _n[0];
+    nodes[1] = _n[1];
+    notstd::copy_n(_n+4, input_order()*2-2, nodes+2);
+    assert(mutable_common()==common());
+    more->set_parameters("branch", this, mutable_common(), 0., 0, NULL, input_order()*2, nodes);
+    more->set_input_order(input_order()-1);
+    subckt()->push_front(more);
+    subckt()->set_slave();
+
+    assert(more->common() == common());
+    subckt()->expand();
+    trace2("DEV_VCVS::expand branch", hp(more->common()), hp(common()));
+    assert(more->common() == common());
+  }
+#else
+
+  if (input_order()>1) {
+    if (!subckt()) new_subckt();
+    trace3("ELEMENT::expand branch", long_label(), hp(common()), input_order());
+    ELEMENT* more = prechecked_cast<ELEMENT*>(clone());
+    node_t* nodes = new node_t[input_order()*2];
+    nodes[0] = _n[0];
+    nodes[1] = _n[1];
+    notstd::copy_n(_n+4, input_order()*2-2, nodes+2);
+    delete[] nodes;
+    assert(mutable_common()==common());
+    more->set_input_order(input_order()-1);
+    more->set_parameters("branch", this, mutable_common(), 0., 0, NULL, 2+(input_order()-1)*ports_per_input(), nodes);
+
+    for (unsigned i=1; i<num_current_ports(); i++) {
+      string a = current_port_value(i);
+      more->set_port_by_index(i+1, a);
+    }
+    
+//    for(unsigned i=4; i<net_nodes(); i++){untested();
+//      string a = port_value(i);
+//      trace2("ELEMENT::expand ", i, a);
+//      more->set_port_by_index(i-2, a);
+//    }
+
+    subckt()->push_front(more);
+    subckt()->set_slave();
+
+    assert(more->common() == common());
+    trace2("DEV_CCSRC::expand branch", hp(more->common()), hp(common()));
+    subckt()->expand();
+    // assert(more->common() == common()); maybe not.
+  }else{
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
 void ELEMENT::precalc_last()
 {
   COMPONENT::precalc_last();
@@ -93,13 +162,17 @@ void ELEMENT::precalc_last()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_begin()
 {
-  _time[0] = 0.;
+  _trsteporder = -1;
+  trace4("ELEMENT::tr_begin", long_label(), value(), has_common(), tr_needs_eval());
+  if (_sim->_time0) { untested();
+  }
+  _time[0] = _sim->_time0;
   _y[0].x  = 0.;
   _y[0].f0 = LINEAR;
   _y[0].f1 = value();
   _y1 = _y[0];
   for (int i=1; i<OPT::_keep_time_steps; ++i) {
-    _time[i] = 0.;
+    _time[i] = _sim->_time0;
     _y[i] = FPOLY1(0., 0., 0.);
   }
   _dt = NOT_VALID;
@@ -107,7 +180,9 @@ void ELEMENT::tr_begin()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_restore()
 {
-  if (_time[0] > _sim->_time0) {itested();
+  trace0(("ELEMENT::tr_restore for " + short_label()).c_str());
+  if (_time[0] > _sim->_time0) { itested();
+    trace0("shift back");
     for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {itested();
       _time[i] = _time[i+1];
       _y[i] = _y[i+1];
@@ -115,13 +190,17 @@ void ELEMENT::tr_restore()
     _time[OPT::_keep_time_steps-1] = 0.;
     _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
   }else if (_time[0] == _sim->_time0) {
+    trace2( "*no shift ", _time[0] , _sim->_time0 );
   }else{untested();
   }
 
-  //assert(_time[0] == _sim->_time0);
-  if (_time[0] != _sim->_time0) {itested();
-    error(bDANGER, "//BUG// restore time mismatch.  last=%g, using=%g\n",
-	  _time[0], _sim->_time0);
+  if (_time[0] != _sim->_time0) { itested();
+    error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
+        _time[0], _sim->_time0);
+
+    for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
+      _time[i] = _sim->_time0;
+    }
     //BUG// happens when continuing after a ^c,
     // when the last step was not printed
     // _time[0] is the non-printed time.  _sim->_time0 is the printed time.
@@ -138,7 +217,10 @@ void ELEMENT::dc_advance()
   assert(_sim->_time0 == 0.); // DC
 
   for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
-    assert(_time[i] == 0.);
+    if(!_time[i] == _sim->_time0){
+      // in _dc_cont case allow to skip dc analysis....
+      _time[i] = _sim->_time0;
+    }
   }
 
   _dt = NOT_VALID;
@@ -156,12 +238,49 @@ void ELEMENT::tr_advance()
   _time[0] = _sim->_time0;
 
   _dt = _time[0] - _time[1];
+
+  DISCONT d = disNONE;
+  for (unsigned i=0;i < net_nodes(); ++i) {
+    d |= _n[i]->discont();
+    assert(_n[i].n_() != &ground_node || !_n[i]->discont());
+  }
+
+  if (d & 1) {
+    _trsteporder = -1;
+  }else if (d & 2) {
+    _trsteporder = 0;
+  }else if (_trsteporder < (int)OPT::trsteporder) {
+    ++_trsteporder;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()
 {
+  trace4("ELEMENT::tr_regress", long_label(), _sim->_time0, _time[0], _time[1]);
   assert(_time[0] >= _sim->_time0); // moving backwards
   assert(_time[1] <= _sim->_time0); // but not too far backwards
+
+  for (int i=OPT::_keep_time_steps-1; i>0; --i) {
+    trace1("i", i);
+    assert(_time[i] < _time[i-1] || _time[i] == 0.);
+  }
+  _time[0] = _sim->_time0;
+
+  _dt = _time[0] - _time[1];
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/* some regress hack??
+void ELEMENT::tr_regress()
+{
+  trace3("ELEMENT::tr_regress", _time[0], _time[1], _sim->_time0);
+  assert(_time[0] >= _sim->_time0); // moving backwards
+//  assert(_time[1] <= _sim->_time0); // but not too far backwards
+  if (  _time[1] <  _sim->_time0){
+    error(bDANGER, "regress %s //BUG// some time mismatch.  _time[1]=%.17f, _sim->_time0=%.17f\n",
+        (short_label()).c_str(),
+    _time[1], _sim->_time0);
+  }
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
     assert(_time[i] < _time[i-1] || _time[i] == 0.);
@@ -170,9 +289,11 @@ void ELEMENT::tr_regress()
 
   _dt = _time[0] - _time[1];
 }
+*/
 /*--------------------------------------------------------------------------*/
 TIME_PAIR ELEMENT::tr_review()
 {
+  trace2("ELEMENT::tr_review", long_label(), order());
   COMPONENT::tr_review();
   if (order() > 0 && _y[0].f0 != LINEAR) {
     double timestep = tr_review_trunc_error(_y);
@@ -180,7 +301,19 @@ TIME_PAIR ELEMENT::tr_review()
     _time_by.min_error_estimate(newtime);
   }else{
   }
+
   return _time_by;
+}
+/*--------------------------------------------------------------------------*/
+void ELEMENT::tr_accept()
+{
+  COMPONENT::tr_accept();
+  if (_discont) {
+    for (unsigned int i=0; i < matrix_nodes(); ++i) {
+      _n[i]->discont(_discont);
+    }
+  } else {
+  }
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_passive()
@@ -188,9 +321,12 @@ void ELEMENT::tr_iwant_matrix_passive()
   assert(matrix_nodes() == 2);
   assert(is_device());
   //assert(!subckt()); ok for subckt to exist for logic
-  trace2(long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
+  trace3("ELEMENT::tr_iwant_matrix_passive", long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
 
-  assert(_n[OUT1].m_() != INVALID_NODE);
+  if (_n[OUT1].m_() == INVALID_NODE) {
+    std::cerr << "ELEMENT::tr_iwant_matrix_passive " << long_label() << "\n";
+    exit(4);
+  }
   assert(_n[OUT2].m_() != INVALID_NODE);
 
   _sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
@@ -199,9 +335,10 @@ void ELEMENT::tr_iwant_matrix_passive()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_active()
 {
-  assert(matrix_nodes() == 4);
+  trace3("ELEMENT::tr_iwant_matrix_active", long_label(), _n[OUT1].m_(), _n[OUT2].m_());
+  assert(matrix_nodes() >= 4);
   assert(is_device());
-  assert(!subckt());
+  // assert(!subckt());
 
   assert(_n[OUT1].m_() != INVALID_NODE);
   assert(_n[OUT2].m_() != INVALID_NODE);
@@ -225,13 +362,16 @@ void ELEMENT::tr_iwant_matrix_active()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_extended()
 {
+  trace4("ELEMENT::tr_iwant_matrix_extended", long_label(), dev_type(),  ext_nodes(), int_nodes());
   assert(is_device());
-  assert(!subckt());
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
-  for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() >= 0) {
-      for (int jj = 0;  jj < ii ;  ++jj) {
+  for (uint_t ii = 0;  ii < matrix_nodes();  ++ii) {
+      trace2("ELEMENT::tr_iwant_matrix_extended", ii, _n[ii].m_() );
+  }
+  for (uint_t ii = 0;  ii < matrix_nodes();  ++ii) {
+    if (_n[ii].m_()  != INVALID_NODE) {
+      for (uint_t jj = 0;  jj < ii ;  ++jj) {
 	_sim->_aa.iwant(_n[ii].m_(),_n[jj].m_());
 	_sim->_lu.iwant(_n[ii].m_(),_n[jj].m_());
       }
@@ -260,12 +400,11 @@ void ELEMENT::ac_iwant_matrix_active()
 void ELEMENT::ac_iwant_matrix_extended()
 {
   assert(is_device());
-  assert(!subckt());
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
-  for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() >= 0) {
-      for (int jj = 0;  jj < ii ;  ++jj) {
+  for (uint_t ii = 0;  ii < matrix_nodes();  ++ii) {
+    if (_n[ii].m_() !=INVALID_NODE) {
+      for (uint_t jj = 0;  jj < ii ;  ++jj) {
 	_sim->_acx.iwant(_n[ii].m_(),_n[jj].m_());
       }
     }else{itested();
@@ -274,21 +413,82 @@ void ELEMENT::ac_iwant_matrix_extended()
   }
 }
 /*--------------------------------------------------------------------------*/
-double ELEMENT::tr_amps()const
+hp_float_t ELEMENT::tr_amps()const
 {
-  trace5("", _loss0, tr_outvolts(), _m0.c1, tr_involts(), _m0.c0);
-  return fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0),
-  		 _m0.c0);
+  hp_float_t root = fixzero((_loss0 * tr_outvolts() + _m0.c1 * tr_involts() + _m0.c0),
+      _m0.c0);
+
+  assert (root==root);
+  return (root);
+}
+/*--------------------------------------------------------------------------*/
+void ELEMENT::tr_save_amps(int n){
+
+  trace2( "ELEMENT::tr_save_amps ",  n, _sim->_tt_accepted);
+  hp_float_t tramps = tr_amps();
+
+  hp_float_t _tr_amps_diff_cur;
+  hp_float_t _tr_amps_sum_cur;
+
+  if( _amps_new == 0 ){
+    incomplete(); // somebody forgot to initilize
+    return;
+  }
+
+  if(_amps!=0) {
+    trace3( "saving _amps[ ",  n ,  net_nodes(), _amps[n] );
+    _tr_amps_sum_cur = fabs( _amps[n] ) + fabs( tramps );
+    _tr_amps_diff_cur = fabs( _amps[n] - tramps );
+    //		std::cerr << "ELEMENT::tr_save_amps: not first. diff= " << _tr_amps_diff_cur << "\n";
+  } else {
+    trace2( "dummy _amps[ ",  n ,  net_nodes() );
+    _tr_amps_diff_cur = 0;
+    _tr_amps_sum_cur = 1;
+  }
+
+  //	std::cerr << short_label() << ": saving _amps[ " << n << " ]" << _amps << " \n";
+  trace2( (short_label() + " have ").c_str(), tramps, n);
+  _amps_new[ n ]= tramps;
+
+
+  trace1("ELEMENT::tr_save_amps", _tr_amps_sum_cur);
+  tr_behaviour_del = _tr_amps_diff_cur;
+  tr_behaviour_rel = _tr_amps_diff_cur / _tr_amps_sum_cur;
+
+
+  //	tr_behaviour_del = 0;
+  //	tr_behaviour_rel = 0;
+
+  COMPONENT::tr_behaviour();
+
 }
 /*--------------------------------------------------------------------------*/
 double ELEMENT::tr_probe_num(const std::string& x)const
 {
   if (Umatch(x, "v{out} ")) {
     return tr_outvolts();
-  }else if (Umatch(x, "vi{n} ")) {
+  }else if (Umatch(x, "amps_diff ")) {
+    return tr_amps_diff();
+  }else if (Umatch(x, "vi{n} |v0 ")) {
     return tr_involts();
+//  }else if (Umatch(x, "dv ")) { untested();
+//      return ( _n[OUT2].vt1() - _n[OUT1].vt1() );
+  }else if (Umatch(x, "v1 ")) {
+    if(input_order()>1){
+      const ELEMENT* more = prechecked_cast<const ELEMENT*>(*(subckt()->begin()));
+      return more->tr_involts();
+      return fixzero(dn_diff(_n[IN3].v0(),_n[IN2].v0()),1);
+    }
+    return NOT_VALID;
   }else if (Umatch(x, "i ")) {
     return tr_amps();
+  }else if (Umatch(x, "i1 ")) {
+    const ELEMENT* more = prechecked_cast<const ELEMENT*>(*(subckt()->begin()));
+    if(input_order()>1){
+      assert(more);
+      return more->tr_amps();
+    }
+    return NOT_VALID;
   }else if (Umatch(x, "p ")) {
     return tr_amps() * tr_outvolts();
   }else if (Umatch(x, "pd ")) {
@@ -307,15 +507,25 @@ double ELEMENT::tr_probe_num(const std::string& x)const
     }
   }else if (Umatch(x, "ev |df ")) {
     return _y[0].f1;
+  }else if (Umatch(x, "dx ")) {
+    return _y1.x-_y[0].x;
+  }else if (Umatch(x, "res ")) {
+    return _y1.f0-_y[0].f0;
+  }else if (Umatch(x, "conv ")) {
+    // assert(converged()==conv_check());
+    if (conv_check()) { 
+      return 10; } 
+    //  fprintf(stderr,"hi\n");
+    return 1993;
   }else if (Umatch(x, "nv ")) {
     return value();
   }else if (Umatch(x, "eiv ")) {untested();
     return _m0.x;
-  }else if (Umatch(x, "y ")) {
+  }else if (Umatch(x, "y |m0c1 ")) {
     return _m0.c1;
   }else if (Umatch(x, "is{tamp} ")) {
     return _m0.f0();
-  }else if (Umatch(x, "iof{fset} ")) {itested();
+  }else if (Umatch(x, "iof{fset} ")) {
     return _m0.c0;
   }else if (Umatch(x, "ip{assive} ")) {itested();
     return _m0.c1 * tr_involts();
@@ -337,10 +547,32 @@ double ELEMENT::tr_probe_num(const std::string& x)const
     //return  (i0 - it1) / (_sim->_time0 - _time1);
   }else if (Umatch(x, "r ")) {
     return (_m0.c1!=0.) ? 1/_m0.c1 : MAXDBL;
+  }else if (Umatch(x, "ic ")) {
+    if (!has_ic()){ untested();
+      return NOT_VALID;
+    } else if (const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common())) {
+      return x->_ic;
+    } else { unreachable();
+      return NOT_VALID;
+    }
   }else if (Umatch(x, "z ")) {
-    return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, mfactor()*(_m0.c1+_loss0));
+    return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, (double) (mfactor()*(_m0.c1+_loss0)));
+#ifndef NDEBUG
+  }else if (Umatch(x, "mp ")) {
+    return _n[OUT1].m_();
+  }else if (Umatch(x, "mn ")) {
+    return _n[OUT2].m_();
+#endif
+  }else if (Umatch(x, "common ")) {
+    return has_common();
+  }else if (Umatch(x, "treval ")) {
+    return has_tr_eval();
+  }else if (Umatch(x, "utreval ")) {
+    return using_tr_eval();
   }else if (Umatch(x, "zraw ")) {
     return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, 0.);
+  }else if (Umatch(x, "ord{er} ")) {
+    return order();
   }else{
     return COMPONENT::tr_probe_num(x);
   }
@@ -349,12 +581,12 @@ double ELEMENT::tr_probe_num(const std::string& x)const
 COMPLEX ELEMENT::ac_amps()const
 {
   assert(!is_source());
-  return (ac_involts() * _acg + ac_outvolts() * _loss0);
+  return (ac_involts() * _acg + ac_outvolts() * (double)_loss0);
 }
 /*--------------------------------------------------------------------------*/
 XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
 {
-  COMPLEX admittance = (is_source()) ? _loss0 : _acg+_loss0;
+  COMPLEX admittance = (is_source()) ? _loss0 : _acg+ (double)_loss0;
 
   if (Umatch(x, "v{out} ")) {			/* volts (out) */
     return XPROBE(ac_outvolts());
@@ -367,8 +599,9 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
   }else if (Umatch(x, "nv ")) {untested();	/* nominal value */
     return XPROBE(value());
   }else if (Umatch(x, "ev ")) {			/* effective value */
-    return XPROBE(_ev);
-  }else if (Umatch(x, "y ")) {untested();		/* admittance */
+    return XPROBE((COMPLEX)_ev);
+  }else if (Umatch(x, "y ")) {
+    /* admittance */
     return XPROBE(admittance, mtREAL);
   }else if (Umatch(x, "r ")) {			/* complex "resistance" */
     if (admittance == 0.) {untested();
@@ -380,6 +613,8 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
     return XPROBE(port_impedance(_n[OUT1], _n[OUT2], _sim->_acx, mfactor()*admittance));
   }else if (Umatch(x, "zraw ")) {		/* port impedance, raw */
     return XPROBE(port_impedance(_n[OUT1], _n[OUT2], _sim->_acx, COMPLEX(0.)));
+  }else if (Umatch(x, "n ")) {		        /* port noise, raw */
+    return XPROBE(port_noise(_n[OUT1], _n[OUT2]));
   }else{ 					/* bad parameter */
     return COMPONENT::ac_probe_ext(x);
   }
@@ -387,17 +622,20 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
 /*--------------------------------------------------------------------------*/
 double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
 {
+  trace1("ELEMENT::tr_review_trunc_error", order());
   int error_deriv = order()+1;
   double timestep;
+  trace1("ELEMENT::tr_review_trunc_error", error_deriv);
+  trace2("ELEMENT::tr_review_trunc_error", _time[0], error_deriv);
   if (_time[0] <= 0.) {
     // DC, I know nothing
     timestep = NEVER;
-  }else if (_time[error_deriv] <= 0.) {
+  }else if (error_deriv - 1 - OPT::initsc < 0 || _time[error_deriv - 1 - OPT::initsc] <= 0 ) {
     // first few steps, I still know nothing
     // repeat whatever step was used the first time
     timestep = _dt;
   }else{
-    for (int i=error_deriv; i>0; --i) {
+    for (int i=error_deriv-1; i>0; --i) {
       assert(_time[i] < _time[i-1]); // || _time[i] == 0.);
     }
 
@@ -406,7 +644,17 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
       c[i] = q[i].f0;
     }
     assert(error_deriv < OPT::_keep_time_steps);
-    derivatives(c, OPT::_keep_time_steps, _time);
+
+    // better use divdiff.
+    // better, only compute up to error_div
+    if (error_deriv && 0. == _time[error_deriv-1]) {
+      // vile hack, probably not a good idea
+      _time[error_deriv] = -_time[error_deriv-2];
+      derivatives(c, OPT::_keep_time_steps, _time);
+      _time[error_deriv] = 0;
+    } else {
+      derivatives(c, OPT::_keep_time_steps, _time);
+    }
     // now c[i] is i'th derivative
     
     assert(OPT::_keep_time_steps >= 5);
@@ -419,7 +667,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
       timestep = NEVER;
     }else{
       double chargetol = std::max(OPT::chgtol,
-	OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
+				OPT::reltol * std::max((double)std::abs(q[0].f0), (double) std::abs(q[1].f0)));
       double tol = OPT::trtol * chargetol;
       double denom = error_factor() * std::abs(c[error_deriv]);
       assert(tol > 0.);
@@ -450,8 +698,8 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
 
     if (timestep < _dt * OPT::trreject) {
       if (_time[order()] == 0) {
-	error(bWARNING, "initial step rejected:" + long_label() + '\n');
-	error(bWARNING, "new=%g  old=%g  required=%g\n",
+	error(bTRACE, "initial step rejected:" + long_label() + '\n');
+	error(bTRACE, "new=%g  old=%g  required=%g\n",
 	      timestep, _dt, _dt * OPT::trreject);
       }else{
 	error(bTRACE, "step rejected:" + long_label() + '\n');
@@ -470,4 +718,108 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
   return time_future;
 }
 /*--------------------------------------------------------------------------*/
+void ELEMENT::set_ic(double x)
+{ 
+  // tr_unload();
+  trace1("ELEMENT::set_ic " + long_label(), x);
+  *(_value.pointer_hack()) = x;
+  // do_tr();
+  // tr_load();
+  q_eval();
+  // q_load();
+}
 /*--------------------------------------------------------------------------*/
+void ELEMENT::keep_ic()
+{ 
+  unreachable();
+}
+/*--------------------------------------------------------------------------*/
+void ELEMENT::tt_advance()
+{
+  trace3("ELEMENT::tt_advance", short_label(), _sim->_time0, _sim->_dt0);
+  if (_time[0] > 0.) {
+    for (int i=0; i<OPT::_keep_time_steps-1; ++i) {
+      _time[i] = 0.;
+      _y[i] = _y[i+1];
+    }
+    _time[OPT::_keep_time_steps-1] = 0.;
+    _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
+  }else if (_time[0] == _sim->_time0) {
+  }else{ untested();
+  }
+
+  for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
+    assert(!_time[i]);
+  }
+}
+/*--------------------------------------------------------------------------*/
+// hmmmm like tr_begin? start from scratch?
+void ELEMENT::tt_regress()
+{
+  assert(_sim->_time0 == 0.);
+  trace3("ELEMENT::tt_regress", short_label(), _sim->_time0, _sim->_dt0);
+  if (_time[0] > _sim->_time0) {
+    for (int i=0; i<OPT::_keep_time_steps-1; ++i) {
+      _time[i] = 0.;
+      _y[i] = _y[i+1];
+    }
+    _time[OPT::_keep_time_steps-1] = 0.;
+    _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
+  }else if (_time[0] == _sim->_time0) { untested();
+
+  }else{
+
+  }
+
+  for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
+    assert(!_time[i]);
+  }
+}
+/*--------------------------------------------------------------------------*/
+// probably ineffective?
+void ELEMENT::set_param_by_name(string Name, string Value)
+{
+  trace3("ELEMENT::set_param_by_name", Name, Value, value_name());
+  bool isvalue = false;
+  if(value_name() == "") {
+  }else if(Umatch(Name,value_name())) {
+    set_value(Value);
+    isvalue = true;
+  } else {
+  }
+
+  if (has_common()) {
+    COMMON_COMPONENT* c = mutable_common()->clone();
+    try{
+      c->set_param_by_name(Name,Value);
+    }catch(Exception_No_Match){ untested();
+      if(!isvalue){ untested();
+	delete c;
+	throw;
+      }
+    }
+    if(isvalue){ untested();
+      c->set_modelname(Value);
+    }
+    attach_common(c);
+  }else if (Umatch (Name,"type")) { untested();
+    COMMON_COMPONENT* c = bm_dispatcher[Value];
+    if(!c) throw Exception_No_Match(Value);
+    attach_common(c->clone());
+  } else {
+    COMPONENT::set_param_by_name(Name,Value);
+  }
+}
+/*--------------------------------------------------------------------------*/
+string ELEMENT::dev_type()const
+{
+  if (common()) {
+    return common()->modelname();
+  }else{
+    return element_type();
+  }
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

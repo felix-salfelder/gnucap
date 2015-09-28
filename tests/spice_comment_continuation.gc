@@ -1,0 +1,10 @@
+options picky
+spice
+
+V1 1 0 pulse pv=1 delay=1 iv=1
+*this is a comment
++iv=2
+
+.print dc v(nodes)
+.dc
+.end

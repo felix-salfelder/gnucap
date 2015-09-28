@@ -1,0 +1,70 @@
+spice
+.load c_wave.so
+.options TEMP=25
+.param vdd=2.7
+*.options trace
+.options method traponly
+
+.load rcd_sym.so
+
+.param cmosp_bti=bti_sum_some
+.model my_rcd rcd_exp
+
+
+* my_rcd #(.weight(100) .rc0(10) .rc1(10).re0(11) .re1(-3) ) z3( nin, 0);
+*                                re1     re0                     rc1              rc0
+.model bti_sum_some bti_sum (
++ parms = ((6.764403498935, -3.0, 11.6851098109742111, 10, 10.802215970322095))
++rcd_model_name=my_rcd weight=1)
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = 0
++ bti_model=cmosp_bti
++ )
+
+R1 0 nout 1k
+MP1 nout ng ndd ndd cmosp l=.4e-4 w=4.5e-6
+VDD ndd 0 2.7
+
+* weird?
+* vgate ng 0 pulse (iv=0 pv=vdd rise=.1u fall=.1u width=.2u delay=.05u period=1u)
+vgate ndd ng pulse (iv=0 pv=vdd rise=.1u fall=.1u width=.2u delay=.01u period=1u)
+
+.verilog
+measm nomax(nout,0);
+spice
+
+.print tw dvth(M*1) dvth(M*1.bti) P(M*1.bti.rcd*)
++ stress(M*1.bti.rcd0) rcdnumber(M*1.bti) uin(M*1.bti.rcd*)
++ ueff(M*1.bti.rcd*)
++ hidden(0) order(M*1.bti.rcd0) ttorder(0)
+.print tran dvth(M*1) v(ng)
++ E(M*1.bti.RCD0)
++ E0(M*1.bti.RCD0)
++ stress(M*1.bti) hidden(0)
+
+*
++ tau(MP1.bti.rcd0)
++ re0(MP1.bti.rcd0)
++ re1(MP1.bti.rcd0)
++ rc0(MP1.bti.rcd0)
++ rc1(MP1.bti.rcd0)
+
+*.tran 0 1u .1u trace=i
+
+.store tw dvth(M*1.bti)
+.ttr 10u .1u 3u             trace=i basic tran basic > btitest_tr.out
+.wave list tt
+.wave list tran
+.measure bti=at(probe="dvth(MP1.BTI)")
+
+.ttr 0 10u .1u 1u 1u    new trace=i basic >/dev/null tran basic >> btitest_tr.out
+.measure bti=at(probe="dvth(MP1.BTI)")
+
+.ttr 0 20m .1u 1u * 1.3 new trace=i basic >/dev/null tran basic >> btitest_tr.out
+.measure bti=at(probe="dvth(MP1.BTI)")
+
+
+.end

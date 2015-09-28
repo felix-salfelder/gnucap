@@ -1,4 +1,4 @@
-/*$Id: d_cap.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: d_cap.cc,v 1.10 2010-08-26 09:07:17 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -30,46 +30,9 @@
  * m.x = volts, m.c0 = amps,    acg = m.c1 = mhos
  */
 //testing=script 2006.07.17
+#include "d_cap.h"
 #include "e_storag.h"
-/*--------------------------------------------------------------------------*/
-namespace {
-/*--------------------------------------------------------------------------*/
-class DEV_CAPACITANCE : public STORAGE {
-protected:
-  explicit DEV_CAPACITANCE(const DEV_CAPACITANCE& p) :STORAGE(p) {}
-public:
-  explicit DEV_CAPACITANCE()	:STORAGE() {}
-protected: // override virtual
-  char	   id_letter()const	{return 'C';}
-  std::string value_name()const {return "c";}
-  std::string dev_type()const	{return "capacitor";}
-  int	   max_nodes()const	{return 2;}
-  int	   min_nodes()const	{return 2;}
-  int	   matrix_nodes()const	{return 2;}
-  int	   net_nodes()const	{return 2;}
-  bool	   has_iv_probe()const  {return true;}
-  bool	   use_obsolete_callback_parse()const {return true;}
-  CARD*	   clone()const		{return new DEV_CAPACITANCE(*this);}
-  void	   tr_iwant_matrix()	{tr_iwant_matrix_passive();}
-  bool	   do_tr();
-  void	   tr_load()		{tr_load_passive();}
-  void	   tr_unload()		{tr_unload_passive();}
-  double   tr_involts()const	{return tr_outvolts();}
-  double   tr_involts_limited()const {return tr_outvolts_limited();}
-  double   tr_probe_num(const std::string&)const;
-  void	   ac_iwant_matrix()	{ac_iwant_matrix_passive();}
-  void	   ac_begin()		{_ev = _y[0].f1;}
-  void	   do_ac();
-  void	   ac_load()		{ac_load_passive();}
-  COMPLEX  ac_involts()const	{itested();return ac_outvolts();}
-
-  std::string port_name(int i)const {
-    assert(i >= 0);
-    assert(i < 2);
-    static std::string names[] = {"p", "n"};
-    return names[i];
-  }
-};
+namespace SOME_CAP_HACK {
 /*--------------------------------------------------------------------------*/
 class DEV_TRANSCAP : public DEV_CAPACITANCE {
 private:
@@ -80,22 +43,21 @@ private: // override virtual
   char     id_letter()const	{untested();return '\0';}
   std::string value_name()const {untested(); return "c";}
   std::string dev_type()const	{return "tcap";}
-  int	   max_nodes()const	{return 4;}
-  int	   min_nodes()const	{return 4;}
-  int	   matrix_nodes()const	{return 4;}
-  int	   net_nodes()const	{return 4;}
+  uint_t	   max_nodes()const	{return 4;}
+  uint_t	   min_nodes()const	{return 4;}
+  uint_t	   matrix_nodes()const	{return 4;}
+  uint_t	   net_nodes()const	{return 4;}
   bool	   has_iv_probe()const  {untested(); return false;}
   bool	   f_is_value()const	{untested();return true;}
   CARD*	   clone()const		{return new DEV_TRANSCAP(*this);}
   void	   tr_iwant_matrix()	{tr_iwant_matrix_active();}
   void	   tr_load()		{tr_load_active();}
-  double   tr_involts()const	{return dn_diff(_n[IN1].v0(),_n[IN2].v0());}
-  double   tr_involts_limited()const {return volts_limited(_n[IN1],_n[IN2]);}
-  void	   ac_iwant_matrix()	{ac_iwant_matrix_active();}
-  void	   ac_load()		{untested(); ac_load_active();}
-
-  std::string port_name(int i)const {untested();
-    assert(i >= 0);
+  hp_float_t   tr_involts()const	{return dn_diff(_n[IN1].v0(),_n[IN2].v0());}
+  hp_float_t   tr_involts_limited()const {return volts_limited(_n[IN1],_n[IN2]);}
+  void	    ac_iwant_matrix()	{ac_iwant_matrix_active();}
+  void	    ac_load()		{untested(); ac_load_active();}
+  std::string port_name(uint_t i)const {untested();
+    assert(i != INVALID_NODE);
     assert(i < 4);
     static std::string names[] = {"p", "n", "ps", "ns"};
     return names[i];
@@ -112,47 +74,115 @@ private: // override virtual
   char     id_letter()const	{untested();return '\0';}
   std::string value_name()const {untested(); return "c";}
   std::string dev_type()const	{return "vccap";}
-  int	   max_nodes()const	{return 4;}
-  int	   min_nodes()const	{return 4;}
-  int	   matrix_nodes()const	{return 4;}
-  int	   net_nodes()const	{return 4;}
+  uint_t	   max_nodes()const	{return 4;}
+  uint_t	   min_nodes()const	{return 4;}
+  uint_t	   matrix_nodes()const	{return 4;}
+  uint_t	   net_nodes()const	{return 4;}
   bool	   has_iv_probe()const  {untested(); return false;}
   bool	   f_is_value()const	{untested();return true;}
   CARD*	   clone()const		{return new DEV_VCCAP(*this);}
   void	   tr_iwant_matrix()	{tr_iwant_matrix_extended();}
   bool     do_tr();
-  double   tr_involts()const	{return dn_diff(_n[IN1].v0(),_n[IN2].v0());}
-  double   tr_involts_limited()const {return volts_limited(_n[IN1],_n[IN2]);}
-  void	   ac_iwant_matrix()	{ac_iwant_matrix_extended();}
+  void uic_clanup();
+  hp_float_t   tr_involts()const	{return dn_diff(_n[IN1].v0(),_n[IN2].v0());}
+  hp_float_t   tr_involts_limited()const {return volts_limited(_n[IN1],_n[IN2]);}
+  void	    ac_iwant_matrix()	{ac_iwant_matrix_extended();}
 
-  std::string port_name(int i)const {untested();
-    assert(i >= 0);
+  std::string port_name(uint_t i)const {untested();
+    assert(i != INVALID_NODE);
     assert(i < 4);
     static std::string names[] = {"p", "n", "ps", "ns"};
     return names[i];
   }
+
 };
 /*--------------------------------------------------------------------------*/
+// obsolete
+bool DEV_CAPACITANCE::has_ic() const
+{
+  if ( const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common()) ){
+    if (x->_ic != NOT_INPUT) return 1;
+  }
+  return 0;
+}
 /*--------------------------------------------------------------------------*/
 bool DEV_CAPACITANCE::do_tr()
 {
+  // FPOLY1* q=_y;
+  //trace0(("DEV_CAPACITANCE::do_tr " + long_label()));
+  //trace3(("DEV_CAPACITANCE::do_tr " + long_label()).c_str(), _y[0].f1, value(), tr_input() );
   if (using_tr_eval()) {
+    trace1("DEV_CAPACITANCE::do_tr, tr_eval", has_tr_eval());
     _y[0].x = tr_input_limited();
     tr_eval();
   }else{
+    trace0("DEV_CAPACITANCE::do_tr, no tr_eval");
     _y[0].x = tr_input(); // tr_involts();
     assert(_y[0].f1 == value());
     _y[0].f0 = _y[0].x * _y[0].f1;
     assert(converged());
   }
+  trace3("DEV_CAPACITANCE::do_tr ", _y[0].f1, _sim->uic_now(), is_constant() );
   store_values();
   q_load();
 
-  trace3("q", _y[0].x, _y[0].f0, _y[0].f1);
-  _i[0] = differentiate(_y, _i, _time, _method_a);
-  trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
+  if (_sim->uic_now() && has_ic()) {
+    double G = 1./OPT::shortckt;
+    assert(_time[0] == 0.);
+
+    trace1("DEV_CAPACITANCE::do_tr: desired capacitance is ", _y[0].f1);
+    trace1("DEV_CAPACITANCE::do_tr: desired charge is      ", _y[0].f0);
+    trace1("DEV_CAPACITANCE::do_tr: desired voltage is     ", _y[0].x);
+
+    // imitate voltage source... (d_vs.cc)
+    _i[0] = FPOLY1( CPOLY1( 0., -_y[0].x * G,         G  ) ); 
+//    trace2("2 quotienten", ( -_y[0].f0 / (OPT::shortckt)  ) /-_y[0].x  / (OPT::shortckt) ,
+//			         (_y[0].f1 / (OPT::shortckt))/    1/(OPT::shortckt)  );
+
+    // picked up by tr_load_*
+    _loss0 = G;
+
+  } else {
+    trace4("q", _y[0].x, _y[0].f0, _y[0].f1, _sim->_phase);
+    trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+    trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
+  }
   _m0 = CPOLY1(_i[0]);
+  trace4("DEV_CAPACITANCE::do_tr done", long_label(), value(), _m0, _m1);
   return converged();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CAPACITANCE::tr_accept()
+{
+  ELEMENT::tr_accept(); // commmon->accept..
+
+  if (_loss0!=0) {
+    // _loss0 should be irrelevant
+    // sources might have been abused to enforce initial conditions
+    // during dc analysis (otherwise this should be unreachable)
+
+    if (0 && !_sim->uic_now()) { // s_ddc
+      _m0.c0 = 0;
+      trace2("DEV_CAPACITANCE::tr_accept ddc", _m0, _m1);
+    } else {
+      trace3("DEV_CAPACITANCE::tr_accept ddc", _m0, _m1, _sim->_uic);
+      // vera hack. something about qdot
+      // also used in dc uic + tr cont ...
+      FPOLY1 m(_m0);
+
+      m.x = tr_input();
+      m.f0 = - _loss0 * tr_outvolts() - _m0.c0;
+      m.f1 = 0;
+      _m0 = CPOLY1(m);
+      _i[0].f0=0;
+      _i[0].f1=0;
+    }
+
+    _loss0 = 0.;
+    set_converged(false);
+  } else {
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CAPACITANCE::do_ac()
@@ -161,9 +191,11 @@ void DEV_CAPACITANCE::do_ac()
     ac_eval();
   }else{
     assert(_ev == _y[0].f1);
-    assert(has_tr_eval() || _ev == double(value()));
+    assert(has_tr_eval() || _ev == hp_float_t(value()));
   }
-  _acg = _ev * _sim->_jomega;
+  trace1("DEV_CAPACITANCE::do_ac", _sim->_jomega);
+  _acg =  (COMPLEX)_ev * _sim->_jomega;
+
 }
 /*--------------------------------------------------------------------------*/
 double DEV_CAPACITANCE::tr_probe_num(const std::string& x)const
@@ -212,6 +244,9 @@ DISPATCHER<CARD>::INSTALL
   d1(&device_dispatcher, "C|capacitor",	    &p1),
   d2(&device_dispatcher, "tcap|tcapacitor", &p2),
   d3(&device_dispatcher, "vccap",	    &p3);
+/*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

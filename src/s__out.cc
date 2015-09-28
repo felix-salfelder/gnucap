@@ -1,4 +1,5 @@
-/*$Id: s__out.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: s__out.cc,v 1.8 2010-09-07 07:46:24 felix Exp $ -*- C++ -*-
+ * vim:sw=2:ts=8:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -41,6 +42,7 @@ const PROBELIST& SIM::plotlist()const
 }
 const PROBELIST& SIM::printlist()const
 {
+  trace2("SIM::printlist", _sim->_mode, PROBE_LISTS::print[_sim->_mode].size() );
   return PROBE_LISTS::print[_sim->_mode];
 }
 const PROBELIST& SIM::storelist()const
@@ -48,13 +50,77 @@ const PROBELIST& SIM::storelist()const
   return PROBE_LISTS::store[_sim->_mode];
 }
 /*--------------------------------------------------------------------------*/
+void SIM::expect_results(double t){
+  CS* c = _sim->expect_file();
+
+  vector<double> last_raw(_sim->_expect_raw);
+
+  if (!c) return;
+  trace2("SIM::expect_results",t,  c->fullstring() );
+
+
+  double d;
+
+  double et = -1;
+
+  while(  et-t < -1e-20 ){ // FIXME rounding bug.
+    trace2("SIM::expect_results loop", et, t);
+    c->get_line(I_PROMPT);
+    _sim->_expect_raw.clear();
+
+    while (c->umatch("'|*|#|//|\"")){
+      c->get_line(I_PROMPT);
+      c->eat_lines();
+    }
+    c->eat_lines();
+
+    if(!c->more()){
+      incomplete();
+      assert(false);
+    }
+
+    *c >> et;
+    trace1("SIM::expect_results time", et);
+    assert(( et==0) == (t==0));
+    _sim->_expect_raw.push_back(et);
+
+    while( c->more()){
+      *c >> d;
+      trace1("SIM::expect_results found", d);
+      _sim->_expect_raw.push_back(d);
+
+      if (_sim->_expect_raw.size() > 100) assert(false); // safety net.
+    }
+
+    trace0("need more input");
+    last_raw = _sim->_expect_raw;
+
+    {
+
+      //interpolate
+      //
+    }
+
+
+  }
+
+
+  trace1("SIM::expect_results size", _sim->_expect_raw.size());
+
+}
+/*--------------------------------------------------------------------------*/
 /* SIM::out: output the data, "keep" for ac reference
  */
 void SIM::outdata(double x)
 {
+
+  trace1("SIM::outdata ", x);
+
+  expect_results(x);
   ::status.output.start();
   plottr(x, plotlist());
   print_results(x);
+  
   alarm();
   store_results(x);
   _sim->reset_iteration_counter(iPRINTSTEP);
@@ -66,13 +132,33 @@ void SIM::outdata(double x)
  */
 void SIM::head(double start, double stop, const std::string& col1)
 {
-  if (_sim->_waves) {
-    delete [] _sim->_waves;
+  _sim->_waves[_sim->_label].clear();
+
+  if(_wavep){
+    delete[] _wavep;
   }else{
   }
+  _wavep = new WAVE*[storelist().size()];
 
-  _sim->_waves = new WAVE [storelist().size()];
+  unsigned ii = 0;
+  for (PROBELIST::const_iterator
+	 p=storelist().begin();  p!=storelist().end();  ++p) {
+    string l = (*p)->label();
+    if (OPT::case_insensitive) {
+      notstd::to_upper(&l);
+    }
+    WAVE* newwave = &(_sim->_waves[_sim->_label][l]);
 
+    // UGLY: linear.
+    for(unsigned j = 0; j<ii; ++j){
+      if(_wavep[j] == newwave){
+	newwave = NULL;
+	error(bPICKY,"cowardly refusing to register twice: " + (*p)->label() + " at index " + to_string(ii) + "\n");
+	break;
+      }
+    }
+    _wavep[ii++] = newwave;
+  }
 
   if (!plopen(start, stop, plotlist())) {
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -85,8 +171,9 @@ void SIM::head(double start, double stop, const std::string& col1)
 
     for (PROBELIST::const_iterator
 	   p=printlist().begin();  p!=printlist().end();  ++p) {
-      _out.form(format, ' ', p->label().c_str());
+      _out.form(format, ' ', (*p)->label().c_str());
     }
+    //    _out <<  printlist().size() << '\n';
     _out << '\n';
   }else{
   }
@@ -97,17 +184,35 @@ void SIM::head(double start, double stop, const std::string& col1)
  */
 void SIM::print_results(double x)
 {
+  trace2("SIM::print_results", printlist().size(), x);
+  unsigned i=0;
+
+  //if (_sim->expect_file()){
+  //  assert( fabs (_sim->_expect_raw[i] - x) < 1e-20);
+  //}
+
   if (!IO::plotout.any()) {
     _out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
     assert(x != NOT_VALID);
     _out << x;
     for (PROBELIST::const_iterator
 	   p=printlist().begin();  p!=printlist().end();  ++p) {
-      _out << p->value();
+      trace1("SIM::print_results", (*p)->label());
+      double v= (*p)->value(); 
+      if(_sim->expect_file()){ 
+        i++;
+        trace3("SIM::print_results", v,_sim->_expect_raw[i],i);
+        trace1("SIM::print_results", fabs(v-_sim->_expect_raw[i]));
+          
+        assert( fabs(v-_sim->_expect_raw[i]) < pow(10., 1-OPT::numdgt) );
+      }
+      _out << v;
     }
     _out << '\n';
   }else{
   }
+  trace0("SIM::print_results done");
+
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::alarm: print a message when a probe is out of range
@@ -117,8 +222,8 @@ void SIM::alarm(void)
   _out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
   for (PROBELIST::const_iterator
 	 p=alarmlist().begin();  p!=alarmlist().end();  ++p) {
-    if (!p->in_range()) {
-      _out << p->label() << '=' << p->value() << '\n';
+    if (!(*p)->in_range()) {
+      _out << (*p)->label() << '=' << (*p)->value() << '\n';
     }else{
     }
   }
@@ -131,8 +236,14 @@ void SIM::store_results(double x)
   int ii = 0;
   for (PROBELIST::const_iterator
 	 p=storelist().begin();  p!=storelist().end();  ++p) {
-    _sim->_waves[ii++].push(x, p->value());
+    if(_wavep[ii]){
+      _wavep[ii]->push(x, (*p)->value());
+    }else{
+      // unneeded.
+    }
+    ++ii;
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

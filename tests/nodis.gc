@@ -1,0 +1,10 @@
+spice
+* check how discontinuities propagte
+
+v1 n1 0 pulse iv=0 pv=2 delay=.5 width=1 fall=.5
+c1 n3 n1 1
+c2 0 n2 1
+
+.print tran v(n1) dis(n*) method(c*)
+.tran 0 3 3 trace=a
+.end

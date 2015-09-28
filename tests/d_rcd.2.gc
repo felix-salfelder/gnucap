@@ -1,0 +1,44 @@
+spice
+.options numdgt 9
+.load rcd_sym.so
+.options ttcorr=true
+
+.model my_rcd rcd_exp
+
+.options initsc 1
+
+.verilog
+my_rcd #(.weight(1) .rc0(0) .rc1(-1) .re0(-1) .re1(1) ) z3( nin, 0);
+
+spice
+
+V1 nin 0 1
+
+.param period=1
+.param width=1
+.param delay=1n
+
+.print tran
++stress(z*)
++v(nin)
++e(z*)
++p(z*)
+
+.print tt p(z*)
++e(z*)
++order(z*)
++ueff(z*)
+
+.echo A
+.ttr 0 16m 4m 1m 4m new tran > debug_pfet_age_tr.out echo
+
+.tw 1m 4m 20m new tran > debug_pfet_age_tr.out echo
+.echo B
+.tw 1m 4m 12m new tran noage > debug_pfet_age_tr.out echo
+
+.echo C
+.options ttcorr=false
+.tw 1m 4m 20m new tran > debug_pfet_age_tr.out echo
+
+.status notime
+.end

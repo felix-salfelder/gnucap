@@ -1,4 +1,4 @@
-/*$Id: e_storag.h,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
+/*$Id: e_storag.h,v 1.3 2010-07-16 08:22:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,7 +26,7 @@
 #define E_STORAGE_H
 #include "e_elemnt.h"
 /*--------------------------------------------------------------------------*/
-enum METHOD {mTRAPGEAR, mEULER, mTRAP, mGEAR, mTRAPEULER};
+//enum METHOD {mTRAPGEAR, mEULER, mTRAP, mGEAR, mTRAPEULER};
 /*--------------------------------------------------------------------------*/
 INTERFACE FPOLY1 differentiate(const FPOLY1* q, const FPOLY1* i, double* time,
 		     METHOD method);
@@ -45,9 +45,11 @@ public: // override virtual
   void	   precalc_last();
   void     tr_begin();
   void     tr_restore();
+  void     tr_adapt();
+  virtual void    tr_init(double) { unreachable(); }
   void     dc_advance();
   void     tr_advance();
-  //void   tr_regress();	//ELEMENT
+  void     tr_regress();
   bool	   tr_needs_eval()const;
   //void   tr_queue_eval()	//ELEMENT
   TIME_PAIR tr_review();
@@ -56,15 +58,16 @@ public:
   double   tr_c_to_g(double c, double g)const;
 private:
   int	   order()const {
-    const int o[] = {1, 1, 2, 1, 1};
-    int ord = o[_method_a];
+    const int o[] = {0, 1, 1, 2, 1, 1};
+    int ord = o[_method_a+1];
     assert(ord < OPT::_keep_time_steps);
-    return ord;
+    return min(ord,ELEMENT::order());
   }
   double   error_factor()const {
     const double f[]={1./2., 1./2., 1./12., 1./6., 1./2.};
     return f[_method_a];
   }
+  bool uic_now()const {return _sim->uic_now() && has_ic();}
 public: // used by commons
   method_t _method_u;	/* method to use for this part per user */
   METHOD   _method_a;	/* actual integration method (auto)	*/
@@ -72,7 +75,28 @@ protected:
   FPOLY1   _i[OPT::_keep_time_steps]; /* deriv of _q */
 protected:
   static METHOD method_select[meNUM_METHODS][meNUM_METHODS];
+  void set_ic(double); // protected?? bug??
+public:
+  double* set__ic();
+  bool has_memory(){return true;}
+  void keep_ic();
+
 };
+
+/*--------------------------------------------------------------------------*/
+
+// storage should do. I might use this to be sure
+class INTERFACE STORAGE_HEADLESS : public STORAGE {
+  public:
+    explicit STORAGE_HEADLESS()			
+      :STORAGE() {}
+    explicit STORAGE_HEADLESS(const STORAGE_HEADLESS& p)
+      :STORAGE(p){}
+    ~STORAGE_HEADLESS() {}
+};
+
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

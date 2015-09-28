@@ -1,4 +1,4 @@
-/*$Id: lang_spectre.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: lang_spectre.cc 2015/01/27 al $ -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+//testing=script 2015.01.27
+#include "globals.h"
 #include "c_comand.h"
 #include "d_dot.h"
 #include "d_coment.h"
@@ -30,14 +32,16 @@ namespace {
 /*--------------------------------------------------------------------------*/
 class LANG_SPECTRE : public LANGUAGE {
 public:
+  LANG_SPECTRE()  {}
+  ~LANG_SPECTRE() {}
   std::string name()const {return "spectre";}
   bool case_insensitive()const {return false;}
   UNITS units()const {return uSI;}
 
 public: // override virtual, used by callback
-  std::string arg_front()const {return " ";}
-  std::string arg_mid()const {return "=";}
-  std::string arg_back()const {return "";}
+  std::string arg_front()const {unreachable();return " ";}
+  std::string arg_mid()const {unreachable();return "=";}
+  std::string arg_back()const {unreachable();return "";}
 
 public: // override virtual, called by commands
   void		parse_top_item(CS&, CARD_LIST*);
@@ -46,7 +50,7 @@ public: // override virtual, called by commands
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*);
   MODEL_SUBCKT* parse_module(CS&, MODEL_SUBCKT*);
   COMPONENT*	parse_instance(CS&, COMPONENT*);
-  std::string	find_type_in_string(CS&);
+  std::string	find_type_in_string(CS&) const;
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*);
@@ -54,8 +58,11 @@ private: // override virtual, called by print_item
   void print_instance(OMSTREAM&, const COMPONENT*);
   void print_comment(OMSTREAM&, const DEV_COMMENT*);
   void print_command(OMSTREAM& o, const DEV_DOT* c);
+  string getlines(FILE *fileptr) const;
 private: // local
   void print_args(OMSTREAM&, const CARD*);
+  static void parse_args(CS& cmd, CARD* x);
+  void parse_ports(CS& cmd, COMPONENT* x) const;
 } lang_spectre;
 
 DISPATCHER<LANGUAGE>::INSTALL
@@ -70,7 +77,7 @@ static void parse_type(CS& cmd, CARD* x)
   x->set_dev_type(new_type);
 }
 /*--------------------------------------------------------------------------*/
-static void parse_args(CS& cmd, CARD* x)
+void LANG_SPECTRE::parse_args(CS& cmd, CARD* x)
 {
   assert(x);
   
@@ -80,8 +87,9 @@ static void parse_args(CS& cmd, CARD* x)
     cmd >> '=';
     std::string value = cmd.ctos("", "(", ")");
     try{
+      trace2("parse_args", name, value);
       x->set_param_by_name(name, value);
-    }catch (Exception_No_Match&) {untested();
+    }catch (Exception_No_Match&) {
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
   }
@@ -95,40 +103,49 @@ static void parse_label(CS& cmd, CARD* x)
   x->set_label(my_name);
 }
 /*--------------------------------------------------------------------------*/
-static void parse_ports(CS& cmd, COMPONENT* x)
+void LANG_SPECTRE::parse_ports(CS& cmd, COMPONENT* x) const
 {
   assert(x);
 
+  uint_t index = 0;
   if (cmd >> '(') {
-    int index = 0;
     while (cmd.is_alnum()) {
       unsigned here = cmd.cursor();
       try{
 	std::string value;
 	cmd >> value;
 	x->set_port_by_index(index++, value);
-      }catch (Exception_Too_Many& e) {untested();
+      }catch (Exception_Too_Many& e) {
 	cmd.warn(bDANGER, here, e.message());
       }
     }
     cmd >> ')';
   }else{
     unsigned here = cmd.cursor();
-    OPT::language->find_type_in_string(cmd);
+    string s = find_type_in_string(cmd);
+    bool sub = (s=="subckt");
     unsigned stop = cmd.cursor();
+    trace4("LANG_SPECTRE::parse_ports no paren", x->long_label(), s, cmd.tail(), stop);
     cmd.reset(here);
+    trace1("LANG_SPECTRE::parse_ports here", cmd.tail());
 
-    int index = 0;
-    while (cmd.cursor() < stop) {
+    while (cmd.cursor() < stop || ( sub && cmd.is_alnum())) {
       here = cmd.cursor();
       try{
 	std::string value;
 	cmd >> value;
 	x->set_port_by_index(index++, value);
-      }catch (Exception_Too_Many& e) {untested();
+      }catch (Exception_Too_Many& e) {
 	cmd.warn(bDANGER, here, e.message());
       }
     }
+  }
+  if (index < x->min_nodes()) {
+    cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
+    for (uint_t iii = index;  iii < x->min_nodes();  ++iii) {
+      x->set_port_to_ground(iii);
+    }
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -147,7 +164,7 @@ DEV_DOT* LANG_SPECTRE::parse_command(CS& cmd, DEV_DOT* x)
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
   cmd.reset().skipbl();
-  if ((cmd >> "model |simulator |parameters |subckt ")) {
+  if ((cmd >> "model |simulator |parameters |subckt |list |eval |include ")) {
     cmd.reset();
     CMD::cmdproc(cmd, scope);
   }else{
@@ -208,6 +225,7 @@ MODEL_SUBCKT* LANG_SPECTRE::parse_module(CS& cmd, MODEL_SUBCKT* x)
 /*--------------------------------------------------------------------------*/
 COMPONENT* LANG_SPECTRE::parse_instance(CS& cmd, COMPONENT* x)
 {
+  assert(x);
   cmd.reset();
   parse_label(cmd, x);
   parse_ports(cmd, x);
@@ -217,17 +235,17 @@ COMPONENT* LANG_SPECTRE::parse_instance(CS& cmd, COMPONENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
-std::string LANG_SPECTRE::find_type_in_string(CS& cmd)
+std::string LANG_SPECTRE::find_type_in_string(CS& cmd) const
 {
   // known to be not always correct
 
   cmd.reset().skipbl();
   unsigned here = 0;
   std::string type;
-  if ((cmd >> "*|//")) {itested();
+  if ((cmd >> "*|//")) {
     assert(here == 0);
     type = "dev_comment";
-  }else if ((cmd >> "model |simulator |parameters |subckt ")) {
+  }else if ((cmd >> "model |simulator |parameters |subckt |list |include |eval ")) {
     // type is first, it's a control statement
     type = cmd.trimmed_last_match();
   }else if (cmd.reset().skiparg().match1("(") && cmd.scan(")")) {
@@ -236,7 +254,7 @@ std::string LANG_SPECTRE::find_type_in_string(CS& cmd)
     here = cmd.cursor();
     cmd.reset(here);
     cmd >> type;
-  }else if (cmd.reset().scan("=")) {itested();
+  }else if (cmd.reset().scan("=")) {
     // back up two, by starting over
     cmd.reset().skiparg();
     unsigned here1 = cmd.cursor();
@@ -306,11 +324,11 @@ static void print_ports(OMSTREAM& o, const COMPONENT* x)
 
   o << " (";
   std::string sep = "";
-  for (int ii = 0;  x->port_exists(ii);  ++ii) {
+  for (uint_t ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep << x->port_value(ii);
     sep = " ";
   }
-  for (int ii = 0;  x->current_port_exists(ii);  ++ii) {
+  for (uint_t ii = 0;  x->current_port_exists(ii);  ++ii) {untested();
     o << sep << x->current_port_value(ii);
     sep = " ";
   }
@@ -355,13 +373,60 @@ void LANG_SPECTRE::print_instance(OMSTREAM& o, const COMPONENT* x)
 void LANG_SPECTRE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 {
   assert(x);
+  if (x->comment()[0] != '*') {
+    o << "*";
+  }else{untested();
+  }
   o << x->comment() << '\n';
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPECTRE::print_command(OMSTREAM& o, const DEV_DOT* x)
-{
+{untested();
   assert(x);
   o << x->s() << '\n';
+}
+/*--------------------------------------------------------------------------*/
+std::string LANG_SPECTRE::getlines(FILE *fileptr) const
+{
+  assert(fileptr);
+  const int buffer_size = BIGBUFLEN;
+  std::string s;
+
+  bool need_to_get_more = true;  // get another line (extend)
+  while (need_to_get_more) {
+    char buffer[buffer_size+1];
+    char* got_something = fgets(buffer, buffer_size, fileptr);
+    if (!got_something) { // probably end of file
+      need_to_get_more = false;
+      if (s == "") {
+	throw Exception_End_Of_Input("");
+      }else{untested();
+      }
+    }else{
+      trim(buffer);
+      size_t count = strlen(buffer);
+      if(count==0){
+      }else if (buffer[count-1] == '\\') {itested();
+        buffer[count-1] = '\0';
+      }else{
+        // look ahead at next line
+        //int c = fgetc(fileptr);
+
+        int c;
+        while (isspace(c = fgetc(fileptr)));
+		  assert(c!='\n');
+        if (c == '+') {
+          need_to_get_more = true;
+        }else{
+          need_to_get_more = false;
+          ungetc(c,fileptr);
+        }
+      }
+      s += buffer;
+      s += ' ';
+    }
+  }
+  return s;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -378,14 +443,14 @@ class CMD_MODEL : public CMD {
     const CARD* p = lang_spectre.find_proto(base_name, NULL);
     if (p) {
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(p->clone());
-      if (exists(new_card)) {
+      if (new_card) {
 	assert(!new_card->owner());
 	lang_spectre.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
-      }else{	//BUG// memory leak
+      }else{untested();
 	cmd.warn(bDANGER, here, "model: base has incorrect type");
       }
-    }else{
+    }else{untested();
       cmd.warn(bDANGER, here, "model: no match");
     }
   }
@@ -426,3 +491,4 @@ DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spectre", &p8);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

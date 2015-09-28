@@ -1,4 +1,4 @@
-/*$Id: e_base.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: e_base.cc 2015/01/27 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,12 +21,15 @@
  *------------------------------------------------------------------
  * Base class for "cards" in the circuit description file
  */
-//testing=script 2006.07.12
+//testing=script 2014.07.04
+#include "ap.h"
 #include "u_sim_data.h"
 #include "m_wave.h"
 #include "u_prblst.h"
 #include "u_xprobe.h"
 #include "e_base.h"
+#include <typeinfo>
+#include "ap.h"
 /*--------------------------------------------------------------------------*/
 static char fix_case(char c)
 {
@@ -34,42 +37,88 @@ static char fix_case(char c)
 }
 /*--------------------------------------------------------------------------*/
 double CKT_BASE::tr_probe_num(const std::string&)const {return NOT_VALID;}
+double CKT_BASE::tt_probe_num(const std::string&)const {return NOT_VALID;}
 XPROBE CKT_BASE::ac_probe_ext(const std::string&)const {return XPROBE(NOT_VALID, mtNONE);}
+XPROBE CKT_BASE::sens_probe_ext(const std::string&)const {
+  trace1("CKT_BASE::sens_probe_ext", typeid(*this).name());
+  return XPROBE(NOT_VALID, mtNONE);
+}
 /*--------------------------------------------------------------------------*/
-SIM_DATA sim_data;
-SIM_DATA* CKT_BASE::_sim = &sim_data;
+SIM_DATA* CKT_BASE::_sim = NULL;
+PROBE_LISTS* CKT_BASE::_probe_lists = NULL;
+/*--------------------------------------------------------------------------*/
+double	CKT_BASE::tt_behaviour =  0;
+double	CKT_BASE::tr_behaviour_del =  0;
+double	CKT_BASE::tr_behaviour_rel =  0;
+double	CKT_BASE::tt_behaviour_del =  0;
+double	CKT_BASE::tt_behaviour_rel =  0;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
 {
   trace1("~CKT_BASE", _probes);
-  PROBE_LISTS::purge(this);
-  trace1("", _probes);
-  assert(_probes==0);
+  if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
+  }else if (!_sim) {untested();
+  }else{
+    _probe_lists->purge(this);
+  }
 }
 /*--------------------------------------------------------------------------*/
 const std::string CKT_BASE::long_label()const
 {
+  trace0("CKT_BASE::long_label");
   //incomplete();
   std::string buffer(short_label());
-  //for (const CKT_BASE* brh = owner(); exists(brh); brh = brh->owner()) {
+  //for (const CKT_BASE* brh = owner(); exists(brh); brh = brh->owner()) {untested();
   //  buffer += '.' + brh->short_label();
   //}
   return buffer;
 }
 /*--------------------------------------------------------------------------*/
+bool CKT_BASE::help(CS& Cmd, OMSTREAM& Out)const
+{
+  if (help_text() != "") {
+    unsigned here = Cmd.cursor();
+    std::string keyword;
+    Cmd >> keyword;
+    CS ht(CS::_STRING, help_text());
+    if (keyword == "") {
+      Out << ht.get_to("@@");
+    }else if (ht.scan("@@" + keyword + ' ')) {
+      Out << ht.get_to("@@");
+    }else if (keyword == "?") {
+      while (ht.scan("@@")) {
+	Out << "  " << ht.get_to("\n") << '\n';
+      }
+    }else{
+      Cmd.warn(bWARNING, here, "no help on subtopic " + Cmd.substr(here));
+    }
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
 double CKT_BASE::probe_num(const std::string& what)const
 {
+  trace2("CKT_BASE::probe_num", what, long_label());
   double x;
-  if (_sim->analysis_is_ac()) {
+  if (_sim->analysis_is_tt()){
+    x = tt_probe_num(what) ;
+  }else  if (_sim->analysis_is_ac()) {
+    x = ac_probe_num(what);
+  }else  if (_sim->analysis_is_sens()) {
     x = ac_probe_num(what);
   }else{
     x = tr_probe_num(what);
   }
-  return (std::abs(x)>=1) ? x : floor(x/OPT::floor + .5) * OPT::floor;
+  // FIXME, HACK
+  return x; // (std::abs(x)>=1) ? x : floor(x/OPT::floor + .5) * OPT::floor;
 }
 /*--------------------------------------------------------------------------*/
 double CKT_BASE::ac_probe_num(const std::string& what)const
 {
+  trace1("CKT_BASE::ac_probe_num", what);
   size_t length = what.length();
   mod_t modifier = mtNONE;
   bool want_db = false;
@@ -93,15 +142,19 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   
   // "p" is "what" with the modifier chopped off.
   // Try that first.
-  XPROBE xp = ac_probe_ext(parameter);
+  XPROBE xp(0);
+  if (_sim->analysis_is_ac()) {
+    xp = XPROBE(ac_probe_ext(parameter));
+  } else {
+    xp = XPROBE(sens_probe_ext(parameter));
+  }
 
   // If we don't find it, try again with the full string.
   if (!xp.exists()) {
     xp = ac_probe_ext(what);
     if (!xp.exists()) {
       // Still didn't find anything.  Print "??".
-    }else{
-      untested();
+    }else{untested();
       // The second attempt worked.
     }
   }
@@ -110,27 +163,92 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
 /*--------------------------------------------------------------------------*/
 /*static*/ double CKT_BASE::probe(const CKT_BASE *This, const std::string& what)
 {
-  if (exists(This)) {
+  if (This) {
     return This->probe_num(what);
   }else{				/* return 0 if doesn't exist */
     return 0.0;				/* happens when optimized models */
   }					/* don't have all parts */
 }
 /*--------------------------------------------------------------------------*/
+/*static*/ WAVE_LIST& CKT_BASE::create_waves(const std::string& coll_name)
+{
+  assert(_sim);
+  _sim->_label = coll_name;
+  return _sim->_waves[coll_name];
+}
+/*--------------------------------------------------------------------------*/
+/*static*/ WAVE_LIST* CKT_BASE::find_waves(const std::string& coll_name)
+{
+  std::map<std::string,WAVE_LIST>::iterator i;
+  string n = coll_name;
+  if (0 && OPT::case_insensitive) { untested();
+    notstd::to_upper(&n);
+  }else{
+  }
+  i = _sim->_waves.find(n);
+  if(i!=_sim->_waves.end()){
+    return &i->second;
+  }else{
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+/*static*/ WAVE& CKT_BASE::create_wave(const std::string& wave_name, std::string coll_name)
+{
+  assert(_sim);
+  if(coll_name==""){untested();
+    coll_name = _sim->_label;
+  }else{
+  }
+  std::string n = wave_name;
+  if (OPT::case_insensitive) {
+    notstd::to_upper(&n);
+  }else{ untested();
+  }
+  return _sim->_waves[coll_name][n];
+}
+/*--------------------------------------------------------------------------*/
 /*static*/ WAVE* CKT_BASE::find_wave(const std::string& probe_name)
 {
-  int ii = 0;
-  for (PROBELIST::const_iterator
-       p  = PROBE_LISTS::store[_sim->_mode].begin();
-       p != PROBE_LISTS::store[_sim->_mode].end();
-       ++p) {
-    if (wmatch(p->label(), probe_name)) {
-      return &(_sim->_waves[ii]);
-    }else{
-    }
-    ++ii;
+  trace2("find_wave", probe_name, _sim->_label);
+  std::map<std::string,WAVE>* w = &_sim->_waves[_sim->_label];
+  std::map<std::string,WAVE>::iterator i;
+  string n = probe_name;
+  if (OPT::case_insensitive) {
+    notstd::to_upper(&n);
+  }else{ untested();
   }
+  i = w->find(n);
+  if(i!=_sim->_waves[_sim->_label].end()){
+    return &i->second;
+  }else{
+  }
+  std::string prefix;
+  std::string suffix;
+  CS cmd(CS::_STRING, probe_name);
+  prefix = cmd.ctos(":");
+
+  if(_sim->_waves.find(prefix) == _sim->_waves.end()) {
+    return NULL;
+  }else{
+  }
+
+  cmd >> ":";
+  suffix = cmd.ctos("");
+  if (OPT::case_insensitive) {
+    notstd::to_upper(&suffix);
+  }else{untested();
+  }
+  trace0(("\"" + prefix + "\":\"" + suffix + "\"").c_str());
+  i = _sim->_waves[prefix].find(suffix);
+  if(i!=_sim->_waves[prefix].end()){
+    return &i->second;
+  }
+
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
+bool CKT_BASE::operator!=(const std::string& n)const {return strcasecmp(_label.c_str(),n.c_str())!=0;}
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

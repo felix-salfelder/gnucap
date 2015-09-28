@@ -1,0 +1,19 @@
+spice
+
+* V1 0 in1 pulse iv=0 pv=1 delay=0 rise=1m
+.options initsc 1
+.verilog
+brl #(.l(1) .ic(1)) lb(in1,0);
+spice
+R1 in1 0 100
+
+L1 in2 0 1 ic=1
+R1 in2 0 100
+
+.print tran v(in1) i(r1) i(l*) v(l*) vin(l*) y(l*) flux(l*) hidden(0) v(l*)
+.print dc   v(in1) i(r1) i(l*) v(l*) vin(l*) y(l*) flux(l*) hidden(0) v(l*)
+
+.dc uic
+
+.tran 0 10m 10m trace=a cont
+.end

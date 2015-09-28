@@ -1,4 +1,4 @@
-/*$Id: bm_sffm.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_sffm.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -49,6 +49,8 @@ private:
   PARAMETER<double> _samples;
   PARAMETER<bool>   _zero;
   PARAMETER<bool>   _peak;
+  // static map<string, PARA_BASE EVAL_BM_SIN::*> param_dict;
+  void set_param_by_name(string /*Name*/, string /*Value*/){incomplete();}
   explicit	EVAL_BM_SFFM(const EVAL_BM_SFFM& p);
 public:
   explicit      EVAL_BM_SFFM(int c=0);
@@ -60,7 +62,7 @@ private: // override vitrual
 
   void		precalc_first(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
-  TIME_PAIR	tr_review(COMPONENT*);
+  TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "sffm";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
@@ -109,9 +111,6 @@ bool EVAL_BM_SFFM::operator==(const COMMON_COMPONENT& x)const
     && _zero == p->_zero
     && _peak == p->_peak
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -152,17 +151,15 @@ void EVAL_BM_SFFM::tr_eval(ELEMENT* d)const
   tr_finish_tdv(d, ev);
 }
 /*--------------------------------------------------------------------------*/
-TIME_PAIR EVAL_BM_SFFM::tr_review(COMPONENT* d)
+TIME_PAIR EVAL_BM_SFFM::tr_review(COMPONENT* d)const
 {
   double time = d->_sim->_time0 + d->_sim->_dtmin * .01;
   double old_time;
   double N = 0;
-  double old_N;
   trace2("", time, N);
   do {
     // simple fixed point iteration to find peaks and zero crossings
     old_time = time;
-    old_N = N;
     double mod = (_modindex * sin(M_TWO_PI * _signal * time));
     double inst_freq = _carrier * (1 + mod / (M_TWO_PI * _carrier * time));
     if (N == 0) {
@@ -236,3 +233,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "sffm", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,4 +1,5 @@
-/*$Id: measure_eval.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: measure_eval.cc,v 1.3 2010-09-17 12:26:00 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -27,18 +28,28 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class MEASURE : public FUNCTION {
+class EVAL : public FUNCTION_BASE {
+PARAMETER<double> arg;
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const
+  string label()const {return "eval";}
+  fun_t eval(CS& Cmd, const CARD_LIST* Scope)const
   {
-    PARAMETER<double> arg;
-    Cmd >> arg;
+    USE(Cmd);
+    trace1("EVAL::eval", (string)Cmd);
     arg.e_val(BIGBIG, Scope);
-    return to_string(double(arg));
+     // std::cout << to_string(double(arg));
+    return to_fun_t(double(arg));
   }
+  void expand(CS& Cmd, const CARD_LIST*){
+    Cmd >> arg;
+    trace2("EVAL::expand", (string)Cmd, arg);
+
+  } 
+  virtual FUNCTION_BASE* clone()const { return new EVAL(*this);}
 } p1;
-DISPATCHER<FUNCTION>::INSTALL d1(&measure_dispatcher, "eval", &p1);
+DISPATCHER<FUNCTION_BASE>::INSTALL d1(&measure_dispatcher, "eval", &p1);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

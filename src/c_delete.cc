@@ -1,4 +1,4 @@
-/*$Id: c_delete.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: c_delete.cc,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -122,3 +122,4 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "delete|rm", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

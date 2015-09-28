@@ -1,0 +1,24 @@
+spice
+
+
+.model pd sw vt=0 vh=1 ron=1e-12 roff=1e12
+sw 1 2 1 0 pd
+
+v1 1 0 pulse iv=0 pv=pv delay=1 rise=2
+.param pv=4
+
+r1 2 3 1k
+c1 3 0 100u
+
+.print tran v(nodes) disc(1) disc(2)
++ s0(sw) s1(sw)
++ method(c1)
++ hidden(0)
+
+.tran 0 6 6 trace=a > s.out echo
+.status notime
+
+.options method traponly
+.tran 0 6 6 trace=a > t.out echo
+.status notime
+.end

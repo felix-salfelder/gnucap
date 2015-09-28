@@ -1,0 +1,13 @@
+spice
+
+Vvmid nmid 0 2.5
+r1 nmid 0 1
+
+.list
+
+.alter r1=3
+.alter r1=1
+.print tran v(nodes)
+
+.tran 0 1 0.1
+.end

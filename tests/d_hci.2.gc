@@ -1,0 +1,55 @@
+// n type inv amp w/hci
+spice
+
+.options TEMP=25
+*.options trace
+.options nottcorr
+
+*.include inv_amp_p.mod
+.param vdd=2.7
+
+
+.param cmosn_hci=1e-3
+.param cmosp_hci=0
+.param cmosn_bti=none
+.param cmosp_bti=none
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.0E-08 BETA0 = 12
++ H0 = cmosp_hci
++ bti_model=cmosp_bti
++ )
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ vth0=2
++ H0 = cmosn_hci
++ bti_model=cmosn_bti
++ )
+
+R1 nout ndd 10
+MN1 nout nin 0 0 cmosn l=1.5e-7 w=4.5e-6
+
+* weird
+R1 nout2 0 9k
+
+c1 nout 0 10p
+
+VDD ndd 0 vdd
+
+.param risefall=.1u
+
+Rin np nin 1k
+vin np 0 pulse (iv=0 pv=vdd rise=risefall fall=risefall width=10u delay=2u period=20u)
+
+.print tran hidden(0) v(nin) v(nout) vth(MN1) stress(MN1.HCI) age(0) hci(MN1.hci)
+.tran 0 20u 1u age trace=n
+
+.print tw dvth(MN1) dvth(MN1.hci) vth(MN1) von(MN1) hci(MN1.hci) control(0)
+.print tran clear
+.ttr 0 100u 20u 10u * 2 new trace=v
+
+.status notime
+.end

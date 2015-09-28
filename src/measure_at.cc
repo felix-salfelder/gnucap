@@ -1,4 +1,5 @@
-/*$Id: measure_at.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: measure_at.cc,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,48 +27,57 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class MEASURE : public FUNCTION {
+class MEASURE : public WAVE_FUNCTION {
+  PARAMETER<double> x;
+  bool derivative;
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const
-  {
-    std::string probe_name;
-    PARAMETER<double> x;
-    bool derivative = false;
-
+  MEASURE() :
+    WAVE_FUNCTION(),
+    derivative(false)
+  {}
+  virtual FUNCTION_BASE* clone()const { return new MEASURE(*this);}
+  string label() const{return "at";}
+  void expand(CS& Cmd, const CARD_LIST* Scope){
     unsigned here = Cmd.cursor();
     Cmd >> probe_name;
-    WAVE* w = find_wave(probe_name);
+    _w = find_wave(probe_name);
 
-    if (!w) {
+    if (!_w) {
       Cmd.reset(here);
     }else{
     }
+    x = BIGBIG;
+    derivative=false;
 
     here = Cmd.cursor();
     do {
       ONE_OF
-	|| Get(Cmd, "probe",	    &probe_name)
-	|| Get(Cmd, "x",	    &x)
-	|| Get(Cmd, "at",	    &x)
-	|| Get(Cmd, "deriv{ative}", &derivative)
-	;
+        || Get(Cmd, "probe",	    &probe_name)
+        || Get(Cmd, "x",	    &x)
+        || Get(Cmd, "at",	    &x)
+        || Get(Cmd, "deriv{ative}", &derivative)
+        ;
     }while (Cmd.more() && !Cmd.stuck(&here));
 
-    if (!w) {
-      w = find_wave(probe_name);
+    if (!_w) {
+      _w = find_wave(probe_name);
     }else{
     }
-    
-    if (w) {
-      x.e_val(BIGBIG, Scope);
-      return to_string((derivative) ? (w->v_out(x).f1) : (w->v_out(x).f0));
+    x.e_val(BIGBIG, Scope);
+  }
+/*--------------------------------------------------------------------------*/
+  fun_t wave_eval()const
+  {
+    if (_w) {
+      return to_fun_t((derivative) ? (_w->v_out(x).f1) : (_w->v_out(x).f0));
     }else{
       throw Exception_No_Match(probe_name);
     }
   }
 } p1;
-DISPATCHER<FUNCTION>::INSTALL d1(&measure_dispatcher, "at", &p1);
+DISPATCHER<FUNCTION_BASE>::INSTALL d1(&measure_dispatcher, "at", &p1);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

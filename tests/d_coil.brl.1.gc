@@ -1,0 +1,13 @@
+spice
+
+
+.brl l1 0 1 1.111 ic=1
+R1 0 1 1
+
+l2 0 2 1.111 ic=1
+R2 0 2 1
+
+.print tran v(nodes) i(r*) i(l*)
+.dc uic
+.tran 0 1 0.1 cont
+.end

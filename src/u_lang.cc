@@ -1,4 +1,4 @@
-/*$Id: u_lang.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: u_lang.cc 2015/01/27 al $ -*- C++ -*-
  * Copyright (C) 2006 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -19,6 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+// testing=script 2015.01.27
+#include "globals.h"
 #include "c_comand.h"
 #include "d_dot.h"
 #include "d_coment.h"
@@ -26,14 +28,56 @@
 #include "e_model.h"
 #include "u_lang.h"
 /*--------------------------------------------------------------------------*/
+LANGUAGE::~LANGUAGE()
+{
+  if (OPT::language == this) {
+    OPT::language = NULL;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string LANGUAGE::getlines(FILE *fileptr) const
+{
+  // probably missing getlines in your current lang.
+  assert(fileptr);
+  const int buffer_size = BIGBUFLEN;
+
+  char buffer[buffer_size+1];
+  char* got_something = fgets(buffer, buffer_size, fileptr);
+
+  if (got_something)
+	  return std::string(got_something);
+  throw Exception_End_Of_Input("");
+}
+/*--------------------------------------------------------------------------*/
 void LANGUAGE::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.get_line(I_PROMPT);
   CMD::cmdproc(cmd, Scope);
+  trace0("done top item");
+}
+/*--------------------------------------------------------------------------*/
+const CARD* LANGUAGE::find_card(string name, CARD_LIST* Scope, bool nondevice) {
+  if (!Scope) Scope = &CARD_LIST::card_list;
+  CARD_LIST::const_iterator i = Scope->find_(name);
+  if(nondevice){
+    while (i!=Scope->end()) {
+      if((*i)->is_device()){
+        i = Scope->find_again(name, ++i); // skip
+      } else {
+        break;
+      }
+    }
+  }
+  if (i == Scope->end()) {
+    throw Exception_Cant_Find(name, "scope");
+  }
+  return *i;
 }
 /*--------------------------------------------------------------------------*/
 const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
 {
+  trace1("LANGUAGE::find_proto", Name);
   const CARD* p = NULL;
   if (Scope) {
     try {
@@ -50,13 +94,18 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     }
   }
   
-  if (p) {itested();
+  if (p) {
+    trace1("LANGUAGE::find_proto found something", prechecked_cast<const COMPONENT*>(p));
+    trace1("LANGUAGE::find_proto found something", prechecked_cast<const MODEL_CARD*>(p));
     return p;
-  }else if ((p = command_dispatcher[Name])) {
+  }else if ((command_dispatcher[Name])) {
+    trace1("command_dispatcher", Name);
     return new DEV_DOT;	//BUG// memory leak
   }else if ((p = device_dispatcher[Name])) {
+    trace0("LANGUAGE::find_proto found device " +Name);
     return p;
   }else if ((p = model_dispatcher[Name])) {
+    trace0("LANGUAGE::find_proto found model " +Name);
     return p;
   }else{
     assert(!p);
@@ -75,6 +124,8 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     else if (Umatch(Name, "st{atus} "))     {            s = "status";}
     else if (Umatch(Name, "te{mperature} ")){untested(); s = "temperature";}
     else if (Umatch(Name, "tr{ansient} "))  {            s = "transient";}
+    else if (Umatch(Name, "tw{otimetran} ")){            s = "twotimetran";}
+    else if (Umatch(Name, "ttr "))          {            s = "twotimetran";}
     else if (Umatch(Name, "!"))		    {untested(); s = "system";}
     else if (Umatch(Name, "<"))		    {untested(); s = "<";}
     else if (Umatch(Name, ">"))		    {untested(); s = ">";}
@@ -82,6 +133,7 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
       s = Name;
     }
     if ((command_dispatcher[s])) {
+      trace1("command_dispatcher", Name);
       return new DEV_DOT; //BUG// we will look it up twice, //BUG// memory leak
     }else{
       return NULL;
@@ -91,18 +143,24 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::new__instance(CS& cmd, MODEL_SUBCKT* owner, CARD_LIST* Scope)
 {
+  trace4("LANGUAGE::new__instance", cmd.fullstring(), name(), hp(Scope), owner);
+
   if (cmd.is_end()) {
     // nothing
   }else{
     std::string type = find_type_in_string(cmd);
+
     if (const CARD* proto = find_proto(type, owner)) {
+      trace3("LANGUAGE::new__instance", type, name(), prechecked_cast<const DEV_DOT*>(proto));
       CARD* new_instance = proto->clone_instance();
+      trace2("LANGUAGE::new__instance", hp(owner), (owner?int(hp(owner->scope())):0));
       assert(new_instance);
       new_instance->set_owner(owner);
       CARD* x = parse_item(cmd, new_instance);
       if (x) {
 	assert(Scope);
 	Scope->push_back(x);
+        trace3("LANGUAGE::new__instance pushback", x->long_label(), hp(Scope), hp(x->scope()));
       }else{
       }
     }else{
@@ -113,6 +171,7 @@ void LANGUAGE::new__instance(CS& cmd, MODEL_SUBCKT* owner, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
 {
+  trace1("LANGUAGE::parse_item", cmd.fullstring());
   // See Stroustrup 15.4.5
   // If you can think of a better way, tell me.
   // It must be in the LANGUAGE class, not CARD.
@@ -120,12 +179,15 @@ CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
   if (dynamic_cast<MODEL_SUBCKT*>(c)) {
     return parse_module(cmd, prechecked_cast<MODEL_SUBCKT*>(c));
   }else if (dynamic_cast<COMPONENT*>(c)) {
+    trace0("LANGUAGE::parse_item: COMPONENT");
     return parse_instance(cmd, prechecked_cast<COMPONENT*>(c));
   }else if (dynamic_cast<MODEL_CARD*>(c)) {
+    trace0("LANGUAGE::parse_item: MODEL_CARD");
     return parse_paramset(cmd, prechecked_cast<MODEL_CARD*>(c));
   }else if (dynamic_cast< DEV_COMMENT*>(c)) {
     return parse_comment(cmd, prechecked_cast<DEV_COMMENT*>(c));
   }else if (dynamic_cast<DEV_DOT*>(c)) {
+    trace0("LANGUAGE::parse_item: DEV_DOT");
     return parse_command(cmd, prechecked_cast<DEV_DOT*>(c));
   }else{untested();
     incomplete();
@@ -158,22 +220,22 @@ void LANGUAGE::print_item(OMSTREAM& o, const CARD* c)
   }
 }
 /*--------------------------------------------------------------------------*/
-OMSTREAM& operator<<(OMSTREAM& o, LANGUAGE* x)
-{
-  if (x) {
-    return (o << x->name());
-  }else{
-    return (o << "none");
-  }
-}
-/*--------------------------------------------------------------------------*/
 bool Get(CS& cmd, const std::string& key, LANGUAGE** val)
 {
   if (cmd.umatch(key + " {=}")) {
     LANGUAGE* lang = language_dispatcher[cmd];
     if (lang) {
       *val = lang;
-    }else{
+    }else{untested();
+      std::string choices;
+      for(DISPATCHER<LANGUAGE>::const_iterator
+	  i = language_dispatcher.begin(); i != language_dispatcher.end(); ++i) {untested();
+	if (i->second) {untested();
+	  choices += i->first + ' ';
+	}else{untested();
+	}
+      }
+      cmd.warn(bWARNING, "need a language (" + choices + ")");
     }
     return true;
   }else{
@@ -182,3 +244,4 @@ bool Get(CS& cmd, const std::string& key, LANGUAGE** val)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:sw=2:ts=8:noet:

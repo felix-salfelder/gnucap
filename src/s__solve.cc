@@ -1,4 +1,4 @@
-/*$Id: s__solve.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,11 +21,11 @@
  *------------------------------------------------------------------
  * solve one step of a transient or dc analysis
  */
-//testing=script 2006.07.14
 #include "e_cardlist.h"
 #include "u_status.h"
 #include "e_node.h"
 #include "s__.h"
+#include "io_matrix.h"
 /*--------------------------------------------------------------------------*/
 //	bool	SIM::solve(int,int);
 //	void	SIM::finish_building_evalq();
@@ -41,17 +41,20 @@ static bool converged = false;
 /*--------------------------------------------------------------------------*/
 bool SIM::solve(OPT::ITL itl, TRACE trace)
 {
+  trace1("SIM::solve", trace);
   converged = false;
   int convergedcount = 0;
   
   _sim->reset_iteration_counter(iSTEP);
   advance_time();
 
-  _sim->_damp = OPT::dampmax;
+  _sim->_damp = OPT::dampmax; // default 1.0
  
   do{
-    if (trace >= tITERATION) {
-      print_results(static_cast<double>(-_sim->iteration_number()));
+    if (( trace & (tMATRIX-1) ) >= tITERATION) {
+      trace1("SIM::solve results", _sim->sim_mode());
+      SIM::print_results(static_cast<double>(-_sim->iteration_number()));
+      // Hack: Added SIM:: / print_results has been overloade but puts out the wrong data
     }
     set_flags();
     clear_arrays();
@@ -82,28 +85,45 @@ bool SIM::solve(OPT::ITL itl, TRACE trace)
     if (!converged || !OPT::fbbypass || _sim->_damp < .99) {
       set_damp();
       load_matrix();
-      solve_equations();
+      assert(_sim->_loadq.empty());
+      trace0("solve_equations");
+      try{
+        solve_equations(trace);
+      }catch(Exception e){
+       error(bWARNING, "%s\n", e.message().c_str());
+       return false;
+      }
+
+      trace0("solve_equations done");
     }
   }while (!converged && !_sim->exceeds_iteration_limit(itl));
 
+  //for(unsigned int y=0; y<_sim->_loadq.size(); y++) {
+    //untested0( ("after solve loadq " + _sim->_loadq[y]->long_label()).c_str() );
+  //}
   return converged;
 }
 /*--------------------------------------------------------------------------*/
 bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
 {
   solve(itl, trace);
-  trace2("plain", ::status.iter[iSTEP], OPT::gmin);
+  trace3("plain", _sim->_iter[iSTEP], OPT::gmin, converged);
   if (!converged && OPT::itl[OPT::SSTEP] > 0) {
     int save_itermin = OPT::itermin;
     OPT::itermin = 0;
     double save_gmin = OPT::gmin;
-    OPT::gmin = 1;
+    OPT::gmin = .9;
     while (_sim->_iter[iPRINTSTEP] < OPT::itl[OPT::SSTEP] && OPT::gmin > save_gmin) {
       //CARD_LIST::card_list.precalc();
       _sim->set_inc_mode_no();
+      trace2("again... ", _sim->_iter[iSTEP], OPT::gmin);
       solve(itl, trace);
       if (!converged) {
 	trace2("fail", _sim->_iter[iSTEP], OPT::gmin);
+	if (OPT::gmin*OPT::shortckt > 1){
+	  error(bDANGER, "ramping failed at gmin=%E\n", OPT::gmin);
+	  break;
+	}
 	OPT::gmin *= 3.5;
       }else{
 	trace2("success", _sim->_iter[iSTEP], OPT::gmin);
@@ -142,19 +162,23 @@ void SIM::finish_building_evalq(void)
 /*--------------------------------------------------------------------------*/
 void SIM::advance_time(void)
 {
-  ::status.advance.start();
   static double last_iter_time;
+  trace2("SIM::advance_time()", _sim->_time0, last_iter_time);
+  ::status.advance.start();
   if (_sim->_time0 > 0) {
+    _sim->_nstat[0].set_discont(disNONE);
     if (_sim->_time0 > last_iter_time) {	/* moving forward */
       notstd::copy_n(_sim->_v0, _sim->_total_nodes+1, _sim->_vt1);
       CARD_LIST::card_list.tr_advance();
-    }else{				/* moving backward */
+    }else{
+      /* moving backward */
       /* don't save voltages.  They're wrong! */
       /* instead, restore a clean start for iteration */
       notstd::copy_n(_sim->_vt1, _sim->_total_nodes+1, _sim->_v0);
       CARD_LIST::card_list.tr_regress();
     }
   }else{
+    trace1("SIM::advance_time dc_adv.", _sim->_time0);
     CARD_LIST::card_list.dc_advance();
   }
   last_iter_time = _sim->_time0;
@@ -191,17 +215,23 @@ void SIM::set_flags()
 /*--------------------------------------------------------------------------*/
 void SIM::clear_arrays(void)
 {
+  trace0("SIM::clear_arrays");
   if (!_sim->is_inc_mode()) {			/* Clear working array */
     _sim->_aa.zero();
     _sim->_aa.dezero(OPT::gmin);		/* gmin fudge */
+    trace2("SIM::clear_arrays ", _sim->_aa.size(), hp(_sim->_i) );
+    assert(_sim->_i);
+    assert(_sim->_aa.size()<=_sim->_total_nodes);
     std::fill_n(_sim->_i, _sim->_aa.size()+1, 0);
   }
+  trace0("loadq clear");
   _sim->_loadq.clear();
 }
 /*--------------------------------------------------------------------------*/
 void SIM::evaluate_models()
 {
   ::status.evaluate.start();
+  _sim->_nstat[0].set_discont(disNONE);
   if (OPT::bypass) {
     converged = true;
     swap(_sim->_evalq, _sim->_evalq_uc);
@@ -231,43 +261,82 @@ void SIM::set_damp()
   }else{
     _sim->_damp = OPT::dampmax;
   }
-  trace1("", _sim->_damp);
+  trace1("SIM::set_damp", _sim->_damp);
 }
 /*--------------------------------------------------------------------------*/
 void SIM::load_matrix()
 {
   ::status.load.start();
   if (OPT::traceload && _sim->is_inc_mode()) {
+    trace0("SIM::load_matrix loading some");
     while (!_sim->_loadq.empty()) {
       _sim->_loadq.back()->tr_load();
       _sim->_loadq.pop_back();
     }
   }else{
+    trace0("SIM::load_matrix loading all :( ");
     _sim->_loadq.clear();
     CARD_LIST::card_list.tr_load();
   }
   ::status.load.stop();
 }
 /*--------------------------------------------------------------------------*/
-void SIM::solve_equations()
+#ifndef NDEBUG
+static double* v0;
+unsigned init_vectors;
+#endif
+void SIM::solve_equations(TRACE trace)
 {
+#ifndef NDEBUG
+  if (init_vectors!=_sim->_total_nodes+1) {
+    delete[] v0;
+    v0 = new double[_sim->_total_nodes+1];
+    init_vectors = _sim->_total_nodes+1;
+  }
+#endif
+
+  trace1("SIM::solve_equations", trace);
+  if(trace & tMATRIX /* && printhere */) {
+    _out << "\n--- aa -------\n" <<  _sim->_aa << "\n--- i ----\n";
+    for (unsigned i=0; i<_sim->_total_nodes; ++i){
+      _out << _sim->_i[i+1] << ", ";
+    }
+    _out << "\n-----\n";
+  }
+
   ::status.lud.start();
   _sim->_lu.lu_decomp(_sim->_aa, bool(OPT::lubypass && _sim->is_inc_mode()));
   ::status.lud.stop();
 
+#ifndef NDEBUG
+  notstd::copy_n(_sim->_v0, _sim->_total_nodes+1, v0);
+#endif
   ::status.back.start();
   _sim->_lu.fbsub(_sim->_v0, _sim->_i, _sim->_v0);
   ::status.back.stop();
-  
+
+  _sim->_dxm = 0;
+  for(unsigned i=0;i<=_sim->_total_nodes; ++i){
+    if (!is_number(_sim->_v0[i])) {
+      assert(i); // cannot happen in gnd
+      throw(Exception("cannot solve linear equation, encountered nan in " + to_string(i)));
+    }
+#ifndef NDEBUG
+    _sim->_dxm = std::max(_sim->_dxm, fabs(_sim->_v0[i] - v0[i]));
+#endif
+  }
+
   if (_sim->_nstat) {
     // mixed mode
-    for (int ii = _sim->_lu.size(); ii >= 1; --ii) {
+    for (unsigned ii = _sim->_lu.size(); ii >= 1; --ii) {
+//      _sim->_nstat[ii].set_discont(disNONE);
       _sim->_nstat[ii].set_a_iter();
+//      assert(!_sim->_nstat[ii].discont());
     }
-  }else{
+  }else{ untested();
     // pure analog
-    untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

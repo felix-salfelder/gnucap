@@ -1,4 +1,4 @@
-/*$Id: bm.cc,v 26.132 2009/11/24 04:26:37 al Exp $ -*- C++ -*-
+/*$Id: bm.cc 2015/01/21 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,6 +26,8 @@
 #include "e_elemnt.h"
 #include "bm.h"
 /*--------------------------------------------------------------------------*/
+using std::map;
+/*--------------------------------------------------------------------------*/
 const double _default_bandwidth	(NOT_INPUT);
 const double _default_delay	(0.);
 const double _default_phase	(0.);
@@ -34,7 +36,7 @@ const double _default_ioffset	(0.);
 const double _default_scale	(1.);
 const double _default_tc1	(0.);
 const double _default_tc2	(0.);
-const double _default_ic	(0.);
+const double _default_ic	(NOT_INPUT);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 EVAL_BM_ACTION_BASE::EVAL_BM_ACTION_BASE(int c)
@@ -74,9 +76,12 @@ double EVAL_BM_ACTION_BASE::temp_adjust()const
 void EVAL_BM_ACTION_BASE::tr_final_adjust(FPOLY1* y, bool f_is_value)const
 {
   if (f_is_value) {
-    y->f1 = y->f0;
+    y->f1 = y->f0; // used by vs as value(now)...
     y->f0 = 0.;
   }else{
+	 // f0==offset
+	 // f1==linear coefficient
+    y->f1 += _ooffset;
   }
   *y *= temp_adjust();
   y->f0 += _ooffset;
@@ -88,13 +93,14 @@ void EVAL_BM_ACTION_BASE::tr_finish_tdv(ELEMENT* d, double val)const
   tr_final_adjust(&(d->_y[0]), false);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_ACTION_BASE::ac_final_adjust(COMPLEX* y)const
+template <class T>
+void EVAL_BM_ACTION_BASE::ac_final_adjust(T* y)const
 {
   if (_bandwidth != NOT_INPUT && _bandwidth != 0.) {untested();
     assert(y->imag() == 0);
-    double ratio = CKT_BASE::_sim->_freq / _bandwidth;
-    double coeff = y->real() / (1.+(ratio*ratio));
-    *y = COMPLEX(coeff, -coeff * ratio);
+    double ratio = _sim->_freq / _bandwidth;
+    double coeff = double( y->real() / (1.+(ratio*ratio)));
+    *y = T(coeff, -coeff * ratio);
   }else{
   }
   
@@ -104,7 +110,7 @@ void EVAL_BM_ACTION_BASE::ac_final_adjust(COMPLEX* y)const
   }
 
   if (_delay != 0.) {untested();
-    double ratio = CKT_BASE::_sim->_freq * _delay;
+    double ratio = _sim->_freq * _delay;
     if (ratio > 100000.) {untested();
       error(bPICKY, "delay too long\n");
       ratio = 0.;
@@ -115,10 +121,34 @@ void EVAL_BM_ACTION_BASE::ac_final_adjust(COMPLEX* y)const
   }
 }
 /*--------------------------------------------------------------------------*/
+template <class T>
+void EVAL_BM_ACTION_BASE::ac_final_adjust_with_temp(T* y)const
+{
+  *y *= temp_adjust();
+  ac_final_adjust(y);
+}
+/*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::ac_final_adjust_with_temp(COMPLEX* y)const
 {
   *y *= temp_adjust();
   ac_final_adjust(y);
+}
+void EVAL_BM_ACTION_BASE::ac_final_adjust_with_temp(std::complex<long double>* y)const
+{
+  *y *= temp_adjust();
+  ac_final_adjust(y);
+}
+/*--------------------------------------------------------------------------*/
+inline bool EVAL_BM_BASE::operator==(const COMMON_COMPONENT&x)const
+{
+  if (this==&x) { untested();
+    return true;
+  }else{
+  }
+  /* incomplete(); */
+  return 0;
+  /* breaks param.13.gc */
+  return COMMON_COMPONENT::operator==(x);
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
@@ -135,9 +165,6 @@ bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
     && _tc2 == p->_tc2
     && _ic == p->_ic
     && EVAL_BM_BASE::operator==(x);
-  if (rv) {untested();
-  }else{
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -168,6 +195,16 @@ void EVAL_BM_ACTION_BASE::precalc_first(const CARD_LIST* Scope)
   _tc1.e_val(_default_tc1, Scope);
   _tc2.e_val(_default_tc2, Scope);
   _ic.e_val(_default_ic, Scope);
+
+  trace1("EVAL_BM_ACTION_BASE::precalc_first ", _ic);
+
+}
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
+{
+  assert(Scope);
+  COMMON_COMPONENT::precalc_first(Scope);
+  _ic.e_val(_default_ic, Scope);
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::ac_eval(ELEMENT* d)const 
@@ -177,8 +214,32 @@ void EVAL_BM_ACTION_BASE::ac_eval(ELEMENT* d)const
   ac_final_adjust(&(d->_ev));
 }
 /*--------------------------------------------------------------------------*/
+map<string, PARA_BASE EVAL_BM_ACTION_BASE::*> EVAL_BM_ACTION_BASE::_param_dict =
+  boost::assign::map_list_of
+  ("bandwidth",(PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_bandwidth)
+  ("delay",    (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_delay)
+  ("phase",    (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_phase)
+  ("ioffset",  (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_ioffset)
+  ("ooffset",  (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_ooffset)
+  ("scale",    (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_scale)
+  ("tc1",      (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_tc1)
+  ("tc2",      (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_tc2)
+  ("ic",       (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_ic);
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_ACTION_BASE::set_param_by_name(string Name, string Value)
+{
+  PARA_BASE EVAL_BM_ACTION_BASE::* x = _param_dict[Name];
+  if(x) {
+    PARA_BASE* p = &(this->*x);
+    *p = Value;
+  }else{
+    COMMON_COMPONENT::set_param_by_name(Name, Value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(CS& cmd)
 {
+  trace1("EVAL_BM_ACTION_BASE::parse_params_obsolete_callback", cmd.tail());
   return ONE_OF
     || Get(cmd, "bandwidth",&_bandwidth)
     || Get(cmd, "delay",    &_delay)
@@ -208,17 +269,22 @@ bool EVAL_BM_ACTION_BASE::has_ext_args()const
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT* EVAL_BM_ACTION_BASE::parse_func_type(CS& cmd)
 {
-  const COMMON_COMPONENT* p = 
-    (cmd.is_float() || cmd.match1('_') || cmd.skip1b('='))
-    ? bm_dispatcher["eval_bm_value"]
-    : bm_dispatcher[cmd];
+  const COMMON_COMPONENT* p;
+  if (cmd.is_float() || cmd.match1('_') || cmd.skip1b('=')) {
+    p = bm_dispatcher["eval_bm_value"];
+  }else{
+    p = bm_dispatcher[cmd];
+  }
 
   if (p) {
     p->skip_type_tail(cmd);
-    return p->clone();
+    COMMON_COMPONENT* q = p->clone();
+	 q->parse_type_tail(cmd);
+	 return q;
   }else{
     return NULL;
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

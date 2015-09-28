@@ -1,0 +1,62 @@
+spice
+* p type inv amp w/bti
+.options TEMP=25
+.options ttsteporder 3
+
+.option nopicky
+
+.load rcd_sym.so
+.options ttstepgrow=2
+.options ttsteporder=3
+
+.param pulse_iv=0
+.param pulse_rise=1n
+
+.param voff=0.4
+.model my_rcdmodel rcd_exp
+
+.param vdd=5
+R1 0 nctrl 100k
+.ttcap c1 nctrl 0 1u ic=2.1
+
+.print dc v(nodes) v(c1)
+
+.print tran v(nodes) v(c1) hidden(0) ttstate(c1) ttmeth(c1)
++ charge(c1)
+
+.print tw
++ v(nctrl)
++ hidden(0)
++ ttmeth(c1)
++ ttstep(c1)
++ ttord(c1)
++ ttstdt(c1)
++ ttdelta(c1)
++ ttgain(0)
++ control(0)
+
+.dc uic
+.tran 0 1 1 cont trace=a > lp_tran.out
+
+.dc uic
+.tw 10u .1m 1 * 2 new trace=n basic > lp_tt.out echo tran cont trace=n > lp_tr.out
+
+.echo >> lp_tt.out
+.tw 0 new
+.dc uic
+.tw 10u .1m 1 * 1.5 new trace=n basic >> lp_tt.out echo tran cont trace=n >> lp_tr.out
+.status notime
+
+.echo >> lp_tt.out
+.tw 0 new
+.dc uic
+.tw 10u .1m 1 * 1.05 new trace=n basic >> lp_tt.out echo tran cont trace=n >> lp_tr.out
+.status notime
+
+.echo >> lp_tt.out
+.tw 0 new
+.dc uic
+.ttr 0 .1 .1m 1u .1m new trace=n basic >> lp_tt.out echo tran cont trace=n >> lp_tr.out
+.stat notime
+
+.end

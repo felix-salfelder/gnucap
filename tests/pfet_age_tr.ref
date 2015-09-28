@@ -1,0 +1,73 @@
+bti_noage= 34.46709n
+bti_noage= 3.653511u
+age 
+bti_age= 387.2721u
+bti2= 32.10609n
+tran storelist 
+        dvth(MP1.BTI) dvth(MP1.BTI)
+wavelist 
+tran (6)
+DVTH(MP1) (0),
+DVTH(MP1.BTI) (0),
+ISCALE(MP1.BTI) (0),
+MAX(MYM) (0),
+STRESS(MP1.BTI) (0),
+TAU(MP1.BTI.RCD0) (0)
+.wave dump "dvth(MP1.BTI)" 
+           ^ ? what's this?
+        dvth(MP1) dvth(MP1.BTI) tau(MP1.BTI.RCD0) stress(MP1.BTI) max(mym) dvth(MP1.BTI) iscale(MP1.BTI)
+cowardly refusing to register twice: dvth(MP1.BTI) at index 1
+#Time       dvth(MP1)  dvth(MP1.BTI) tau(MP1.BTI.RCD0) stress(MP1.BTI) max(mym)   dvth(MP1.BTI) iscale(MP1.BTI)
+ 0.         0.         0.         1.3196E+3  0.5       -Inf        0.        -1.        
+ 1.E-6      0.         100.3E-12  1.317E+3   0.50197    4.7307E-9  100.3E-12 -1.        
+ 2.E-6      100.3E-12  201.3E-12  1.3093E+3  0.50786    4.7307E-9  201.3E-12 -1.        
+ 3.E-6      201.3E-12  303.2E-12  1.2965E+3  0.51769    4.7307E-9  303.2E-12 -1.        
+ 4.E-6      303.2E-12  406.6E-12  1.2789E+3  0.53137    4.7307E-9  406.6E-12 -1.        
+ 5.E-6      406.6E-12  511.7E-12  1.2567E+3  0.5489     4.7307E-9  511.7E-12 -1.        
+ 15.556E-6  511.7E-12  2.1543E-9  849.32     0.94067    4.7307E-9  2.1543E-9 -1.        
+ 26.111E-6  2.1543E-9  5.2351E-9  452.81     1.5696     4.7307E-9  5.2351E-9 -1.        
+ 40.889E-6  5.2351E-9  14.558E-9  209.5      2.3404     0.0033345  14.558E-9 -1.        
+ 55.667E-6  14.558E-9  24.83E-9   190.12     2.4374     0.0045763  24.83E-9  -1.        
+ 77.833E-6  24.83E-9   29.886E-9  579.44     1.3231     0.0045763  29.886E-9 -1.        
+ 100.E-6    29.886E-9  32.106E-9  1.3196E+3  0.50003    0.0045763  32.106E-9 -1.        
+posttran 
+ (0), *tran (1)
+DVTH(MP1.BTI) (12)
+ 0.         0.        
+ 1.u        100.35p   
+ 2.u        201.29p   
+ 3.u        303.22p   
+ 4.u        406.57p   
+ 5.u        511.73p   
+ 15.556u    2.1543n   
+ 26.111u    5.2351n   
+ 40.889u    14.558n   
+ 55.667u    24.83n    
+ 77.833u    29.886n   
+ 100.u      32.106n   
+bti3= 32.10609n
+cowardly refusing to register twice: dvth(MP1.BTI) at index 1
+cowardly refusing to register twice: dvth(MP1.BTI) at index 2
+cowardly refusing to register twice: dvth(MP1.BTI) at index 3
+#Time       dvth(MP1)  dvth(MP1.BTI) tau(MP1.BTI.RCD0) stress(MP1.BTI) max(mym)   dvth(MP1.BTI) iscale(MP1.BTI)
+ 0.         0.         0.         1.3196E+3  0.5       -Inf        0.        -1.        
+ 1.E-6      0.         100.3E-12  1.317E+3   0.50197    4.7307E-9  100.3E-12 -1.        
+ 2.E-6      0.         201.3E-12  1.3093E+3  0.50786    4.7307E-9  201.3E-12 -1.        
+ 3.E-6      0.         303.2E-12  1.2965E+3  0.51769    4.7307E-9  303.2E-12 -1.        
+ 4.E-6      0.         406.6E-12  1.2789E+3  0.53137    4.7307E-9  406.6E-12 -1.        
+ 5.E-6      0.         511.7E-12  1.2567E+3  0.5489     4.7307E-9  511.7E-12 -1.        
+ 15.556E-6  0.         2.1543E-9  849.32     0.94067    4.7307E-9  2.1543E-9 -1.        
+ 26.111E-6  0.         5.2351E-9  452.81     1.5696     4.7307E-9  5.2351E-9 -1.        
+ 40.889E-6  0.         14.558E-9  209.5      2.3404     0.0033345  14.558E-9 -1.        
+ 55.667E-6  0.         24.83E-9   190.12     2.4374     0.0045763  24.83E-9  -1.        
+ 77.833E-6  0.         29.886E-9  579.44     1.3231     0.0045763  29.886E-9 -1.        
+ 100.E-6    0.         32.106E-9  1.3196E+3  0.50003    0.0045763  32.106E-9 -1.        
+bti3= 32.10609n
+tran storelist (this is a bug) 
+        dvth(MP1.BTI) dvth(MP1.BTI) dvth(MP1.BTI) dvth(MP1.BTI)
+Gnucap   System status
+iterations: op=0, dc=0, tran=50, fourier=0, total=1761
+transient timesteps: accepted=354, rejected=0, total=354
+twotime timesteps: accepted=0, rejected=0, total=0
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=87.5%, ac density=87.5%

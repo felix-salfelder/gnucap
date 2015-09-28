@@ -1,0 +1,10 @@
+spice
+
+* BUG: where does the trailing space come from?!
+.echo hello world
+
+.echo .echo hello world > echo.tmp.out
+.echo .echo 42 >> echo.tmp.out
+
+.include echo.tmp.out
+.end

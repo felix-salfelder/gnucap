@@ -1,4 +1,4 @@
-/*$Id: bm_exp.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_exp.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -46,6 +46,7 @@ private:
   PARAMETER<double> _tau2;	// fall time constant
   PARAMETER<double> _period;	// repeat period
   PARAMETER<double> _end;	// marks the end of the list
+  static map<string, PARA_BASE EVAL_BM_EXP::*> param_dict;
   explicit	EVAL_BM_EXP(const EVAL_BM_EXP& p);
 public:
   explicit      EVAL_BM_EXP(int c=0);
@@ -57,10 +58,11 @@ private: // override vitrual
 
   void		precalc_first(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
-  TIME_PAIR	tr_review(COMPONENT*);
+  TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "exp";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
+  void      set_param_by_name(string N, string V);
   bool		parse_params_obsolete_callback(CS&);
 };
 /*--------------------------------------------------------------------------*/
@@ -103,10 +105,29 @@ bool EVAL_BM_EXP::operator==(const COMMON_COMPONENT& x)const
     && _tau2== p->_tau2
     && _period== p->_period
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
+}
+/*--------------------------------------------------------------------------*/
+map<string, PARA_BASE EVAL_BM_EXP::*> EVAL_BM_EXP::param_dict = 
+  boost::assign::map_list_of
+    ("iv",    (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_iv)
+    ("pv",    (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_pv)
+    ("td1",   (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_td1)
+    ("tau1",  (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_tau1)
+    ("td2",   (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_td2)
+    ("tau2",  (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_tau2)
+    ("period",(PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_period)
+    ("period",(PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_period);
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_EXP::set_param_by_name(std::string Name, std::string Value)
+{ untested();
+  PARA_BASE EVAL_BM_EXP::* x = (param_dict[Name]);
+  if(x) {
+    PARA_BASE* p = &(this->*x);
+    *p = Value;
+  } else {
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_EXP::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
@@ -152,7 +173,7 @@ void EVAL_BM_EXP::tr_eval(ELEMENT* d)const
   tr_finish_tdv(d, ev);
 }
 /*--------------------------------------------------------------------------*/
-TIME_PAIR EVAL_BM_EXP::tr_review(COMPONENT* d)
+TIME_PAIR EVAL_BM_EXP::tr_review(COMPONENT* d)const
 {
   double time = d->_sim->_time0;
   time += d->_sim->_dtmin * .01;  // hack to avoid duplicate events from numerical noise
@@ -223,3 +244,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "exp", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

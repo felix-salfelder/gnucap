@@ -1,0 +1,83 @@
+// p type inv amp w/hci
+spice
+
+.options TEMP=25
+*.options trace
+
+*.include inv_amp_p.mod
+.param vdd=2.7
+
+
+.param cmosn_hci=1
+.param cmosp_hci=0
+.param cmosn_bti=none
+.param cmosp_bti=none
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.0E-08 BETA0 = 12
++ H0 = cmosp_hci
++ bti_model=cmosp_bti
++ )
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = cmosn_hci
++ bti_model=cmosn_bti
++ )
+
+MP1 nout nin ndd ndd cmosp l=1.5e-7 w=4.5e-6
+*MN1 0 nin nout 0 cmosn l=1.5e-7 w=4.5e-6
+MN1 nout nin 0 0 cmosn l=1.5e-7 w=4.5e-6
+
+* weird
+* MNweird ndd nin nout2 0 cmosn l=1.5e-7 w=4.5e-6
+R1 nout2 0 9k
+
+c1 nout 0 10p
+
+VDD ndd 0 vdd
+
+.param risefall=2u
+
+Rin np nin 1k
+vin np 0 pulse (iv=0 pv=vdd rise=risefall fall=risefall width=10u delay=2u period=20u)
+
+.verilog
+measm nomax(nout,0);
+spice
+
+.print tran hidden(0) v(nin)
++ v(nout)
++ ids(MN1)
++ idb(MN1)
++ stress(MN*.hci)
++ dtr(MN1.HCI)
+.store tran stress(MN*.hci) hidden(0)
+
+.echo #k risefall hci fine  > hcisweep.out
+.echo >hci_auto_tr.out
+.echo >hci_1_sweep.out
+
+* bug at k= -6.263158.. hmmm
+.param k
+.sweep 20 k -11 -6
+.param risefall {10^k}
+.tran 0 7u 7u age trace=a >> hci_auto_tr.out
+
+.measure hci_int=integral("stress(MN1.hci)") > /dev/null
+.param hci=hci_int*1e18
+
+.tran 0 7u .01u age trace=a >> hci_auto_tr.out
+
+.measure hci_int_fine=integral("stress(MN1.hci)") > /dev/null
+.param hci_fine=hci_int_fine*1e18
+.param delta=hci-hci_fine
+.param rel=hci/hci_fine
+
+.printf "%f %f %f %f %f\n", k, hci, hci_fine, delta, rel, >> hci_1_sweep.out echo
+
+go
+.status notime
+.end

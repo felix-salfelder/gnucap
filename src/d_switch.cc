@@ -1,4 +1,4 @@
-/*$Id: d_switch.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: d_switch.cc,v 1.6 2010-07-09 12:14:22 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -33,27 +33,33 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-  enum state_t {_UNKNOWN, _ON, _OFF};
+using std::string;
+/*--------------------------------------------------------------------------*/
+  enum state_t {_UNKNOWN=0, _ON=1, _OFF=2};
 /*--------------------------------------------------------------------------*/
 class COMMON_SWITCH : public COMMON_COMPONENT {
 private:
   explicit COMMON_SWITCH(const COMMON_SWITCH& p)
-    :COMMON_COMPONENT(p), _ic(p._ic) {}
+    :COMMON_COMPONENT(p), ic(p.ic), _ic(p._ic) {}
 public:
   explicit COMMON_SWITCH(int c=0) 
-    :COMMON_COMPONENT(c), _ic(_UNKNOWN) {}
+    :COMMON_COMPONENT(c), ic(0), _ic(_UNKNOWN) {}
   bool operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const {return new COMMON_SWITCH(*this);}
   std::string name()const	 {untested(); return "switch";}
 
   bool		param_is_printable(int)const;
   std::string	param_name(int)const;
+  void		set_param_by_name(string, string);
   std::string	param_name(int,int)const;
   std::string	param_value(int)const;
   int param_count()const {return (1 + COMMON_COMPONENT::param_count());}
 public:
+  void precalc_last(const CARD_LIST* par_scope);
+public:
+  PARAMETER<int> ic;
+public: // calculated params
   state_t	_ic;		/* initial state, belongs in common */
-  //BUG// no way to set _ic
 };
 /*--------------------------------------------------------------------------*/
 class SWITCH_BASE : public ELEMENT {
@@ -64,11 +70,11 @@ protected: // override virtual
   std::string value_name()const	{return "";}
   std::string dev_type()const {assert(common()); return common()->modelname().c_str();}
   bool	   print_type_in_spice()const {return true;}
-  int	   tail_size()const	{return 1;}
-  int	   max_nodes()const	= 0;
-  int	   min_nodes()const	= 0;
-  int	   matrix_nodes()const	{return 2;}
-  int	   net_nodes()const	= 0;
+  uint_t	   tail_size()const	{return 1;}
+  uint_t	   max_nodes()const	= 0;
+  uint_t	   min_nodes()const	= 0;
+  uint_t	   matrix_nodes()const	{return 2;}
+  uint_t	   net_nodes()const	= 0;
   CARD*	   clone()const		= 0;
   void     expand();
   void     precalc_last();
@@ -77,23 +83,31 @@ protected: // override virtual
   void     dc_advance();
   void     tr_advance();
   void     tr_regress();
-  bool	   tr_needs_eval()const {return _sim->analysis_is_static();} // also q by tr_advance
+  bool     tr_needs_eval()const {return _sim->analysis_is_static();} // also q by tr_advance
   bool	   do_tr();
   void	   tr_load()		{tr_load_passive();}
   TIME_PAIR tr_review();
   void	   tr_unload()		{untested(); tr_unload_passive();}
-  double   tr_involts()const	{untested(); return tr_outvolts();}
-  double   tr_involts_limited()const {unreachable(); return tr_outvolts_limited();}
+  hp_float_t   tr_involts()const {return tr_outvolts();}
+  hp_float_t   tr_involts_limited()const {unreachable(); return tr_outvolts_limited();}
   void	   ac_iwant_matrix()	{ac_iwant_matrix_passive();}
   void	   ac_begin()		{_ev = _y[0].f1; _acg = _m0.c1;}
   void	   do_ac();
   void	   ac_load()		{ac_load_passive();}
   COMPLEX  ac_involts()const	{untested(); return ac_outvolts();}
+  double tr_probe_num(const std::string& x)const;
+  void     do_tt() { q_tt_accept(); }
+  void     tt_advance();
+  void     tt_regress();
+  TIME_PAIR tt_review();
+  void     tt_accept();
 protected:
   const ELEMENT* _input;
 private:
   double	_in[OPT::_keep_time_steps];
+  double	_in_tt[2];
   state_t	_state[OPT::_keep_time_steps];
+  state_t	_state_tt[2];
 };
 /*--------------------------------------------------------------------------*/
 class DEV_VSWITCH : public SWITCH_BASE {
@@ -102,14 +116,14 @@ private:
 public:
   explicit  DEV_VSWITCH()	:SWITCH_BASE() {}
 private: // override virtual
-  int	    max_nodes()const	{return 4;}
-  int	    min_nodes()const	{return 4;}
-  int	    net_nodes()const	{return 4;}
+  uint_t	    max_nodes()const	{return 4;}
+  uint_t	    min_nodes()const	{return 4;}
+  uint_t	    net_nodes()const	{return 4;}
   CARD*	    clone()const	{return new DEV_VSWITCH(*this);}
   char	    id_letter()const	{return 'S';}
 
-  std::string port_name(int i)const {itested();
-    assert(i >= 0);
+  std::string port_name(uint_t i)const {itested();
+    assert(i != INVALID_NODE);
     assert(i < 4);
     static std::string names[] = {"p", "n", "ps", "ns"};
     return names[i];
@@ -123,28 +137,28 @@ private:
 public:
   explicit  DEV_CSWITCH()	:SWITCH_BASE(), _input_label() {}
 private: // override virtual
-  int	    max_nodes()const	{return 3;}
-  int	    ext_nodes()const	{return 2;}
-  int	    min_nodes()const	{return 3;}
-  int	    net_nodes()const	{return 2;}
-  int	    num_current_ports()const {return 1;}
-  const std::string current_port_value(int)const {return _input_label;};
+  uint_t	    max_nodes()const	{return 3;}
+  uint_t	    ext_nodes()const	{return 2;}
+  uint_t	    min_nodes()const	{return 3;}
+  uint_t	    net_nodes()const	{return 2;}
+  uint_t	    num_current_ports()const {return 1;}
+  const std::string current_port_value(uint_t)const {return _input_label;};
   CARD*	    clone()const	{return new DEV_CSWITCH(*this);}
   void	    expand();
   char	    id_letter()const	{return 'W';}
   void	   set_port_by_name(std::string& Name, std::string& Value)
 		{untested(); SWITCH_BASE::set_port_by_name(Name,Value);}
-  void	   set_port_by_index(int, std::string&);
-  bool	   node_is_connected(int)const;
+  void	   set_port_by_index(uint_t, std::string&);
+  bool	   node_is_connected(uint_t)const;
 
-  std::string port_name(int i)const {itested();
-    assert(i >= 0);
+  std::string port_name(uint_t i)const {itested();
+    assert(i != INVALID_NODE);
     assert(i < 2);
     static std::string names[] = {"p", "n"};
     return names[i];
   }
-  std::string current_port_name(int i)const {
-    assert(i >= 0);
+  std::string current_port_name(uint_t i)const {
+    assert(i != INVALID_NODE);
     assert(i < 1);
     static std::string names[] = {"in"};
     return names[i];
@@ -163,6 +177,7 @@ private: // override virtual
   std::string	dev_type()const;
   CARD*		clone()const	{return new MODEL_SWITCH(*this);}
   void		precalc_first();
+//  void		set_param_by_name(string, string); // not yet
   void		set_param_by_index(int, std::string&, int);
   bool		param_is_printable(int)const;
   std::string	param_name(int)const;
@@ -194,7 +209,9 @@ double const MODEL_SWITCH::_default_roff = 1e12;
 bool COMMON_SWITCH::operator==(const COMMON_COMPONENT& x)const
 {
   const COMMON_SWITCH* p = dynamic_cast<const COMMON_SWITCH*>(&x);
-  return p && COMMON_COMPONENT::operator==(x);
+  return p
+    && ic == p->ic
+    && COMMON_COMPONENT::operator==(x);
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_SWITCH::param_is_printable(int i)const
@@ -202,6 +219,16 @@ bool COMMON_SWITCH::param_is_printable(int i)const
   switch (COMMON_SWITCH::param_count() - 1 - i) {
   case 0:  return (_ic == _ON || _ic == _OFF);
   default: return COMMON_COMPONENT::param_is_printable(i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_SWITCH::set_param_by_name(string Name, string Value)
+{
+  if (Umatch (Name,"ic")) {
+    ic = Value;
+    trace4("COMMON_SWITCH::set_param_by_name", Name, Value, hp(this), ic);
+  }else{ untested();
+    return COMMON_COMPONENT::set_param_by_name(Name, Value);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -225,10 +252,24 @@ std::string COMMON_SWITCH::param_name(int i, int j)const
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_SWITCH::param_value(int i)const
-{itested();
+{
   switch (COMMON_SWITCH::param_count() - 1 - i) {
   case 0:  return (_ic == _ON) ? "1" : "0";
   default: return COMMON_COMPONENT::param_value(i);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_SWITCH::precalc_last(const CARD_LIST* par_scope)
+{
+  assert(par_scope);
+  COMMON_COMPONENT::precalc_last(par_scope);
+  ic.e_val(0, par_scope);
+
+  if (ic.has_hard_value()){
+    _ic = (ic)?_ON:_OFF;
+    trace2("COMMON_SWITCH::precalc_last", _ic, ic);
+  }else{
+    trace3("COMMON_SWITCH::precalc_last no hard value", _ic, ic, hp(this));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -325,30 +366,16 @@ bool MODEL_SWITCH::param_is_printable(int i)const
 /*--------------------------------------------------------------------------*/
 std::string MODEL_SWITCH::param_name(int i)const
 {
-  switch (type) {
-  case VOLTAGE:
-    switch (MODEL_SWITCH::param_count() - 1 - i) {
-    case 0: return "vt";
-    case 1: return "vh";
-    case 2: return "von";
-    case 3: return "voff";
+  string p = (type==VOLTAGE)?"v":"i";
+  switch (MODEL_SWITCH::param_count() - 1 - i) {
+    case 0: return p+"t";
+    case 1: return p+"h";
+    case 2: return p+"on";
+    case 3: return p+"off";
     case 4: return "ron";
     case 5: return "roff";
     default: return MODEL_CARD::param_name(i);
-    }
-  case CURRENT:
-    switch (MODEL_SWITCH::param_count() - 1 - i) {
-    case 0: return "it";
-    case 1: return "ih";
-    case 2: return "ion";
-    case 3: return "ioff";
-    case 4: return "ron";
-    case 5: return "roff";
-    default: return MODEL_CARD::param_name(i);
-    }
   }
-  unreachable();
-  return "";
 }
 /*--------------------------------------------------------------------------*/
 std::string MODEL_SWITCH::param_name(int i, int j)const
@@ -418,6 +445,7 @@ void SWITCH_BASE::precalc_last()
     assert(c);
     const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
     assert(m);
+    trace1("SWITCH_BASE::precalc_last", c->_ic);
     _y1.f1 = _y[0].f1 = (c->_ic == _ON) ? m->ron : m->roff;	// override, unknown is off
     
     assert(!is_constant()); // depends on input
@@ -450,6 +478,11 @@ void SWITCH_BASE::tr_begin()
   _m0.c1 = 1./_y[0].f1;
   assert(_m0.c0 == 0.);
   _m1 = _m0;
+  if (c->_ic!=_UNKNOWN) {
+//    _in[0] = m->vt + (3-2*c->_ic) * m->vh;
+    q_load();
+  }
+
   _state[1] = _state[0] = c->_ic;
   set_converged();
 }
@@ -469,7 +502,7 @@ void SWITCH_BASE::tr_advance()
   const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
   assert(m);
   
-   _state[1] = _state[0];
+  _state[1] = _state[0];
   _y[0].x = _in[1] = _in[0];
   
   if (_y[0].x >= m->von) {
@@ -489,8 +522,6 @@ void SWITCH_BASE::tr_advance()
   
   assert(_y[0].f1 == ((_state[0] == _ON) ? m->ron : m->roff));
   assert(_y[0].f0 == LINEAR);
-  trace4("", _m0.c1, 1./_y[0].f1, ((_m0.c1) - (1./_y[0].f1)), ((_m0.c1) / (1./_y[0].f1)));
-  assert(conchk(_m0.c1, 1./_y[0].f1));
   assert(_m0.c0 == 0.);
   set_converged();
 }
@@ -502,13 +533,97 @@ void SWITCH_BASE::tr_regress()
   const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
   assert(c);
   const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
-  assert(m);
+  assert(m); USE(m);
+
+  // heuristic hack
+  if (OPT::disc>=dREJECT && _y[0].f1 <= 1){
+    for (unsigned i=0;i < 2; ++i) {
+      if (DISCONT d=_n[i]->discont()) {
+        _n[1-i]->discont(d);
+      } else {
+      }
+    }
+  }
 
   assert(_y[0].f1 == ((_state[0] == _ON) ? m->ron : m->roff));
   assert(_y[0].f0 == LINEAR);
-  assert(_m0.c1 == 1./_y[0].f1);
+  // assert(_m0.c1 == 1./_y[0].f1); see do_tr (?)
   assert(_m0.c0 == 0.);
   set_converged();
+}
+/*--------------------------------------------------------------------------*/
+TIME_PAIR SWITCH_BASE::tt_review()
+{
+  const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
+  assert(c);
+  const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
+  assert(m);
+
+  double ttin = _in_tt[0]; // pre tr
+  _in_tt[0] = _in[0];
+  state_t ttstate = _state_tt[0];
+  _state_tt[0] = _state[0];
+
+  _time_by.reset();
+
+  double old_dt = _sim->_dT0;
+  double old_dv = _in_tt[0] - _in_tt[1];
+  double new_dt = NEVER;
+  assert(_sim->last_time()>0);
+
+  if (ttstate != _state[0]) {
+     // back... catch exact switching time.
+     _time_by.min_event(_sim->_Time0 - _sim->_dT0/2);
+  }else if (_state[0] != _ON && ttstate != _ON && old_dv > 0) {
+    double new_dv = m->von - ttin;
+    new_dt = old_dt * new_dv / old_dv - _sim->_dT0;
+    _time_by.min_event(_sim->_Time0 + new_dt + _sim->last_time() );
+  }else if (_state[0] != _OFF && ttstate != _OFF && old_dv < 0) {
+    double new_dv = m->voff - ttin;
+    new_dt = old_dt * new_dv / old_dv;
+    _time_by.min_event(_sim->_Time0 + new_dt + _sim->last_time() );
+  }else{
+    assert(_time_by._event == NEVER);
+  }
+
+  return _time_by;
+}
+/*--------------------------------------------------------------------------*/
+void SWITCH_BASE::tt_accept()
+{
+  trace3("SWITCH_BASE::tt_acc", _sim->_Time0, _in[0], _in[1]);
+  ELEMENT::tt_accept();
+  return;
+}
+/*--------------------------------------------------------------------------*/
+void SWITCH_BASE::tt_advance()
+{
+  ELEMENT::tt_advance();
+  _state_tt[1] = _state_tt[0];
+  _in_tt[1] = _in_tt[0];
+
+  // _in_tt[0] == ??!
+}
+/*--------------------------------------------------------------------------*/
+void SWITCH_BASE::tt_regress()
+{
+  ELEMENT::tt_regress();
+  const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
+  assert(c);
+  const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
+  assert(m);
+  trace3("tt_regr", _sim->_Time0, _in_tt[0], _in_tt[1]);
+
+  _in[0] = _in[1] = _in_tt[1] = _in_tt[1];
+  _state[0] = _state[1] = _state_tt[0] = _state_tt[1];
+
+  // necessary? tr_advance should take care(?);
+  _y[0].f1 = (_state[0] == _ON) ? m->ron : m->roff;	/* unknown is off */
+  if (_state[0] == _UNKNOWN) { untested();
+  }
+
+  _m0.c1 = 1./_y[0].f1;
+  q_eval();
 }
 /*--------------------------------------------------------------------------*/
 bool SWITCH_BASE::do_tr()
@@ -518,13 +633,16 @@ bool SWITCH_BASE::do_tr()
   const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
   assert(m);
 
-  if (_sim->analysis_is_static()) {
+  if (_sim->analysis_is_static() ) {
     _y[0].x = (_input)			/* _y[0].x is controlling value */
       ? CARD::probe(_input,"I")		/* current controlled */
       : _n[IN1].v0() - _n[IN2].v0();	/* voltage controlled */
     
     state_t new_state;
-    if (_y[0].x > m->von) {
+    if (_sim->uic_now() && c->_ic!=_UNKNOWN) { // necessary?
+      new_state = _state[1] = c->_ic;
+      _state[0] = _state[1];
+    } else if (_y[0].x > m->von) {
       new_state = _ON;
     }else if (_y[0].x < m->voff) {
       new_state = _OFF;
@@ -536,7 +654,7 @@ bool SWITCH_BASE::do_tr()
       _y[0].f1 = (new_state == _ON) ? m->ron : m->roff;	/* unknown is off */
       _state[0] = new_state;
       _m0.c1 = 1./_y[0].f1;
-      trace4("change", new_state, old_state, _y[0].f1, _m0.c1);
+      //trace4("change", new_state, old_state, _y[0].f1, _m0.c1);
       q_load();
       store_values();
       set_not_converged();
@@ -576,21 +694,31 @@ TIME_PAIR SWITCH_BASE::tr_review()
     ? CARD::probe(_input,"I")
     : _n[IN1].v0() - _n[IN2].v0();
 
+  if (_sim->uic_now() && c->_ic!=_UNKNOWN) {
+    _in[0] = m->vt + (3-2*c->_ic) * m->vh;
+  }
+
   double old_dt = _time[0] - _time[1];
   double old_dv = _in[0] - _in[1];
+  double new_dt = NEVER;
 
   if (_state[0] != _ON  &&  old_dv > 0) {
     double new_dv = m->von - _in[1];
-    double new_dt = old_dt * new_dv / old_dv;
+    new_dt = old_dt * new_dv / old_dv;
     _time_by.min_event(_time[1] + new_dt);
   }else if (_state[0] != _OFF  &&  old_dv < 0) {
     double new_dv = m->voff - _in[1];
-    double new_dt = old_dt * new_dv / old_dv;
+    new_dt = old_dt * new_dv / old_dv;
     _time_by.min_event(_time[1] + new_dt);
   }else{
     assert(_time_by._event == NEVER);
   }
   // _time_by_event is the predicted switch time
+
+  if (new_dt<_dt+ _sim->_dtmin) {
+    _discont |= disSECOND;
+    q_accept();
+  }
 
   return _time_by;
 }
@@ -598,7 +726,21 @@ TIME_PAIR SWITCH_BASE::tr_review()
 void SWITCH_BASE::do_ac()
 {
   assert(_ev  == _y[0].f1);
-  assert(_acg == _m0.c1);
+  assert(_acg == (double)_m0.c1);
+}
+/*--------------------------------------------------------------------------*/
+double SWITCH_BASE::tr_probe_num(const std::string& x)const
+{
+  const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
+  assert(c);
+  if (Umatch(x, "state|s0 ")) {
+    return _state[0];
+  }else if (Umatch(x, "ic ")) {
+    return c->_ic;
+  }else if (Umatch(x, "s1 ")) {
+    return _state[1];
+  }
+  return ELEMENT::tr_probe_num(x);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -612,7 +754,7 @@ void DEV_CSWITCH::expand()
   }
 }
 /*--------------------------------------------------------------------------*/
-void DEV_CSWITCH::set_port_by_index(int Num, std::string& Value)
+void DEV_CSWITCH::set_port_by_index(uint_t Num, std::string& Value)
 {
   if (Num == 2) {
     _input_label = Value;
@@ -621,7 +763,7 @@ void DEV_CSWITCH::set_port_by_index(int Num, std::string& Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool DEV_CSWITCH::node_is_connected(int i)const
+bool DEV_CSWITCH::node_is_connected(uint_t i)const
 {
   if (i == 2) {
     return _input_label != "";
@@ -645,3 +787,4 @@ DISPATCHER<MODEL_CARD>::INSTALL
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

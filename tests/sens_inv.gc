@@ -1,0 +1,39 @@
+spice
+
+*            T
+*            |
+*            |
+*           [ ] R1
+*            |
+*            o---------------------------o
+*            |                            nout
+*         ||--
+*      o--||<--------------o
+*      |  ||--             |
+*      |     |             V
+*  Vin O     |
+*      |     |
+*      |     |
+*      o------
+*         |
+*         V
+
+.model nmos_1 nmos(level=1)
+.model pmos_1 pmos(level=1)
+
+MN1 0 nin noutn 0 nmos_1 w=3e-5
+MP1 noutp nin ndd ndd pmos_1 w=5e-5
+
+Rn noutn ndd 300k
+Rp noutp 0 200k
+
+vdd1 ndd 0 vdd
+vin nin 0 pulse iv=1 pv=vdd rise=1
+
+.parameter vdd 2
+
+.print sens wr(M*) lr(M*) gmr(M*) rr(R1)
+.print dc v(nodes) ids(MN1) idsxxx(MN1) vgs(MN1) gm(MN1) vds(MN1) vbs(MN1)
+.dc
+.sens v(noutn) v(noutp)
+.end

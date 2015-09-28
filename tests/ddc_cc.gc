@@ -1,0 +1,16 @@
+spice
+
+.param P -1
+.param I 1
+.param qci1=1
+.param in0=1
+
+* test input
+C1 n1 0 1u ic=1
+C2 n2 0 1u ic=-1
+R1 n1 n2 1k
+
+.print ddc v(nodes) v(C1) dv(nodes) ddv(nodes)
+.ddc tr trstep=1e-5
+.ddc old tr trstep=1e-6
+.end

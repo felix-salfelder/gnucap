@@ -1,4 +1,4 @@
-/*$Id: u_lang.h,v 26.109 2009/02/02 06:39:10 al Exp $ -*- C++ -*-
+/*$Id: u_lang.h 2015/01/21 al $ -*- C++ -*-
  * Copyright (C) 2006 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,6 +21,7 @@
  */
 #ifndef U_LANG_H
 #define U_LANG_H
+#include "e_base.h"
 #include "u_opt.h"
 /*--------------------------------------------------------------------------*/
 class COMPONENT;
@@ -31,14 +32,15 @@ class DEV_COMMENT;
 class DEV_DOT;
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
-class INTERFACE LANGUAGE {
+class INTERFACE LANGUAGE : public CKT_BASE {
 public:
-  const CARD* find_proto(const std::string&, const CARD*);
+  static const CARD* find_proto(const std::string&, const CARD*);
 public:
   void new__instance(CS& cmd, MODEL_SUBCKT* owner, CARD_LIST* Scope);
 
 public:
-  virtual ~LANGUAGE() {}
+  //BUG//need constructors
+  virtual ~LANGUAGE();
   virtual std::string name()const = 0;
   virtual bool case_insensitive()const = 0;
   virtual UNITS units()const = 0;
@@ -51,13 +53,14 @@ public: // used by obsolete_callback
 public: // real public interface
   virtual void		parse_top_item(CS&, CARD_LIST*);
   virtual CARD*		parse_item(CS&, CARD*);
+  virtual std::string getlines(FILE*) const;
 public: // called by commands and parse_item
   virtual DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*) = 0;
   virtual DEV_DOT*	parse_command(CS&, DEV_DOT*) = 0;
   virtual MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*) = 0;
   virtual MODEL_SUBCKT* parse_module(CS&, MODEL_SUBCKT*) = 0;
   virtual COMPONENT*	parse_instance(CS&, COMPONENT*) = 0;
-  virtual std::string	find_type_in_string(CS&) = 0;
+  virtual std::string	find_type_in_string(CS&) const = 0;
 
   // out
 public: // real public interface
@@ -68,8 +71,22 @@ private: // called by print_item
   virtual void print_instance(OMSTREAM&, const COMPONENT*) = 0;
   virtual void print_comment(OMSTREAM&, const DEV_COMMENT*) = 0;
   virtual void print_command(OMSTREAM&, const DEV_DOT*) = 0;
+protected:
+  static const CARD* find_card(string name, CARD_LIST* Scope, bool nondevice);
 };
-OMSTREAM& operator<<(OMSTREAM& o, LANGUAGE* x);
+
+/*--------------------------------------------------------------------------*/
+template<class T>
+inline T& operator<<(T& o, LANGUAGE* x)
+{
+  if (x) {
+    return (o << x->name());
+  }else{
+    return (o << "none");
+  }
+}
+/*--------------------------------------------------------------------------*/
+
 bool Get(CS&, const std::string& key, LANGUAGE** val);
 /*--------------------------------------------------------------------------*/
 // This is for backward compatibility only.
@@ -92,3 +109,4 @@ void print_pair(OMSTREAM& o, LANGUAGE* lang, const std::string& name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

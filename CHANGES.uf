@@ -1,0 +1,88 @@
+- added tw (otime transient analysis)
+  - waves, measurements
+  - step control
+  - a few models
+- added sim commmand, time-as-parameter (hack?)
+- added command history (incomplete)
+- allow parameters as probe (HACK)
+      ( almost: expressions like {a+v(foo)} )
+- repaired sweep for batchmode.
+    uses parameters, breaks interactive mode sweep (?)
+    also takes parameters.
+    no nesting yet
+- load/attach/include uses includepath (?)
+- powerof from gnucap-a merged
+- changed measurements to return double (not string)
+   ( if strings are needed, templates should be used ?)
+- fixed OMSTREAM to support multiple files. (used in tt)
+- .echo command
+- read $PWD/.gnucaprc on startup (otherwise read ~/.gnucaprc)
+- rudimentary .vdump .vload support
+- propagate error ( return from main )
+- switched to automake dependencies (good idea? might break modelgen stuff)
+- internal subckt nodes accessible for probes
+  - added .nodelist command
+- enhance io_trace
+   - use streams
+   - prevent stale traces (USE macro)
+- hacked measurements to allow instanciation etc.
+   - precalc etc. for measurement probes
+- templatized OMSTREAM::operator<<
+- use correct numdgt in .eval
+- added members to BSMATRIX:
+   - real, imaginary part
+   - matrix-vector multiplication
+   - some stream::operator<<
+   - minor stuff
+- subckt nodes accessible via .probe
+- s_ddc.cc: dynamic dc simulation
+- sensitivity analysis (experimental)
+- debug helpers in c_debug.cc
+- added line eater for verilog parser.
+- socket remote controlled simulation
+- added std::vector and matrix PARAMETER
+- improve spectre parser
+- node order method "oTREE" sorts according to tree-structure (alpha)
+- matrix use visualization. new allocator (allocate component-wise)
+- nodeset/nodedump
+- getopt (stub)
+- build sustem
+   - gnucap-conf script. helps with compiling after install
+   - add version information to compiled plugins
+   - gnucap.mk: compile plugins after installation
+   - attach/load .cc files (compile-on-demand)
+- tr: "cont" switch: start from (current/previously marked) dc-point.
+- is_constant for bm_cond
+- discontinuity support
+   - announce and propagate
+   - changes in integration method/step control
+- fully automated test suite (automake based, with noise filter)
+- dc analysis enhanced (step control)
+- .printf command
+- attemptt to make ELEMENT+BM accessible from languages != spice
+
+(moved to external plugins)
+- ir filtering kit
+   - fir filter bm
+   - iir based noise generator
+   - ac analysis for FIR filters
+- added admst hicum0 and ota_simple
+- added opamp adms model
+
+(currently broken, unnnecessary, nonsense, recheck)
+- changed PROBElist to (*PROBE)-list
+- header/supplement for ivl tgt-gc output
+- icarus verilog interfacing device.
+- logic node analog transitions delayed
+- make output easier to parse for gnuplot (^* for non-data-lines)
+- added ADP_CARD. not of any use.
+- added "math probes" (preliminary, stupid)
+- printrejected simplifies figuring out rejects.
+- allow inf as double value (hack), breaks i.* as variable name
+   FIXME: use constant parameters (?)
+- added options:
+  - some tolarance values (tt)
+  - new option includepath (colon separated)
+- hacked TRANSIENT:
+  - last step handler
+  - moved clear-queue loop to accept()

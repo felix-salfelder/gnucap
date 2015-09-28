@@ -1,0 +1,36 @@
+spice
+.options insensitive=0
+
+.parameters global_l=1.22e-6
+.parameters global_w=1e-6
+.parameters global_volts=1
+.spectre
+
+
+subckt nch d g s b
+  model nch nmos
+  parameters nchscope=1
+  nch1 (d g s b) nch w=1 l=l
+  *v1 (d g) voltage dc=l
+ends nch
+
+subckt compon ngnd 1 2 3 4
+  parameters fc_comp_param=2
+  parameters volts={2+global_volts+off}
+  parameters off=-0.5
+  parameters test=fc_comp_param+global_l
+  N1 (net1 vbias4 ngnd ngnd) nch l=global_l w={1+global_w}
+  V1 (1 2) vsource dc=volts
+ends
+
+I6 (0 1 2 3 4) compon arg=3
+V1 (vdd! 0) vsource dc=3
+
+simulator lang=spice
+.options insensitive=0
+
+.print op v(I6.N1.nch1) v(I6.V1) l(I6.N1.nch1)
+.echo NL
+.op 0 1u 1u trace=v
+
+.end

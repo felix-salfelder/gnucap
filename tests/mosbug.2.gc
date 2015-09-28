@@ -1,0 +1,28 @@
+spice
+*.options TEMP=25
+.param vdd=2.7
+.options trace
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ )
+
+.param r=1k
+R1 0 nout r
+MP1 ndd ng nout 0 cmosp l=1.5e-7 w=4.5e-6
+VDD ndd 0 vdd
+vgate ng 0 0
+
+.print op v(nodes) vg(mp1) vds(mp1) vdsi(mp1)
++ vd(mp1) vs(mp1) 
++ vid(mp1) vis(mp1) 
++ reversed(mp1) gmin(0)
+
+* this one will converge
+.op
+
+* this one will not converge
+.param r=9k
+.op trace=i
+.end

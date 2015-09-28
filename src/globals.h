@@ -1,4 +1,4 @@
-/*$Id: globals.h,v 26.136 2009/12/07 23:20:42 al Exp $ -*- C++ -*-
+/*$Id: globals.h,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -22,6 +22,16 @@
  * declarations of globals that are exported to plugins
  */
 #include "l_dispatcher.h"
+#ifdef ADD_VERSION
+#include "patchlev.h"
+#endif
+
+extern const char*  lib_version();
+
+extern "C" {
+const char* interface_name();
+unsigned interface_version();
+}
 
 class CMD;
 class COMMON_COMPONENT;
@@ -29,6 +39,7 @@ class MODEL_CARD;
 class CARD;
 class LANGUAGE;
 class FUNCTION;
+class FUNCTION_BASE;
 class CKT_BASE;
 class PROBELIST;
 
@@ -38,8 +49,9 @@ extern INTERFACE DISPATCHER<MODEL_CARD> model_dispatcher;
 extern INTERFACE DISPATCHER<CARD> device_dispatcher;
 extern INTERFACE DISPATCHER<LANGUAGE> language_dispatcher;
 extern INTERFACE DISPATCHER<FUNCTION> function_dispatcher;
-extern INTERFACE DISPATCHER<FUNCTION> measure_dispatcher;
+extern INTERFACE DISPATCHER<FUNCTION_BASE> measure_dispatcher;
 extern INTERFACE DISPATCHER<CKT_BASE> status_dispatcher;
 extern INTERFACE DISPATCHER<CKT_BASE> help_dispatcher;
 extern INTERFACE DISPATCHER<PROBELIST> probe_dispatcher;
 extern INTERFACE std::string head;
+// vim:ts=8:sw=2:noet:

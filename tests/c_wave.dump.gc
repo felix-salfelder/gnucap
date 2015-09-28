@@ -1,0 +1,25 @@
+load c_wave.so
+
+wave build foo
+#a b c d  e
+.1 1 2 1  3
+1  2 2 1  2
+2  3 3 1  4
+
+wave list foo
+wave dump foo:b
+wave dump foo:c
+wave dump foo:d
+wave dump foo:e
+wave dump foo
+
+
+wave build bar
+#a b c d  e
+0  1 2 ?? 3
+1  2 2 ?? 2
+2  3 3 ?? 4
+
+wave dump bar
+
+end

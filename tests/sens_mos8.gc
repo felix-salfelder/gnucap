@@ -1,0 +1,39 @@
+spice
+
+*            T
+*            |
+*            |
+*           [ ] R1
+*            |
+*            o---------------------------o
+*            |                            nout
+*         ||--
+*      o--||<--------------o
+*      |  ||--             |
+*      |     |             V
+*   V1 O     |
+*      |     |
+*      |     |
+*      o------
+*         |
+*         V
+
+.model nmos_8 nmos(level=8)
+
+*MN1 nout nin 0 0 nmos_8
+MN1 0 nin nout 0 nmos_8
+C1 nin 0 3m
+
+v1 nin 0 2.2
+
+R1 nout ndd 300k
+
+vdd1 ndd 0 vdd
+
+.parameter vdd 5
+
+.print sens wr(M*) lr(M*) gmr(M*) rr(R1)
+.print dc v(nodes) reversed(M*)
+.dc
+.sens v(nout)
+.end

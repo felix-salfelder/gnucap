@@ -1,0 +1,11 @@
+spice
+
+V1 n1 0 2
+
+.print dc v(n1)
+
+.echo reverse
+* does 1.5 0.5
+.dc V1 0.5 2 1 reverse
+
+.end

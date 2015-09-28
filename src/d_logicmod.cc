@@ -1,4 +1,4 @@
-/*$Id: d_logicmod.cc,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
+/*$Id: d_logicmod.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,8 +26,9 @@
  */
 //testing=script 2006.07.17
 #include "d_logic.h"
+using namespace std;
 /*--------------------------------------------------------------------------*/
-MODEL_LOGIC::MODEL_LOGIC(const DEV_LOGIC* p)
+MODEL_LOGIC::MODEL_LOGIC(const COMPONENT* p)
   :MODEL_CARD(p),
    delay  (1e-9),
    vmax   (5.),
@@ -88,7 +89,42 @@ void MODEL_LOGIC::precalc_first()
   mf.e_val(5., par_scope);
   over.e_val(.1, par_scope);
 
+  margin = max(rise*(1-th1),fall*th0);
   range = vmax - vmin;
+  hash_logic();
+}
+/*--------------------------------------------------------------------------*/
+void MODEL_LOGIC::hash_logic(){
+	typedef struct {
+		double d1;
+		double d2;
+		double d3;
+		double d4;
+		double d5;
+	} doubles;
+   doubles myparms = { (double) delay, 
+		                 (double) fall,
+							  (double) rise,
+							  (double) vmin,
+							  (double) vmax
+                    	};
+
+	union {
+		doubles data;
+		unsigned char bin[sizeof(doubles)];
+	} hash;
+
+	hash.data = myparms;
+	trace1("hashing ", myparms.d1);
+
+	_hash = 0;
+	for( unsigned i=0; i < sizeof(doubles); ++i){
+		trace2("hash ", (unsigned) hash.bin[i], i );
+		_hash*=17;
+	  	_hash+=(unsigned) hash.bin[i];
+	}
+	trace1( "hashed ", _hash );
+	assert(_hash!=0);
 }
 /*--------------------------------------------------------------------------*/
 void MODEL_LOGIC::set_param_by_index(int i, std::string& value, int offset)
@@ -183,3 +219,4 @@ std::string MODEL_LOGIC::param_value(int i)const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

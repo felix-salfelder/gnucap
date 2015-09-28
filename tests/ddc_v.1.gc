@@ -1,0 +1,13 @@
+spice
+
+
+V1 n1 0 pulse iv=1 pv=1 rise=1
+
+* this works
+.print dc v(n1)
+.dc v1 -1 2 1
+
+* this doesnt
+.print ddc v(n1)
+.ddc v1 -1 2 1
+.end

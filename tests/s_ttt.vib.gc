@@ -1,0 +1,45 @@
+* Astable multivibrator MOSFET
+* free runnning ttr
+
+options edgedist .01
+options ttstepgrow 2
+spice
+
+*Vdd 4 0 pulse iv=0 pv=5 rise=1p
+Vdd 4 0 5
+C1 2 out 5p
+C2 1 3 5p
+C3 3 0 1p ic=0
+R1 4 1 50k
+
+R2 4 2 2Meg
+R3 4 3 2Meg
+R4 4 out 50k
+
+R5 2 0 .5Meg
+R6 3 0 .5Meg
+
+MN1 1 2  0 0 nmos L=8u
+MN2 out 3 0 0 nmos L=8u
+
+.model nmos nmos
++ LAMBDA=3e-2 CBD=1f  IS=1E-21 PB=0.7256 CGSO=0.3n CGDO=0.3n CJ=1e-3 MJ=0.315  CJSW=4.054e-10 MJSW=0.2313 TOX=8n NSUB=2.5e17
+
+.list
+
+.print tran v(nodes) v0t(0) v0dist(0)
+.print dc v(nodes)
+
+.dc uic
+
+.TR 0 16u 1u trace=a edge=y cont > lrc_y.out echo
+.TR 40u trace=a edge=b > lrc_b.out echo
+
+.print tw control(0) lt(0) ltt(0)
+
+.parameter period=11.59u
+.dc uic
+.TR 0 10u 10u trace=a cont 
+
+.ttr 0 5000  {period} .05u * 1e9 trace=g cont new > tw.out echo tran cont edge=b > tttr.out
+.end

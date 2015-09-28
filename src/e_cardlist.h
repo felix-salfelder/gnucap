@@ -1,4 +1,5 @@
-/*$Id: e_cardlist.h,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: e_cardlist.h,v 1.10 2010-08-26 09:07:17 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,57 +26,67 @@
 #ifndef E_CARDLIST_H
 #define E_CARDLIST_H
 #include "md.h"
+#include "ap.h"
+
 /*--------------------------------------------------------------------------*/
 // defined here
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 // external
 class CARD;
+#define PARAM_LIST PARAM_LIST_MAP
 class PARAM_LIST;
+class PARAM_LIST_BASE;
 class NODE_MAP;
+class NODE;
+class NODE_BASE;
 class LANGUAGE;
-class TIME_PAIR;
+struct TIME_PAIR;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
 private:
   const CARD_LIST* _parent;
   mutable NODE_MAP* _nm;
+  mutable int	*_mnm;	 // map node user number to matrix number.
   mutable PARAM_LIST* _params;
   LANGUAGE* _language;
   std::list<CARD*> _cl;
+  const CARD* _owner;       // stupid hack
+  const CARD_LIST* _origin; // even more stupid hack
 public:
   // internal types
   typedef std::list<CARD*>::iterator iterator;
   typedef std::list<CARD*>::const_iterator const_iterator;
   class fat_iterator {
-  private:
-    CARD_LIST* _list;
-    iterator   _iter;
-  private:
-    explicit	  fat_iterator()	{unreachable();}
-  public:
-		  fat_iterator(const fat_iterator& p)
-			: _list(p._list), _iter(p._iter) {}
-    explicit	  fat_iterator(CARD_LIST* l, iterator i)
-			: _list(l), _iter(i) {}
-    bool	  is_end()const		{return _iter == _list->end();}
-    CARD*	  operator*()		{return (is_end()) ? NULL : *_iter;}
-    fat_iterator& operator++()	{assert(!is_end()); ++_iter; return *this;}
-    fat_iterator  operator++(int)
-		{assert(!is_end()); fat_iterator t(*this); ++_iter; return t;}
-    bool	  operator==(const fat_iterator& x)const
-    	     {unreachable(); assert(_list==x._list); return (_iter==x._iter);}
-    bool	  operator!=(const fat_iterator& x)const
-			{assert(_list==x._list); return (_iter!=x._iter);}
-    iterator	  iter()const		{return _iter;}
-    CARD_LIST*	  list()const		{return _list;}
-    fat_iterator  end()const	{return fat_iterator(_list, _list->end());}
+    private:
+      CARD_LIST* _list;
+      iterator   _iter;
+    private:
+      explicit	  fat_iterator()	{unreachable();}
+    public:
+      fat_iterator(const fat_iterator& p)
+        : _list(p._list), _iter(p._iter) {}
+      explicit	  fat_iterator(CARD_LIST* l, iterator i)
+        : _list(l), _iter(i) {}
+      bool	  is_end()const		{return _iter == _list->end();}
+      CARD*	  operator*()		{return (is_end()) ? NULL : *_iter;}
+      fat_iterator& operator++()	{assert(!is_end()); ++_iter; return *this;}
+      fat_iterator  operator++(int)
+      {assert(!is_end()); fat_iterator t(*this); ++_iter; return t;}
+      bool	  operator==(const fat_iterator& x)const
+      {unreachable(); assert(_list==x._list); return (_iter==x._iter);}
+      bool	  operator!=(const fat_iterator& x)const
+      {assert(_list==x._list); return (_iter!=x._iter);}
+      iterator	  iter()const		{return _iter;}
+      CARD_LIST*	  list()const		{return _list;}
+      fat_iterator  end()const	{return fat_iterator(_list, _list->end());}
 
-    void	  insert(CARD* c)	{list()->insert(iter(),c);}
+      void	  insert(CARD* c)	{list()->insert(iter(),c);}
   };
 
   // status queries
   bool is_empty()const			{return _cl.empty();}
+  size_t size()const			{return _cl.size();}
   const CARD_LIST* parent()const	{return _parent;}
   const LANGUAGE* language()const	{untested(); return _language;}
 
@@ -104,13 +115,25 @@ public:
   CARD_LIST& erase(CARD* c);
   CARD_LIST& erase_all();
 
+  // just delete...
+  CARD_LIST& remove(CARD* c);
+
   // operations on the whole list
+  CARD_LIST& do_forall( void (CARD::*thing)( void ) );
+  CARD_LIST& do_forall( void (CARD::*thing)( int ), int );
+  const CARD_LIST& do_forall( void (CARD::*thing)( void ) const ) const;
+  const CARD_LIST& tr_stress_last()const;
+  CARD_LIST& stress_calc();   // calculate stress parameters
+  CARD_LIST& do_tt();         // apply stress parameters to components.
   CARD_LIST& set_owner(CARD* owner);
+  CARD_LIST& set_origin(CARD_LIST* origin);
+  const CARD* owner()const {return _owner;}
   CARD_LIST& set_slave();
   CARD_LIST& precalc_first();
   CARD_LIST& expand();
   CARD_LIST& precalc_last();
   CARD_LIST& map_nodes();
+  void rewire_nodenames(const CARD_LIST*); //temporary hack
   CARD_LIST& tr_iwant_matrix();
   CARD_LIST& tr_begin();
   CARD_LIST& tr_restore();
@@ -124,26 +147,44 @@ public:
   TIME_PAIR  tr_review();
   CARD_LIST& tr_accept();
   CARD_LIST& tr_unload();
+  CARD_LIST& keep_ic();
   CARD_LIST& ac_iwant_matrix();
   CARD_LIST& ac_begin();
   CARD_LIST& do_ac();
   CARD_LIST& ac_load();
+  double do_noise() const;
+  CARD_LIST& do_sens();
+  CARD_LIST& tt_begin();
+  TIME_PAIR tt_review();
+  CARD_LIST& tt_accept();
+  CARD_LIST& tt_advance();
+  CARD_LIST& tt_regress();
+  CARD_LIST& tt_behaviour_commit();
 
   NODE_MAP*   nodes()const {assert(_nm); return _nm;}
+  NODE_BASE*       node(std::string)const;
+  unsigned total_nodes()const; // recursively (for now) sum up ckt node number...
+  unsigned adp_nodes()const; // recursively (for now) sum up total adp number...
   PARAM_LIST* params();
   PARAM_LIST* params()const;
 
   // more complex stuff
-  void attach_params(PARAM_LIST* p, const CARD_LIST* scope);
+  void attach_params(PARAM_LIST_BASE* p, const CARD_LIST* scope);
   void shallow_copy(const CARD_LIST*);
   void map_subckt_nodes(const CARD* model, const CARD* owner);
 
-  explicit CARD_LIST();
+
+  void init_node_count( unsigned* user_nodes, unsigned* subckt_nodes, unsigned*
+      _model_nodes, unsigned* _adp_nodes) const;
+ // ADP_NODE* new_adp_node(const CARD* c, string name);
+
+  explicit CARD_LIST(const CARD* owner=0, PARAM_LIST_MAP* p=NULL);
   CARD_LIST(const CARD* model, CARD* owner, const CARD_LIST* scope,
-  	    PARAM_LIST* p);
+  	    PARAM_LIST_BASE* p);
   ~CARD_LIST();
 private:
-  explicit CARD_LIST(const CARD_LIST&) {unreachable(); incomplete();}
+  // needed to parr to <<
+  // explicit CARD_LIST(const CARD_LIST&) {unreachable(); incomplete();}
 public:
   static CARD_LIST card_list; // in globals.cc
 };
@@ -156,5 +197,13 @@ inline CARD_LIST::fat_iterator findbranch(CS& cmd, CARD_LIST* cl)
   return findbranch(cmd, CARD_LIST::fat_iterator(cl, cl->begin()));
 }
 /*--------------------------------------------------------------------------*/
+inline CARD_LIST::fat_iterator findbranch(const string cmd, CARD_LIST* cl = 0)
+{
+  if (cl==0) cl = &CARD_LIST::card_list;
+  CS c(CS::_STRING,cmd);
+  return findbranch(c, CARD_LIST::fat_iterator(cl, cl->begin()));
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

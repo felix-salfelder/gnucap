@@ -1,0 +1,63 @@
+spice
+* p type inv amp w/bti
+.options TEMP=25
+.options nottcorr
+
+.load rcd_sym.so
+*.options numdgt=7
+
+.param pulse_iv=0
+.param pulse_rise=1n
+
+.param voff=0.4
+.model my_rcdmodel rcd_exp
+
+.list
+
+.model cmosn nmos(
++ level=8
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0=1e-8
++)
+
+.param vdd=3
+V1 nin 0 sin ( delay=-0.025m amplitude={vdd/3} offset={vdd/2})
+R2 nin ng 10k
+MN1 nout ng 0 0 cmosn l=3.5e-5 w=4.5e-4
+R1 ndd nout 9k
+VDD ndd 0 vdd
+
+.verilog
+measm mym(nout,0);
+spice
+
+.print tran
++ v(nin)
++ v(nout)
++ ids(MN1)
++ isb(MN1)
++ stress(MN1.HCI)
+
+.print tw
++ hidden(0)
++ dvth(MN1.HCI) dvth(MN1) iter(0) control(0)
+
+* one-step powerdown
+.ttr 1 .01m .1m * 1.5 new trace=n tran > d_hci_pd_tr.out
+.store tw dvth(MN1)
+.tw 100 pd
+.measure pd=at(probe="dvth(MN1)")
+
+.print tran clear
+
+* powerdown simulated
+.tw .01m .1m 1 new > /dev/null
+.param vdd=0
+.store tw dvth(MN1)
+.tw 100
+.measure sim=at(probe="dvth(MN1)")
+
+.eval sim-pd
+
+.status notime
+.end

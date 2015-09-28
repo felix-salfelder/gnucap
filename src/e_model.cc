@@ -1,4 +1,4 @@
-/*$Id: e_model.cc,v 26.132 2009/11/24 04:26:37 al Exp $ -*- C++ -*-
+/*                                      -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,29 +21,42 @@
  *------------------------------------------------------------------
  * base class for all models
  */
-//testing=script 2006.07.12
 #include "e_compon.h"
 #include "e_model.h"
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const COMPONENT* p)
   :CARD(),
+	_frozen(0),
    _component_proto(p),
    _tnom_c(NOT_INPUT)
 {
-  _sim->uninit();
+  trace0("MODEL_CARD::MODEL_CARD sim->uninit" + dev_type());
+  if (_sim) {
+    _sim->uninit();
+  } else {
+  }
 }
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const MODEL_CARD& p)
   :CARD(p),
+	_frozen(0),
    _component_proto(p._component_proto),
    _tnom_c(p._tnom_c)
 {
-  _sim->uninit();
+  trace0("MODEL_CARD::MODEL_CARD uninit");
+  if (_sim) {
+    _sim->uninit();
+  } else { untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::~MODEL_CARD()
 {
-  _sim->uninit(); // disconnect models from devices
+  trace0("MODEL_CARD::~MODEL_CARD uninit "+ dev_type());
+  if (_sim) {
+    _sim->uninit();
+  } else { untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void MODEL_CARD::set_param_by_index(int i, std::string& value, int offset)
@@ -68,6 +81,12 @@ std::string MODEL_CARD::param_name(int i)const
   case 0: return "tnom\0";
   default: return CARD::param_name(i);
   }
+}
+/*--------------------------------------------------------------------------*/
+void MODEL_CARD::set_param_by_name(std::string Name, std::string Value)
+{
+  if (Umatch (Name,"tnom")) { _tnom_c = Value; }
+  else{ CARD::set_param_by_name(Name,Value);}
 }
 /*--------------------------------------------------------------------------*/
 std::string MODEL_CARD::param_name(int i, int j)const
@@ -96,3 +115,4 @@ void MODEL_CARD::precalc_first()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

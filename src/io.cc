@@ -1,4 +1,4 @@
-/*$Id: io.cc,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*$Id: io.cc,v 1.2 2009-11-30 10:56:40 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,7 +25,12 @@
 #include "io_.h"
 
 OMSTREAM IO::mstdout(stdout);
+
+
+// BUG. use stdout in interactive mode!
+// (or something like that)
 OMSTREAM IO::error(stdout);
+
 OMSTREAM IO::plotout;
 bool	IO::plotset(false);
 int	IO::formaat(0);

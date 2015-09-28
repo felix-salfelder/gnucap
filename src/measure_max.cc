@@ -1,4 +1,4 @@
-/*$Id: measure_max.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*                           -*- C++ -*-
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,21 +26,35 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class MEASURE : public FUNCTION {
+class MAX : public WAVE_FUNCTION {
+  PARAMETER<double> before;
+  PARAMETER<double> after;
+  bool last;
+  bool arg;
+  bool derivative;
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const
+  MAX() :
+    WAVE_FUNCTION(),
+    before(BIGBIG),
+    after(-BIGBIG),
+    last(false),
+    arg(false),
+    derivative(false) {}
+  virtual FUNCTION_BASE* clone()const { return new MAX(*this);}
+  string label()const{return "max";}
+  void expand(CS& Cmd, const CARD_LIST* Scope)
   {
-    std::string probe_name;
-    PARAMETER<double> before(BIGBIG);
-    PARAMETER<double> after(-BIGBIG);
-    bool last = false;
-    bool arg = false;
-
+    before = BIGBIG;
+    after = -BIGBIG;
+    last = false;
+    arg = false;
+    derivative = false;
     unsigned here = Cmd.cursor();
     Cmd >> probe_name;
-    WAVE* w = find_wave(probe_name);
+    _w = find_wave(probe_name);
 
-    if (!w) {
+    if (!_w) {
+      // skipped precalc (?)
       Cmd.reset(here);
     }else{
     }
@@ -53,41 +67,60 @@ public:
 	|| Get(Cmd, "after",  &after)
 	|| Get(Cmd, "end",    &before)
 	|| Get(Cmd, "begin",  &after)
+	|| Set(Cmd, "deriv{ative}", &derivative, true)
 	|| Set(Cmd, "arg",    &arg, true)
 	|| Set(Cmd, "last",   &last, true)
 	|| Set(Cmd, "first",  &last, false)
 	;
     }while (Cmd.more() && !Cmd.stuck(&here));
 
-    if (!w) {
-      w = find_wave(probe_name);
+    if (!_w) {
+      _w = find_wave(probe_name);
     }else{
     }
-    
-    if (w) {
-      before.e_val(BIGBIG, Scope);
-      after.e_val(-BIGBIG, Scope);
-
+    before.e_val(BIGBIG, Scope);
+    after.e_val(-BIGBIG, Scope);
+  } 
+  fun_t wave_eval()const
+  {
+    if (_w) {
       double time = (last) ? -BIGBIG : BIGBIG;
       double m = -BIGBIG;
-      WAVE::const_iterator begin = lower_bound(w->begin(), w->end(), DPAIR(after, -BIGBIG));
-      WAVE::const_iterator end   = upper_bound(w->begin(), w->end(), DPAIR(before, BIGBIG));
+      WAVE::const_iterator begin = lower_bound(_w->begin(), _w->end(), DPAIR(after, -BIGBIG));
+      WAVE::const_iterator end   = upper_bound(_w->begin(), _w->end(), DPAIR(before, BIGBIG));
+      if (begin == end) return(NAN);
+      double prev = 0;
+      double t1 = begin->first;
       for (WAVE::const_iterator i = begin; i < end; ++i) {
-	double val = i->second;
+        double val;
+	if(derivative){ // very simple difference quotient.
+          double dt = i->first - t1;
+          t1 = i->first;
+          if(!dt) {
+            prev = i->second;
+            continue;
+          }
+          val = (i->second - prev)/(dt);
+          prev = i->second;
+        }else{
+          val = i->second;
+        }
 	if (val > m || (last && (val == m))) {
 	  time = i->first;
 	  m = val;
 	}else{
 	}
       }
-      return to_string((arg) ? (time) : (m));
+      return to_fun_t((arg) ? (time) : (m));
     }else{
+      trace0("measure max, !w "+ probe_name );
       throw Exception_No_Match(probe_name);
     }
   }
 } p1;
-DISPATCHER<FUNCTION>::INSTALL d1(&measure_dispatcher, "max", &p1);
+DISPATCHER<FUNCTION_BASE>::INSTALL d1(&measure_dispatcher, "max", &p1);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

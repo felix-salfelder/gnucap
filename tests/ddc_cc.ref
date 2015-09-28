@@ -1,0 +1,5 @@
+#           v(n1)      v(n2)      v(C1)      dv(n1)     dv(n2)     ddv(n1)    ddv(n2)   
+ 0.         1.        -1.         1.        -2.K        2.K       -1.9~K      1.9~K     
+#           v(n1)      v(n2)      v(C1)      dv(n1)     dv(n2)     ddv(n1)    ddv(n2)   
+open circuit: internal node 2
+ 0.         1.        -1.         1.         0.         0.        -1.99~K     1.99~K    

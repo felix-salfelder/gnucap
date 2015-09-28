@@ -1,0 +1,11 @@
+spice
+* bug or feature? or spice bug?
+
+V1 in1 0 pulse iv=1 pv=0 delay=0 rise=1m
+V2 in2 0 1
+
+.print tran v(in*)
+.print dc v(in*)
+.tran 0 1 0.5
+.tran 0 1 0.5 uic
+.end

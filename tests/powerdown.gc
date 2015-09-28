@@ -1,0 +1,95 @@
+load rcd_sym.so
+spice
+* p type inv amp w/bti
+
+.options defl=1e-7
+
+.options TEMP=25
+.model bti_ptm_approx bti_sum (
++ parms = (
++(0.0425895446518,-0.0, 4.1230027350333067, 44.168622555330224, 0.35639368027120355),
++(0.00986204739979,-0.046730726782108274, 6.9322844619511379, 34.467824008855281, 19.76034507753667),
++(1.28936788433,-0.0, 13.433303380408852, 43.576925888911987, 1.4509831704140836),
++(65734.7534834,-0.0, 7.6851098109742111, 33.944029750879885, 20.802215970322095),
++(25.5541996901,-46.321386556453803, 16.844440862184946, 11.976323270474861, 23.296371309229073)
++)
++rcd_model_name=my_rcdmodel  weight=1)
+
+* BUG?
+*+(323556.834838 ,-0.74091304338940822, 7.9999074744048002, 50.0, 25.0),
+
+.model my_rcdmodel rcd_exp
+
+
+.include lf150_aging.mod
+.param lfpbti="bti_ptm_approx"
+.param vddon=1.5
+.param vdd=vddon
+.param ttend=1000
+
+* == netlist ==
+R2 0 ng 10k
+MP1 nout ng ndd ndd cmosp l=1.5e-7 w=4.5e-6
+R1 0 nout 9k
+
+* == input ==
+VDD ndd 0 vdd
+
+.print tw dvth(MP1.BTI)
++ P(MP1.bti.rcd*)
++ tt(MP1.BTI.RCD*)
++ meas({max(probe="v(nout)")})
+
+
+.print tran v(ng) v(nout) P(MP1.BTI)
++m(nout)
++uhi(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
++tr(MP1.BTI.RCD*)
++m(ndd)
+
+.echo tranprobes
+.print tran
+
+.tw new
+.dumpnodes adp > fresh.dat
+*.dumpnodes > fresh_dc.dat
+
+* bug. always start with fresh!
+
+.echo fresh tran (tr.out)
+.tr 10u .1m basic > tr.out
+.echo fresh tran done
+
+
+.echo aging (tt.out)
+.tw 10u .1m {ttend/3} new basic trace=a > tt_pd.out tran > tran.out
+.echo aging done
+
+
+.dumpnodes adp > aged.dat
+
+.echo pd 1
+.tw {2*ttend/3} pd basic >> tt_pd.out
+.echo pd done
+
+.dumpnodes > after_pd.dat
+
+.tw {ttend} trace=a cont basic >> tt_pd.out tran > tran_pd.out
+
+**********8 fake pd ***********************8
+.param vdd=vddon
+.echo new again ( nopd_tt.out )
+.tw  10u .1m  {ttend/3} new > tt_fpd.out tran > nopd.out
+.echo done 1st aging ( nopd_tt.out )
+
+.param vdd=0
+.echo ifake pd
+.dc
+.tw {2*ttend/3} >> tt_fpd.out tran >> nopd.out
+.param vdd=vddon
+.dc
+
+.tw {ttend} >> tt_fpd.out tran >> nopd.out
+.end
+
+.end

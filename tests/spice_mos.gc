@@ -1,0 +1,8 @@
+spice
+
+.model cmosn nmos (level=8 ld=0.265073u tox=418.0e-10 rd=1)
+m1 3 6 5 8 cmosn w=5u l=5u ad=45p as=45p pd=28u ps=28u nrd=1.8 nrs=1.8
+
+.print dc v(nodes)
+.dc trace=v
+.end

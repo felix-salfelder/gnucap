@@ -1,4 +1,4 @@
-/*$Id: lang_verilog.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*                                     -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,37 +26,38 @@
 #include "e_model.h"
 #include "u_lang.h"
 /*--------------------------------------------------------------------------*/
-namespace {
+namespace { //
 /*--------------------------------------------------------------------------*/
-class LANG_VERILOG : public LANGUAGE {
+class LANG_VERILOG : public LANGUAGE { //
   enum MODE {mDEFAULT, mPARAMSET} _mode;
   mutable int arg_count;
   enum {INACTIVE = -1};
 public:
   LANG_VERILOG() : arg_count(INACTIVE) {}
+  ~LANG_VERILOG() {}
   std::string name()const {return "verilog";}
   bool case_insensitive()const {return false;}
   UNITS units()const {return uSI;}
 
 public: // override virtual, used by callback
-  std::string arg_front()const {
-    switch (_mode) {
+  std::string arg_front()const { untested();
+    switch (_mode) { untested();
     case mPARAMSET: return " .";			    break;
     case mDEFAULT:  return (arg_count++ > 0) ? ", ." : "."; break;
     }
     unreachable();
     return "";
   }
-  std::string arg_mid()const {
-    switch (_mode) {
+  std::string arg_mid()const { untested();
+    switch (_mode) { untested();
     case mPARAMSET: return "="; break;
     case mDEFAULT:  return "("; break;
     }
     unreachable();
     return "";
   }
-  std::string arg_back()const {
-    switch (_mode) {
+  std::string arg_back()const { untested();
+    switch (_mode) { untested();
     case mPARAMSET: return ";"; break;
     case mDEFAULT:  return ")"; break;
     }
@@ -71,7 +72,7 @@ public: // override virtual, called by commands
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*);
   MODEL_SUBCKT* parse_module(CS&, MODEL_SUBCKT*);
   COMPONENT*	parse_instance(CS&, COMPONENT*);
-  std::string	find_type_in_string(CS&);
+  std::string	find_type_in_string(CS&) const;
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*);
@@ -109,6 +110,7 @@ static void parse_args_paramset(CS& cmd, MODEL_CARD* x)
     }catch (Exception_No_Match&) {untested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
+    cmd.eat_lines();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -164,16 +166,23 @@ static void parse_ports(CS& cmd, COMPONENT* x)
   if (cmd >> '(') {
     if (cmd.is_alnum()) {
       // by order
-      int index = 0;
+      uint_t index = 0;
       while (cmd.is_alnum()) {
 	unsigned here = cmd.cursor();
 	try{
 	  std::string value;
 	  cmd >> value;
 	  x->set_port_by_index(index++, value);
-	}catch (Exception_Too_Many& e) {untested();
+	}catch (Exception_Too_Many& e) {
 	  cmd.warn(bDANGER, here, e.message());
 	}
+      }
+      if (index < x->min_nodes()) {
+	cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
+	for (int iii = index;  iii < x->min_nodes();  ++iii) {
+	  x->set_port_to_ground(iii);
+	}
+      }else{
       }
     }else{
       // by name
@@ -183,7 +192,7 @@ static void parse_ports(CS& cmd, COMPONENT* x)
 	  std::string name, value;
 	  cmd >> name >> '(' >> value >> ')' >> ',';
 	  x->set_port_by_name(name, value);
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, "mismatch, ignored");
 	}
       }
@@ -208,7 +217,17 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
   x->set(cmd.fullstring());
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
-  cmd.reset();
+  if(cmd.cursor()!=0 && cmd.cursor()!=1){ // unreachable(); not yet.
+    trace2("bogus cursor?", cmd.cursor(), cmd.fullstring());
+  }
+  cmd.reset(); // is this necessary? maybe we should trust the cursor
+
+  if(cmd.match1('.')){
+    // HACK. is this a spice command?
+    cmd.skip1('.');
+  }else{
+  }
+
   CMD::cmdproc(cmd, scope);
   delete x;
   return NULL;
@@ -230,9 +249,13 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
   parse_label(cmd, x);
   parse_type(cmd, x);
   cmd >> ';';
+  trace0("LANG_VERILOG::parse_paramset, have ;");
+  cmd.eat_lines();
   parse_args_paramset(cmd, x);
+  cmd.eat_lines();
   cmd >> "endparamset ";
   cmd.check(bWARNING, "what's this?");
+  trace0("done.");
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -269,6 +292,7 @@ MODEL_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, MODEL_SUBCKT* x)
 /*--------------------------------------------------------------------------*/
 COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 {
+  assert(x);
   cmd.reset();
   parse_type(cmd, x);
   parse_args_instance(cmd, x);
@@ -279,16 +303,21 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
-std::string LANG_VERILOG::find_type_in_string(CS& cmd)
+std::string LANG_VERILOG::find_type_in_string(CS& cmd) const
 {
   unsigned here = cmd.cursor();
   std::string type;
   if ((cmd >> "//")) {
-    assert(here == 0);
+    assert(here == 0); // BUG. why not "\t//"?
     type = "dev_comment";
+  }else if (cmd.skip1('.')) {
+    cmd.check(bWARNING, "bogus input. trying to ignore leading dot...");
+    here += 1;
+    cmd >> type;
   }else{
     cmd >> type;
   }
+  trace1("hmmm", type);
   cmd.reset(here);
   return type;
 }
@@ -303,7 +332,7 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
-  if (x->use_obsolete_callback_print()) {
+  if (x->use_obsolete_callback_print()) {untested();
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
     for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
@@ -320,11 +349,12 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   o << " #(";
-  if (x->use_obsolete_callback_print()) {
+  if (0 && x->use_obsolete_callback_print()) { untested();
     arg_count = 0;
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
     arg_count = INACTIVE;
   }else{
+    trace1("PA", x->param_count());
     std::string sep = ".";
     for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
       if (x->param_is_printable(ii)) {
@@ -356,11 +386,11 @@ static void print_ports_long(OMSTREAM& o, const COMPONENT* x)
 
   o << " (";
   std::string sep = ".";
-  for (int ii = 0;  x->port_exists(ii);  ++ii) {
+  for (uint_t ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep << x->port_name(ii) << '(' << x->port_value(ii) << ')';
     sep = ",.";
   }
-  for (int ii = 0;  x->current_port_exists(ii);  ++ii) {
+  for (uint_t ii = 0;  x->current_port_exists(ii);  ++ii) { untested();
     o << sep << x->current_port_name(ii) << '(' << x->current_port_value(ii) << ')';
     sep = ",.";
   }
@@ -374,11 +404,11 @@ static void print_ports_short(OMSTREAM& o, const COMPONENT* x)
 
   o << " (";
   std::string sep = "";
-  for (int ii = 0;  x->port_exists(ii);  ++ii) {
+  for (uint_t ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep << x->port_value(ii);
     sep = ",";
   }
-  for (int ii = 0;  x->current_port_exists(ii);  ++ii) {
+  for (uint_t ii = 0;  x->current_port_exists(ii);  ++ii) { untested();
     o << sep << x->current_port_value(ii);
     sep = ",";
   }
@@ -390,9 +420,9 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
   _mode = mPARAMSET;
-  o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\\\n";
+  o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
   print_args(o, x);
-  o << "\\\n"
+  o << "\n"
     "endparmset\n\n";
   _mode = mDEFAULT;
 }
@@ -426,18 +456,22 @@ void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 {
   assert(x);
+  if ((x->comment().compare(0, 2, "//")) != 0) {untested();
+    o << "//";
+  }else{
+  }
   o << x->comment() << '\n';
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
-{
+{untested();
   assert(x);
   o << x->s() << '\n';
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class CMD_PARAMSET : public CMD {
+class CMD_PARAMSET : public CMD { //
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
     // already got "paramset"
@@ -450,21 +484,21 @@ class CMD_PARAMSET : public CMD {
     const CARD* p = lang_verilog.find_proto(base_name, NULL);
     if (p) {
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(p->clone());
-      if (exists(new_card)) {
+      if (new_card) {
 	assert(!new_card->owner());
 	lang_verilog.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
-      }else{	//BUG// memory leak
+      }else{
 	cmd.warn(bDANGER, here, "paramset: base has incorrect type");
       }
-    }else{
+    }else{ untested();
       cmd.warn(bDANGER, here, "paramset: no match");
     }
   }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);
 /*--------------------------------------------------------------------------*/
-class CMD_MODULE : public CMD {
+class CMD_MODULE : public CMD { //
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
     MODEL_SUBCKT* new_module = new MODEL_SUBCKT;
@@ -478,7 +512,7 @@ class CMD_MODULE : public CMD {
 } p2;
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "module|macromodule", &p2);
 /*--------------------------------------------------------------------------*/
-class CMD_VERILOG : public CMD {
+class CMD_VERILOG : public CMD { //
 public:
   void do_it(CS&, CARD_LIST* Scope)
   {
@@ -490,3 +524,4 @@ DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "verilog", &p8);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,0 +1,23 @@
+spice
+
+V1 m1 0 3
+R1 m1 m2 50
+C3 m2 0 4u ic=0.5
+
+*     V1   __R3  C3
+*  o---O--[__]--||---o
+*  |                 |
+*  V                 V
+
+.print dc v(nodes)
+.print TRAN  v(nodes) conv(C3)
+
+*.TRAN 0 12 0.1 uic trace iterations >rc-glied3_tran.out
+*.TRAN 0 15e-6 2e-7 uic >rc-glied3_tran.out
+
+.dc uic
+.TRAN 0 200u 10u cont
+*.tran 0 200u 10u uic // should work undesired because of SPICE compatibility
+
+
+.end

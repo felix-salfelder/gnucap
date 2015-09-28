@@ -1,4 +1,4 @@
-/*$Id: bm_pwl.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_pwl.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -51,7 +51,7 @@ private: // override virtual
   void		precalc_last(const CARD_LIST*);
 
   void		tr_eval(ELEMENT*)const;
-  TIME_PAIR	tr_review(COMPONENT*);
+  TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "pwl";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
@@ -87,9 +87,6 @@ bool EVAL_BM_PWL::operator==(const COMMON_COMPONENT& x)const
     && _raw_table == p->_raw_table
     && _num_table == p->_num_table
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -131,7 +128,7 @@ void EVAL_BM_PWL::precalc_last(const CARD_LIST* Scope)
 	 p = _raw_table.begin();  p != _raw_table.end();  ++p) {
     if (last > p->first) {
       throw Exception_Precalc("PWL is out of order: (" + to_string(last)
-			      + ", " + to_string(p->first) + ")\n");
+			      + ", " + string(p->first) + ")\n");
     }else{
       DPAIR x(p->first, p->second);
       _num_table.push_back(x);
@@ -143,25 +140,51 @@ void EVAL_BM_PWL::precalc_last(const CARD_LIST* Scope)
 void EVAL_BM_PWL::tr_eval(ELEMENT* d)const
 {
   double ext = (d->is_source()) ? 0. : NOT_INPUT;
-  d->_y[0] = interpolate(_num_table.begin(), _num_table.end(), 
-		       ioffset(d->_y[0].x), ext, ext);
-  tr_final_adjust(&(d->_y[0]), d->f_is_value());
+  try {
+	  d->_y[0] = interpolate(_num_table.begin(), _num_table.end(),
+			  ioffset(d->_y[0].x), ext, ext);
+	  tr_final_adjust(&(d->_y[0]), d->f_is_value());
+  } catch (Exception& e) {
+	  error(bDANGER, e.message() + '\n');
+	  throw(Exception("evaluation error in " + d->long_label() + " pwl"));
+  }
 }
 /*--------------------------------------------------------------------------*/
-TIME_PAIR EVAL_BM_PWL::tr_review(COMPONENT* d)
+TIME_PAIR EVAL_BM_PWL::tr_review(COMPONENT* d)const
 {
   if (d->is_source()) {
     // index (x) is time
     ELEMENT* dd = prechecked_cast<ELEMENT*>(d);
     assert(dd);
-    double x = dd->_y[0].x + d->_sim->_dtmin * .01;
+	 double eps = d->_sim->_dtmin * .01;
+	 double x = dd->_y[0].x + eps;
     DPAIR here(x, BIGBIG);
-    std::vector<DPAIR>::iterator begin = _num_table.begin();
-    std::vector<DPAIR>::iterator end   = _num_table.end();
-    std::vector<DPAIR>::iterator upper = upper_bound(begin, end, here);
-    std::vector<DPAIR>::iterator lower = upper - 1;
+    std::vector<DPAIR>::const_iterator begin = _num_table.begin();
+    std::vector<DPAIR>::const_iterator end   = _num_table.end();
+    std::vector<DPAIR>::const_iterator upper = upper_bound(begin, end, here);
+    std::vector<DPAIR>::const_iterator lower = upper - 1;
     assert(x > lower->first);
-    d->_time_by.min_event((x < upper->first) ? upper->first : NEVER);
+//     if (x > 0.1 ) {
+//        x=x+1E-20;
+//      }
+//      if (upper > end) {
+//       fprintf(stderr,"upper after end\n");
+//     } else {
+//       fprintf(stderr," %x upf %f \n",upper,upper->first);      
+//       if (upper->first > 0.4 ) {
+//         x=x+1E-20;
+//       }
+//     }
+    // fprintf(stderr,"x %f \n",x);
+
+    
+	 if ((x < upper->first)) {
+		 d->_time_by.min_event(upper->first);
+		 if (dd->_y[0].x < eps + lower->first) {
+			 dd->_discont |= disSECOND;
+			 d->q_accept();
+		 }
+	 }
   }else{untested();
     // index (x) is input
     // It's really needed here too, more work needed
@@ -216,3 +239,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "pwl", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

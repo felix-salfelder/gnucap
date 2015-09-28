@@ -1,0 +1,27 @@
+simulator language=verilog
+
+parameter mainscope=1
+parameter m=1
+
+module SOME(n p);
+   parameter value=1;
+   resistor #(.r(value),.m(3)) r(n,p);
+endmodule
+
+
+module DUT (1,2);
+parameter value=1
+SOME #(.value(value)) res (1, 2);
+endmodule
+
+DUT #(.value(1)) dut0 (.1(1),.2(0));
+DUT #(.value(2)) dut1 (.1(2),.2(0));
+
+vsource #(.dc(1)) v1 (1,2);
+
+spice
+.store dc v(nodes)
+.dc >/dev/null
+.measure v1 at(probe="v(1)")
+.measure v2 at(probe="v(2)")
+.end

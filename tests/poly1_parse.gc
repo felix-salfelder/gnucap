@@ -1,0 +1,10 @@
+spice
+* test poly(1)
+
+V1 nin 0 sin(amplitude=1, freq=1)
+E4 nsk 0 poly(1) nin 0   0 0 1
+
+.list
+.print tran v(nodes)
+.tran 0 1 .05
+.end

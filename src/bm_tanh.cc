@@ -1,4 +1,4 @@
-/*$Id: bm_tanh.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_tanh.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -35,6 +35,7 @@ class EVAL_BM_TANH : public EVAL_BM_ACTION_BASE {
 private:
   PARAMETER<double> _gain;
   PARAMETER<double> _limit;
+  PARAMETER<double> _shear;
   explicit	EVAL_BM_TANH(const EVAL_BM_TANH& p);
 public:
   explicit      EVAL_BM_TANH(int c=0);
@@ -50,20 +51,23 @@ private: // override virtual
   bool		ac_too()const		{untested();return false;}
   bool		parse_numlist(CS&);
   bool		parse_params_obsolete_callback(CS&);
+  bool		param_is_printable(int i)const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 EVAL_BM_TANH::EVAL_BM_TANH(int c)
   :EVAL_BM_ACTION_BASE(c),
    _gain(NOT_INPUT),
-   _limit(NOT_INPUT)
+   _limit(NOT_INPUT),
+   _shear(NOT_INPUT)
 {
 }
 /*--------------------------------------------------------------------------*/
 EVAL_BM_TANH::EVAL_BM_TANH(const EVAL_BM_TANH& p)
   :EVAL_BM_ACTION_BASE(p),
    _gain(p._gain),
-   _limit(p._limit)
+   _limit(p._limit),
+   _shear(p._shear)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -73,10 +77,8 @@ bool EVAL_BM_TANH::operator==(const COMMON_COMPONENT& x)const
   bool rv = p
     && _gain == p->_gain
     && _limit == p->_limit
+    && _shear == p->_shear
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -86,6 +88,9 @@ void EVAL_BM_TANH::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)co
   o << name();
   print_pair(o, lang, "gain", _gain);
   print_pair(o, lang, "limit", _limit);
+  if(_shear.has_hard_value()) { untested();
+	  print_pair(o, lang, "shear", _shear);
+  }
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
@@ -95,6 +100,7 @@ void EVAL_BM_TANH::precalc_first(const CARD_LIST* Scope)
   EVAL_BM_ACTION_BASE::precalc_first(Scope);
   _gain.e_val(_default_gain, Scope);
   _limit.e_val(_default_limit, Scope);
+  _shear.e_val(0, Scope);
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_TANH::tr_eval(ELEMENT* d)const
@@ -103,15 +109,15 @@ void EVAL_BM_TANH::tr_eval(ELEMENT* d)const
   double aa = x * _gain/_limit;
   double f1, f0;
   if (aa > LOGBIGBIG) {
-    f1 = 0;
-    f0 = _limit;
+    f1 = _shear;
+    f0 = _shear * x + _limit;
   }else if (aa < -LOGBIGBIG) {
-    f1 = 0;
-    f0 = -_limit;
+    f1 = _shear;
+    f0 = _shear * x -_limit;
   }else{
     double cosine = cosh(aa);
-    f1 = _gain / (cosine*cosine);
-    f0 = _limit * tanh(aa);
+    f1 = _shear + _gain / (cosine*cosine);
+    f0 = _shear * x + _limit * tanh(aa);
   }
   d->_y[0] = FPOLY1(x, f0, f1);
   tr_final_adjust(&(d->_y[0]), d->f_is_value());
@@ -137,8 +143,19 @@ bool EVAL_BM_TANH::parse_params_obsolete_callback(CS& cmd)
   return ONE_OF
     || Get(cmd, "gain",  &_gain)
     || Get(cmd, "limit", &_limit)
+    || Get(cmd, "shear", &_shear)
     || EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(cmd)
     ;
+}
+/*--------------------------------------------------------------------------*/
+bool EVAL_BM_TANH::param_is_printable(int i)const
+{
+  switch (EVAL_BM_TANH::param_count() - 1 - i) { untested();
+  case 0:  return (true);
+  case 1:  return (true);
+  case 2:  untested(); return _shear.has_hard_value();
+  default: return EVAL_BM_ACTION_BASE::param_is_printable(i);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -147,3 +164,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "tanh", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

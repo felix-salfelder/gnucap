@@ -1,4 +1,4 @@
-/*$Id: io_error.h,v 26.130 2009/11/15 21:51:59 al Exp $ -*- C++ -*-
+/*$Id: io_error.h 2015/01/27 al $ -*- C++ -*-
  * data for error and exception handling
  *
  * Copyright (C) 2001 Albert Davis
@@ -44,6 +44,14 @@ struct Exception {
   Exception(const std::string& Message)
     :_message(Message) {
   }
+  Exception(const char* fmt, ...) {
+    char buffer[BIGBUFLEN] = "";
+    va_list arg_ptr;
+    va_start(arg_ptr,fmt);
+    vsprintf(buffer,fmt,arg_ptr);
+    va_end(arg_ptr);
+    _message= std::string( buffer );
+  }
   virtual ~Exception() {}
 };
 class CS;
@@ -73,11 +81,12 @@ struct Exception_Cant_Find :public Exception{
   }
 };
 struct Exception_Too_Many :public Exception{
-  int _requested, _max, _offset;
-  Exception_Too_Many(int requested, int max, int offset)
-    :Exception("too many: requested=" + to_string(requested+offset)
-	       + " max=" + to_string(max+offset)),
-     _requested(requested), _max(max), _offset(offset) {untested();
+  uint_t _requested, _max;
+  int _offset;
+  Exception_Too_Many(uint_t requested, uint_t max, int offset=0)
+    :Exception("too many: requested=" + ::to_string(int(requested)+int(offset))
+	       + " max=" + ::to_string(int(max)+int(offset))),
+     _requested(requested), _max(max), _offset(offset) {
   }
 };
 struct Exception_Type_Mismatch :public Exception{
@@ -109,3 +118,4 @@ struct Exception_File_Open :public Exception{
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

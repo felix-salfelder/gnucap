@@ -1,0 +1,15 @@
+*>options numdgt 30
+spice
+v1 nin 0 1 ac 1
+
+.brl l1 nin n_1 1
+R1 n_1 0 1
+
+l2 nin n_2 1
+R2 n_2 0 1
+
+.print ac vp(n_*) vm(n_*)
+.ac 1m 1k * 10
+.nodelist
+.dc dm
+.end

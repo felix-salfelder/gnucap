@@ -1,4 +1,5 @@
-/*$Id: ap_convert.cc,v 26.125 2009/10/15 20:58:21 al Exp $ -*- C++ -*-
+/*$Id: ap_convert.cc,v 1.3 2010-09-17 12:25:55 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -73,6 +74,7 @@ std::string CS::ctos(const std::string& term,
 		     const std::string& end_quote,
 		     const std::string& trap)
 {
+  trace1("CS::ctos", tail());
   assert(begin_quote.length() == end_quote.length());
 
   skipbl();
@@ -105,13 +107,19 @@ std::string CS::ctos(const std::string& term,
 	end_string = cursor() - 1;
 	s += _cmd.substr(begin_string, end_string-begin_string);
 	begin_string = cursor();
-	skip1(the_end_quote);
+	if (skip1('n')) {
+          s += '\n';
+          ++begin_string;
+        }else{
+          skip1(the_end_quote);
+        }
       }else{
 	skip();
       }
     }
     s += _cmd.substr(begin_string, end_string-begin_string);
   }else{
+    trace0("CS::ctos term?");
     while(ns_more() && !is_term(term)) {
       skip();
     }
@@ -148,7 +156,11 @@ bool CS::ctob()
   bool val = true;
   ONE_OF
     || Set(*this, "1",       &val, true)
+    || Set(*this, "1.",      &val, true)
     || Set(*this, "0",       &val, false)
+    || Set(*this, "0.",      &val, false)
+    || Set(*this, ".0",      &val, false)
+    || Set(*this, "0.0",     &val, false)
     || Set(*this, "t{rue}",  &val, true)
     || Set(*this, "f{alse}", &val, false)
     || Set(*this, "y{es}",   &val, true)
@@ -260,6 +272,7 @@ int CS::ctox()
  */
 double CS::ctof()
 {
+  trace0( "CS::ctof " + tail());
   double val = 0.0;
   double power = 1.0;
   int    sign = 1;
@@ -276,6 +289,11 @@ double CS::ctof()
     sign = -1;
   }else{
     skip1("+");
+  }
+
+  if( umatch("inf") ){
+    trace0("Get read inf");
+    return sign*inf;
   }
 
   while (is_digit()) {			// up to dec pt
@@ -343,3 +361,4 @@ double CS::ctof()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

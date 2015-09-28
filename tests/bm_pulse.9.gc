@@ -1,0 +1,35 @@
+spice
+
+v0  n00 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=0
+v1  n01 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.05
+v2  n02 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.1
+v3  n03 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.15
+v4  n04 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.2
+v5  n05 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.5
+v6  n06 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.8
+v7  n07 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.85
+v8  n08 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.9
+v9  n09 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=.95
+v10 n10 0 pulse iv=0 pv=1 rise=.2 fall=.2 area=1
+
+.list
+
+.print dc v(nodes)
+.dc
+.store tran v(nodes)
+.print tran v(nodes)
+.tran 0 1 1 trace=a > pulses.out echo
+
+.measure i=integral(probe="v(n00)")
+.measure i=integral(probe="v(n01)")
+.measure i=integral(probe="v(n02)")
+.measure i=integral(probe="v(n03)")
+.measure i=integral(probe="v(n04)")
+.measure i=integral(probe="v(n05)")
+.measure i=integral(probe="v(n06)")
+.measure i=integral(probe="v(n07)")
+.measure i=integral(probe="v(n08)")
+.measure i=integral(probe="v(n09)")
+.measure i=integral(probe="v(n10)")
+.status notime
+.end

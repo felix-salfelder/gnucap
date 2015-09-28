@@ -1,0 +1,123 @@
+noage 
+#TTime      dvth(MP1)  dvth(MP1.BTI) control(0)
+ 0.         0.         0.         100.      
+#TTime      time       dvth(MP1)  dvth(MP1.BTI)
+ 0.         0.         0.         0.        
+ 0.         50.u       0.         21.~n     
+ 0.         100.u      0.         33.094n   
+
+ 100.u      33.094n    33.094n    100.      
+#TTime      time       dvth(MP1)  dvth(MP1.BTI)
+ 100.u      0.         33.097n    33.~n     
+ 100.u      50.u       33.097n    54.~n     
+ 100.u      100.u      33.097n    66.~n     
+
+ 200.u      66.19n     66.19n     100.      
+#TTime      time       dvth(MP1)  dvth(MP1.BTI)
+ 200.u      0.         66.193n    66.~n     
+ 200.u      50.u       66.193n    87.~n     
+ 200.u      100.u      66.193n    99.~n     
+
+ 300.u      99.283n    99.283n    1.5K      
+age (default?) 
+#TTime      dvth(MP1)  dvth(MP1.BTI) control(0)
+ 0.         0.         0.         100.      
+#TTime      time       dvth(MP1)  dvth(MP1.BTI)
+ 0.         0.         0.         0.        
+ 0.         50.u       0.         21.~n     
+ 0.         100.u      0.         33.094n   
+
+ 100.u      33.094n    33.094n    100.      
+#TTime      time       dvth(MP1)  dvth(MP1.BTI)
+ 100.u      0.         33.097n    33.~n     
+ 100.u      50.u       33.097n    54.~n     
+ 100.u      100.u      33.097n    66.~n     
+
+ 200.u      66.19n     66.19n     100.      
+#TTime      time       dvth(MP1)  dvth(MP1.BTI)
+ 200.u      0.         66.193n    66.~n     
+ 200.u      50.u       66.193n    87.~n     
+ 200.u      100.u      66.193n    99.~n     
+
+ 300.u      99.283n    99.283n    1.5K      
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) max(mym)   max(mym)   tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 0.         0.         0.         0.         100.      -Inf       -Inf        ??        -Inf       -Inf        Inf       
+ 100.u      34.4~n     34.4~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 200.u      68.9~n     68.9~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 310.u      106.~n     106.~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.72~     -2.5       
+ 535.u      184.~n     184.~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 775.24u    266.~n     266.~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.0012334  424.~n     424.~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 0.0019928  686.~n     686.~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.0031319  1.07~n     1.07~n     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.0048283  1.66~u     1.66~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 0.0073912  2.54~u     2.54~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.011215   3.86~u     3.86~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.016965   5.83~u     5.83~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.025614   8.81~u     8.81~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.038589   13.2~u     13.2~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.058051   19.9~u     19.9~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 0.087244   30.0~u     30.0~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.13103    45.1~u     45.1~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 0.19672    67.7~u     67.7~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.29524    101.~u     101.~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.44303    152.~u     152.~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 0.66472    228.~u     228.~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.72~     -2.5       
+ 0.99724    343.~u     343.~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 1.496      514.~u     514.~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.74~     -2.5       
+ 2.2442     771.~u     771.~u     0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+ 3.3665     0.0011555  0.0011555  0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.72~     -2.5       
+ 5.         0.0017114  0.0017114  0.         100.       0.0060~    0.0060~    38~.~     -0.5       -1.73~     -2.5       
+tt continue 
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) max(mym)   max(mym)   tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 5.0001     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 5.0002     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 5.0003     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 5.0007     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 5.0015     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 5.0031     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.74~     -2.5       
+ 5.0063     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.74~     -2.5       
+ 5.0127     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.74~     -2.5       
+ 5.0255     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 5.0511     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.72~     -2.5       
+ 5.1023     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.74~     -2.5       
+ 5.2047     0.0017~    0.0017~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.74~     -2.5       
+ 5.4095     0.0018~    0.0018~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.74~     -2.5       
+ 5.8191     0.0019~    0.0019~    0.         100.       0.00602~   0.00602~   38~.~     -0.5       -1.73~     -2.5       
+ 6.6383     0.0022~    0.0022~    0.         100.       0.00601~   0.00601~   38~.~     -0.5       -1.73~     -2.5       
+ 8.2767     0.0028~    0.0028~    0.         100.       0.00600~   0.00600~   38~.~     -0.5       -1.73~     -2.5       
+ 10.        0.0033~    0.0033~    0.         100.       0.00599~   0.00599~   38~.~     -0.5       -1.73~     -2.5       
+tran age 
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) max(mym)   max(mym)   tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 10.        0.         0.         0.         100.      -Inf       -Inf        ??        -Inf       -Inf        Inf       
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) max(mym)   max(mym)   tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 0.         0.         0.         0.         100.      -Inf       -Inf        ??        -Inf       -Inf        Inf       
+ 100.u      34.467n    34.467n    0.         100.       0.0060502  0.0060502  383.44    -0.5       -1.7359    -2.5       
+ 200.u      68.936n    68.936n    0.         1.5K       0.0060525  0.0060525  383.45    -0.5       -1.7359    -2.5       
+tran noage 
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) max(mym)   max(mym)   tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 200.u      0.         0.         0.         100.      -Inf       -Inf        ??        -Inf       -Inf        Inf       
+#TTime      dvth(MP1.BTI) dvth(MP1)  iter(0)    control(0) max(mym)   max(mym)   tau(MP1.BTI.RCD0) uhi(MP1.BTI.RCD0) ueff(MP1.BTI.RCD0) ulo(MP1.BTI.RCD0)
+ 0.         0.         0.         0.         100.      -Inf       -Inf        ??        -Inf       -Inf        Inf       
+ 100.u      34.467n    34.467n    0.         100.       0.0060502  0.0060502  383.44    -0.5       -1.7359    -2.5       
+ 200.u      68.936n    68.936n    0.         1.5K       0.0060525  0.0060525  383.45    -0.5       -1.7359    -2.5       
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=257952
+transient timesteps: accepted=52564, rejected=0, total=52558
+twotime timesteps: accepted=2, rejected=0, total=492
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=87.5%, ac density=87.5%
+* p type inv amp w/bti 
+*.options numdgt=7 
+.model my_rcdmodel rcd ( tnom=NA( 27.) anneal=NA(1) rem=NA( 1.Meg) Re=NA( 1.) Rc=NA( 1.))
+.model singleton bti_sum ( params=((65734.764403498935,-1,7.6851098109742111,33.944029750879885,20.802215970322095)) tnom=NA( 27.) rcd_number=1 anneal=NA(1) rcd_model_name=my_rcdmodel weight=1)
+.model cmosp pmos8 ( level=8 cdsc=NA( 240.u) cdscb=NA( 0.) cdscd=NA( 0.) cit=NA( 0.) nfactor=NA( 1.) xj=NA( 150.n) vsat=NA( 80.K) at=NA( 33.K) a0=NA( 1.) ags=NA( 0.) a1=NA( 0.) a2=NA( 1.) keta=NA(-0.047) nsub=NA( 60.E+15) ngate=NA( 0.) vbm=NA(-3.) xt=NA( 155.n) kt1=NA(-0.11) kt1l=NA( 0.) kt2=NA( 0.022) k3=NA( 80.) k3b=NA( 0.) w0=NA( 2.5u) nlx=NA( 174.n) dvt0=NA( 2.2) dvt1=NA( 0.53) dvt2=NA(-0.032) dvt0w=NA( 0.) dvt1w=NA( 5.3Meg) dvt2w=NA(-0.032) drout=NA( 0.56) ua1=NA( 4.31n) ua=NA( 2.25n) ub1=NA(-7.61E-18) ub=NA( 587.E-21) ute=NA(-1.5) voff=NA(-0.08) delta=NA( 0.01) rdsw=NA( 0.) prwg=NA( 0.) prwb=NA( 0.) prt=NA( 0.) eta0=NA( 0.08) etab=NA(-0.07) pclm=NA( 1.3) pdiblc1=NA( 0.39) pdiblc2=NA( 0.0086) pdiblcb=NA( 0.) pscbe1=NA( 424.Meg) pscbe2=NA( 10.u) pvag=NA( 0.) wr=NA( 1.) dwg=NA( 0.) dwb=NA( 0.) b0=NA( 0.) b1=NA( 0.) alpha0=NA( 0.) beta0=NA( 30.) elm=NA( 5.) vfbcv=NA(-1.) cgsl=NA( 0.) cgdl=NA( 0.) ckappa=NA( 0.6) clc=NA( 100.n) cle=NA( 0.6) acde=NA( 1.) moin=NA( 15.) noff=NA( 1.) voffcv=NA( 0.) alpha1=NA( 0.) capmod=NA(3) nqsmod=NA(0) mobmod=NA(1) noimod=NA(1) paramchk=NA(0) binunit=NA(1) version=NA( 3.3) tox=NA( 15.n) xpart=NA( 0.) jsw=NA( 0.) nj=NA( 1.) xti=NA( 3.) lint=NA( 0.) ll=NA( 0.) lln=NA( 1.) lw=NA( 0.) lwn=NA( 1.) lwl=NA( 0.) wint=NA( 0.) wl=NA( 0.) wln=NA( 1.) ww=NA( 0.) wwn=NA( 1.) wwl=NA( 0.) em=NA( 41.Meg) ef=NA( 1.) acnqsmod=NA(0) toxm=NA( 15.n) lintnoi=NA( 0.) ijth=NA( 0.1) tpb=NA( 0.) tcj=NA( 0.) tpbsw=NA( 0.) tcjsw=NA( 0.) tpbswg=NA( 0.) tcjswg=NA( 0.) llc=NA( 0.) lwc=NA( 0.) lwlc=NA( 0.) wlc=NA( 0.) wwc=NA( 0.) wwlc=NA( 0.) acm=NA(10) h0=NA( NA) tnom=NA( 27.) fc=NA( 0.5) pb= 1. cj=NA( 500.u) mj=NA( 0.5) cjsw=NA( 0.) mjsw= 0.33 is=NA( 10.f) cgso= 207.188p cgdo= 207.188p cgbo= 0. ld=NA( 0.) bti_model=singleton)
+V1 ( nin ndd ) sin offset=-vdd/2 amplitude=vdd/3 frequency= 10.K delay=-25.u damping=NA( 0.)
+R2 ( nin ng )  10.K
+MP1 ( nout ng ndd ndd )  cmosp  l=3.5e-5 w=4.5e-6
+*MP1 ndd ng nout ndd cmosp l=1.5e-5 w=4.5e-6 
+R1 ( 0 nout )  9.K
+VDD ( ndd 0 ) vdd
+mym ( nout 0 )  measm 
+*sanitycheck 
+* + P(MP1.BTI) 

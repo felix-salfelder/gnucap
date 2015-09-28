@@ -1,4 +1,5 @@
-/*$Id: c_modify.cc,v 26.132 2009/11/24 04:26:37 al Exp $ -*- C++ -*-
+/*$Id: c_modify.cc,v 1.3 2010-07-27 07:45:31 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -89,6 +90,7 @@ double sweep_fix(CS& cmd, const CARD *brh)
 /*--------------------------------------------------------------------------*/
 void modify_fault(CS& cmd, WHATTODO command, CARD_LIST* scope)
 {
+  trace0("modify_fault");
   CKT_BASE::_sim->uninit();
   while (cmd.is_alpha()) {
     unsigned mark = cmd.cursor();
@@ -162,6 +164,7 @@ public:
       faultstack.back().restore();
       faultstack.pop_back();
     }
+    trace0("CMD_UNFAULT");
     _sim->uninit();
   }
 } p4;
@@ -170,3 +173,4 @@ DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "unfault", &p4);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

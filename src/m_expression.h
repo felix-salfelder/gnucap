@@ -1,4 +1,4 @@
-/*$Id: m_expression.h,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
+/*$Id:                                -*- C++ -*-
  * Copyright (C) 2003 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -20,10 +20,11 @@
  * 02110-1301, USA.
  *------------------------------------------------------------------
  */
-//testing=script 2009.08.12
+#ifndef EXPR_H__
+#define EXPR_H__
 #include "m_base.h"
 /*--------------------------------------------------------------------------*/
-class Symbol_Table;
+//class Symbol_Table;
 class CARD_LIST;
 class Expression;
 /*--------------------------------------------------------------------------*/
@@ -37,23 +38,38 @@ private:
 public:
   void parse(CS&) {unreachable();}
 public:
-  void dump(std::ostream&)const;
+  void dump(std::ostream&out)const;
+  void dump(OMSTREAM& o)const { untested();
+    stringstream a;
+    dump(a);
+    o << a.str();
+  }
 protected:
   explicit Token(const std::string Name, const Base* Data, const std::string Args)
     : _name(Name), _data(Data), _aRgs(Args) {}
   explicit Token(const Token& P)
     : Base(), _name(P._name), _data(P._data), _aRgs(P._aRgs) {assert(!_data);}
 public:
-  virtual ~Token()   {if (_data) {delete _data;}else{}}
+  virtual ~Token()   {if (_data) {
+delete _data;}else{
+}}
   virtual Token*     clone()const = 0;
   const std::string& name()const {return _name;}
   const Base*	     data()const {return _data;}
   const std::string& aRgs()const {return _aRgs;}
   const std::string  full_name()const {return name() + aRgs();}
+  template<class S>
+  S& full_dump(S& s)const {return _full_dump(s);}
   virtual void	     stack_op(Expression*)const {unreachable();}
-  bool operator==(const Token& P) {untested();return (typeid(*this)==typeid(P))
+  bool operator==(const Token& P) {return (typeid(*this)==typeid(P))
       && (data()==P.data()) && (name()==P.name()) && (aRgs()==P.aRgs());}
+protected:
+  virtual OMSTREAM& _full_dump(OMSTREAM& s)const {return s << full_name();}
+  virtual std::ostream& _full_dump(std::ostream& s)const {untested(); return s << full_name();}
 };
+/*--------------------------------------------------------------------------*/
+template<class S>
+inline S& operator<<(S& out, const Token& d) {d.dump(out); return out;}
 /*--------------------------------------------------------------------------*/
 class Token_SYMBOL : public Token
 {
@@ -64,6 +80,10 @@ public:
   Token* clone()const {untested();return new Token_SYMBOL(*this);}
   void stack_op(Expression*)const;
 };
+/*--------------------------------------------------------------------------*/
+template<class S>
+inline S& operator<<(S& out, const Token_SYMBOL& d) {untested(); d.dump(out); return out;}
+/*--------------------------------------------------------------------------*/
 class Token_BINOP : public Token
 {
 public:
@@ -110,6 +130,9 @@ public:
   explicit Token_CONSTANT(const Token_CONSTANT& P) : Token(P) {untested();}
   Token* clone()const {untested();return new Token_CONSTANT(*this);}
   void stack_op(Expression*)const;
+protected:
+  std::ostream& _full_dump(std::ostream& s)const {data()->dump(s); return s;}
+  OMSTREAM& _full_dump(OMSTREAM& s)const {data()->dump(s); return s;}
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE Expression
@@ -119,12 +142,16 @@ public:
   const CARD_LIST* _scope;
 public:
   void parse(CS&);
-  void dump(std::ostream&)const;
+  void dump(std::ostream&out)const {return _dump(out);}
+  void dump(OMSTREAM&out)const {return _dump(out); }
+private:
+  template<class S> void _dump(S&)const;
 private: // expression-in.cc
   void arglisttail(CS& File);
   void arglist(CS& File);
   void leaf(CS& File);
   void factor(CS& File);
+  void factortail(CS& File);
   void termtail(CS& File);
   void term(CS& File);
   void addexptail(CS& File);
@@ -136,18 +163,27 @@ private: // expression-in.cc
   void exptail(CS& File);
   void expression(CS& File);
 public:
-  explicit Expression() : _scope(NULL) {untested();}
-  explicit Expression(CS& File) : _scope(NULL) {parse(File);}
+  explicit Expression() : _scope(NULL) {
+  }
+  explicit Expression(CS& File) : _scope(NULL) {
+    parse(File);
+  }
 private: // expression-reduce.cc
   void reduce_copy(const Expression&);
 public:
   explicit Expression(const Expression&, const CARD_LIST*);
 public: // other
-  bool as_bool()const {untested();return (!is_empty() && back()->data());}
+  bool as_bool()const { untested();
+    return (!is_empty() && back()->data());
+  }
   double eval()const {
     const Float* f = dynamic_cast<const Float*>(back()->data());
     return ((f && size()==1) ? (f->value()) : (NOT_INPUT));
   }
 };
 /*--------------------------------------------------------------------------*/
+template<class S>
+inline S& operator<<(S& out, const Expression& d) {d.dump(out); return out;}
 /*--------------------------------------------------------------------------*/
+#endif
+// vim:ts=8:sw=2:noet:

@@ -1,0 +1,75 @@
+// p type inv amp w/hci
+spice
+
+.options TEMP=25
+.options initsc 1
+.options nottcorr
+
+*.include inv_amp_p.mod
+.param vdd=2.7
+
+
+.param cmosn_hci=1
+.param cmosp_hci=0
+.param cmosn_bti=none
+.param cmosp_bti=none
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.0E-08 BETA0 = 12
++ H0 = cmosp_hci
++ bti_model=cmosp_bti
++ )
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ H0 = cmosn_hci
++ bti_model=cmosn_bti
++ )
+
+MP1 ndd ng nout ndd cmosp l=1.5e-7 w=4.5e-6
+R1 0 nout 9k
+R1 0 nout2 9k
+
+* weird
+MN1 ndd ng nout2 0 cmosn l=1.5e-7 w=4.5e-6
+
+MN2 nout ng 0 0 cmosn l=1.5e-7 w=4.5e-6
+VDD ndd 0 vdd
+
+vgate ng 0 pulse (iv=0 pv=vdd rise=1u fall=1u width=2u delay=.5u)
+
+.verilog
+measm nomax(nout,0);
+spice
+
+.print tw
++ hci(MN*.hci)
++ dvth(MN1.hci)
++ dvth(MN1)
++ v(nomax)
++ use_hci(M*1)
++ hidden(0)
++ age(0)
+.print tran
++ v(ng) Isb(MP1) Isb(MN1) Idb(MP1) Idb(MN1)
++ dvth(MN1)
++ hidden(0)
+
+.ttr 100u .1u 5u basic tran basic > hcitest_tr.out
+.ttr 0. 100u * 2 basic new trace=a tran basic >> hcitest_tr.out
+
+.print tw dvth(MN1) hci(MN1)
+.ttr 0 21u 1u 5u 6u basic new tran basic
+
+.print tran v(ng) dvth(MN1) stress(MN*.hci)
+.tran 0 5u 5u trace=a
+.tran 0 5u 5u basic trace=a age
+
+* fine sampling for reference
+.print tran +hidden(0)
+.tran 0 5u .05u basic age skip=10
+
+.status notime
+.end

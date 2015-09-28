@@ -1,4 +1,4 @@
-/*$Id: io_findf.cc,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/*                                         -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -31,18 +31,15 @@
  *
  * PATHSEP, ENDDIR are system dependent, defined in md.h
  */
-//testing=script,sparse 2006.07.17
 #include "l_lib.h"
 /*--------------------------------------------------------------------------*/
 std::string findfile(const std::string& filename, const std::string& path,
 		     int mode)
 {
 #ifdef CHECK_LOCAL_FIRST
-  if (OS::access_ok(filename, mode)) {
-    untested(); 
+  if (OS::access_ok(filename, mode)) { untested();
     return filename;
-  }else{
-    untested(); 
+  }else{ untested();
   }
 #endif
 					// for each item in the path
@@ -55,11 +52,11 @@ std::string findfile(const std::string& filename, const std::string& path,
     }
     if (!target.empty() &&  !strchr(ENDDIR,p_ptr[-1])) {
       target += *ENDDIR;		// append '/' if needed
-    }else{untested();
+    }else{ untested();
     }
-    
+
     target += filename;
-    if (OS::access_ok(target, mode)) {untested();	// found it
+    if (OS::access_ok(target, mode)) {
       return target;
     }else if (p_ptr==path.end()) {	// ran out of path, didn't find it
       return "";
@@ -70,3 +67,4 @@ std::string findfile(const std::string& filename, const std::string& path,
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,0 +1,11 @@
+spice
+
+R1 vbg2 0 100k
+V1 vbg2 0 7
+
+.list
+.nodelist
+
+.print tran v(nodes) i(v1) R(r1) v(r1) i(r1)
+.tran 0 1 0.1
+.end

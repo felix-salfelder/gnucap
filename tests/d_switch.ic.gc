@@ -1,0 +1,26 @@
+spice
+
+V1   1  0  1
+
+S0   n0  1  nctl  0  myswitch ic=0
+R0 n0 0 1k
+
+S1   n1  1  nctl  0  myswitch ic=1
+R1 n1 0 1k
+
+S2   n2  1  nctl  0  myswitch
+R2 n2 0 1k
+
+Vctl   nctl  0  0
+.model  myswitch  sw  ( vt= 0.  vh= 2.  ron= 1e-12  roff= 1.E+12 )
+
+.print dc v(n*) s0(s*)
+
+.list
+
+.dc vctl 0 5 1 loop
+.dc vctl 0 5 1 cont loop
+.dc vctl 0 5 1 uic
+.dc vctl -5 5 1 reverse cont
+
+.end

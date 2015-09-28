@@ -1,0 +1,20 @@
+#ifndef PATCHLEVEL_H
+#define PATCHLEVEL_H
+
+// lets assume 26 is the interface and 138 is some sort of revision
+// eventually, SOME_NUMBER might become the distance to the last gittag?
+#define SOME_NUMBER "138"
+#define PATCHLEVEL "@PACKAGE_VERSION@ GIT @INTERFACE_VERSION@." SOME_NUMBER
+
+// needed?
+// #define HAVE_GIT_REPO @HAVE_GIT_REPO@
+
+#ifdef ADD_VERSION
+static const unsigned iv = @INTERFACE_VERSION@;
+static const char* in = @INTERFACE_NAME@;
+extern "C" {
+unsigned interface_version(){return iv;}
+const char* interface_name(){return in;}
+}
+#endif
+#endif

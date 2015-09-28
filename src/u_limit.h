@@ -1,4 +1,4 @@
-/* $Id: u_limit.h,v 26.81 2008/05/27 05:34:00 al Exp $ -*- C++ -*-
+/* $Id: u_limit.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2006 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -116,3 +116,4 @@ inline double fet_limit_vgs(double vnew, double vold, double vto)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

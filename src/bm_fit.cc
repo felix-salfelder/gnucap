@@ -1,4 +1,4 @@
-/*$Id: bm_fit.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_fit.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -42,6 +42,8 @@ private:
   PARAMETER<double> _above;
   PARAMETER<double> _delta;
   PARAMETER<int>    _smooth;
+  static map<string, PARA_BASE EVAL_BM_FIT::*> param_dict;
+
   std::vector<std::pair<PARAMETER<double>,PARAMETER<double> > > _table;
   SPLINE* _spline;
   explicit	EVAL_BM_FIT(const EVAL_BM_FIT& p);
@@ -60,6 +62,7 @@ private: // override virtual
   std::string	name()const		{return "fit";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
+  void      set_param_by_name(string Name, string Value);
   bool		parse_params_obsolete_callback(CS&);
 };
 /*--------------------------------------------------------------------------*/
@@ -104,9 +107,6 @@ bool EVAL_BM_FIT::operator==(const COMMON_COMPONENT& x)const
     && _smooth == p->_smooth
     && _table == p->_table
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -154,7 +154,7 @@ void EVAL_BM_FIT::precalc_last(const CARD_LIST* Scope)
 	 iterator p = _table.begin();  p != _table.end();  ++p) {
     if (last > p->first) {untested();
       throw Exception_Precalc("FIT table is out of order: (" + to_string(last)
-      			      + ", " + to_string(p->first) + ")\n");
+      			      + ", " + string(p->first) + ")\n");
     }else{
     }
     last = p->first;
@@ -202,6 +202,25 @@ bool EVAL_BM_FIT::parse_numlist(CS& cmd)
   return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
+map<string, PARA_BASE EVAL_BM_FIT::*> EVAL_BM_FIT::param_dict = 
+  boost::assign::map_list_of
+    ("order", (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_order)
+    ("below", (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_below)
+    ("above", (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_above)
+    ("delta", (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_delta)
+    ("smooth",(PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_smooth);
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_FIT::set_param_by_name(string Name, string Value)
+{ untested();
+  PARA_BASE EVAL_BM_FIT::* x = (param_dict[Name]);
+  if(x) {
+    PARA_BASE* p = &(this->*x);
+    *p = Value;
+  } else {
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool EVAL_BM_FIT::parse_params_obsolete_callback(CS& cmd)
 {
   return ONE_OF
@@ -220,3 +239,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "fit", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

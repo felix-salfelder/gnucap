@@ -1,0 +1,8 @@
+spice
+
+R1 1 0 tran 1 dc 2 else 1g
+V1 1 0 1
+.print tran v(nodes) r(r1)
+.list
+.tran 0 1 0.1
+.end

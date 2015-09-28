@@ -1,0 +1,29 @@
+spectre
+parameters global_r=9
+
+subckt compon ngnd ndd
+  R1 (ndd ngnd) resistor r=global_r
+ends
+
+subckt componb ( ngnd ndd )
+  R1 (ndd ngnd) resistor r=2
+ends
+
+subckt deep ngnd ndd
+  parameters global_r=6
+  c1 (ndd ngnd) compon
+ends
+
+t1 (0 ndd) compon
+t2 (0 ndd) componb
+d1 (0 ndd) deep
+
+V1 (ndd 0) vsource dc=10
+
+simulator lang=spice
+.options insensitive=0
+
+.print dc r(t*.R*) r(d1.c1.R*)
+.dc
+
+.end

@@ -1,4 +1,4 @@
-/*$Id: ap_construct.cc,v 26.130 2009/11/15 21:51:59 al Exp $ -*- C++ -*-
+/*                                    -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,16 +21,30 @@
  *------------------------------------------------------------------
  * construction, copy, etc.
  */
-//testing=script,sparse 2006.07.17
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "u_opt.h"
 #include "ap.h"
+#include <ios>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#ifdef HAVE_BOOST
+# include <boost/algorithm/string.hpp>
+# include <boost/algorithm/string/split.hpp>
+#endif
+#include "u_lang.h"
 
-#if defined(HAVE_LIBREADLINE)
+#ifdef HAVE_LIBREADLINE
   #include <readline/readline.h>
   #include <readline/history.h>
 #endif
 /*--------------------------------------------------------------------------*/
-static std::string getlines(FILE*);
+// static std::string getlines(FILE*);
 OMSTREAM mout; // > file bitmap //BUG//encapsulation
 OMSTREAM mlog; // log file bitmap
 /*--------------------------------------------------------------------------*/
@@ -45,11 +59,57 @@ CS::CS(CS::STDIN)
    _ok(true),
    _line_number(0)
 {
+
+#ifdef HAVE_LIBREADLINE
+  std::string gh = std::string(getenv("HOME")) + "/.gnucap_history";
+  char str[BUFLEN];
+  std::ifstream file;
+  file.open(gh.c_str());
+  if( file )
+    while(file.getline(str, BUFLEN)) {
+      add_history(str);
+    }
+  file.close();
+#endif
+  
+  // add history
 }
-/*--------------------------------------------------------------------------*/
+
+CS::~CS()
+{
+  if (_file==stdin){
+
+
+  }
+  if (is_file()) {fclose(_file);}
+
+}
+/*--------------------------------------------------------------------------
+  bool search_file( std::string &name ){
+    const char* h ="HOME";
+    const char* home= getenv(h);
+
+    if (name[0] == '/') return true; // fixme
+
+    std::string pathlist[4] = { OPT::libpath , "./",  LIBDIR,
+      std::string(home) + std::string("/.gnucap/lib/") };
+
+    // FIXME. use libpath 
+
+    for(int i=1; i<4 ; i++) {
+      if ( FILE* tmp = fopen( (pathlist[i] + "/" + name).c_str(), "r" ) ) {
+        fclose(tmp);
+        name = pathlist[i]+"/"+name;
+        return true;
+      }
+      trace0( (" not found " + pathlist[i] + "/" + name).c_str());
+    }
+    return false;
+
+  }
+--------------------------------------------------------------------------*/
 CS::CS(CS::INC_FILE, const std::string& name)
-  :_file(fopen(name.c_str(), "r")),
-   _name(name),
+  :_name(name),
    _cmd(),
    _cnt(0),
    _length(0),
@@ -58,6 +118,33 @@ CS::CS(CS::INC_FILE, const std::string& name)
    _ok(true),
    _line_number(0)
 {
+
+#ifdef HAVE_BOOST
+  if(name[0]=='/' || name[0]=='~')
+#else
+  if(1)
+#endif
+  {
+    trace0(("CS::CS(inc, absulute " +  name).c_str());
+    _file = fopen(name.c_str(), "r");
+  }else{
+
+    std::vector< std::string > pathlist;
+    std::string includepath = OPT::includepath;
+#ifdef HAVE_BOOST
+    boost::algorithm::split(pathlist, includepath, boost::is_any_of(":"));
+    for(std::vector< std::string >::iterator i=pathlist.begin(); i!=pathlist.end() ; ++i) {
+      std::string fn = (*i + "/" + name);
+      trace1("CS::CS inc, trying ", fn.c_str());
+      if (( _file = fopen( fn.c_str(), "r" ) ) ) {
+        break;
+      }else{
+        trace0("no file");
+      }
+    }
+#endif
+  }
+
   if (!_file) {itested();
     throw Exception_File_Open(name + ':' + strerror(errno));
   }else{
@@ -144,17 +231,43 @@ CS& CS::operator=(const CS& p)
 }
 #endif
 /*--------------------------------------------------------------------------*/
+bool CS::eat_lines()
+{
+
+  bool ret=false;
+  
+  skipbl(); 
+  while(_file && !tailsize()){
+    ret=true;
+
+    get_line( string());
+    skipbl(); 
+  }
+
+  return ret;
+
+}
+/*--------------------------------------------------------------------------*/
 CS& CS::get_line(const std::string& prompt)
 {
   ++_line_number;
-  if (is_file()) {
-    _cmd = getlines(_file);
+  if (!_file) { // assume string or something
+    _cnt = 0;
+    _length = 0;
+    throw Exception_End_Of_Input("EOF on string/whatever");
+  }else if (is_file() ) {
+    assert(OPT::language);
+    // BUG!?
+    // CS must know its language.
+    _cmd = OPT::language->getlines(_file);
     _cnt = 0;
     _length = static_cast<unsigned>(_cmd.length());
     _ok = true;
   }else{itested();
+    trace1("", _file);
     assert(_file == stdin);
     char cmdbuf[BUFLEN];
+//    trace0("CS::get_line " + std::string(cmdbuf));
     getcmd(prompt.c_str(), cmdbuf, BUFLEN);
     _cmd = cmdbuf;
     _cnt = 0;
@@ -179,7 +292,7 @@ char *getcmd(const char *prompt, char *buffer, int buflen)
   assert(buffer);
   if (isatty(fileno(stdin))) {
     // stdin is keyboard
-#if defined(HAVE_LIBREADLINE)
+#ifdef HAVE_LIBREADLINE
     if (OPT::edit) {
       char* line_read = readline(prompt);
       if (!line_read) {itested();
@@ -196,7 +309,16 @@ char *getcmd(const char *prompt, char *buffer, int buflen)
       free(line_read);
       
       if (*buffer) {
+        trace1("adding history", std::string(buffer));
 	add_history(buffer);
+
+        std::string gh = std::string(getenv("HOME")) + "/.gnucap_history";
+        std::ofstream file;
+        file.open(gh.c_str(),std::ios_base::app);
+        if( file )
+                file << buffer << "\n";
+        file.close();
+
       }else{
       }
     }else
@@ -224,49 +346,5 @@ char *getcmd(const char *prompt, char *buffer, int buflen)
   }
 }
 /*--------------------------------------------------------------------------*/
-static std::string getlines(FILE *fileptr)
-{
-  assert(fileptr);
-  const int buffer_size = BIGBUFLEN;
-  std::string s;
-
-  bool need_to_get_more = true;  // get another line (extend)
-  while (need_to_get_more) {
-    char buffer[buffer_size+1];
-    char* got_something = fgets(buffer, buffer_size, fileptr);
-    if (!got_something) { // probably end of file
-      need_to_get_more = false;
-      if (s == "") {
-	throw Exception_End_Of_Input("");
-      }else{untested();
-      }
-    }else{
-      trim(buffer);
-      size_t count = strlen(buffer);
-      if (buffer[count-1] == '\\') {itested();
-	buffer[count-1] = '\0';
-      }else{
-	// look ahead at next line
-	//int c = fgetc(fileptr);
-	int c;
-	while (isspace(c = fgetc(fileptr))) {
-	  // skip
-	}
-	if (c == '+') {
-	  need_to_get_more = true;
-	}else if (c == '\n') {unreachable();
-	  need_to_get_more = true;
-	  ungetc(c,fileptr);
-	}else{
-	  need_to_get_more = false;
-	  ungetc(c,fileptr);
-	}
-      }
-      s += buffer;
-      s += ' ';
-    }
-  }
-  return s;
-}
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:et:

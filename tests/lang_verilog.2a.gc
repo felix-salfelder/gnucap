@@ -1,0 +1,9 @@
+verilog
+paramset diode d;
+.is=5;
+endparamset
+
+paramset foo
+
+list
+end

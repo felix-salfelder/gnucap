@@ -1,4 +1,4 @@
-/*$Id: u_sdp.h,v 26.83 2008/06/05 04:46:59 al Exp $ -*- C++ -*-
+/*$Id: u_sdp.h,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -51,6 +51,12 @@ public:
       + _wd.e_val(0.,scope)/W + _pd.e_val(0.,scope)/(W*L);
   }
   double nom()const {return _nom;}
+  double dW(double W, double L, const CARD_LIST* scope)const {
+    return - _wd.e_val(0.,scope)/(W*W) - _pd.e_val(0.,scope)/(W*W*L);
+  }
+  double dL(double W, double L, const CARD_LIST* scope)const {
+    return - _ld.e_val(0.,scope)/(L*L) - _pd.e_val(0.,scope)/(W*L*L);
+  }
   void set_nom(double n) {untested();_nom = n;}
   void set_w(double n) {untested();_wd = n;}
   void set_l(double n) {untested();_ld = n;}
@@ -68,11 +74,12 @@ public:
   bool l_has_value()const {return _ld.has_hard_value();}
   bool p_has_value()const {return _pd.has_hard_value();}
 
-  std::string string()const {return _nom.string();}
-  std::string w_string()const {return _wd.string();}
-  std::string l_string()const {return _ld.string();}
-  std::string p_string()const {return _pd.string();}
+  std::string string()const {return _nom;}
+  std::string w_string()const {return _wd;}
+  std::string l_string()const {return _ld;}
+  std::string p_string()const {return _pd;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+// vim:ts=8:sw=2:noet:

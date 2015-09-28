@@ -1,4 +1,4 @@
-/*$Id: io_error.cc,v 26.83 2008/06/05 04:46:59 al Exp $ -*- C++ -*-
+/*$Id: io_error.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -43,13 +43,13 @@ Exception_CS::Exception_CS(const std::string& Message, const CS& cmd)
   :Exception(Message),
    _cmd(cmd.fullstring()),
    _cursor(cmd.cursor())
-{itested();
+{
 }
 /*--------------------------------------------------------------------------*/
 const std::string Exception_CS::message()const
-{itested();
+{
   std::string s;
-  if (_cursor < 40) {itested();
+  if (_cursor < 40) {
     s = _cmd.substr(0,60)
       + '\n' + std::string(_cursor, ' ') + "^ ? " + Exception::message();
   }else{untested();
@@ -85,3 +85,4 @@ void error(int badness, const std::string& message)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

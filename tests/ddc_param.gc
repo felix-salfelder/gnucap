@@ -1,0 +1,12 @@
+spice
+
+.parameter u=1
+.parameter x=10
+V1 na 0 u
+C1 fo 0 2n ic=x
+
+.print ddc v(nodes)
+.ddc au -1 1 1
+.ddc u -1 1 1
+.ddc x -1 1 1
+.end

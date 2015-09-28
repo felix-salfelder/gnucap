@@ -1,0 +1,111 @@
+spice 
+>>>>>.print tran v(nodes) method(c1) disc(nodes) hidden(0) event(v1) 
+>>>>>.tran 0 2 2 trace=a 
+#Time       v(n1)      v(n2)      method(c1) disc(n1)   disc(n2)   hidden(0)  event(v1) 
+ 0.         0.         0.        -1.         0.         0.         1.         1.        
+ 0.02       0.         0.         4.         0.         0.         1.         1.        
+ 0.04       0.         0.         2.         0.         0.         1.         1.        
+ 0.06       0.         0.         2.         0.         0.         1.         1.        
+ 0.08       0.         0.         2.         0.         0.         1.         1.        
+ 0.1        0.         0.         2.         0.         0.         1.         1.        
+ 1.         0.         0.         2.         2.         2.         1.         1.001     
+step rejected:c1
+new=1.4e-05  old=0.001  required=0.0005
+backwards time step
+newtime=1.000014e+00  rejectedtime=1.001000e+00  oldtime=1.000000e+00
+step rejected:c1
+new=1.94444e-07  old=1.38889e-05  required=6.94444e-06
+backwards time step
+newtime=1.000000e+00  rejectedtime=1.000014e+00  oldtime=1.000000e+00
+step rejected:c1
+new=2.70062e-09  old=1.92901e-07  required=9.64506e-08
+backwards time step
+newtime=1.000000e+00  rejectedtime=1.000000e+00  oldtime=1.000000e+00
+ 1.         4.0187u    16.f       4.         0.         0.         4.         1.001     
+ 1.         38.855u    763.f      2.         0.         0.         1.         1.001     
+ 1.         73.692u    2.723p     2.         0.         0.         1.         1.001     
+ 1.         132.12u    8.736p     2.         0.         0.         1.         1.001     
+ 1.         0.0092944  43.193n    2.         0.         0.         1.         1.001     
+ 1.0001     0.14381    10.34u     2.         0.         0.         1.         1.001     
+ 1.001      0.99547    495.27u    2.         0.         0.         1.         1.001     
+ 1.001      0.99999    499.78u    2.         2.         2.         1.         4.001     
+step rejected:c1
+new=8.88308e-05  old=0.00584211  required=0.00292105
+backwards time step
+newtime=1.001089e+00  rejectedtime=1.006842e+00  oldtime=1.001000e+00
+step rejected:c1
+new=8.2403e-06  old=8.85167e-05  required=4.42584e-05
+backwards time step
+newtime=1.001008e+00  rejectedtime=1.001089e+00  oldtime=1.001000e+00
+ 1.001      0.99999    507.82u    4.         0.         0.         3.         4.001     
+ 1.001      0.99999    515.86u    2.         0.         0.         1.         4.001     
+ 1.0103     0.99999    0.0097183  2.         0.         0.         1.         4.001     
+ 1.0273     0.99999    0.026474   2.         0.         0.         1.         4.001     
+ 1.1489     0.99999    0.13805    2.         0.         0.         1.         4.001     
+ 1.3191     0.99999    0.27326    2.         0.         0.         1.         4.001     
+ 1.5461     0.99999    0.42139    2.         0.         0.         1.         4.001     
+ 1.773      1.         0.53933    2.         0.         0.         1.         4.001     
+ 2.         1.         0.63322    2.         0.         0.         1.         4.001     
+>>>>>.stat notime 
+Gnucap   System status
+iterations: op=0, dc=0, tran=107, fourier=0, total=136
+transient timesteps: accepted=24, rejected=5, total=29
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+>>>>>.echo tranponly 
+tranponly 
+>>>>>.options method traponly 
+>>>>>.tran 0 2 2 trace=a 
+#Time       v(n1)      v(n2)      method(c1) disc(n1)   disc(n2)   hidden(0)  event(v1) 
+ 0.         0.         0.        -1.         0.         0.         1.         1.        
+ 0.02       0.         0.         2.         0.         0.         1.         1.        
+ 0.04       0.         0.         2.         0.         0.         1.         1.        
+ 0.06       0.         0.         2.         0.         0.         1.         1.        
+ 0.08       0.         0.         2.         0.         0.         1.         1.        
+ 0.1        0.         0.         2.         0.         0.         1.         1.        
+ 1.         0.         0.         2.         2.         2.         1.         1.001     
+step rejected:c1
+new=8.4e-05  old=0.001  required=0.0005
+backwards time step
+newtime=1.000083e+00  rejectedtime=1.001000e+00  oldtime=1.000000e+00
+step rejected:c1
+new=7e-06  old=8.33333e-05  required=4.16667e-05
+backwards time step
+newtime=1.000007e+00  rejectedtime=1.000083e+00  oldtime=1.000000e+00
+step rejected:c1
+new=5.83333e-07  old=6.94444e-06  required=3.47222e-06
+backwards time step
+newtime=1.000001e+00  rejectedtime=1.000007e+00  oldtime=1.000000e+00
+step rejected:c1
+new=4.86111e-08  old=5.78704e-07  required=2.89352e-07
+backwards time step
+newtime=1.000000e+00  rejectedtime=1.000001e+00  oldtime=1.000000e+00
+ 1.         48.225u    1.163p     2.         0.         0.         5.         1.001     
+ 1.         83.061u    3.45p      2.         0.         0.         1.         1.001     
+ 1.         117.9u     6.95p      2.         0.         0.         1.         1.001     
+ 1.         0.0093811  44.003n    2.         0.         0.         1.         1.001     
+ 1.0001     0.1446     10.455u    2.         0.         0.         1.         1.001     
+ 1.001      0.99917    498.96u    2.         0.         0.         1.         1.001     
+ 1.001      0.99999    499.78u    2.         2.         2.         1.         4.001     
+step rejected:c1
+new=0.00053575  old=0.00587647  required=0.00293824
+backwards time step
+newtime=1.001534e+00  rejectedtime=1.006876e+00  oldtime=1.001000e+00
+step rejected:c1
+new=8.68887e-05  old=0.000534225  required=0.000267112
+backwards time step
+newtime=1.001076e+00  rejectedtime=1.001534e+00  oldtime=1.001000e+00
+ 1.0011     0.99999    576.05u    2.         0.         0.         3.         4.001     
+ 1.0011     0.99999    624.44u    2.         0.         0.         1.         4.001     
+ 1.0084     0.99999    0.007832   2.         0.         0.         1.         4.001     
+ 1.0792     0.99999    0.075704   2.         0.         0.         1.         4.001     
+ 1.2327     0.99999    0.20744    2.         0.         0.         1.         4.001     
+ 1.4884     0.99999    0.38718    2.         0.         0.         1.         4.001     
+ 1.7442     1.         0.52615    2.         0.         0.         1.         4.001     
+ 2.         1.         0.63361    2.         0.         0.         1.         4.001     
+>>>>>.stat notime 
+Gnucap   System status
+iterations: op=0, dc=0, tran=105, fourier=0, total=269
+transient timesteps: accepted=46, rejected=11, total=57
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

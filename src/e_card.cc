@@ -1,4 +1,4 @@
-/*$Id: e_card.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: e_card.cc 2015/01/27 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,11 +21,13 @@
  *------------------------------------------------------------------
  * Base class for "cards" in the circuit description file
  */
-//testing=script 2006.07.12
 #include "u_time_pair.h"
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
+#include "e_model.h"
+#include "d_subckt.h"
+#include "io_misc.h"
 /*--------------------------------------------------------------------------*/
 const int POOLSIZE = 4;
 /*--------------------------------------------------------------------------*/
@@ -35,31 +37,50 @@ CARD::CARD()
    _subckt(0),
    _owner(0),
    _constant(false),
+   _comment(""),
    _n(0),
-   _net_nodes(0)
+   _net_nodes(0),
+	tr_behaviour_del(0),
+	tt_behaviour_del(0),
+	tr_behaviour_rel(0),
+	tt_behaviour_rel(0)
 {
+}
+/*--------------------------------------------------------------------------*/
+CARD* CARD::clone()const
+{
+	unreachable();
+	error(bDANGER, "CARD::clone, " + dev_type() +" " + long_label() 
+			+ " has no clone()\n");
+	
+	return NULL;
 }
 /*--------------------------------------------------------------------------*/
 CARD::CARD(const CARD& p)
   :CKT_BASE(p),
    _evaliter(-100),
-   _subckt(0), //BUG// isn't this supposed to copy????
-   _owner(0),
-   _constant(p._constant),
-   _n(0),
-   _net_nodes(p._net_nodes)
+	_subckt(0), //BUG// isn't this supposed to copy????
+	_owner(0),
+	_constant(p._constant),
+	_comment(p._comment),
+	_n(0),
+	_net_nodes(p._net_nodes),
+	tr_behaviour_del(0),
+	tt_behaviour_del(0),
+	tr_behaviour_rel(0),
+	tt_behaviour_rel(0)
 {
 }
 /*--------------------------------------------------------------------------*/
 CARD::~CARD()
 {
-  delete _subckt;
+	delete _subckt;
 }
 /*--------------------------------------------------------------------------*/
 const std::string CARD::long_label()const
 {
   std::string buffer(short_label());
-  for (const CARD* brh = owner(); exists(brh); brh = brh->owner()) {
+  for (const CARD* brh = owner();  brh;  brh = brh->owner()) {
     buffer = brh->short_label() + '.' + buffer;
   }
   return buffer;
@@ -71,13 +92,11 @@ const std::string CARD::long_label()const
  * does not traverse subcircuits
  */
 int CARD::connects_to(const node_t& node)const
-{
-  untested();
+{untested();
   int count = 0;
-  if (is_device()) {
-    for (int ii = 0;  ii < net_nodes();  ++ii) {
-      untested();
-      if (node.n_() == _n[ii].n_()) {
+  if (is_device()) {untested();
+    for (uint_t ii = 0;  ii < net_nodes();  ++ii) {untested();
+      if (node.n_() == _n[ii].n_()) {untested();
         ++count;
       }else{untested();
       }
@@ -115,6 +134,8 @@ CARD* CARD::find_in_my_scope(const std::string& name)
   assert(name != "");
   assert(scope());
 
+  trace0(("CARD::find_in_my_scope, looking for " + name).c_str() );
+
   CARD_LIST::iterator i = scope()->find_(name);
   if (i == scope()->end()) {
     throw Exception_Cant_Find(long_label(), name,
@@ -133,6 +154,8 @@ const CARD* CARD::find_in_my_scope(const std::string& name)const
 {
   assert(name != "");
   assert(scope());
+
+  trace0(("CARD::find_in_my_scope looking for " + name).c_str() );
 
   CARD_LIST::const_iterator i = scope()->find_(name);
   if (i == scope()->end()) {
@@ -176,7 +199,7 @@ const CARD* CARD::find_looking_out(const std::string& name)const
     }else if (makes_own_scope()) {
       // probably a subckt or "module"
       CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
-      if (i != CARD_LIST::card_list.end()) {itested();
+      if (i != CARD_LIST::card_list.end()) {
 	return *i;
       }else{
 	throw;
@@ -192,37 +215,55 @@ TIME_PAIR CARD::tr_review()
   return TIME_PAIR(NEVER,NEVER);
 }
 /*--------------------------------------------------------------------------*/
-void CARD::new_subckt()
+void CARD::new_subckt(PARAM_LIST_MAP* p)
 {
   delete _subckt;
-  _subckt = new CARD_LIST;
+  _subckt = new CARD_LIST(this, p);
 }
 /*--------------------------------------------------------------------------*/
 void CARD::new_subckt(const CARD* Model, CARD* Owner,
-		      const CARD_LIST* Scope, PARAM_LIST* Params)
+		      const CARD_LIST* Scope, PARAM_LIST_BASE* Params)
 {
+  trace2("CARD::new_subckt", long_label(), *Params);
   delete _subckt;
+  assert(Scope==scope()); // why should
+  assert(Owner==this);    // we want something different?
   _subckt = new CARD_LIST(Model, Owner, Scope, Params);
 }
 /*--------------------------------------------------------------------------*/
 void CARD::renew_subckt(const CARD* Model, CARD* Owner,
-		      const CARD_LIST* Scope, PARAM_LIST* Params)
+		      const CARD_LIST* Scope, PARAM_LIST_BASE* Params)
 {
-  if (_sim->is_first_expand()) {
+  // trying to fix: is_first_expand is true too often!
+  bool frozen = 0;
+  const MODEL_CARD* m = dynamic_cast<const MODEL_CARD*>(Model);
+  if(m){
+    // not tested yet.
+    // frozen = m->frozen();
+  }
+  const MODEL_SUBCKT* s = dynamic_cast<const MODEL_SUBCKT*>(Model);
+  if(s){
+    frozen = s->frozen();
+  }
+
+  if (_sim->is_first_expand() && !frozen ) {
+    trace3("CARD::renew_subckt, first_expand", long_label(), *Params, *(Scope->params()));
     new_subckt(Model, Owner, Scope, Params);
-  }else{untested();
+  }else{
     assert(subckt());
+    trace3("CARD::renew_subckt, second_expand", long_label(), *Params, *(Scope->params()));
     subckt()->attach_params(Params, scope());
   }
 }
 /*--------------------------------------------------------------------------*/
-node_t& CARD::n_(int i)const
+node_t& CARD::n_(unsigned i)const
 {
   return _n[i];
 }
 /*--------------------------------------------------------------------------*/
 void CARD::set_param_by_name(std::string Name, std::string Value)
 {
+  trace2("CARD::set_param_by_name", Name, Value);
   //BUG// ugly linear search
   for (int i = param_count() - 1;  i >= 0;  --i) {
     for (int j = 0;  param_name(i,j) != "";  ++j) { // multiple names
@@ -243,7 +284,7 @@ void CARD::set_param_by_name(std::string Name, std::string Value)
  */
 void CARD::set_dev_type(const std::string& New_Type)
 {
-  if (!Umatch(New_Type, dev_type() + ' ')) {itested();
+  if (!Umatch(New_Type, dev_type() + ' ')) {
     //throw Exception_Cant_Set_Type(dev_type(), New_Type);
   }else{
     // it matches -- ok.
@@ -261,3 +302,4 @@ bool CARD::evaluated()const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

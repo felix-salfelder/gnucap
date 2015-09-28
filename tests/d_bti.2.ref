@@ -1,0 +1,32 @@
+bti11= 0.2632~  
+bti12= 0.1626~  
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=22307
+transient timesteps: accepted=4495, rejected=0, total=4494
+twotime timesteps: accepted=41, rejected=1, total=42
+nodes: user=9, subckt=0, model=0, total=9
+dctran density=43.2%, ac density=43.2%
+bti21= 0.2630~  
+bti22= 0.1596~  
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=714736
+transient timesteps: accepted=144024, rejected=0, total=144022
+twotime timesteps: accepted=1193, rejected=111, total=1346
+nodes: user=9, subckt=0, model=0, total=9
+dctran density=43.2%, ac density=43.2%
+bti31= 0.2632~  
+bti32= 0.1602~  
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=718989
+transient timesteps: accepted=144881, rejected=0, total=144878
+twotime timesteps: accepted=8, rejected=0, total=1354
+nodes: user=9, subckt=0, model=0, total=9
+dctran density=43.2%, ac density=43.2%
+bti41= 0.2628~  
+bti42= 0.1649~  
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=746606
+transient timesteps: accepted=150446, rejected=0, total=150442
+twotime timesteps: accepted=52, rejected=0, total=1406
+nodes: user=9, subckt=0, model=0, total=9
+dctran density=43.2%, ac density=43.2%

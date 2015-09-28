@@ -1,4 +1,4 @@
-/*$Id: c_prbcmd.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: c_prbcmd.cc,v 1.5 2010-07-09 12:14:20 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -49,32 +49,40 @@ void do_probe(CS& cmd, PROBELIST *probes)
 
   ONE_OF
     || Set(cmd, "tr{ansient}", &simtype, s_TRAN)
+    || Set(cmd, "tw{ot}",      &simtype, s_TTT)
+    || Set(cmd, "tt",          &simtype, s_TTT)
     || Set(cmd, "ac",	       &simtype, s_AC)
     || Set(cmd, "dc",	       &simtype, s_DC)
+    || Set(cmd, "ddc",         &simtype, s_DDC)
     || Set(cmd, "op",	       &simtype, s_OP)
     || Set(cmd, "fo{urier}",   &simtype, s_FOURIER)
+    || Set(cmd, "sens",        &simtype, s_SENS)
     ;
   
   if (!simtype) {			/* must be all simtypes */
     if (cmd.is_end()) {			/* list all */
       probes[s_TRAN].listing("tran");
+      probes[s_TTT].listing("tw");
       probes[s_AC].listing("ac");
       probes[s_DC].listing("dc");
+      probes[s_DDC].listing("ddc");
       probes[s_OP].listing("op");
       probes[s_FOURIER].listing("fourier");
+      probes[s_SENS].listing("sens");
     }else if (cmd.umatch("clear ")) {		/* clear all */
-      for (int ii = sSTART;  ii < sCOUNT;  ++ii) {
+      for (unsigned ii = sSTART;  ii < sCOUNT;  ++ii) {
 	probes[ii].clear();
       }
     }else{itested();				/* error */
       throw Exception_CS("what's this?", cmd);
     }
   }else{
-    if (cmd.is_end()) {untested();		/* list */
+    if (cmd.is_end()) {                         /* list */
       probes[simtype].listing("");
-    }else if (cmd.umatch("clear ")) {untested();/* clear */
+    }else if (cmd.umatch("clear ")) {           /* clear */
       probes[simtype].clear();
     }else{					/* add/remove */
+      trace0("CKT_BASE::_sim->init from print command");
       CKT_BASE::_sim->init();
       if (cmd.match1('-')) {itested();		/* setup cases like: */
 	action = aDELETE;			/* .probe ac + ....  */
@@ -99,8 +107,10 @@ void do_probe(CS& cmd, PROBELIST *probes)
 	}else{
 	}
 	if (action == aDELETE) {
+          trace0( "do_probe aDELETE" );
 	  probes[simtype].remove_list(cmd);
 	}else{
+          trace0("calling add_list");
 	  probes[simtype].add_list(cmd);
 	}
       }
@@ -146,6 +156,15 @@ public:
 } p3;
 DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|print|probe", &p3);
 /*--------------------------------------------------------------------------*/
+class CMD_VERIFY : public CMD {
+public:
+  void do_it(CS& cmd, CARD_LIST*)
+  {
+    do_probe(cmd,PROBE_LISTS::verify);
+  }
+} p4;
+DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "verify", &p4);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

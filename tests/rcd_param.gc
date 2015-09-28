@@ -1,0 +1,30 @@
+spice
+.load rcd_sym.so
+
+.model my_rcd rcd_exp
+
+.options initsc 1
+.param s=1
+
+.verilog
+// swapped
+my_rcd #(.weight(100) .rc0(12) .rc1(-3).re0(12) .re1(12) ) z3( nin, 0);
+my_rcd #(.weight(10) .rc0(s*12) .rc1(-s*3).re0(12) .re1(12) ) z2( nin, 0);
+
+spice
+.list
+
+.param amplitude=0.8
+V1 nin 0 sin amplitude=1.2 offset=1.5 frequency=1
+.param period=1
+.param width=1
+.param delay=1n
+
+.print tran v(nin)
++P(z*)
++tau(z*)
+
+.tr 0 1 .1 trace=a
+
+.status notime
+.end

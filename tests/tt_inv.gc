@@ -1,0 +1,63 @@
+spice
+.options TEMP=25
+
+.load rcd_sym.so
+.model my_rcdmodel rcd_exp
+
+.model bti_1 bti_sum (
++ parms = (
++(323556.834838 ,-0.74091304338940822, 7.9999074744048002, 50.0, 25.0),
++(0.00986204739979 ,-0.046730726782108274, 6.9322844619511379, 34.467824008855281, 19.76034507753667),
++(1.28936788433 ,-0.0, 13.433303380408852, 43.576925888911987, 1.4509831704140836),
++(65734.7534834 ,-0.0, 7.6851098109742111, 33.944029750879885, 20.802215970322095),
++(0.0425895446518 ,-0.0, 4.1230027350333067, 44.168622555330224, 0.35639368027120355),
++(25.5541996901 ,-46.321386556453803, 16.844440862184946, 11.976323270474861, 23.296371309229073)
++)
++rcd_model_name=my_rcdmodel  weight=1)
+.model my_rcdmodel rcd_exp
+.model cmosp pmos (
++ level = 8
++ bti_model = bti_1
++ H0 = 1e-3 )
+
+V1 nin 0 sin ( delay=-0.025m amplitude=1 frequency=1e4 offset=0.4)
+
+.param pulse_iv=0
+.param pulse_rise=1n
+
+.param voff=0.4
+
+.param vdd=3.3
+R2 nin ng 10k
+MP1 ndd ng nout ndd cmosp l=1.5e-7 w=4.5e-5
+R1 0 nout 5k
+VDD ndd 0 vdd
+
+.print tw
++      meas({max(probe="v(nout)")})
++      meas({min(probe="v(nout)")})
++      hci(MP1) dvth(MP1) bti(MP1)
+
+.echo tt init run
+.store tran v(nout)
+.print tran v(n*)
+.tw .1u .1m 1 new tran > tt_inv_tran.out
+.echo dumping nodes
+.dumpnodes adp > tt_inv_adp.dat
+
+* BUG: 2nd line in tran.out
+.tw 10 tran > tt_inv_tran2.out
+.end
+
+.param amplitude=0
+.tw 10 cont
+
+.end
+
+.param amplitude=0.4
+.tw 0 100 5000
+.param amplitude=0
+.tw 10000
+
+.end
+

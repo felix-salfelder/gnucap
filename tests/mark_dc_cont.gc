@@ -1,0 +1,21 @@
+spice
+
+.param myR=1
+
+R1 0 2 myR
+I1 0 2 3
+
+.op
+.mark
+.print tran v(nodes)
+
+.tr 0 1 .5
+.tr 0 1 .5 cont
+
+.param myR=2
+.tr 0 1 .5 cont
+
+.alter R1 4
+.tr 0 1 .5 cont
+
+.end

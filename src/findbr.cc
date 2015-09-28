@@ -1,4 +1,4 @@
-/*$Id: findbr.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: findbr.cc,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -107,3 +107,4 @@ CARD_LIST::fat_iterator findbranch(CS& cmd, CARD_LIST::fat_iterator here)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

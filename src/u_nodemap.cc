@@ -1,4 +1,5 @@
-/*$Id: u_nodemap.cc,v 26.83 2008/06/05 04:46:59 al Exp $ -*- C++ -*-
+/*$Id: u_nodemap.cc,v 1.1 2009-10-23 12:01:45 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2002 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -23,12 +24,13 @@
  */
 //testing=script,complete 2006.07.14
 #include "e_node.h"
+#include "e_adp.h"
 #include "u_nodemap.h"
 /*--------------------------------------------------------------------------*/
 NODE ground_node("0",0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
-  : _node_map()
+  : _node_map(), ckt(0), adp(0)
 {
   _node_map["0"] = &ground_node;
 }
@@ -43,10 +45,12 @@ NODE_MAP::NODE_MAP(const NODE_MAP& p)
   unreachable();
   for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) {
     untested();
-    if (i->first != "0") {
+    CKT_NODE* s=dynamic_cast<CKT_NODE*>(i->second);
+
+    if (i->first != "0" && s) {
       untested();
       assert(i->second);
-      i->second = new NODE(i->second);
+      i->second = (NODE_BASE*) new CKT_NODE(s);
     }else{
       untested();
     }
@@ -55,6 +59,7 @@ NODE_MAP::NODE_MAP(const NODE_MAP& p)
 /*--------------------------------------------------------------------------*/
 NODE_MAP::~NODE_MAP()
 {
+  trace0("NODE_MAP::~NODE_MAP");
   for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) {
     if (i->first != "0") {
       assert(i->second);
@@ -63,10 +68,30 @@ NODE_MAP::~NODE_MAP()
   }  
 }
 /*--------------------------------------------------------------------------*/
+//#ifdef DO_TRACE FIXME!
+// slow/stupid, but used for sckt node naming.
+// need map<unsigned, NODE_BASE*>;
+NODE_BASE* NODE_MAP::operator[](unsigned x)const {
+  USE(x);
+
+  for (NODE_MAP::const_iterator ni = _node_map.begin(); ni != _node_map.end(); ++ni) {
+    NODE_BASE* n = (*ni).second;
+    USE(n);
+    string label = (*ni).first;
+    trace2("NODE_MAP::operator[]", x, label);
+
+    CKT_NODE* c = dynamic_cast<CKT_NODE*>(n);
+    if(c && c->user_number() == x){ return c; };
+  }
+  error(bDANGER, "cannot find %d\n", x);
+  assert(false);
+  return 0;
+}
+/*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
  * returns NULL pointer if no match
  */
-NODE* NODE_MAP::operator[](std::string s)
+NODE_BASE* NODE_MAP::operator[](std::string s)
 {
   const_iterator i = _node_map.find(s);
   if (i != _node_map.end()) {
@@ -83,22 +108,79 @@ NODE* NODE_MAP::operator[](std::string s)
 /* return a pointer to a node given a string
  * creates a new one if it isn't already there.
  */
-NODE* NODE_MAP::new_node(std::string s)
-{  
+CKT_NODE* NODE_MAP::new_node(std::string s_in, const CARD_LIST* scope)
+{
+  std::string::size_type dotplace = s_in.find_last_of(".");
+  string s = s_in;
+
+  trace1("new_node", s_in);
+  // allow leading dot only (stupid)
+  if(dotplace == std::string::npos || s_in.c_str()[0]=='.'){
+  }else{
+    error(bWARNING,"something wrong with dotplace" + s_in + "\n");
+  }
+
   if (OPT::case_insensitive) {
     notstd::to_lower(&s);
   }else{
   }
-  NODE* node = _node_map[s];
+  NODE_BASE* node = _node_map[s];
+  CKT_NODE* cnode=dynamic_cast<CKT_NODE*>(node);
+
+  if(node && !cnode){
+    incomplete(); // type/name collision
+    assert(false);
+  }
+
+  // increments how_many() when lookup fails (new s)
+  if (!node) {
+    node = new CKT_NODE(s, how_many(), scope);
+    //trace2("NODE_MAP::new_node", s, node->user_number());
+    //                 ^^^^ is really the map number of the new node
+    ckt++;
+    _node_map[s] = dynamic_cast<NODE_BASE*>(node);
+  }
+  trace2("NODE_MAP::new_node ", s, node->user_number());
+  assert(node);
+  return dynamic_cast<CKT_NODE*>(node); 
+}
+/*--------------------------------------------------------------------------*/
+ADP_NODE* NODE_MAP::new_adp_node(std::string s, const CARD_LIST* p)
+{
+  std::string::size_type dotplace = s.find_last_of(".");
+  assert(dotplace == std::string::npos); USE(dotplace);
+
+  trace1("NODE_MAP::new_node ", s);
+  if (OPT::case_insensitive) {
+    notstd::to_lower(&s);
+  }else{
+  }
+  NODE_BASE* node = _node_map[s];
+  ADP_NODE* anode = dynamic_cast<ADP_NODE*>(node);
+
+  if (node && !anode){
+    error(bDANGER, "node exists and is not an adp node: %s\n", node->long_label().c_str());
+    assert(0);
+  }
 
   // increments how_many() when lookup fails (new s)  
   if (!node) {
-    node = new NODE(s, how_many());
-    //                 ^^^^ is really the map number of the new node
+    assert(!anode);
+    anode = new ADP_NODE( s, p);
+    assert(anode);
+    node = prechecked_cast<NODE_BASE*>(anode);
+    assert(node);
+    trace2("NODE_MAP::new_adp_node", anode->long_label(),
+                     anode->m_());
+    //                ^^^^ is really the map number of the new node
+    adp++;
     _node_map[s] = node;
+  }else{ untested();
+    trace2("NODE_MAP::new_adp_node already there.", hp(anode), anode->short_label());
   }
-  assert(node);
-  return node;
+  assert(_node_map[s]);
+  assert(anode);
+  return anode;
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

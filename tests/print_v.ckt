@@ -1,0 +1,10 @@
+
+R1 0 1 1
+R2 0 2 1
+R3 0 3 1
+
+.print op v 1 2 3
+.op
+
+.print op v nodes
+.op

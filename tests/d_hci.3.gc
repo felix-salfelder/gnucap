@@ -1,0 +1,54 @@
+// n type inv amp w/hci
+spice
+
+.options TEMP=25
+.options nowarn
+.options nottcorr
+
+*.include inv_amp_p.mod
+.param vdd=2.7
+
+
+.param cmosn_hci=1e-3
+.param cmosp_hci=0
+.param cmosn_bti=none
+.param cmosp_bti=none
+
+.MODEL cmosp PMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.0E-08 BETA0 = 12
++ H0 = cmosp_hci
++ bti_model=cmosp_bti
++ )
+
+.MODEL cmosn NMOS (
++ LEVEL   = 49
++ ALPHA0 = 6.27411E-08 BETA0 = 11.59263
++ vth0=2
++ H0 = cmosn_hci
++ bti_model=cmosn_bti
++ )
+
+R1 nout ndd 10k
+MN1 nout nin 0 0 cmosn l=1.5e-7 w=4.5e-4
+
+R1 nout2 0 9k
+c1 nout 0 10p
+VDD ndd 0 vdd
+
+.param risefall=.1u
+
+Rin np nin 1k
+vin np 0 sin amplitude={vdd/2} offset={vdd/2}
+
+.print tran hidden(0) v(nin) v(nout) vth(MN1) stress(MN1.HCI)
+
+.print tw dvth(MN1) vth(MN1) von(MN1) dvth(MN1.hci) hci(mn1.hci)
++ ttorder(mn1.hci)
+
+.ttr 0 200u 20u 1u * 2 new trace=g  tran > hci_3_tr.out
+
+.ttr 0 200u 200u 10u * 2 new tran > hci_3b_tr.out
+
+.status notime
+.end

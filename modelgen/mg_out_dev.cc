@@ -1,4 +1,4 @@
-/*$Id: mg_out_dev.cc,v 26.134 2009/11/29 03:44:57 al Exp $ -*- C++ -*-
+/*                                  -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -28,7 +28,8 @@ static void make_dev_dispatcher(std::ofstream& out, const Device& d)
     "  static DEV_" << d.name() << " p0;\n"
     "  static DISPATCHER<CARD>::INSTALL\n"
     "    d0(&device_dispatcher, \"";
-  if (d.id_letter() != "") {
+  if (d.id_letter() != "" && d.id_letter() != "\\0" ) {
+	  std::cerr << d.id_letter() << "....\n";
     out << d.id_letter() << '|';
   }else{
   }
@@ -165,7 +166,7 @@ void make_dev_copy_constructor(std::ofstream& out, const Device& d)
 static void make_set_parameters(std::ofstream& out, const Element& e)
 {
   make_tag();
-  out << "      _" << e.name() << "->set_parameters(\"" << e.name() << "\", this, ";
+  out << "        _" << e.name() << "->set_parameters(\"" << e.name() << "\", this, ";
   if (e.eval() != "") {
     out << "&Eval_" << e.eval();
   }else if (e.args() != "") {
@@ -184,6 +185,7 @@ static void make_set_parameters(std::ofstream& out, const Element& e)
 /*--------------------------------------------------------------------------*/
 static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
 {
+  std::cerr << "name: " << e.name() << "\n";
   make_tag();
   if (!(e.omit().empty())) {
     out <<
@@ -259,10 +261,13 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
 static void make_dev_allocate_local_nodes(std::ofstream& out, const Port& p)
 {
   make_tag();
-  if (p.short_if().empty()) {untested();
-    out << 
-      "  assert(!(_n[n_" << p.name() << "].n_()));\n"
-      "  _n[n_" << p.name() << "].new_model_node();\n";
+  if (p.short_if().empty()) {
+    out <<
+      "    if (!(_n[n_" << p.name() << "].n_())) {\n"
+      "      _n[n_" << p.name() << "] = _n[n_" << p.short_to() << "];\n"
+      "    }else{\n"
+      "    }\n";
+    //BUG// generates bad code if no short_to
   }else{
     out <<
       "    //assert(!(_n[n_" << p.name() << "].n_()));\n"
@@ -313,7 +318,14 @@ static void make_dev_expand(std::ofstream& out, const Device& d)
     "  if (_sim->is_first_expand()) {\n"
     "    precalc_first();\n"
     "    precalc_last();\n"
-    "    // local nodes\n";
+    "    // optional nodes\n";
+  for (Port_List::const_iterator
+       p = d.circuit().opt_nodes().begin();
+       p != d.circuit().opt_nodes().end();
+       ++p) {
+    make_dev_allocate_local_nodes(out, **p);
+  }
+  out << "    // local nodes\n";
   for (Port_List::const_iterator
        p = d.circuit().local_nodes().begin();
        p != d.circuit().local_nodes().end();
@@ -340,6 +352,15 @@ static void make_dev_expand(std::ofstream& out, const Device& d)
     out << "  subckt()->set_slave();\n";
   }else{
   }
+  if (true) { // ? 
+    out <<
+      "  if ( adp() == NULL ){\n"
+      "    attach_adp( m->new_adp( (COMPONENT*) this ) );\n"
+      "  }else{\n"
+      "    assert(false);\n"
+      "  }\n";
+  }
+
   out << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -400,8 +421,9 @@ void make_probe_parameter_list(std::ofstream& out,const Parameter_List& pl)
   }
 }
 /*--------------------------------------------------------------------------*/
-static void make_dev_probe(std::ofstream& out, const Device& d)
+static void make_dev_tr_probe(std::ofstream& out, const Device& d)
 {
+  bool use_adp=false;
   make_tag();
   out << "double DEV_" << d.name() << "::tr_probe_num(const std::string& x)const\n"
     "{\n"
@@ -415,7 +437,13 @@ static void make_dev_probe(std::ofstream& out, const Device& d)
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
     "  assert(s);\n"
-    "\n"
+    "  const ADP_" << d.model_type() << "* a = prechecked_cast<const ADP_"
+      << d.model_type() << "*>(adp()); a=a;\n";
+
+  if ( use_adp )
+    out << "  if(!a)untested();\n";
+
+  out << "\n"
     "  ";
   for (Probe_List::const_iterator
        p = d.probes().begin();
@@ -433,6 +461,45 @@ static void make_dev_probe(std::ofstream& out, const Device& d)
     "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
+}
+static void make_dev_tt_probe(std::ofstream& out, const Device& d)
+{
+  make_tag();
+  out << "double DEV_" << d.name() << "::tt_probe_num(const std::string& x)const\n"
+    "{\n"
+    "  assert(_n);\n"
+    "  const COMMON_" << d.name() << "* c = prechecked_cast<const COMMON_"
+      << d.name() << "*>(common());\n"
+    "  assert(c);\n"
+    "  const MODEL_" << d.model_type() << "* m = prechecked_cast<const MODEL_"
+      << d.model_type() << "*>(c->model());\n"
+    "  assert(m);\n"
+    "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
+      << d.model_type() << "*>(c->sdp());\n"
+    "  assert(s);\n"
+    "  const ADP_" << d.model_type() << "* a = prechecked_cast<const ADP_"
+      << d.model_type() << "*>(adp());\n"
+    "  if(!a)untested0(\"no a\");\n"
+    "\n"
+    "  ";
+  for (Probe_List::const_iterator
+       p = d.tt_probes().begin();
+       p != d.tt_probes().end();
+       ++p) {
+    assert(*p);
+    out << "if (Umatch(x, \"" << (**p).name() << " \")) {\n"
+      "    return " << fix_expression((**p).expression()) << ";\n"
+      "  }else ";
+  }
+  // make_probe_parameter_list(out, d.device().calculated());
+  out << "{\n"
+    "    return BASE_SUBCKT::tt_probe_num(x);\n"
+    "  }\n"
+    "}\n"
+    "/*--------------------------------------"
+    "------------------------------------*/\n";
+
+
 }
 /*--------------------------------------------------------------------------*/
 static void make_dev_aux(std::ofstream& out, const Device& d)
@@ -459,10 +526,12 @@ void make_cc_dev(std::ofstream& out, const Device& d)
   make_dev_default_constructor(out, d);
   make_dev_copy_constructor(out, d);
   make_dev_expand(out, d);
-  make_dev_probe(out, d);
+  make_dev_tr_probe(out, d);
+  make_dev_tt_probe(out, d);
   make_dev_aux(out, d);
   out << "/*--------------------------------------"
     "------------------------------------*/\n";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,0 +1,12 @@
+build
+v1 1 2 sin amplitude=1
+r1 1 0 1
+l1 1 1 1
+
+param tend=1
+
+tr 0 {tend} {tend} trace=a
+echo second
+tr {2.2*tend} trace=r edge=break
+status
+end

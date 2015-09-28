@@ -1,0 +1,7 @@
+'parameter test 
+v1 ( 1 0 )  DC (a)  AC b
+r1 ( 1 2 ) c
+r2 ( 2 0 ) c+1
+ a= 1. b=a+1 c=a+b d=c+1
+#           v(1)       v(2)      
+ 27.        1.         0.57143   

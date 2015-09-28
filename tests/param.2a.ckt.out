@@ -1,0 +1,13 @@
+'parameter test 
+parameter a+b has no value
+v1 ( 1 0 )  DC (a)  AC b
+r1 ( 1 2 ) a+b
+r2 ( 2 0 ) d
+v1 ( 1 0 )  DC (a)  AC b
+r1 ( 1 2 ) a+b
+r2 ( 2 0 ) d
+ a= 1. b= 2. c= 3. d= 4.
+#           v(1)       v(2)      
+ 27.        1.         0.57143   
+#Freq       v(1)       v(2)      
+ 0.         2.         1.1429    

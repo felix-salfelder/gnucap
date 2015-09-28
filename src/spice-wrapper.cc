@@ -1,4 +1,4 @@
-/* $Id: spice-wrapper.cc,v 26.136 2009/12/07 23:20:42 al Exp $ -*- C++ -*-
+/*                                   -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -85,10 +85,10 @@ extern "C" {
 /*--------------------------------------------------------------------------*/
 extern SPICEdev info;
 const int SPICE_INVALID_NODE = 0;
-const int SPICE_UNCONNECTED_NODE = -1;
+const uint_t SPICE_UNCONNECTED_NODE = -2;
 const int OFFSET = 1;
 enum {uGROUND=1, uFLOAT=2, uDISALLOW=3};
-const int MATRIX_NODES = (MAX_NET_NODES + INTERNAL_NODES);
+const uint_t MATRIX_NODES = (MAX_NET_NODES + INTERNAL_NODES);
 class DEV_SPICE;
 class MODEL_SPICE;
 static COMMON_SUBCKT Default_Params(CC_STATIC);
@@ -211,11 +211,11 @@ protected: // override virtual
   char	  id_letter()const	{untested();return SPICE_LETTER[0];}
   bool	  print_type_in_spice()const {return true;}
   std::string value_name()const {return VALUE_NAME;}
-  int	  max_nodes()const	{return MAX_NET_NODES;}
-  int	  min_nodes()const	{return MIN_NET_NODES;}
-  int	  matrix_nodes()const	{return MATRIX_NODES;}
-  int	  net_nodes()const	{return _net_nodes;}
-  int	  int_nodes()const	{return INTERNAL_NODES;}
+  uint_t max_nodes()const	{return MAX_NET_NODES;}
+  uint_t min_nodes()const	{return MIN_NET_NODES;}
+  uint_t matrix_nodes()const	{return MATRIX_NODES;}
+  uint_t net_nodes()const	{return _net_nodes;}
+  uint_t int_nodes()const	{return INTERNAL_NODES;}
   CARD*	  clone()const		{return new DEV_SPICE(*this);}
   void	  precalc_first();
   void	  expand();
@@ -236,9 +236,9 @@ protected: // override virtual
   TIME_PAIR tr_review();
   void    tr_accept();
   void	  tr_unload();
-  double  tr_involts()const	{unreachable();return NOT_VALID;}
+  hp_float_t  tr_involts()const	{unreachable();return NOT_VALID;}
   //double tr_input()const	//ELEMENT
-  double  tr_involts_limited()const {unreachable();return NOT_VALID;}
+  hp_float_t  tr_involts_limited()const {unreachable();return NOT_VALID;}
   //double tr_input_limited()const //ELEMENT
   double  tr_amps()const	{itested();return NOT_VALID;}
   double  tr_probe_num(const std::string&)const;
@@ -250,14 +250,13 @@ protected: // override virtual
   COMPLEX ac_involts()const	{unreachable();return NOT_VALID;}
   COMPLEX ac_amps()const	{unreachable();return NOT_VALID;}
   XPROBE  ac_probe_ext(const std::string&)const {itested(); return XPROBE(NOT_VALID, mtNONE);}
-  int	  tail_size()const	{return TAIL_SIZE;}
+  uint_t	  tail_size()const	{return TAIL_SIZE;}
 public:	// type
   void set_dev_type(const std::string& nt);
   std::string dev_type()const	{return _modelname;}
 public:	// ports
   // bool port_exists(int i)const //COMPONENT
-  std::string port_name(int i)const {itested();
-    assert(i >= 0);
+  std::string port_name(uint_t i)const {itested();
     assert(i < MAX_NET_NODES);
     return port_names[i];
   }
@@ -280,6 +279,10 @@ private:
   void update_ckt()const;
   void localize_ckt()const;
   int* spice_nodes()const	{return &(_spice_instance.GENnode1);}
+#ifndef NDEBUG
+private:
+  unsigned _trouble;
+#endif
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -439,12 +442,12 @@ void DEV_SPICE::localize_ckt()const
   assert_ckt_up_to_date(ckt());
   ckt()->CKTstat = reinterpret_cast<STATistics*>(const_cast<DEV_SPICE*>(this));
   assert(OPT::_keep_time_steps <= 8);
-  for (int ii=0; ii<8; ++ii) {
+  for (uint_t ii=0; ii<8; ++ii) {
     ckt()->CKTstates[ii] = _states[ii];
   }
   //assert(ckt()->CKTtime == _time[0]); //BUG// can fail in ac
   ckt()->CKTdelta = _dt;
-  for (int ii=0; ii<OPT::_keep_time_steps-1; ++ii) {
+  for (uint_t ii=0; ii<OPT::_keep_time_steps-1; ++ii) {
     ckt()->CKTdeltaOld[ii] = _time[ii] - _time[ii+1];
   }
   assert(_dt == NOT_VALID || conchk(ckt()->CKTdelta, ckt()->CKTdeltaOld[0]));
@@ -716,22 +719,22 @@ DEV_SPICE::DEV_SPICE()
 
   {
     int* node = spice_nodes();
-    for (int ii = 0; ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
       node[ii] = SPICE_INVALID_NODE;
     }
   }
   _n = _nodes;
-  for (int ii = 0; ii < matrix_nodes(); ++ii) {
+  for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
     assert(!(_n[ii].n_()));
   }
 
-  for (int ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
+  for (uint_t ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
     _matrix[ii] = _matrix_core[ii];
     assert(_matrix[ii]);
   }
 
   assert(OPT::_keep_time_steps <= 8);
-  for (int ii=0; ii<8; ++ii) {
+  for (uint_t ii=0; ii<8; ++ii) {
     _states[ii] = NULL;
   }
 
@@ -759,22 +762,22 @@ DEV_SPICE::DEV_SPICE(const DEV_SPICE& p)
 
   {
     int* node = spice_nodes();
-    for (int ii = 0; ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
       assert(node[ii] == SPICE_INVALID_NODE);
     }
   }
   _n = _nodes;
-  for (int ii = 0; ii < matrix_nodes(); ++ii) {
+  for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
     _n[ii] = p._n[ii];
   }
 
-  for (int ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
+  for (uint_t ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
     _matrix[ii] = _matrix_core[ii];
     assert(_matrix[ii]);
   }
 
   assert(OPT::_keep_time_steps <= 8);
-  for (int ii=0; ii<8; ++ii) {
+  for (uint_t ii=0; ii<8; ++ii) {
     _states[ii] = NULL;
   }
 
@@ -790,7 +793,7 @@ DEV_SPICE::~DEV_SPICE()
   
   if (_states[0]) {
     // regular instances
-    for (int ii=0; ii<OPT::_keep_time_steps; ++ii) {
+    for (uint_t ii=0; ii<OPT::_keep_time_steps; ++ii) {
       assert(_states[ii]);
       delete [] _states[ii];
     }
@@ -799,7 +802,7 @@ DEV_SPICE::~DEV_SPICE()
   }else{
     // prototype
     assert(OPT::_keep_time_steps <= 8);
-    for (int ii=0; ii<8; ++ii) {
+    for (uint_t ii=0; ii<8; ++ii) {
       assert(!_states[ii]);
     }
     assert(!_states_1);
@@ -879,15 +882,15 @@ void DEV_SPICE::expand()
   
   { //-------- fix up external nodes
     int* node = spice_nodes();
-    for (int ii = 0; ii < net_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < net_nodes(); ++ii) {
       node[ii] = ii+OFFSET;
     }
     if (UNCONNECTED_NODES == uGROUND) {
-      for (int ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
+      for (uint_t ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
 	node[ii] = ii+OFFSET;
       }
     }else if (UNCONNECTED_NODES == uFLOAT) {
-      for (int ii = net_nodes(); ii < max_nodes(); ++ii) {untested();
+      for (uint_t ii = net_nodes(); ii < max_nodes(); ++ii) {untested();
 	node[ii] = SPICE_UNCONNECTED_NODE;
       }
     }else{
@@ -897,7 +900,7 @@ void DEV_SPICE::expand()
     }
     ckt()->CKTmaxEqNum = max_nodes();
 
-    for (int ii = max_nodes(); ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = max_nodes(); ii < matrix_nodes(); ++ii) {
       node[ii] = 0;
     }
   }
@@ -928,14 +931,14 @@ void DEV_SPICE::expand()
 
   //-------- allocate state vectors
   if (!_states[0]) {
-    for (int ii=0; ii<OPT::_keep_time_steps; ++ii) {
+    for (uint_t ii=0; ii<OPT::_keep_time_steps; ++ii) {
       assert(!_states[ii]);
       _states[ii] = new double[_num_states];
     }
     _states_1 = new double[_num_states];
   }else{
   }
-  for (int ii=0; ii<OPT::_keep_time_steps; ++ii) {
+  for (uint_t ii=0; ii<OPT::_keep_time_steps; ++ii) {
     assert(_states[ii]);
     std::fill_n(_states[ii], _num_states, 0);
   }
@@ -949,7 +952,7 @@ void DEV_SPICE::expand()
   if (_sim->is_first_expand()) {
     int start_internal = 0;
     if (UNCONNECTED_NODES == uGROUND) {
-      for (int ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
+      for (uint_t ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
 	_n[ii].set_to_ground(this);
       }
       start_internal = max_nodes();
@@ -961,40 +964,40 @@ void DEV_SPICE::expand()
 
     int* node = spice_nodes(); // treat as array
     char fake_name[] = "a";
-    for (int ii = start_internal; ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = start_internal; ii < matrix_nodes(); ++ii) {
       if (node[ii] >= start_internal+OFFSET) {
 	// real internal node
-	_n[ii].new_model_node('.' + long_label() + '.' + fake_name, this);
-	trace1("new int", node[ii]);
+	_n[ii].new_model_node("." + short_label() + '_' + fake_name, this);
+	trace3("new int", node[ii], _n[ii].t_(), short_label());
 	assert(_n[ii].n_());
       }else if (node[ii] >= 0+OFFSET) {
 	// collapsed to an external node
+	trace2("collapse", node[ii], _n[ii].t_());
 	_n[ii] = _n[node[ii]-OFFSET];
-	trace1("collapse", node[ii]);
 	assert(_n[ii].n_());
       }else{
 	// not assigned
-	trace1("not used", node[ii]);
+	trace2("not used", node[ii], _n[ii].t_());
 	assert(!_n[ii].n_());
       }
       ++(*fake_name);
     }
     
-    for (int ii = 0; ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
       trace2((_n[ii].n_()) ? (_n[ii].n_()->short_label().c_str()) : ("NULL"), ii, node[ii]);
     }
     
     // This could be one loop, but doing it this way gives more info.
-    for (int ii = 0; ii < min_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < min_nodes(); ++ii) {
       assert(_n[ii].n_());
     }
-    for (int ii = min_nodes(); ii < net_nodes(); ++ii) {
+    for (uint_t ii = min_nodes(); ii < net_nodes(); ++ii) {
       assert(_n[ii].n_());
     }
-    for (int ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
+    for (uint_t ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
       //assert(_n[ii].n_());
     }
-    for (int ii = max_nodes(); ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = max_nodes(); ii < matrix_nodes(); ++ii) {
       assert(_n[ii].n_() || !node[ii]);
     }
   }else{untested();
@@ -1038,15 +1041,15 @@ void DEV_SPICE::precalc_last()
   { //-------- fix up external nodes, again ........
     // put the originals back, so DEVsetup can mess them up the same as last time
     int* node = spice_nodes();
-    for (int ii = 0; ii < net_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < net_nodes(); ++ii) {
       node[ii] = ii+OFFSET;
     }
     if (UNCONNECTED_NODES == uGROUND) {
-      for (int ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
+      for (uint_t ii = net_nodes(); ii < max_nodes(); ++ii) {itested();
 	node[ii] = ii+OFFSET;
       }
     }else if (UNCONNECTED_NODES == uFLOAT) {
-      for (int ii = net_nodes(); ii < max_nodes(); ++ii) {untested();
+      for (uint_t ii = net_nodes(); ii < max_nodes(); ++ii) {untested();
 	node[ii] = SPICE_UNCONNECTED_NODE;
       }
     }else{
@@ -1056,7 +1059,7 @@ void DEV_SPICE::precalc_last()
     }
     ckt()->CKTmaxEqNum = max_nodes();
 
-    for (int ii = max_nodes(); ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = max_nodes(); ii < matrix_nodes(); ++ii) {
       node[ii] = 0;
     }
   }
@@ -1073,7 +1076,7 @@ void DEV_SPICE::precalc_last()
 
     assert(ok == OK);
     assert(num_states_garbage == _num_states);
-    trace3("precalc", maxEqNum_stash, ckt()->CKTmaxEqNum, (maxEqNum_stash == ckt()->CKTmaxEqNum));
+    //trace3("precalc", maxEqNum_stash, ckt()->CKTmaxEqNum, (maxEqNum_stash == ckt()->CKTmaxEqNum));
     assert(_maxEqNum == ckt()->CKTmaxEqNum);
     notstd::copy_n(node_stash, matrix_nodes(), node); // put back real nodes
     // hopefully, the matrix pointers are the same as last time!
@@ -1115,7 +1118,7 @@ void DEV_SPICE::tr_advance()
   update_ckt();
   
   double* t = _states[OPT::_keep_time_steps-1];
-  for (int ii = OPT::_keep_time_steps-1;  ii > 0;  --ii) {
+  for (uint_t ii = OPT::_keep_time_steps-1;  ii > 0;  --ii) {
     _states[ii] = _states[ii-1];
   }
   _states[0] = t;
@@ -1142,7 +1145,7 @@ bool DEV_SPICE::tr_needs_eval()const
   }else{
     int* node = spice_nodes();
     // check the node voltages, reference to ground
-    for (int ii=0; ii<matrix_nodes(); ++ii) {
+    for (uint_t ii=0; ii<matrix_nodes(); ++ii) {
       if ((node[ii] != SPICE_INVALID_NODE) 
 	  && !conchk(_v1[node[ii]], _n[ii].v0(), 0, OPT::reltol*OPT::bypasstol)) {
 	return true;
@@ -1150,8 +1153,8 @@ bool DEV_SPICE::tr_needs_eval()const
       }
     }
     // check the node voltages, reference to each other
-    for (int ii=0; ii<matrix_nodes(); ++ii) {
-      for (int jj=0; jj<ii; ++jj) {
+    for (uint_t ii=0; ii<matrix_nodes(); ++ii) {
+      for (uint_t jj=0; jj<ii; ++jj) {
 	if ((node[ii] != SPICE_INVALID_NODE) && (node[jj] != SPICE_INVALID_NODE) 
 	    && !conchk((_v1[node[ii]] - _v1[node[jj]]),
 		       (_n[ii].v0() - _n[jj].v0()),
@@ -1216,7 +1219,7 @@ bool DEV_SPICE::do_tr()
     int* node = spice_nodes();
     assert(ckt()->CKTrhsOld == _v1);
     std::fill_n(_v1, matrix_nodes()+OFFSET, 0);
-    for (int ii = 0; ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
       if (node[ii] != SPICE_INVALID_NODE) {
 	_v1[node[ii]] = _n[ii].v0();
       }else{
@@ -1230,9 +1233,9 @@ bool DEV_SPICE::do_tr()
     assert(ckt()->CKTrhs == _i0);
     std::fill_n(_i0, matrix_nodes()+OFFSET, 0);
 
-    for (int ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
-      for (int jj = 0; jj < matrix_nodes()+OFFSET; ++jj) {
-	_matrix[ii][jj].real() = 0;
+    for (uint_t ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
+      for (uint_t jj = 0; jj < matrix_nodes()+OFFSET; ++jj) {
+	_matrix[ii][jj].real(0.);
       }
     }
   }
@@ -1242,20 +1245,34 @@ bool DEV_SPICE::do_tr()
   info.DEVload(&(_spice_model->_gen), ckt());
   //-----
   // convergence check -- gnucap method
-  set_converged(ckt()->CKTnoncon == 0);
+  unsigned trouble = ckt()->CKTnoncon;
+  double ramptol = 1e12*OPT::gmin;
+  ramptol=1;
+  set_converged(!trouble);
   for (int ii = 0; ii < _num_states; ++ii) {
-    set_converged(converged() && conchk(_states[0][ii], _states_1[ii]));
+    if(converged()){
+      bool c = conchk(_states[0][ii], _states_1[ii], OPT::abstol*ramptol);
+      if(!c) trouble = 10;
+      set_converged(c);
+    }
     trace3("", ii, _states_1[ii], _states[0][ii]);
     _states_1[ii] = _states[0][ii];
   }
-  for (int ii = 0; converged() && ii < matrix_nodes()+OFFSET; ++ii) {
-    set_converged(conchk(_i0[ii], _i1[ii]));
+  for (uint_t ii = 0; converged() && ii < matrix_nodes()+OFFSET; ++ii) {
+    bool c = conchk(_i0[ii], _i1[ii], OPT::abstol*ramptol);
+    if(!c) trouble = 20;
+    set_converged(c);
   }
-  for (int ii = 0; converged() && ii < matrix_nodes()+OFFSET; ++ii) {
-    for (int jj = 0; converged() && jj < matrix_nodes()+OFFSET; ++jj) {
-      set_converged(conchk(_matrix[ii][jj].real(), _matrix[ii][jj].imag()));
+  for (uint_t ii = 0; converged() && ii < matrix_nodes()+OFFSET; ++ii) {
+    for (uint_t jj = 0; converged() && jj < matrix_nodes()+OFFSET; ++jj) {
+      bool c = conchk(_matrix[ii][jj].real(), _matrix[ii][jj].imag(), OPT::abstol*ramptol);
+      if(!c) trouble = 30;
+      set_converged(c);
     }
   }
+#ifndef NDEBUG
+  _trouble = trouble;
+#endif
 
   // convergence check -- Spice method 
   // not sure if it is worth the effort
@@ -1269,11 +1286,11 @@ bool DEV_SPICE::do_tr()
   }
 
   bool needs_load = !converged();
-  for (int ii = 0; !needs_load && ii < matrix_nodes()+OFFSET; ++ii) {
+  for (uint_t ii = 0; !needs_load && ii < matrix_nodes()+OFFSET; ++ii) {
     needs_load = !conchk(_i0[ii], _i1[ii], 0, OPT::reltol*OPT::loadtol);
   }
-  for (int ii = 0; !needs_load && ii < matrix_nodes()+OFFSET; ++ii) {
-    for (int jj = 0; !needs_load && jj < matrix_nodes()+OFFSET; ++jj) {
+  for (uint_t ii = 0; !needs_load && ii < matrix_nodes()+OFFSET; ++ii) {
+    for (uint_t jj = 0; !needs_load && jj < matrix_nodes()+OFFSET; ++jj) {
       needs_load = !conchk(_matrix[ii][jj].real(), _matrix[ii][jj].imag(),
 			   0, OPT::reltol*OPT::loadtol);
     }
@@ -1306,14 +1323,14 @@ void DEV_SPICE::tr_load()
   std::fill_n(jhit, matrix_nodes()+OFFSET, 0);
 
   int* node = spice_nodes();
-  for (int ii = 0; ii < matrix_nodes(); ++ii) {
+  for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
     int ni = node[ii];
     if (ni && !ihit[ni]) {
       ihit[ni] = 1;
       int nii = ni-OFFSET;
       trace4("", ii, ni, _i0[ni], _i1[ni]);
       tr_load_source_point(_n[ii], &(_i0[ni]), &(_i1[ni]));
-      for (int jj = 0; jj < matrix_nodes(); ++jj) {
+      for (uint_t jj = 0; jj < matrix_nodes(); ++jj) {
 	int nj = node[jj];
 	if (nj && jhit[nj] != ni) {
 	  jhit[nj] = ni;
@@ -1334,8 +1351,8 @@ void DEV_SPICE::tr_load()
 void DEV_SPICE::tr_unload()
 {untested();incomplete();
 
-  for (int ii = 0; ii < matrix_nodes(); ++ii) {untested();
-    for (int jj = 0; jj < matrix_nodes(); ++jj) {untested();
+  for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {untested();
+    for (uint_t jj = 0; jj < matrix_nodes(); ++jj) {untested();
       _matrix[ii][jj].real() = 0;
     }
   }
@@ -1413,6 +1430,12 @@ double DEV_SPICE::tr_probe_num(const std::string& x)const
     }
   }
 
+#ifndef NDEBUG
+  if (Umatch(x, "trouble ")) {
+    return _trouble;
+  }
+#endif
+
   if (info.DEVask) {
     // data that Spice has, through "ask"
     assert(info.DEVpublic.numInstanceParms);
@@ -1482,8 +1505,8 @@ void DEV_SPICE::do_ac()
     ckt()->CKTtroubleElt = NULL;
     std::fill_n(_i0, matrix_nodes()+OFFSET, 0);
     std::fill_n(_i1, matrix_nodes()+OFFSET, 0);
-    for (int ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
-      for (int jj = 0; jj < matrix_nodes()+OFFSET; ++jj) {
+    for (uint_t ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
+      for (uint_t jj = 0; jj < matrix_nodes()+OFFSET; ++jj) {
 	_matrix[ii][jj] = 0;
       }
     }
@@ -1516,14 +1539,14 @@ void DEV_SPICE::ac_load()
     std::fill_n(jhit, matrix_nodes()+OFFSET, 0);
     
     int* node = spice_nodes();
-    for (int ii = 0; ii < matrix_nodes(); ++ii) {
+    for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {
       int ni = node[ii];
       if (ni && !ihit[ni]) {
 	ihit[ni] = 1;
 	int nii = ni-OFFSET;
 	trace3("", ii, ni, nii);
-	ac_load_source_point(_n[ii], COMPLEX(_i0[node[ni]], _i1[node[ni]]));
-	for (int jj = 0; jj < matrix_nodes(); ++jj) {
+	ac_load_source_point(_n[ii], COMPLEX(_i0[ni], _i1[ni]));
+	for (uint_t jj = 0; jj < matrix_nodes(); ++jj) {
 	  int nj = node[jj];
 	  if (nj && jhit[nj] != ni) {
 	    jhit[nj] = ni;
@@ -1745,7 +1768,7 @@ extern "C" {
 
     std::valarray<FPOLY1> q(OPT::_keep_time_steps);
 
-    for (int ii = 0; ii < OPT::_keep_time_steps; ++ii) {
+    for (uint_t ii = 0; ii < OPT::_keep_time_steps; ++ii) {
       assert(ckt->CKTstates[ii]);
       q[ii].x  = NOT_VALID;
       q[ii].f0 = ckt->CKTstates[ii][qcap];
@@ -1775,7 +1798,7 @@ extern "C" {
     std::valarray<FPOLY1> q(OPT::_keep_time_steps);
     std::valarray<FPOLY1> i(OPT::_keep_time_steps);
 
-    for (int ii = 0; ii < OPT::_keep_time_steps; ++ii) {
+    for (uint_t ii = 0; ii < OPT::_keep_time_steps; ++ii) {
       assert(ckt->CKTstates[ii]);
       q[ii].x  = NOT_VALID;
       q[ii].f0 = ckt->CKTstates[ii][qcap];
@@ -1842,9 +1865,9 @@ extern "C" {
       return &trash;
     }else{
       assert(r >= 0+OFFSET);
-      assert(r < MATRIX_NODES+OFFSET);
+      assert(r < int(MATRIX_NODES)+OFFSET);
       assert(c >= 0+OFFSET);
-      assert(c < MATRIX_NODES+OFFSET);
+      assert(c < int(MATRIX_NODES)+OFFSET);
       COMPLEX** m = reinterpret_cast<COMPLEX**>(mm);
       assert(m);
       assert(m[r-OFFSET]);
@@ -1902,3 +1925,4 @@ static DISPATCHER<MODEL_CARD>::INSTALL
   d1(&model_dispatcher, MODEL_TYPE, &p1);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

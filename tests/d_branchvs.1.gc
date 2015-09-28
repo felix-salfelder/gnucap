@@ -1,0 +1,19 @@
+spice
+
+
+.verilog
+branchvs #(1.111) v1(vdd,0);
+branchvs #(2.222) vlast(lastp,0);
+branchvs #(0) vzero(hmm,0);
+spice
+
+*R1 vbg2 0 100k
+gload vbg2 0 lastp 0 1.5
+V2 vbg2 0 7
+
+.list
+.nodelist
+
+.print tran v(nodes) r(gload) i(v2) R(r1) v(r1) i(r1) vin(v2) v(v2)
+.tran 0 1 0.1
+.end

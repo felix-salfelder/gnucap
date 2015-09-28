@@ -1,0 +1,104 @@
+Mutual inductance test circuit 
+* using 'k' pseudo element 
+.subckt trans2a ( a1 a2 b1 b2 )
+k1 ( l1 l2 ) K12
+l1 ( a1 a2 ) L1
+l2 ( b1 b2 ) L2
+.ends trans2a
+* T model, requires a common terminal 
+.subckt trans2b ( a com b )
+l2a ( a 6 ) L1-M12
+l2b ( 6 com ) M12
+l2c ( 6 b ) L2-M12
+.ends trans2b
+* series model, using VCVS 
+.subckt trans2c ( a1 a2 b1 b2 )
+l3a ( 10 a2 ) L1
+l3b ( 11 b2 ) L2
+e3a ( a1 10 11 b2 ) M12/L2
+e3b ( b1 11 10 a2 ) M12/L1
+.ends trans2c
+* parallel model, using CCCS 
+.subckt trans2d ( a1 a2 b1 b2 )
+l1 ( a1 a2 ) (1-K12*K12)*L1
+l2 ( b1 b2 ) (1-K12*K12)*L2
+f1 ( a1 a2 l2 ) -M12/L1
+f2 ( b1 b2 l1 ) -M12/L2
+.ends trans2d
+v1 ( 1 0 ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+r1a ( 1 2 ) Rsource
+x1 ( 2 0 3 0 )  trans2a  k12=K12 l1=L1 l2=L2
+r1b ( 3 0 ) Rload
+v2 ( 4 0 ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+r2a ( 4 5 ) Rsource
+x2 ( 5 0 7 0 )  trans2d  k12=K12 l1=L1 l2=L2
+r2b ( 7 0 ) Rload
+v3 ( 8 0 ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+r3a ( 8 9 ) Rsource
+x3 ( 9 0 12 0 )  trans2c  k12=K12 l1=L1 l2=L2
+r3b ( 12 0 ) Rload
+#Freq       v(2)       v(3)       v(5)       v(7)       v(9)       v(12)     
+ 0.1        0.01599    0.014244   0.015972   0.014221   0.01599    0.014238  
+ 0.31623    0.050473   0.044959   0.050414   0.044887   0.050473   0.044939  
+ 1.         0.15675    0.13958    0.15658    0.13936    0.15675    0.13951   
+ 3.1623     0.42608    0.37797    0.42574    0.3775     0.4261     0.37781   
+ 10.        0.71644    0.61303    0.71636    0.61268    0.71655    0.61278   
+ 31.623     0.85509    0.56179    0.85515    0.56157    0.85529    0.56137   
+ 100.       0.96752    0.28135    0.96754    0.28123    0.9676     0.28096   
+ 316.23     0.99627    0.096351   0.99627    0.096308   0.99628    0.096198  
+ 1.K        0.99962    0.030735   0.99962    0.030721   0.99962    0.030686  
+#Time       v(2)       v(3)       v(5)       v(7)       v(9)       v(12)     
+ 0.         0.         0.         0.         0.         0.         0.        
+ 0.001      0.         0.         0.         0.         0.         0.        
+ 0.002      0.         0.         0.         0.         0.         0.        
+ 0.003      0.47904    0.0437     0.47904    0.04368    0.47906    0.043635  
+ 0.004      0.92137    0.15871    0.92137    0.15863    0.92145    0.15848   
+ 0.005      0.85441    0.28164    0.85439    0.28151    0.85453    0.28129   
+ 0.006      0.79887    0.37003    0.79884    0.36986    0.79901    0.36961   
+ 0.007      0.27311    0.38865    0.27306    0.38847    0.27323    0.38828   
+ 0.008     -0.20912    0.31633   -0.20919    0.31616   -0.20905    0.31612   
+ 0.009     -0.17675    0.22131   -0.17682    0.22119   -0.17673    0.22127   
+ 0.01      -0.15162    0.14978   -0.1517     0.14968   -0.15164    0.14983   
+* using 'k' pseudo element 
+.subckt trans2a ( a1 a2 b1 b2 )
+k1 ( l1 l2 ) K12
+l1 ( a1 a2 ) L1
+l2 ( b1 b2 ) L2
+.ends trans2a
+* T model, requires a common terminal 
+.subckt trans2b ( a com b )
+l2a ( a 6 ) L1-M12
+l2b ( 6 com ) M12
+l2c ( 6 b ) L2-M12
+.ends trans2b
+* series model, using VCVS 
+.subckt trans2c ( a1 a2 b1 b2 )
+l3a ( 10 a2 ) L1
+l3b ( 11 b2 ) L2
+e3a ( a1 10 11 b2 ) M12/L2
+e3b ( b1 11 10 a2 ) M12/L1
+.ends trans2c
+* parallel model, using CCCS 
+.subckt trans2d ( a1 a2 b1 b2 )
+l1 ( a1 a2 ) (1-K12*K12)*L1
+l2 ( b1 b2 ) (1-K12*K12)*L2
+f1 ( a1 a2 l2 ) -M12/L1
+f2 ( b1 b2 l1 ) -M12/L2
+.ends trans2d
+v1 ( 1 0 ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+r1a ( 1 2 ) Rsource
+x1 ( 2 0 3 0 )  trans2a  k12=K12 l1=L1 l2=L2
+r1b ( 3 0 ) Rload
+v2 ( 4 0 ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+r2a ( 4 5 ) Rsource
+x2 ( 5 0 7 0 )  trans2d  k12=K12 l1=L1 l2=L2
+r2b ( 7 0 ) Rload
+v3 ( 8 0 ) pulse iv= 0. pv= 1. delay= 0.002 rise= 0.002 fall= 0.002 width= 0.002 period= 0.01  AC  1.
+r3a ( 8 9 ) Rsource
+x3 ( 9 0 12 0 )  trans2c  k12=K12 l1=L1 l2=L2
+r3b ( 12 0 ) Rload
+Gnucap   System status
+iterations: op=0, dc=0, tran=462, fourier=0, total=627
+transient timesteps: accepted=151, rejected=5, total=156
+nodes: user=9, subckt=2, model=3, total=14
+dctran density=42.9%, ac density=42.9%

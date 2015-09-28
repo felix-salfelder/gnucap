@@ -1,4 +1,4 @@
-/*$Id: u_opt1.cc,v 26.121 2009/09/22 20:30:18 al Exp $ -*- C++ -*-
+/*                                 -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -22,7 +22,6 @@
  * all the options set by the .options card.
  * initialization and declaration of statics
  */
-//testing=trivial 2006.07.17
 #include "u_opt.h"
 
 bool	OPT::acct = false;
@@ -32,12 +31,19 @@ bool	OPT::page = false;
 bool	OPT::node = false;
 bool	OPT::opts = false;
 double	OPT::gmin = 1e-12;
+double	OPT::cmin = 1e-12;
 double	OPT::bypasstol = .1;
 double	OPT::loadtol = .1;
 double	OPT::reltol = .001;
 double	OPT::abstol = 1e-12;
 double	OPT::vntol = 1e-6;
 double	OPT::trtol = 7.0;
+double	OPT::tttol = 7.0;
+double	OPT::adpabstol = 1;
+double	OPT::adpreltol = 0.001;
+bool	OPT::behave = false;
+double	OPT::behreltol = 0.001;
+double	OPT::adpkorr = 0.;
 double	OPT::chgtol = 1e-14;
 double	OPT::pivtol = 1e-13;
 double	OPT::pivrel = 1e-3;
@@ -49,12 +55,18 @@ int	OPT::limpts = 201;
 int	OPT::lvlcod = 2;
 int	OPT::lvltim = 2;
 method_t OPT::method = meTRAP;
+disc_t  OPT::disc = dIMM;
 int	OPT::maxord = 2;
 double	OPT::defl = 100e-6;
 double	OPT::defw = 100e-6;
 double	OPT::defad = 0.;
 double	OPT::defas = 0.;
+std::string	OPT::libpath = ""; // PREFIX/?
 
+const char* h ="HOME";
+const char* home= getenv(h);
+std::string	OPT::includepath = std::string(".:")+home+std::string("/.gnucap/include");
+bool	OPT::quiet = false; 
 bool	OPT::clobber = true;
 bool	OPT::keys_between_nodes = true;
 double	OPT::dampmax = 1.0;
@@ -65,8 +77,9 @@ double	OPT::vfloor = 1e-15;
 double	OPT::roundofftol = 1e-13;
 double	OPT::temp_c = 27.0;
 double	OPT::shortckt = 10e-6;
+double	OPT::keepcoeff = 1e10;
 int	OPT::picky = bPICKY;
-unsigned OPT::outwidth = 9999;
+unsigned OPT::outwidth = unsigned(-1); // bug?
 double	OPT::ydivisions = 4.;
 phase_t	OPT::phase = pDEGREES;
 order_t	OPT::order = oAUTO;
@@ -79,20 +92,31 @@ bool	OPT::lcbypass = true;
 bool	OPT::lubypass = true;
 bool	OPT::fbbypass = true;
 bool	OPT::traceload = true;
+bool	OPT::tracewdtt = false;
 int	OPT::itermin = 1;
+int	OPT::threads = 1;
+bool	OPT::trage = false;
 double	OPT::vmax =  5;
 double	OPT::vmin = -5;
 double	OPT::dtmin = 1e-12;
+double	OPT::dtddc = 1e-8;
 double	OPT::dtratio = 1e9;
+short int OPT::initsc = -1; // original, default?
 bool	OPT::rstray = true;
 bool	OPT::cstray = true;
+bool	OPT::trnoise = true;
+bool	OPT::filtercomp = true;
 int	OPT::harmonics = 9;
+double	OPT::ttstepgrow = 1.1;
 double	OPT::trstepgrow = 1e99;
 double	OPT::trstephold = 1e99;
 double	OPT::trstepshrink = 2.;		/* spice is fixed at 8 */
 double	OPT::trreject = .5;
-int	OPT::trsteporder = 3;
+double	OPT::ttreject = .5;
+uint_t	OPT::trsteporder = 3;
 double	OPT::trstepcoef[_keep_time_steps] = {1., 1./4., 1./24., 1./192.};
+uint_t	OPT::ttsteporder = 2;
+bool	OPT::ttcorr = true;
 
 bool	OPT::showall = false;
 int	OPT::foooo = 0;
@@ -100,12 +124,17 @@ int	OPT::diodeflags = 0;
 int	OPT::mosflags = 0;
 bool	OPT::quitconvfail = false;
 bool	OPT::edit = true;
+int	OPT::history = 40;
 int	OPT::recursion = 20;
+// doesnt make sense to have no default lang (does it?!)
 LANGUAGE* OPT::language = NULL;
 bool	OPT::case_insensitive = false;
 UNITS	OPT::units = uSI;
+bool    OPT::bogus = false;
 double	OPT::lowlim = 1. - OPT::reltol;
 double	OPT::uplim = 1. + OPT::reltol;
+
+int OPT::rndseed = 0;
 
 int	OPT::itl[OPT::ITL_COUNT] = { 
 		100,	/* 0=dummy */
@@ -117,4 +146,7 @@ int	OPT::itl[OPT::ITL_COUNT] = {
 		5000,	/* 6=source stepping iteration limit */
 		1,	/* 7=worst case iteration limit */
 		99	/* 8=trace nonconvergence start iteration */
+
 };
+double	OPT::edgedist = 10.;
+// vim:ts=8:sw=2:noet:

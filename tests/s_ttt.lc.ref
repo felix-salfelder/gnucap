@@ -1,0 +1,6 @@
+name   ...
+have 1 nodes. model: 0 sckt: 0 adp 0
+
+nosc     nosc matrix_number 1, user_number 1 nm[t]  vdc  0.
+#           v(C1)      i(L1)     
+ 0.         1.         0.        

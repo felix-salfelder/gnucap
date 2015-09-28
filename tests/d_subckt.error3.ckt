@@ -1,0 +1,12 @@
+spice
+.options picky
+
+.subckt foo 1 2 3 4
+R1 1 2 3
+R2 1 4 3
+.ends
+
+X1 1 2 3 foo
+.dc
+.end
+

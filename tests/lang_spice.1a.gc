@@ -1,0 +1,16 @@
+verilog
+
+//options debug
+load bm_wrapper.cc
+
+vsource_sin #(.amplitude(1),.samples(12)) vmysin(1 0);
+// spice listing does not work if label does not start with "[Vv]"
+vsource_sin #(.amplitude(1),.samples(12)) mysin(1 0);
+
+spice
+v1 1 2 sin freq=1 amplitude=1
+.list
+
+.print tran v(nodes)
+.tran 0 1 1 trace=a
+.end

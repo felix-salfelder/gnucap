@@ -1,4 +1,4 @@
-/*$Id: bm_complex.cc,v 26.134 2009/11/29 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: bm_complex.cc,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -31,6 +31,8 @@ namespace {
 class EVAL_BM_COMPLEX : public EVAL_BM_ACTION_BASE {
 private:
   COMPLEX _value;
+  void      set_param_by_name(string /*Name*/, string /*Value*/){incomplete();}
+  // static map<string, PARA_BASE EVAL_BM_SIN::*> param_dict;
   explicit	EVAL_BM_COMPLEX(const EVAL_BM_COMPLEX& p);
 public:
   explicit      EVAL_BM_COMPLEX(int c=0);
@@ -65,9 +67,6 @@ bool EVAL_BM_COMPLEX::operator==(const COMMON_COMPONENT& x)const
   bool rv = p
     && _value == p->_value
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {
-    untested();
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -111,3 +110,4 @@ DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "complex", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

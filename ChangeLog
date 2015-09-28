@@ -1,5 +1,20 @@
 Gnucap revision history
  ------------------------------------------------------------------
+gnucap-uf 0.0.2
+
+* this does not work. see git
+
+gnucap-uf 0.0.1
+
+1. attach modularity (experimental)
+2. improve some error messages
+3. NOT_INPUT initialization bug fixed.
+4. cleanup dist
+
+gnucap-uf 0.0.0
+
+1. changed many things. see CHANGES.uf
+
  ------------------------------------------------------------------
 Gnucap 0.34 release notes  (02/01/2004)
 

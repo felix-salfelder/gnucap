@@ -1,0 +1,5 @@
+#           v(ndd)     v(nin)     v(nout)   
+ 0.         2.         0.3        1.19      
+*param     #@freq      wr(MN1)    lr(MN1)    gmr(MN1)   rr(R1)    
+open circuit: internal node 3
+v(nout)    0.        -6.426K     19.278K   -107.1K    -2.7u      

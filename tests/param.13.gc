@@ -1,0 +1,27 @@
+spice
+
+.parameter toplevel=1
+
+.subckt VOLTAGE_SOURCE_CONST p n
+.parameter model=1
+r p n val
+v p n dc=val
+.ends
+
+.subckt VOLTAGE_SOURCE_PULSE p n
+.parameter iv=0 pv=1 width=.5
+.parameter rise=.1n
+.parameter fall=.1n
+v p n pulse iv=iv pv=pv rise=rise fall=fall width=width delay=delay
+.ends
+
+X1 1 0 VOLTAGE_SOURCE_PULSE delay=1n
+X2 2 0 VOLTAGE_SOURCE_PULSE delay=2n
+X3 3 0 VOLTAGE_SOURCE_CONST val=3
+X4 4 0 VOLTAGE_SOURCE_CONST val=4
+
+.list
+.print tran v(nodes) r(X*.r) const(X3.*)
+
+.tran 0 5n 1n
+.end

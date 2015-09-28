@@ -1,0 +1,20 @@
+spice
+
+
+.model pd sw vt=0 vh=1 ron=1e-12 roff=1e12
+sw 0 0 1 0 pd
+
+v1 1 0 pulse iv=0 pv=pv delay=1 rise=1 width=1 fall=1 period=5
+.param pv=2
+
+.print tt s0(sw) s1(sw) v(1) vin(sw)
+.print tran v(nodes)
++ s0(sw) s1(sw)
+.ttr 20 5 1 * 1.2 new trace=a
+
+.print dc v(nodes) s0(sw)
+.dc v1 2 2 0
+.param pv=0
+.echo cont_dc
+.ttr 0 20 5 1 * 1.2 new trace=a tran cont
+.end

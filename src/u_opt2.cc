@@ -1,4 +1,4 @@
-/*$Id: u_opt2.cc,v 26.132 2009/11/24 04:26:37 al Exp $ -*- C++ -*-
+/*                                -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,7 +21,8 @@
  *------------------------------------------------------------------
  * command and functions to access OPT class
  */
-//testing=script,complete 2006.07.14
+#include "globals.h"
+#include "c_comand.h"
 #include "u_lang.h"
 #include "l_compar.h"
 #include "ap.h"
@@ -38,11 +39,15 @@ void OPT::command(CS& cmd)
  */
 bool OPT::set_values(CS& cmd)
 {
+  unsigned oldorder=order;
   bool big_change = false;
   bool changed = false;
   unsigned here = cmd.cursor();
   do{
     ONE_OF
+      || Get(cmd, "includepath",	&includepath)
+      || Get(cmd, "libpath",	&libpath)
+      || Get(cmd, "quiet",	&quiet)
       || Get(cmd, "acct",	&acct)
       || Get(cmd, "list",	&listing)
       || Get(cmd, "mod",	&mod)
@@ -50,12 +55,19 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "node",	&node)
       || Get(cmd, "opts",	&opts)
       || Get(cmd, "gmin",	&gmin,   mPOSITIVE)
+      || Get(cmd, "cmin",	&cmin,   mPOSITIVE)
       || Get(cmd, "bypasstol",	&bypasstol, mPOSITIVE)
       || Get(cmd, "loadtol",	&loadtol,   mPOSITIVE)
       || Get(cmd, "reltol",	&reltol, mPOSITIVE)
       || Get(cmd, "abstol",	&abstol, mPOSITIVE)
+      || Get(cmd, "adpreltol",	&adpreltol, mPOSITIVE)
+      || Get(cmd, "behreltol",	&behreltol, mPOSITIVE)
+      || Get(cmd, "adpkorr",	&adpkorr, mPOSITIVE)
+      || Get(cmd, "trage", 	&trage)
+      || Get(cmd, "adpabstol",	&adpabstol, mPOSITIVE)
       || Get(cmd, "vntol",	&vntol,  mPOSITIVE)
       || Get(cmd, "trtol",	&trtol,  mPOSITIVE)
+      || Get(cmd, "tttol",	&tttol,  mPOSITIVE)
       || Get(cmd, "chgtol",	&chgtol, mPOSITIVE)
       || Get(cmd, "pivtol",	&pivtol, mPOSITIVE)
       || Get(cmd, "pivrel",	&pivrel, mPOSITIVE)
@@ -77,6 +89,12 @@ bool OPT::set_values(CS& cmd)
 	   || Set(cmd, "t{rap}g{ear}",	&method, meTRAPGEAR)
 	   || Set(cmd, "t{rap}e{uler}",	&method, meTRAPEULER)
 	   || cmd.warn(bWARNING, "illegal method")))
+      || (cmd.umatch("disc{ont} {=}") &&
+	  (ONE_OF
+           || Set(cmd, "none",          &disc,   dNONE)
+           || Set(cmd, "reject",        &disc,   dREJECT)
+           || Set(cmd, "imm{ediately}", &disc,   dIMM)
+	   || cmd.warn(bWARNING, "illegal disc")))
       || Get(cmd, "maxord",	   &maxord)
       || Get(cmd, "defl",	   &defl,	mPOSITIVE)
       || Get(cmd, "defw",	   &defw,	mPOSITIVE)
@@ -118,7 +136,14 @@ bool OPT::set_values(CS& cmd)
 	   || Set(cmd, "r{everse}", &order,	oREVERSE)
 	   || Set(cmd, "f{orward}", &order,	oFORWARD)
 	   || Set(cmd, "a{uto}",    &order,	oAUTO)
-	   || cmd.warn(bWARNING, "need reverse, forward, or auto")))
+	   || Set(cmd, "t{ree}",    &order,	oTREE_BF)
+	   || Set(cmd, "c{omp}",    &order,	oCOMP)
+	   || Set(cmd, "treebf",    &order,	oTREE_BF)
+	   || Set(cmd, "treedf",    &order,	oTREE_DF)
+	   || Set(cmd, "sinkf",     &order,	oSINK_F)
+	   || Set(cmd, "sinkr",     &order,	oSINK_R)
+	   || cmd.warn(bWARNING, "need reverse, forward, auto, tree, comp"))
+           && (big_change |= order != oldorder))
       || (cmd.umatch("mode {=}") &&
 	  (ONE_OF
 	   || Set(cmd, "a{nalog}",  &mode,	moANALOG)
@@ -133,15 +158,24 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "lub{ypass}",    &lubypass)
       || Get(cmd, "fbb{ypass}",	   &fbbypass)
       || Get(cmd, "tracel{oad}",   &traceload)
+      || Get(cmd, "tracewdtt",     &tracewdtt)
+      || Get(cmd, "filtercomp",    &filtercomp)
       || Get(cmd, "itermin",	   &itermin)
+      || Get(cmd, "ttsteporder",   &ttsteporder)
+      || Get(cmd, "ttcorr",	   &ttcorr)
+      || Get(cmd, "ttreject",      &ttreject,	mPOSITIVE)
+      || Get(cmd, "threads",	   &threads)
       || Get(cmd, "vmax",	   &vmax)
       || Get(cmd, "vmin",	   &vmin)
       || Get(cmd, "mrt",	   &dtmin,	mPOSITIVE)
       || Get(cmd, "dtmin",	   &dtmin,	mPOSITIVE)
+      || Get(cmd, "dtddc",	   &dtddc,	mPOSITIVE)
       || Get(cmd, "dtr{atio}",	   &dtratio,	mPOSITIVE)
+      || Get(cmd, "initsc",	   &initsc)
       || (Get(cmd, "rstray",	   &rstray) && (big_change = true))
       || (Get(cmd, "cstray",	   &cstray) && (big_change = true))
       || Get(cmd, "harmonics",	   &harmonics)
+      || Get(cmd, "ttstepgrow",    &ttstepgrow,  mPOSITIVE)
       || Get(cmd, "trstepgrow",    &trstepgrow,  mPOSITIVE)
       || Get(cmd, "trstephold",    &trstephold,  mPOSITIVE)
       || Get(cmd, "trstepshrink",  &trstepshrink,mPOSITIVE)
@@ -151,11 +185,12 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "trstepcoef2",   &trstepcoef[2])
       || Get(cmd, "trstepcoef3",   &trstepcoef[3])
       || Get(cmd, "showall",	   &showall)
-      || Get(cmd, "foooo",	   &foooo)
+      || Get(cmd, "rndseed",	   &rndseed)
       || Get(cmd, "diode{flags}",  &diodeflags,  mOCTAL)
       || Get(cmd, "mos{flags}",    &mosflags,	mOCTAL)
       || Get(cmd, "quitconv{fail}",&quitconvfail)
       || Get(cmd, "edit",	   &edit)
+      || Get(cmd, "history",	   &history)
       || Get(cmd, "recur{sion}",   &recursion)
       || (Get(cmd, "lang{uage}",   &language)
 	  && ((case_insensitive = language->case_insensitive()),
@@ -174,6 +209,7 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "itl6",	   &itl[6])
       || Get(cmd, "itl7",	   &itl[7])
       || Get(cmd, "itl8",	   &itl[8])
+      || Get(cmd, "edgedist",	   &edgedist)
       || (cmd.check(bWARNING, "what's this?"), cmd.skiparg());
 
     if (!cmd.stuck(&here)) {
@@ -182,7 +218,7 @@ bool OPT::set_values(CS& cmd)
   }while (cmd.more() && changed);
 
   if (big_change) {
-    //_sim->uninit();
+    CKT_BASE::_sim->uninit();
     //BUG// not sure if this is really working
     //regressions do go both ways, but not sure if it actually
     //makes the topology changes expected
@@ -206,6 +242,8 @@ void OPT::print(OMSTREAM& o)
 
   o << "* i/o\n";
   o << ".options";
+  o << "  includepath="   << includepath;
+  o << "  libpath="   << libpath;
   o << ((acct)   ?"  acct" :"  noacct");
   o << ((listing)?"  list" :"  nolist");
   o << ((clobber) ? "  clobber" : "  noclobber");
@@ -263,6 +301,7 @@ void OPT::print(OMSTREAM& o)
     o << "  itl@" << ii << "=" << itl[ii];
   }
   o << "  itermin="<< itermin;
+  o << "  ttsteporder="<< ttsteporder;
   o << "  vmax="   << vmax;
   o << "  vmin="   << vmin;
   o << "  dampmax="<< dampmax;
@@ -274,6 +313,7 @@ void OPT::print(OMSTREAM& o)
   o << ".options";
   o << "  dtmin="  << dtmin;
   o << "  dtratio="<< dtratio;
+  o << "  ttstepgrow="  << ttstepgrow;
   o << "  trstepgrow="  << trstepgrow;
   o << "  trstephold="  << trstephold;
   o << "  trstepshrink="<< trstepshrink;
@@ -317,4 +357,16 @@ void OPT::print(OMSTREAM& o)
   //o << "  pivrel=" << pivrel;
 }
 /*--------------------------------------------------------------------------*/
+namespace {
+  class CMD_OPT : public CMD {
+  public:
+    void do_it(CS& cmd, CARD_LIST*) {
+      static OPT o;
+      o.command(cmd);
+    }
+  } p5;
+  DISPATCHER<CMD>::INSTALL d5(&command_dispatcher, "options|set|width", &p5);
+}
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

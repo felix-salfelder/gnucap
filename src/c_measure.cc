@@ -1,4 +1,4 @@
-/*$Id: c_measure.cc,v 26.113 2009/08/12 03:37:19 al Exp $ -*- C++ -*-
+/*
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -33,19 +33,28 @@ class CMD_MEASURE : public CMD {
 public:
   void do_it(CS& Cmd, CARD_LIST* Scope)
   {
+    trace1("CMD_MEASURE::do_it", (string(Cmd)));
     std::string assign_to, function;
     Cmd >> assign_to >> '=' >> function >> '(';
-    if (FUNCTION* f = measure_dispatcher[function]) {
-      std::string value = f->eval(Cmd, Scope);
+    if (FUNCTION_BASE* f = measure_dispatcher[function]) {
+      trace1("CMD_MEASURE::do_it", f->label());
+      f->expand(Cmd,Scope);
+      trace1("CMD_MEASURE::do_it 1", f->label());
+      WAVE_FUNCTION* ff= dynamic_cast<WAVE_FUNCTION*>(f);
+      USE(ff);
+      
+      trace3("CMD_MEASURE::do_it 2", f->label(), hp(ff), hp(f));
+      fun_t value = f->eval(Cmd, Scope); // FIXME?
       if (!Cmd.skip1b(')')) {
 	Cmd.warn(bWARNING, "need )");
       }else{
       }
       OMSTREAM out = IO::mstdout;
-      outset(Cmd, &out);
+      out.outset(Cmd);
       out << assign_to << '=' << value << '\n';
       PARAM_LIST* pl = Scope->params();
       pl->set(assign_to, value);
+      out.outreset();
     }else{
       throw Exception_No_Match(function);
     }
@@ -56,3 +65,4 @@ DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "measure", &p0);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

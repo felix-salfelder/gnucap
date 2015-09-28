@@ -1,0 +1,8 @@
+spice
+
+v1 0 1 2
+c1 0 1 2
+.print tran v(c1)
+
+.ttr 10 1 1 * 2 tran trace=i
+.end

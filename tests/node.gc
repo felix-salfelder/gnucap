@@ -1,0 +1,12 @@
+spice
+
+.subckt foo 1 2
+R1 2 3 10
+R2 2 1 10
+.ends
+
+X1 0 1 foo
+
+.print dc v(nodes) v1(X1.3)
+.dc
+.end

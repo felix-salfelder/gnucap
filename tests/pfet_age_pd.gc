@@ -1,0 +1,63 @@
+spice
+* p type inv amp w/bti
+.options TEMP=25
+
+.load rcd_sym.so
+*.options numdgt=7
+
+.param pulse_iv=0
+.param pulse_rise=1n
+
+.param voff=0.4
+.model my_rcdmodel rcd_exp
+
+.list
+
+.model singleton bti_sum (
++ parms = (
++  (65734.764403498935, -1, 7.6851098109742111, 33.944029750879885, 20.802215970322095)
++ )
++ rcd_model_name=my_rcdmodel
++ weight=1
++)
+
+.model cmosp pmos(
++level=8
++bti_model=singleton
++)
+
+.param vdd=3
+V1 nin ndd sin ( delay=-0.025m amplitude={vdd/3} frequency=1e4 offset={-vdd/2})
+R2 nin ng 10k
+MP1 nout ng ndd ndd cmosp l=3.5e-5 w=4.5e-6
+R1 0 nout 9k
+VDD ndd 0 vdd
+
+.verilog
+measm mym(nout,0);
+spice
+
+.print tw dvth(MP1.BTI) dvth(MP1) iter(0) control(0)
++ tau(MP1.BTI.rcd*)
++ uhi(MP1.BTI.rcd*)
++ ueff(MP1.BTI.rcd*)
++ ulo(MP1.BTI.rcd*)
+* + P(MP1.BTI)
+
+* one-step powerdown
+.tw 1u .1m 5 new > /dev/null
+.store tw dvth(MP1)
+.tw 100 pd
+.measure pd=at(probe="dvth(MP1)")
+
+* powerdown simulated
+.tw 1u .1m 5 new > /dev/null
+.param vdd=0
+.store tw dvth(MP1)
+.tw 100
+.measure sim=at(probe="dvth(MP1)")
+
+.eval sim-pd
+
+.status notime
+.end

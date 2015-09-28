@@ -1,0 +1,13 @@
+not so sure about this...
+#          
+ 27.       
+#Freq       v(nin)     v(nout)    n(nin)     n(nout)    n(V1)      n(R1)      n(R2)      n(R3)      y(R1)      y(R2)      y(R3)     
+ 0.         0.99999    0.33333    2.21E-30   11.05E-21  2.21E-30   11.05E-21  11.05E-21  2.21E-30   1.         0.5        1.        
+#          
+ 27.       
+#Freq       v(nin)     v(nout)    n(nin)     n(nout)    n(V1)      n(R1)      n(R2)      n(R3)      y(R1)      y(R2)      y(R3)     
+ 0.         2.         0.66666    2.21E-30   11.05E-21  2.21E-30   11.05E-21  11.05E-21  2.21E-30   1.         0.5        1.        
+#          
+ 27.       
+#Freq       v(nin)     v(nout)    n(nin)     n(nout)    n(V1)      n(R1)      n(R2)      n(R3)      y(R1)      y(R2)      y(R3)     
+ 0.         3.         0.99999    2.21E-30   11.05E-21  2.21E-30   11.05E-21  11.05E-21  2.21E-30   1.         0.5        1.        

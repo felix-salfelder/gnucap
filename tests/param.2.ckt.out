@@ -1,0 +1,9 @@
+'parameter test 
+parameter a has no value
+parameter a has no value
+v1 ( 1 0 )  DC a  AC b
+r1 ( 1 2 ) c
+r2 ( 2 0 ) d
+ a= 1. b= 2. c= 3. d= 4.
+#           v(1)       v(2)      
+ 27.        1.         0.57143   

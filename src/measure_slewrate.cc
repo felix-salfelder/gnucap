@@ -1,4 +1,5 @@
-/*$Id: measure_slewrate.cc,v 26.131 2009/11/20 08:22:10 al Exp $ -*- C++ -*-
+/*$Id: measure_slewrate.cc,v 1.4 2010-09-07 07:46:24 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et
  * Copyright (C) 2008 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -27,23 +28,33 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class MEASURE : public FUNCTION {
+class SLEW : public WAVE_FUNCTION {
+  PARAMETER<double> before;
+  PARAMETER<double> after;
+  PARAMETER<double> start_val;
+  PARAMETER<double> stop_val;
+  bool last;
+  bool expression;
 public:
-  std::string eval(CS& Cmd, const CARD_LIST* Scope)const
+  SLEW() :
+    WAVE_FUNCTION(),
+    before(BIGBIG),
+    after(-BIGBIG),
+    last(false),
+    expression(false)
+  {}
+  virtual FUNCTION_BASE* clone()const { return new SLEW(*this);}
+  string label()const{return "slewrate";}
+  void expand(CS& Cmd, const CARD_LIST* Scope)
   {
-    std::string probe_name;
-    PARAMETER<double> before(BIGBIG);
-    PARAMETER<double> after(-BIGBIG);
-    PARAMETER<double> start_val;
-    PARAMETER<double> stop_val;
-    bool last = false;
-    bool expression = false;
 
     unsigned here = Cmd.cursor();
     Cmd >> probe_name;
-    WAVE* w = find_wave(probe_name);
 
-    if (!w) {
+    trace0( ("MEASURE::eval probe_name: " + probe_name ).c_str());
+    _w = find_wave(probe_name);
+
+    if (!_w) {
       Cmd.reset(here);
     }else{
     }
@@ -66,23 +77,27 @@ public:
 	;
     }while (Cmd.more() && !Cmd.stuck(&here));
 
-    if (!w) {
-      w = find_wave(probe_name);
+    if (!_w) {
+      _w = find_wave(probe_name);
     }else{
     }
+    before.e_val(BIGBIG, Scope);
+    after.e_val(-BIGBIG, Scope);
+    start_val.e_val(0., Scope);
+    stop_val.e_val(0., Scope);
+  }
+
+  fun_t wave_eval()const
+  {
     
-    if (w) {
-      before.e_val(BIGBIG, Scope);
-      after.e_val(-BIGBIG, Scope);
-      start_val.e_val(0., Scope);
-      stop_val.e_val(0., Scope);
+    if (_w) {
 
       enum STAT {WAITING, READY, IN_RANGE, DONE} stat = WAITING;
       double try_start_time = BIGBIG;
       double start_time = BIGBIG;
       double stop_time = BIGBIG;
-      WAVE::const_iterator begin = lower_bound(w->begin(), w->end(), DPAIR(after, -BIGBIG));
-      WAVE::const_iterator end   = upper_bound(w->begin(), w->end(), DPAIR(before, BIGBIG));
+      WAVE::const_iterator begin = lower_bound(_w->begin(), _w->end(), DPAIR(after, -BIGBIG));
+      WAVE::const_iterator end   = upper_bound(_w->begin(), _w->end(), DPAIR(before, BIGBIG));
       WAVE::const_iterator lower = begin;
       for (WAVE::const_iterator i = begin; i < end && stat != DONE; ++i) {
 	double val = i->second;
@@ -136,21 +151,29 @@ public:
       if (stop_time < BIGBIG) {
 	assert(stop_time > start_time);
 	if (expression) {
-	  return "((" + to_string(stop_val) + "-" + to_string(start_val) + ")/(" 
-	    + to_string(stop_time) + "-" + to_string(start_time) + "))";
+          return ( stop_val - start_val ) / (stop_time - start_time);
+
+        // STRING_FUN ?!
+	//  return "((" + to_string(stop_val) + "-" + to_string(start_val) + ")/(" 
+	//    + to_string(stop_time) + "-" + to_string(start_time) + "))";
+
+
 	}else{
-	  return to_string((stop_val-start_val)/(stop_time-start_time));
+	  return to_fun_t((stop_val-start_val)/(stop_time-start_time));
 	}
       }else{
-	return to_string(BIGBIG);
+	return to_fun_t(BIGBIG);
       }
     }else{
-      throw Exception_No_Match(probe_name);
+     // throw Exception_No_Match(probe_name);
     }
+
+    return to_fun_t(888);
   }
 } p3;
-DISPATCHER<FUNCTION>::INSTALL d3(&measure_dispatcher, "ddt|slewrate|slope", &p3);
+DISPATCHER<FUNCTION_BASE>::INSTALL d3(&measure_dispatcher, "ddt|slewrate|slope", &p3);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

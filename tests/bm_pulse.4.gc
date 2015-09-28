@@ -1,0 +1,21 @@
+spice
+
+* something wrong with pulse at _delay
+
+*.options trace
+
+v1 1 0 pulse iv=0 pv=1 delay=1.1 rise=0
+r1 1 2 1
+c1 2 0 1
+
+.print tran v(nodes)
++ next(c1) event(v1) ev(v1)
++ dis(nodes) method(c1) hidden(0)
++ ord(c1)
+.tran 0 1.2 1.2 trace=r
+.tran 0 2 2 trace=r
+.tran 0 2 .1 trace=r
+.tran 0 20 20 trace=r
+.tran 0 20 1 trace=n skip=10
+.tran 0 1.2 1.2 trace=n skip=100
+.end

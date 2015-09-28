@@ -1,0 +1,31 @@
+spice
+.options numdgt 9
+.load rcd_sym.so
+
+.model my_rcd rcd_exp
+
+.verilog
+my_rcd #(.weight(1) .rc0(0) .rc1(-1) .re0(-1) .re1(1) ) z3( nin, 0);
+
+spice
+.list
+
+V1 nins 0 sin amplitude=.5 offset=0 frequency=2 delay=.5
+Vp nin2 nins pulse iv={0} pv=.5 rise=.1 fall=.1 width=16 delay=.2
+Vp nin nin2 0
+* pulse iv={0} pv=.5 rise=.1 fall=.1 width=1 delay=.5
+
+.param period=1
+.param width=1
+.param delay=1n
+
+.print tran
++stress(z*)
++E(z*)
++tau(z*)
++zero(z*)
++order(z*)
+
+.tr 0 1 .01 trace=a > d_rcd_1.out echo
+.status notime
+.end

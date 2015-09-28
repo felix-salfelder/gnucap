@@ -1,0 +1,20 @@
+name   ...
+have 1 nodes. model: 0 sckt: 0 adp 0
+
+1        1 matrix_number 1, user_number 1 nm[t]  vdc  0.
+#           v(C1)     
+ 0.         1.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=1307
+transient timesteps: accepted=440, rejected=0, total=440
+twotime timesteps: accepted=7, rejected=1, total=8
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%
+#           v(C1)     
+ 0.         1.        
+Gnucap   System status
+iterations: op=0, dc=3, tran=0, fourier=0, total=3755
+transient timesteps: accepted=1265, rejected=0, total=1265
+twotime timesteps: accepted=15, rejected=0, total=23
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

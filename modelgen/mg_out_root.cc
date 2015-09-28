@@ -1,4 +1,4 @@
-/*$Id: mg_out_root.cc,v 26.81 2008/05/27 05:33:43 al Exp $ -*- C++ -*-
+/*$Id: mg_out_root.cc,v 1.2 2010-07-14 15:17:30 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -32,6 +32,8 @@ static void make_header(std::ofstream& out, const File& in,
     "#include \"globals.h\"\n"
     "#include \"e_elemnt.h\"\n"
     "#include \"" << dump_name << ".h\"\n"
+    "#include \"l_stlextra.h\"\n"
+    "using notstd::to_lower;\n"
     "/*--------------------------------------"
     "------------------------------------*/\n"
     "const double NA(NOT_INPUT);\n"
@@ -42,7 +44,7 @@ static void make_header(std::ofstream& out, const File& in,
 /*--------------------------------------------------------------------------*/
 static void make_tail(std::ofstream& out, const File& in)
 {
-  out << in.cc_direct() <<
+  out << "// cc_direct\n" << in.cc_direct() <<
     "/*--------------------------------------"
     "------------------------------------*/\n"
     "/*--------------------------------------"

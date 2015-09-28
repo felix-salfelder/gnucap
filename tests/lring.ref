@@ -1,0 +1,107 @@
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 2.0609n    9.9903     9.9903     5.         0.1       -20.589n    4.        
+ 3.1609n    10.01      10.01      1.         0.1       -31.589n    2.        
+ 23.995n    9.9904     9.9904     1.         0.1       -239.93n    2.        
+ 44.829n    10.01      10.01      1.         0.1       -448.27n    2.        
+ 582.07n    9.9904     9.9904     1.         0.1       -5.8207u    2.        
+ 8.5716u    10.01      10.01      1.         0.1       -85.716u    2.        
+ 152.35u    9.9919     9.9904     1.         0.1       -0.0015235  2.        
+ 0.0071935  10.082     10.01      1.         0.1       -0.071935   2.        
+ 0.1        10.99      9.9904     1.         0.        -1.         2.        
+ 1.         1.         22.199p    1.         0.        -1.         4.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=60, fourier=0, total=75
+transient timesteps: accepted=11, rejected=4, total=15
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 2.0609n    9.9903     9.9903     5.         0.1       -20.589n    4.        
+ 3.1609n    10.01      10.01      1.         0.1       -31.589n    2.        
+ 23.995n    9.9904     9.9904     1.         0.1       -239.93n    2.        
+ 44.829n    10.01      10.01      1.         0.1       -448.27n    2.        
+ 582.07n    9.9904     9.9904     1.         0.1       -5.8207u    2.        
+ 8.5716u    10.01      10.01      1.         0.1       -85.716u    2.        
+ 152.35u    9.9919     9.9904     1.         0.1       -0.0015235  2.        
+ 0.0071935  10.082     10.01      1.         0.1       -0.071935   2.        
+ 0.1        10.99      9.9904     1.         0.        -1.         2.        
+ 1.         1.         22.199p    1.         0.        -1.         4.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=60, fourier=0, total=150
+transient timesteps: accepted=22, rejected=8, total=30
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 0.01       10.1       10.        1.         0.1       -0.1        4.        
+ 0.02       10.2       10.        1.         0.1       -0.2        2.        
+ 0.03       10.3       10.        1.         0.1       -0.3        2.        
+ 0.04       10.4       10.        1.         0.1       -0.4        2.        
+ 0.05       10.5       10.        1.         0.1       -0.5        2.        
+ 0.1        11.        10.        1.         0.        -1.         2.        
+ 1.         1.        -47.~p      1.         0.        -1.         4.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=32, fourier=0, total=190
+transient timesteps: accepted=30, rejected=8, total=38
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+traponly 
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 0.01       10.1       10.        1.         0.1       -0.1        2.        
+ 0.02       10.2       10.        1.         0.1       -0.2        2.        
+ 0.03       10.3       10.        1.         0.1       -0.3        2.        
+ 0.04       10.4       10.        1.         0.1       -0.4        2.        
+ 0.05       10.5       10.        1.         0.1       -0.5        2.        
+ 0.1        11.        10.        1.         0.        -1.         2.        
+ 1.        -9.        -10.        1.         0.        -1.         2.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=35, fourier=0, total=233
+transient timesteps: accepted=38, rejected=8, total=46
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+initsc 0, traponly 
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 1.6745n    9.9881     9.9881     8.         0.1       -16.725n    2.        
+ 2.7745n    10.012     10.012     1.         0.1       -27.725n    2.        
+ 19.26n     9.9882     9.9882     1.         0.1       -192.58n    2.        
+ 35.746n    10.012     10.012     1.         0.1       -357.44n    2.        
+ 428.07n    9.9882     9.9882     1.         0.1       -4.2807u    2.        
+ 5.6121u    10.012     10.012     1.         0.1       -56.121u    2.        
+ 89.865u    9.9891     9.9882     1.         0.1       -898.65u    2.        
+ 0.0037127  10.049     10.012     1.         0.1       -0.037127   2.        
+ 0.1        10.988     9.9882     1.         0.        -1.         2.        
+ 1.        -8.9882    -9.9882     1.         0.        -1.         2.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=75, fourier=0, total=326
+transient timesteps: accepted=49, rejected=15, total=64
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+euleronly 
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 0.01       10.1       10.        1.         0.1       -0.1        1.        
+ 0.012~     10.1~      10.        3.         0.1       -0.12~      1.        
+ 0.01~      10.1~      10.        1.         0.1       -0.1~       1.        
+ 0.1        11.        10.        1.         0.        -1.         1.        
+ 1.         1.         22.22~p    1.         0.        -1.         1.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=32, fourier=0, total=366
+transient timesteps: accepted=55, rejected=17, total=72
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%
+initsc 1 
+#Time       v(1)       v(2)       hidden(0)  event(I1)  i(L1)      method(L1)
+ 0.         0.         0.         1.         0.1        0.        -1.        
+ 0.01       10.1       10.        1.         0.1       -0.1        1.        
+ 0.012~     10.12~     10.        3.         0.1       -0.12~      1.        
+ 0.01~      10.1~      10.        1.         0.1       -0.1~       1.        
+ 0.1        11.        10.        1.         0.        -1.         1.        
+ 1.         1.         22.22~p    1.         0.        -1.         1.        
+Gnucap   System status
+iterations: op=0, dc=0, tran=32, fourier=0, total=406
+transient timesteps: accepted=61, rejected=19, total=80
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

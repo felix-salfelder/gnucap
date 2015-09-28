@@ -1,0 +1,14 @@
+spice
+* an ugly numerical rounding bug.
+* needs investigation
+
+V1 1 0 5
+
+.print tran v(nodes)
+.tran 0 10 1
+
+.mark
+
+.tran 0 1 1 trace=v
+
+.end

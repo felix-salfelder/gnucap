@@ -1,0 +1,20 @@
+spice
+
+.printf "hello"
+.printf " world" 3
+.echo
+.printf " x %f" 42
+* BUG
+* .printf " y %i" 42
+.echo
+.param a=1
+.param b={2*a}
+.eval a
+.eval b
+.printf "a %f b %f" a b
+.echo
+.param b={3*a}
+.printf "a %f b %f", a, b
+.echo
+
+.end

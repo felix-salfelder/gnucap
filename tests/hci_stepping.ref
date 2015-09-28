@@ -1,0 +1,41 @@
+#TTime     
+ 0.        
+ 3.E-6     
+ 6.E-6     
+ 10.E-6    
+#TTime     
+ 0.        
+ 1.E-6     
+ 2.E-6     
+ 3.E-6     
+ 4.E-6     
+ 5.E-6     
+ 6.E-6     
+ 7.E-6     
+ 8.E-6     
+ 10.E-6    
+#TTime     
+ 0.        
+ 1.E-6     
+ 2.E-6     
+ 3.E-6     
+ 4.1E-6    
+ 5.31E-6   
+ 6.641E-6  
+ 8.1051E-6 
+ 9.7156E-6 
+ 11.487E-6 
+ 13.436E-6 
+ 15.579E-6 
+ 17.937E-6 
+ 20.E-6    
+a= 353.~u   
+a= 352.9~u  
+a= 352.7~u  
+a= 434.41~u 
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=1173845
+transient timesteps: accepted=232331, rejected=1480, total=233808
+twotime timesteps: accepted=13, rejected=0, total=25
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=77.8%, ac density=77.8%

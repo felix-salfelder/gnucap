@@ -1,0 +1,25 @@
+spice
+* rc-element 
+
+V1 (1 0) DC 0.5
+R1 1 2 10
+
+* 1          2
+* o---|R1|---o
+* |          |
+* O V1       |
+* |          |
+* o----o-----o 
+*      |
+*      V
+
+
+.PRINT DDC  v(v1)  dv(nodes)
+.DDC v1 0 1 0.1
+
+* does not work (some generator missing)
+*.DDC
+
+
+.END
+

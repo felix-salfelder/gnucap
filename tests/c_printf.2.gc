@@ -1,0 +1,17 @@
+spice
+
+.param a=3
+.printf "t1 %f bar" a
+.echo
+.printf ".param foo=4" > printf.tmp.out
+.echo >> printf.tmp.out
+.printf ".param bar=%f" a, > printf.tmp.out
+.echo >> printf.tmp.out
+.printf ".param bar=%f" (a+3), > printf.tmp.out
+.echo >> printf.tmp.out
+.printf ".echo %f" a, >> printf.tmp.out
+.echo >> printf.tmp.out
+.printf ".eval foo"  >> printf.tmp.out
+.echo >> printf.tmp.out
+.include printf.tmp.out
+.end

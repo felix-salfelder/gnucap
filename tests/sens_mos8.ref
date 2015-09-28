@@ -1,0 +1,4 @@
+#           v(ndd)     v(nin)     v(nout)    reversed(MN1)
+ 0.         5.         2.2        2.2786     1.        
+*param     #@freq      wr(MN1)    lr(MN1)    gmr(MN1)   rr(R1)    
+v(nout)    0.        -430.66K    220.95    -1.4942Meg -9.0128u   

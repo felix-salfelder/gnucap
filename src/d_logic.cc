@@ -1,4 +1,4 @@
-/*$Id: d_logic.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                               -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -64,7 +64,7 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
    _gatemode(moUNKNOWN)   
 {
   assert(max_nodes() == PORTS_PER_GATE);
-  for (int ii = 0;  ii < max_nodes();  ++ii) {
+  for (uint_t ii = 0; ii < max_nodes(); ++ii) {
     nodes[ii] = p.nodes[ii];
   }
   _n = nodes;
@@ -94,12 +94,13 @@ void DEV_LOGIC::expand()
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
     }else{
       _gatemode = OPT::mode;    
-      renew_subckt(model, this, scope(), NULL/*&(c->_params)*/);    
+      // actually _c->_params, but they are not implemented...
+      renew_subckt(model, this, scope(), scope()->params());
       subckt()->expand();
     }
   }catch (Exception_Cant_Find&) {
     error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
-	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
+	  long_label() + ": can't find subckt: \"" + subckt_name + "\", forcing digital\n");
   }
   
   assert(!is_constant()); /* is a BUG */
@@ -188,12 +189,14 @@ void DEV_LOGIC::tr_advance()
     subckt()->tr_advance();
     break;
   case moDIGITAL: 
-    if (_n[OUTNODE]->in_transit()) {
+    if (_n[OUTNODE]->in_transit() || _n[OUTNODE]->final_time_a()  < NEVER ) {
       q_eval();
       if (_sim->_time0 >= _n[OUTNODE]->final_time()) {
 	_n[OUTNODE]->propagate();
-      }else{untested();
+      }else{ // untested();
       }
+    } else if ( _n[OUTNODE]->final_time_a() < NEVER ) {
+      untested();
     }else{
     }
     break;
@@ -246,7 +249,7 @@ bool DEV_LOGIC::tr_needs_eval()const
     }
     return (_sim->analysis_is_static() || _sim->analysis_is_restore());
   case moANALOG:
-    untested();
+    //untested();
     assert(!is_q_for_eval());
     assert(subckt());
     return subckt()->tr_needs_eval();
@@ -277,7 +280,7 @@ bool DEV_LOGIC::tr_eval_digital()
   }else{
     assert(_sim->analysis_is_tran_dynamic());
   }
-  
+
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
@@ -291,7 +294,7 @@ bool DEV_LOGIC::tr_eval_digital()
   set_converged(conv_check());
   store_values();
   q_load();
-  
+
   return converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -304,6 +307,13 @@ bool DEV_LOGIC::do_tr()
   case moANALOG:  assert(subckt()); set_converged(subckt()->do_tr()); break;
   }
   return converged();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_LOGIC::tt_advance()
+{
+  assert(subckt());
+  subckt()->tt_advance();
+  ELEMENT::tt_advance();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_load()
@@ -342,6 +352,17 @@ void DEV_LOGIC::tr_accept()
   assert(c);
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   assert(m);
+
+#ifdef LASTACC
+  if(_sim->_time0 <= _tr_last_acc) {
+    if(_sim->_time0){
+      error(bWARNING, "tr accepting twice %s time0 %E\n", long_label().c_str(), _sim->_time0);
+      // assert(false);
+    }else{
+    }
+  }
+  _tr_last_acc = _sim->_time0;
+#endif
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   /* Check quality and get node info to local array. */
   /* side effect --- generate digital values for analog nodes */
@@ -352,10 +373,10 @@ void DEV_LOGIC::tr_accept()
     _failuremode = _n[OUTNODE]->failure_mode();    /* what is wrong with it? */
     _lastchangenode = OUTNODE;		/* which node changed most recently */
     int lastchangeiter=_n[OUTNODE]->d_iter();/* iteration # when it changed */
-    trace0(long_label().c_str());
-    trace2(_n[OUTNODE]->failure_mode().c_str(), OUTNODE, _n[OUTNODE]->quality());
+    trace1("DEV_LOGIC::tr_accept", long_label());
+    trace3("DEV_LOGIC::tr_accept", _n[OUTNODE]->failure_mode(), OUTNODE, _n[OUTNODE]->quality());
     
-    for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
+    for (uint_t ii = BEGIN_IN; ii < net_nodes(); ++ii) {
       _n[ii]->to_logic(m);
       if (_n[ii]->quality() < _quality) {
 	_quality = _n[ii]->quality();
@@ -374,7 +395,7 @@ void DEV_LOGIC::tr_accept()
      * If all quality are good, can evaluate as digital.
      * Otherwise need to evaluate as analog.
      */
-    trace3(_failuremode.c_str(), _lastchangenode, lastchangeiter, _quality);
+    trace4("DEV_LOGIC::tr_accept", _failuremode, _lastchangenode, lastchangeiter, _quality);
   }
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */  
   if (want_analog()) {
@@ -404,8 +425,11 @@ void DEV_LOGIC::tr_accept()
 	|| _lastchangenode != OUTNODE
 	|| _sim->analysis_is_static()
 	|| _sim->analysis_is_restore()) {
+
       LOGICVAL future_state = c->logic_eval(&_n[BEGIN_IN]);
       //		         ^^^^^^^^^^
+      trace6("hmmm0", long_label(), _sim->_bypass_ok, _lastchangenode != OUTNODE,
+          _sim->analysis_is_static(), _sim->analysis_is_restore(), future_state);
       if ((_n[OUTNODE]->is_unknown()) &&
 	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) {
 	_n[OUTNODE]->force_initial_value(future_state);
@@ -413,13 +437,13 @@ void DEV_LOGIC::tr_accept()
 	 * Answers could be wrong if order in netlist is reversed 
 	 */
       }else if (future_state != _n[OUTNODE]->lv()) {
-	assert(future_state != lvUNKNOWN);
+	// assert(future_state != lvUNKNOWN);
 	switch (future_state) {
 	case lvSTABLE0:	/*nothing*/		break;
 	case lvRISING:  future_state=lvSTABLE0;	break;
 	case lvFALLING: future_state=lvSTABLE1;	break;
 	case lvSTABLE1:	/*nothing*/		break;
-	case lvUNKNOWN: unreachable();		break;
+	case lvUNKNOWN: unreachable(); future_state=lvSTABLE1;		break;
 	}
 	/* This handling of rising and falling may seem backwards.
 	 * These states occur when the value has been contaminated 
@@ -431,13 +455,15 @@ void DEV_LOGIC::tr_accept()
 	assert(future_state.lv_old() == future_state.lv_future());
 	if (_n[OUTNODE]->lv() == lvUNKNOWN
 	    || future_state.lv_future() != _n[OUTNODE]->lv_future()) {
+          trace5( "hmmm", future_state, long_label(), _n[OUTNODE]->lv(),
+              _n[BEGIN_IN]->lv(), _n[BEGIN_IN]->lv_future());
 	  _n[OUTNODE]->set_event(m->delay, future_state);
 	  _sim->new_event(_n[OUTNODE]->final_time());
 	  //assert(future_state == _n[OUTNODE].lv_future());
 	  if (_lastchangenode == OUTNODE) {
 	    unreachable();
-	    error(bDANGER, "%s:%u:%g non-event state change\n",
-		  long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
+	    error(bDANGER, "%s:%u:%g non-event state change: failuremode: %s\n",
+		  long_label().c_str(), _sim->iteration_tag(), _sim->_time0, _failuremode.c_str());
 	  }else{
 	  }
 	}else{
@@ -510,3 +536,4 @@ bool COMMON_LOGIC::operator==(const COMMON_COMPONENT& x)const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

@@ -1,0 +1,9 @@
+* comment
+.verilog
+
+module test(n,p);
+endmodule
+
+test bla(.n(1), .p(0), .q(2));
+
+list

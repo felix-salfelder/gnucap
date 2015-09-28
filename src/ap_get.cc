@@ -1,4 +1,4 @@
-/*$Id: ap_get.cc,v 26.85 2008/06/19 05:01:15 al Exp $ -*- C++ -*-
+/*$Id: ap_get.cc,v 1.2 2010-09-17 12:25:56 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -30,7 +30,7 @@
 bool Get(CS& cmd, const std::string& key, bool* val)
 {
   if (cmd.umatch(key + ' ')) {
-    if (cmd.skip1b('=')) {itested();
+    if (cmd.skip1b('=')) {
       cmd >> *val;
     }else{
       *val = true;
@@ -44,6 +44,41 @@ bool Get(CS& cmd, const std::string& key, bool* val)
   }
 }
 /*--------------------------------------------------------------------------*/
+template<class T>
+bool _Get_int(CS& cmd, const std::string& key, T* val, AP_MOD mod, T scale)
+{
+  if (cmd.umatch(key + " {=}")) {
+    switch(mod) {
+    case mNONE:			*val = T(cmd.ctof()); break;
+    case mSCALE:    untested(); *val = T(T(cmd.ctof())*scale); break;
+    case mOFFSET:   untested(); *val = T(T(cmd.ctof())+scale); break;
+    case mINVERT:   untested(); *val = T(1 / T(cmd.ctof()));   break;
+    case mPOSITIVE: untested(); *val = T(std::abs(T(cmd.ctof()))); break;
+    case mOCTAL:		*val = T(cmd.ctoo());		break;
+    case mHEX:      untested(); *val = T(cmd.ctox());		break;
+    }
+    return true;
+  }else{
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Get(CS& cmd, const std::string& key, short int* val, AP_MOD mod, short int scale)
+{
+	return _Get_int(cmd, key, val, mod, scale);
+}
+/*--------------------------------------------------------------------------*/
+bool Get(CS& cmd, const std::string& key, int* val, AP_MOD mod, int scale)
+{
+	return _Get_int(cmd, key, val, mod, scale);
+}
+/*--------------------------------------------------------------------------*/
+bool Get(CS& cmd, const std::string& key, unsigned* val, AP_MOD mod, unsigned scale)
+{
+	return _Get_int(cmd, key, val, mod, scale);
+}
+/*--------------------------------------------------------------------------*/
+#if 0
 bool Get(CS& cmd, const std::string& key, int* val, AP_MOD mod, int scale)
 {
   if (cmd.umatch(key + " {=}")) {
@@ -61,6 +96,7 @@ bool Get(CS& cmd, const std::string& key, int* val, AP_MOD mod, int scale)
     return false;
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 bool Get(CS& cmd, const std::string& key, double* val, AP_MOD mod, double scale)
 {
@@ -68,9 +104,11 @@ bool Get(CS& cmd, const std::string& key, double* val, AP_MOD mod, double scale)
     switch(mod) {
     case mNONE:	    untested();	*val = cmd.ctof();		break;
     case mSCALE:    untested(); *val = cmd.ctof()*scale;	break;
-    case mOFFSET:   untested(); *val = cmd.ctof()+scale;	break;
+    case mOFFSET:             ; *val = cmd.ctof()+scale;	break;
     case mINVERT:   untested(); *val = 1 / cmd.ctof();		break;
-    case mPOSITIVE:		*val = std::abs(cmd.ctof());	break;
+    case mPOSITIVE:		*val = std::abs(cmd.ctof());
+								trace1(("Get " + std::string((cmd.fullstring()))).c_str(), *val );
+								break;
     case mOCTAL:    untested();	*val = cmd.ctoo();		break;
     case mHEX:      untested(); *val = cmd.ctox();		break;
     }
@@ -81,3 +119,4 @@ bool Get(CS& cmd, const std::string& key, double* val, AP_MOD mod, double scale)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

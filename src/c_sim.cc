@@ -1,4 +1,4 @@
-/*$Id: c_sim.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: c_sim.cc,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -31,7 +31,7 @@ namespace {
 class CMD_MARK : public CMD {
 public:
   void do_it(CS&, CARD_LIST*)
-  {itested();
+  {
     _sim->_freezetime = true;
   }
 } p6;
@@ -49,3 +49,4 @@ DISPATCHER<CMD>::INSTALL d7(&command_dispatcher, "unmark|unfreeze", &p7);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

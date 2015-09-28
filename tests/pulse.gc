@@ -1,0 +1,17 @@
+spice
+
+v1 n1 n2 pulse ( iv={-0.5} pv=0.5 rise=1e-7 fall=4e-7 width=2e-5  period=4e-5 ) ac=1
+r1 n1 0 1
+
+*.dc v1 0 1 0.1
+
+.print tran v(nodes)
+.store tran v(nodes)
+
+.alter r1=10
+.alter r1=1
+
+.tran 0 100u 3u
+.measure t1 at(probe="v(n2)" x=10u)
+.measure t2 at(probe="v(n2)" x=70u)
+.end

@@ -1,0 +1,33 @@
+spice
+
+.load rcd_sym.so
+.model my_rcd rcd_exp
+
+.verilog
+my_rcd #(.weight(100) .re0(12) .re1(12) .rc0(12) .rc1(-3) ) z1( nin, 0);
+spice
+
+V1 nin 0 pulse ( iv=0 pv=amplitude delay=delay rise=1n fall=1n width=width period=period )
+.param amplitude=1.2
+.param period=2
+.param width=1
+.param delay=1n
+
+.print tw tr(z1)  amplitude order(z1) P(z1)
+.print tran v(nin) P(z1) vin(z1) tr(z1)
+
+.tw 1 10 100 100 new 
+* > tw_rcd_tw.out tran > tw_rcd_tr.out
+
+.dumpnodes adp
+.dumpnodes
+.param amplitude=0
+.tw 4000 cont
+
+.param amplitude=.5
+.tw 8000 cont
+* >> tw_rcd_tw.out tran >> tw_rcd_tr.out
+
+* ( BUG: tr; tw doesnt work )
+
+.end

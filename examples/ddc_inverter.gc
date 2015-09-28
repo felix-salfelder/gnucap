@@ -1,0 +1,34 @@
+spice
+*1 NMOS inverter
+
+m1 nout nin 0 0 MODELD w=8u l=2u
+C1 nout 0 10p
+R1 nout 1 120k
+Vdd 1 0 5
+Vin nin 0 5
+
+
+
+*                           Vdd 0V..5V step 0.0001V
+*        ---------| R1 |----O---
+*        |   |                 |
+*        |   = C1              |
+*     ||--   |                 |
+*  ---||<-   -------------------
+*  |  ||-- N-MOSFET    |
+*  |     |             V
+*  O Vin |
+*  | 5V  |
+*  |     |
+*  -------
+*     |
+*     V
+
+.MODEL MODELD NMOS (level=2 KP=10U VTO=1 LAMBDA=0.01 GAMMA=0.9 PHI=0.5)
+.PRINT OP ITER(0) V(nodes)
+.OP 
+.PRINT DDC V(nodes) dv(nodes)
+.DDC Vdd 0 5 0.1 
+.END
+
+

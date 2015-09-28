@@ -1,0 +1,53 @@
+v0 ( n00 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.
+v1 ( n01 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.05
+v2 ( n02 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.1
+v3 ( n03 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.15
+v4 ( n04 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.2
+v5 ( n05 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.5
+v6 ( n06 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.8
+v7 ( n07 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.85
+v8 ( n08 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.9
+v9 ( n09 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 0.95
+v10 ( n10 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 0.2 fall= 0.2 width=NA( Inf) period=NA( Inf) area= 1.
+#           v(n00)     v(n01)     v(n02)     v(n03)     v(n04)     v(n05)     v(n06)     v(n07)     v(n08)     v(n09)     v(n10)    
+ 0.         0.         0.         0.         0.         0.         0.         0.         0.13397    0.29289    0.5        1.        
+#Time       v(n00)     v(n01)     v(n02)     v(n03)     v(n04)     v(n05)     v(n06)     v(n07)     v(n08)     v(n09)     v(n10)    
+ 0.         0.         0.         0.         0.         0.         0.         0.         0.13397    0.29289    0.5        1.        
+ 0.01       0.         0.05       0.05       0.05       0.05       0.05       0.05       0.18397    0.34289    0.55       1.        
+ 0.1        0.         0.5        0.5        0.5        0.5        0.5        0.5        0.63397    0.79289    1.         1.        
+ 0.14142    0.         0.29289    0.70711    0.70711    0.70711    0.70711    0.70711    0.84108    1.         1.         1.        
+ 0.15202    0.         0.23992    0.65413    0.76008    0.76008    0.76008    0.76008    0.89405    1.         1.         1.        
+ 0.16261    0.         0.18695    0.60116    0.81305    0.81305    0.81305    0.81305    0.94703    1.         1.         1.        
+ 0.17321    0.         0.13397    0.54819    0.86603    0.86603    0.86603    0.86603    1.         1.         1.         1.        
+ 0.2        0.         0.         0.41421    0.73205    1.         1.         1.         1.         1.         1.         1.        
+ 0.21657    0.         0.         0.33137    0.64921    0.91716    1.         1.         1.         1.         1.         1.        
+ 0.23314    0.         0.         0.24853    0.56637    0.83431    1.         1.         1.         1.         1.         1.        
+ 0.24971    0.         0.         0.16569    0.48352    0.75147    1.         1.         1.         1.         1.         1.        
+ 0.28284    0.         0.         0.         0.31784    0.58579    1.         1.         1.         1.         1.         1.        
+ 0.34641    0.         0.         0.         0.         0.26795    1.         1.         1.         1.         1.         1.        
+ 0.4        0.         0.         0.         0.         0.         1.         1.         1.         1.         1.         1.        
+ 0.5        0.         0.         0.         0.         0.         1.         1.         1.         1.         1.         1.        
+ 0.7        0.         0.         0.         0.         0.         0.         1.         1.         1.         1.         1.        
+ 0.8        0.         0.         0.         0.         0.         0.         1.         1.         1.         1.         1.        
+ 0.82679    0.         0.         0.         0.         0.         0.         0.86603    1.         1.         1.         1.        
+ 0.85858    0.         0.         0.         0.         0.         0.         0.70711    0.84108    1.         1.         1.        
+ 0.9        0.         0.         0.         0.         0.         0.         0.5        0.63397    0.79289    1.         1.        
+ 0.94142    0.         0.         0.         0.         0.         0.         0.29289    0.42687    0.58579    0.79289    1.        
+ 0.98284    0.         0.         0.         0.         0.         0.         0.085786   0.21976    0.37868    0.58579    1.        
+ 1.         0.         0.         0.         0.         0.         0.         0.         0.13397    0.29289    0.5        1.        
+i= 0.
+i= 0.05
+i= 0.1
+i= 0.15
+i= 0.2
+i= 0.5
+i= 0.8
+i= 0.85
+i= 0.9
+i= 0.95
+i= 1.
+Gnucap   System status
+iterations: op=0, dc=3, tran=75, fourier=0, total=103
+transient timesteps: accepted=23, rejected=2, total=25
+nodes: user=11, subckt=0, model=0, total=11
+dctran density=9.1%, ac density=9.1%

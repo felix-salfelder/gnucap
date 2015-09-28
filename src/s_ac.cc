@@ -1,4 +1,5 @@
-/*$Id: s_ac.cc,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*$Id: s_ac.cc,v 1.2 2009-12-13 17:55:02 felix Exp $ -*- C++ -*-
+ * vim:ts=8:sw=2:et:
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -27,6 +28,7 @@
 #include "u_parameter.h"
 #include "u_prblst.h"
 #include "s__.h"
+#include "io_matrix.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -42,7 +44,8 @@ public:
     _step(0.),
     _linswp(false),
     _prevopppoint(false),
-    _stepmode(ONE_PT)
+    _stepmode(ONE_PT),
+    _dump_matrix(0)
   {}
 
   ~AC() {}
@@ -62,6 +65,7 @@ private:
   bool	_linswp;		// flag: use linear sweep (vs log sweep)
   bool	_prevopppoint;  	// flag: use previous op point
   enum {ONE_PT, LIN_STEP, LIN_PTS, TIMES, OCTAVE, DECADE} _stepmode;
+  bool _dump_matrix; // dump matrix after ac
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -81,8 +85,9 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
   ::status.set_up.stop();
   switch (ENV::run_mode) {
   case rPRE_MAIN:	unreachable();	break;
-  case rBATCH:		itested();
-  case rINTERACTIVE:	itested();
+  case rPIPE:		untested();
+  case rBATCH:
+  case rINTERACTIVE:
   case rSCRIPT:		sweep();	break;
   case rPRESET:		/*nothing*/	break;
   }
@@ -147,8 +152,9 @@ void AC::setup(CS& Cmd)
       || Get(Cmd, "pr{evoppoint}",&_prevopppoint)
       || Get(Cmd, "sta{rt}",	  &_start)
       || Get(Cmd, "sto{p}",	  &_stop)
+      || Get(Cmd, "dm",	          &_dump_matrix)
       || Get(Cmd, "te{mperature}",&_sim->_temp_c)
-      || outset(Cmd,&_out)
+      || _out.outset(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
   Cmd.check(bWARNING, "what's this??");
@@ -172,10 +178,10 @@ void AC::setup(CS& Cmd)
     needslinfix = true;		// and I am too lazy to do it
     _linswp = true;		// right.
     break;
-  case TIMES:untested();
+  case TIMES:
     if (_step == 0.  &&  _start != 0.) {untested();
       _step = _stop / _start;
-    }else{untested();
+    }else{
     }
     needslinfix = false;
     _linswp = false;
@@ -227,6 +233,9 @@ void AC::solve()
   CARD_LIST::card_list.ac_load();
   ::status.load.stop();
 
+  if (_dump_matrix){
+    _out << _sim->_acx << "\n" ;
+  }
   ::status.lud.start();
   _sim->_acx.lu_decomp();
   ::status.lud.stop();
@@ -245,6 +254,13 @@ void AC::sweep()
     _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
     solve();
     outdata(_sim->_freq);
+    if (_dump_matrix){
+      _out << _sim->_acx << "\n";
+      //for(unsigned i=0; i++<_sim->_total_nodes;){
+      //  _out << i << _sim->_i[i] ;
+      //}
+      _out << "\n";
+    }
   } while (next());
 }
 /*--------------------------------------------------------------------------*/
@@ -278,3 +294,4 @@ static DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "ac", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:

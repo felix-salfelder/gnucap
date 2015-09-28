@@ -1,72 +1,67 @@
-Readme for development snapshot 2007-02-21
+Readme for gnucap-uf 0.0.0
 
-This is a development snapshot.  As such, there may be problems due to
-new work.
+(this forks from gnucap and includes several experiments, there exist plans to
+seperate out improvements and fold back to upstream)
 
-The most important change here is enhanced plugin support, and the 3
-new model packages, distributed separately.
+=== build system ===
 
-Also, commands use the dispatcher, so they can be added as plugins.
+see INSTALL. for better coexistance with other gnucap releases, you may want to
+configure --with-program-suffix=-uf
 
+=== regression test suite ===
 
+gnucap-uf implements an automated test suite (automake based, with noise
+filter). the directory 'tests' contains a set of tests that should pass before
+installation. type "make check". some tests are known to fail (XFAIL_TESTS),
+these are meant to document problems. feel free to contribute patches.
 
-Readme for development snapshot 2006-12-04
+=== module compilation ===
 
-This is a development snapshot.  As such, there may be problems due to
-new work.
+compile a plugin from source code
+$ gnucap.mk file.so
 
-New features: "attach" and "detach" commands, for attaching and
-detaching compiled modules.
+compiles cc to so prior to dlopen.
+gnucap> load file.cc
 
-To use ....
+=== Two time analysis (aging etc.) ===
 
-Start with a .model file.
+.ttr [ Tstart ] Tstop [ tstop tstep ] [<args>]
+args are
+* <multiplier>, increase timestep multiplicatively.
+cont: continue with aged node values
+cont_dc: continue from dc operating point
+new: start with fresh devices
 
-Compile it .....
+EXAMPLES
+see regression tests.
 
->> gnucap-modelgen my-model.model
+=== dc analysis ===
 
-.. produces my-model.h amd my-model.cc
+- takes uic argument. compute solution close to specified initial conditions.
+- improve dc sweep initial values and fallback in case of non-convergence.
 
-Compile that, with "-fPIC -shared" options
+=== dynamic dc analysis ===
 
->> g++  -fPIC -shared  my-model.cc
+.ddc command. like .dc, but provides dv probe for voltage nodes.
 
-.. produces a.out  (you could name it with -o ..)
+EXAMPLES
+spice
+c1 0 1 ic=1
+r1 0 1 1
+.print dv(1)
+.ddc
 
-Now, run gnucap
+see regression tests
 
->> gnucap
+=== sensitivity analysis ===
 
-(signs on..)
+- sensitivity probes in .ac analysis.
+- .sens command
 
-then you can attach the model..
+EXAMPLES
+see regresion tests
 
-gnucap> attach ./a.out
+=== remote control ===
 
-gnucap>  
-
-.. now you can use your model!!
-
-
-
-
-This snapshot includes some new verilog code, which is incomplete and
-not ready for anyone but a developer.  You can safely ignore it for
-now.
-
-It also changes the way models, devices, and functions are dispatched.
-The new version uses a dispatcher object, that is built on start-up,
-based on what modules are linked.  Models, devices, and functions can
-be added simply by linking them in.  There is no need to change
-anything else.  Likewise, if you don't need a model, device, or
-function, and want a version with it missing, just remove it from
-"Make1" and relink.
-
-The latest "stable" version is 0.35.  If you want to help development,
-use this snapshot and tell us what you find.  If you don't want to
-live on the edge, use the stable version.
-
-If you are making binary packages for distribution, please try this
-version and let me know how it works, but continue to distribute 0.35.
-
+the .sock command starts an interactive command for direct communication with
+the simulator kernel. this is for academic purposes only.

@@ -1,0 +1,41 @@
+spice
+*.options numdgt 9
+
+.load rcd_sym.so
+
+.model my_rcd rcd_exp
+
+.verilog
+my_rcd #(.weight(100) .re0(12) .re1(12).rc0(12) .rc1(-3) ) z3( nin, 0);
+spice
+
+.param amplitude=1.2
+V1 nin 0 sin amplitude=amplitude offset=1.5 frequency=1
+.param period=1
+.param width=1
+.param delay=1n
+
+.ttr new
+.dumpnodes adp
+
+.print tw
++s(z*)
++P(z*) E(z*)
++tau(z*)
+.store tw P(z*)
+.tw .1 1 100 new
+
+
+* writes .nodeset a(z3.c)= 0.173381650799069220170167682226
+.dumpnodes adp
+
+.echo resetting to new...
+.ttr 0 new
+.dumpnodes adp
+.echo done.
+
+.nodeset a(z3.c)= 0.173381650799069220170167682226
+.ttr 100 200 * 1.2
+
+.status notime
+.end

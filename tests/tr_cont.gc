@@ -1,0 +1,11 @@
+spice
+
+V1 1 0 5
+
+.options initsc 1
+.print tran v(nodes)
+.tran 0 10 5
+
+.tran 0 2 1 cont trace=v
+
+.end

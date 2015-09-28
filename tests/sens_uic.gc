@@ -1,0 +1,39 @@
+spice
+* don't remember what this is about.
+
+*            T
+*            |
+*            |
+*           [ ] R1
+*            |
+*            o---------------------------o
+*            |                            nout
+*         ||--
+*      o--||<--------------o
+*      |  ||--             |
+*      |     |             V
+*   C1 =     |
+*      |     |
+*      |     |
+*      o------
+*         |
+*         V
+
+.model nmos_1 nmos(level=1)
+
+MN1 0 nin nout 0 nmos_1 w=3e-4
+C1 nin 0 3m ic=0.3
+
+*v1 nin 0 1.2
+
+R1 nout ndd 300k
+
+vdd1 ndd 0 vdd
+
+.parameter vdd 2
+
+.print sens wr(M*) lr(M*) gmr(M*) rr(R1)
+.print dc v(nodes)
+.dc uic
+.sens v(nout)
+.end

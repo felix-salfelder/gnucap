@@ -1,0 +1,17 @@
+spice
+* pulse param sanity check
+
+.param vdd 1.7
+.options numdgt=5
+.param stress=1
+.param pw=.000001
+.param pp=0
+.param pw=.1
+V1 nin 0 pulse iv=0 pv=stress width=pw delay=0 period=pp
+.print tran v(nodes)
+
+* this should make a difference
+.param pp=.5
+
+.tran 0 1 .05 trace=a
+.end

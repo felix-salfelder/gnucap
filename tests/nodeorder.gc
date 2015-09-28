@@ -1,0 +1,39 @@
+spice
+
+R0  0 n1 1
+R1 n1 n2 1
+R2 n2 n3 1
+R3 n3 n4 1
+R4 n4 n5 1
+R5 n5 n6 1
+R6 n6 n7 1
+R7 n7 n8 1
+R8 n8 n9 1
+R9 n9 nA 1
+RA nA nB 1
+
+RX n2 n8 1
+RY n2 n9 1
+
+Ry 0 n5 1
+
+.nodelist
+.echo forward
+.options order=f
+.mstat
+.echo sinkr
+.options order=sinkr
+.mstat
+.echo sink forward
+.options order=sinkf
+.mstat
+.echo reverse
+.options order=r
+.mstat
+.echo tree
+.options order=tree
+.mstat
+.echo comp
+.options order=comp
+.mstat
+.end

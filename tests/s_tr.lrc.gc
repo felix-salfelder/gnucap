@@ -1,0 +1,42 @@
+
+param a=1
+param q=1
+
+options trace
+
+*options reltol=1e-5
+
+build
+.brl L1 0 nl .01m ic=0.001
+R1 nosc nl .001
+.ttcap C1 nosc 0 .01m ic=1
+
+
+options ttsteporder=4
+options ttstepgrow 1e99
+
+param tend=62.83u
+param tend=62.913u
+param tend=70u
+
+
+* dc uic
+* store tran v0dist(0)
+* print tran v0dist(0)
+* tr 0 {tend} {tend} trace=r cont edge=yes > /dev/null
+* 
+* measure t min(probe="v0dist(0)", arg, after=60u)
+
+echo > out.out
+echo > tr.out
+
+print dc v(c1) i(l1)
+print tran v(c1) i(l1) v0dist(0) v0t(0) v0r(0) control(0) hidden(0)
+dc uic
+
+tr 0 {tend} {tend} trace=r cont edge=evt
+echo second
+tr {2*tend} trace=a edge=break
+end
+
+

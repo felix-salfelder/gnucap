@@ -1,0 +1,13 @@
+spice
+
+.options trace
+.options initsc 1
+
+v1 n1 0 pulse iv=0 pv=1 delay=1 rise=1
+r1 n1 n2 1k
+c1 n2 0 100n
+
+.print tran v(nodes) i(r1) method(c1) iter(0) disc(nodes)
+.tran 0 10 10 trace=a
+.stat notime
+.end
