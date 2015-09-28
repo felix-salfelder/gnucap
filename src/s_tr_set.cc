@@ -1,4 +1,4 @@
-/*                                -*- C++ -*-
+/*$Id: s_tr_set.cc 2015/01/28 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -73,7 +73,7 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstart = arg1;			    /* _tstart _tstop _tstep */
 	_tstop  = arg2;				
 	_tstep  = arg3;
-      }else{untested(); 		    /* spice (illogical) order */
+      }else{				    /* spice (illogical) order */
 	_tstart = arg3;		    	    /* _tstep _tstop _tstart */
 	_tstop  = arg2;
 	_tstep  = arg1;
@@ -97,7 +97,7 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstop  = arg2;
 	_tstep  = arg1;
       }
-    }else{
+    }else{untested();
       assert(arg1.has_hard_value());
       arg1.e_val(0.,_scope);
       if (arg1 > _sim->last_time()) {
@@ -105,7 +105,7 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstart = _sim->last_time();
 	_tstop  = arg1;
 	/* _tstep unchanged */
-      }else if (arg1 == 0.) {untested();itested();	    /* 1 arg: _tstart */
+      }else if (arg1 == 0.) {untested();	    /* 1 arg: _tstart */
 	double oldrange = _tstop - _tstart;
 	_tstart = 0.;
 	_tstop  = oldrange;
@@ -144,7 +144,7 @@ void TRANSIENT::setup(CS& Cmd)
 
   if (!_tstep.has_good_value()) {untested();
     throw Exception("transient: time step is required");
-  }else if (_tstep==0.) {untested();itested();
+  }else if (_tstep==0.) {untested();
     throw Exception("time step = 0");
   }else{
   }

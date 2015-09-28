@@ -94,8 +94,7 @@ void DEV_LOGIC::expand()
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
     }else{
       _gatemode = OPT::mode;    
-      // actually _c->_params, but they are not implemented...
-      renew_subckt(model, this, scope(), scope()->params());
+      renew_subckt(model, scope()->params());
       subckt()->expand();
     }
   }catch (Exception_Cant_Find&) {

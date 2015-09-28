@@ -1,4 +1,4 @@
-/*$Id: e_base.cc 2015/01/27 al $ -*- C++ -*-
+/*$Id: e_base.cc 2015/02/05 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *

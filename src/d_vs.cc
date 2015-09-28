@@ -104,7 +104,7 @@ void DEV_VS::tr_begin()
   if (!using_tr_eval()) {
     if (_n[OUT2].m_() == 0) {
       _sim->set_limit(value());
-    }else if (_n[OUT1].m_() == 0) {untested();
+    }else if (_n[OUT1].m_() == 0) {
       _sim->set_limit(-value());
     }else{
       //BUG// don't set limit

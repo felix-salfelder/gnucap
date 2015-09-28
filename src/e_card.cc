@@ -221,18 +221,14 @@ void CARD::new_subckt(PARAM_LIST_MAP* p)
   _subckt = new CARD_LIST(this, p);
 }
 /*--------------------------------------------------------------------------*/
-void CARD::new_subckt(const CARD* Model, CARD* Owner,
-		      const CARD_LIST* Scope, PARAM_LIST_BASE* Params)
+void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
 {
   trace2("CARD::new_subckt", long_label(), *Params);
   delete _subckt;
-  assert(Scope==scope()); // why should
-  assert(Owner==this);    // we want something different?
-  _subckt = new CARD_LIST(Model, Owner, Scope, Params);
+  _subckt = new CARD_LIST(Model, this, scope(), Params);
 }
 /*--------------------------------------------------------------------------*/
-void CARD::renew_subckt(const CARD* Model, CARD* Owner,
-		      const CARD_LIST* Scope, PARAM_LIST_BASE* Params)
+void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 {
   // trying to fix: is_first_expand is true too often!
   bool frozen = 0;
@@ -247,11 +243,11 @@ void CARD::renew_subckt(const CARD* Model, CARD* Owner,
   }
 
   if (_sim->is_first_expand() && !frozen ) {
-    trace3("CARD::renew_subckt, first_expand", long_label(), *Params, *(Scope->params()));
-    new_subckt(Model, Owner, Scope, Params);
+    trace2("CARD::renew_subckt, first_expand", long_label(), *Params);
+    new_subckt(Model, Params);
   }else{
     assert(subckt());
-    trace3("CARD::renew_subckt, second_expand", long_label(), *Params, *(Scope->params()));
+    trace2("CARD::renew_subckt, subsequent expand", long_label(), *Params);
     subckt()->attach_params(Params, scope());
   }
 }

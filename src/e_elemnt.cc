@@ -180,9 +180,10 @@ void ELEMENT::tr_begin()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_restore()
 {
-  trace0(("ELEMENT::tr_restore for " + short_label()).c_str());
   if (_time[0] > _sim->_time0) { itested();
-    trace0("shift back");
+    // _freezetime
+    incomplete();
+    //BUG// wrong values in _time[]
     for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {itested();
       _time[i] = _time[i+1];
       _y[i] = _y[i+1];
@@ -190,10 +191,12 @@ void ELEMENT::tr_restore()
     _time[OPT::_keep_time_steps-1] = 0.;
     _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
   }else if (_time[0] == _sim->_time0) {
-    trace2( "*no shift ", _time[0] , _sim->_time0 );
-  }else{untested();
+    // the usual continue where the last one left off
+  }else{unreachable();
+    // skipping ahead, not implemented
   }
 
+  //assert(_time[0] == _sim->_time0);
   if (_time[0] != _sim->_time0) { itested();
     error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
         _time[0], _sim->_time0);
@@ -203,6 +206,7 @@ void ELEMENT::tr_restore()
     }
     //BUG// happens when continuing after a ^c,
     // when the last step was not printed
+    //BUG// also happens with _freezetime
     // _time[0] is the non-printed time.  _sim->_time0 is the printed time.
   }else{
   }
