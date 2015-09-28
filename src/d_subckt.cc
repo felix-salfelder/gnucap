@@ -143,7 +143,11 @@ private:
 
   std::string port_name(uint_t i)const {itested();
     if (_parent) {itested();
-      return _parent->port_value(i);
+      if (i<_parent->net_nodes()){ untested();
+        return _parent->port_value(i);
+      }else{ untested();
+        return "";
+      }
     }else{itested();
       return "";
     }
@@ -187,6 +191,7 @@ private: // no-ops for prototype
   void map_nodes(){untested();}
   void tr_begin(){untested();}
   void tr_load(){untested();}
+  TIME_PAIR tr_review(){untested(); return TIME_PAIR(NEVER, NEVER);}
   void tr_accept(){untested();}
   void tr_advance(){untested();}
   void tr_restore(){untested();}
@@ -389,6 +394,5 @@ uint_t DEV_SUBCKT::net_nodes()const
     return _net_nodes;
   }
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
