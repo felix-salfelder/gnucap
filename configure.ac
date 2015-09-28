@@ -21,7 +21,7 @@
 #  02110-1301, USA.
 
 AC_PREREQ(2.67)
-AC_INIT([gnucap-uf],[0.0.2-rc3],[felix@salfelder.org])
+AC_INIT([gnucap-uf],[0.0.2-rc5],[felix@salfelder.org])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
