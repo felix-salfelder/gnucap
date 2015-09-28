@@ -53,9 +53,9 @@ protected: // override virtual
   //int	  max_nodes()const		//COMPONENT/null
   //int	  num_nodes()const		//COMPONENT/null
   //int	  min_nodes()const		//COMPONENT/null
-  uint_t     matrix_nodes()const		{return 0;}
+  uint_t     matrix_nodes()const	{return 0;}
   uint_t     net_nodes()const		{return _net_nodes;}
-  //CARD* clone()const			//CARD/null
+  CARD*   clone()const			{unreachable(); return NULL;}
   //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
   //void  expand()			//COMPONENT
   //void  precalc_last()	{assert(subckt()); subckt()->precalc();}

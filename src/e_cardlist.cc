@@ -107,6 +107,7 @@ PARAM_LIST* CARD_LIST::params()const
 CARD_LIST::iterator CARD_LIST::find_again(const std::string& short_name,
 					  CARD_LIST::iterator Begin)
 {
+  trace0(("CARD_LIST::find_ name=" + short_name).c_str());
   return notstd::find_ptr(Begin, end(), short_name);
 }
 /*--------------------------------------------------------------------------*/
@@ -811,7 +812,6 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
       assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }
-  delete[] map;
 }
 /*--------------------------------------------------------------------------*/
 ///ADP_NODE* CARD_LIST::new_adp_node{
