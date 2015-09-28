@@ -502,6 +502,8 @@ void SOCK::main_loop()
         throw Exception("unknown opcode");
         break;
     }
+    _sim->reset_iteration_counter(iPRINTSTEP); // used by solve_with_homotopy
+                                               // reset in outdata (not called)
   }
 }
 /*--------------------------------------------------------------------------*/
