@@ -111,9 +111,9 @@ private: //vera stuff.
   void veraop_reply();
   void ev_iter();
   void set_param();
-  void transtep(unsigned init, double dt);
-  void transtep_reply();
-  void transtep_gc_reply();
+  unsigned transtep(unsigned init, double dt);
+  void transtep_reply(unsigned, bool eol=true);
+  void transtep_gc_reply(unsigned);
 
   char* var_names_buf;
 
@@ -130,7 +130,9 @@ private: //vera stuff.
   SocketStream stream;
   //unsigned BUFSIZE;
   unsigned n_bytes;
-  uint16_t error;
+
+  uint16_t _error; // transport between method and method_reply
+  double _dthack; // same
 
   double *dc_werteA,*dc_loesungA,*kons_loesungA,*kons_residuumA;
 
@@ -225,7 +227,7 @@ void SOCK::setup(CS& Cmd)
   IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
   initio(_out);
 
-  error = 0; /* verainit(v_flag, n_inputs, &n_vars, charbuf, &length); */
+  _error = 0; /* verainit(v_flag, n_inputs, &n_vars, charbuf, &length); */
   n_vars = static_cast<uint16_t>( _sim->_total_nodes) ; // _sim->total_nodes doesnt include gnd
   // do this also in sweep to initialize the socket streaM
   var_namen_arr.resize( n_vars, string("unset"));
@@ -463,6 +465,7 @@ void SOCK::main_loop()
     }
 
     double dt;
+    unsigned status;
     switch (opcode) {
       case '\0': // 0
         return;
@@ -486,22 +489,24 @@ void SOCK::main_loop()
         break;
       case 102:
         stream >> dt;
-        transtep(arg[0], dt);
-        transtep_reply();
+        status = transtep(arg[0], dt);
+        transtep_reply(status);
         break;
       case 103: untested();
         set_param();
         break;
       case 104: itested();
         stream >> dt;
-        transtep(arg[0], dt);
-        transtep_gc_reply();
+        status = transtep(arg[0], dt);
+        transtep_gc_reply(status);
 	break;
       default:
         ::error(bDANGER, "unknown opcode %i\n", opcode);
         throw Exception("unknown opcode");
         break;
     }
+    _sim->reset_iteration_counter(iPRINTSTEP); // used by solve_with_homotopy
+                                               // reset in outdata (not called)
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -601,7 +606,7 @@ void SOCK::veraop()
     _input_devs[i]->set_value(d);
   }
 
-  error = 0; /* veraop(sweep_val, x_new, G, C); */
+  _error = 0; /* veraop(sweep_val, x_new, G, C); */
 
   // ================do_dc========
   _sim->_uic = false;
@@ -627,7 +632,7 @@ void SOCK::veraop()
   }
 
   if(!converged){ itested();
-    error = 1;
+    _error = 1;
   }else{
 
     ::status.accept.start();
@@ -685,7 +690,7 @@ void SOCK::verakons()
   }
   _sim->keep_voltages(); // v0->vdc
 
-  error = 0; /* verakons(Dwork, x_new, q_dot, G, C); */
+  _error = 0; /* verakons(Dwork, x_new, q_dot, G, C); */
   //	n_vars = A->n_var;
 
   for( unsigned i = 0; i < _caplist.size(); i++) {
@@ -722,7 +727,7 @@ void SOCK::verakons()
     converged = solve_with_homotopy(itl,_trace);
     if (!converged) {
       ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
-      error=1;
+      _error = 1;
     }
   }
   ::status.accept.start();
@@ -824,7 +829,7 @@ void SOCK::ev_iter()
   trace0("SOCK::ev_iter done");
   _sim->_aa.deaugment();
   assert(_sim->_aa.size()==n_vars);
-  stream << ((uint16_t)error); stream.pad(6);
+  stream << ((uint16_t)_error); stream.pad(6);
   double resnormsq = 0;
   for (unsigned i=0; i < n_vars; i++) { untested();
     resnormsq+=tmp[i]*tmp[i];
@@ -879,9 +884,10 @@ enum{
 // dt. positive timestep, use instead in next call.
 //
 //
-void SOCK::transtep(unsigned init, double dt)
+unsigned SOCK::transtep(unsigned init, double dt)
 {
-  uint64_t ret = sOK;
+  unsigned ret = sOK;
+  _error = 0;
   trace3("SOCK::transtep", n_vars, init, dt);
   _sim->set_command_tran();
   _sim->restore_voltages(); //     _vt1[ii] = _v0[ii] = vdc[ii];
@@ -941,8 +947,9 @@ void SOCK::transtep(unsigned init, double dt)
   assert(_sim->analysis_is_tran());
 
 
+  bool tr_converged;
   for (unsigned i = stepno; i>0; --i) {
-    bool tr_converged = false;
+    tr_converged = false;
     try {
       tr_converged = solve(OPT::TRHIGH, _trace);
     }catch (Exception e) { incomplete();
@@ -980,6 +987,7 @@ void SOCK::transtep(unsigned init, double dt)
   double time_by_error_estimate = time_by._error_estimate;
   assert(time_by_error_estimate>=0);
 
+  // if(!tr_converged?) { ... } else
   if (time_by_error_estimate > _sim->_time0) {
     dt = time_by_error_estimate - _sim->_time0;
     ::status.accept.start();
@@ -1001,11 +1009,17 @@ void SOCK::transtep(unsigned init, double dt)
     tr_reject();
   }
 
+#ifndef NDEBUG
+  for (unsigned i=1; i <= n_vars; i++) {
+    if(isnan(_sim->_i[i])||isnan(_sim->_vdcstack.top()[i]) ) {
+      _error = 1;
+      assert(!tr_converged);
+    }
+  }
+#endif
 
-  stream.pad(8);
-  stream << ret;
-  stream << dt;
-
+  _dthack = dt;
+  return ret; // FIXME: proper status.
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::tr_reject()
@@ -1018,7 +1032,7 @@ void SOCK::tr_reject()
 /*--------------------------------------------------------------------------*/
 void SOCK::verakons_reply()
 {
-  stream << ((uint16_t)error); stream.pad(6);
+  stream << ((uint16_t)_error); stream.pad(6);
   for (unsigned i=1; i <= n_vars; i++) {
     trace1("SOCK::kons_reply", _sim->vdc()[i]);
     stream << _sim->vdc()[i];
@@ -1070,19 +1084,26 @@ void SOCK::verakons_reply()
 
 }
 
-void SOCK::transtep_reply()
+void SOCK::transtep_reply(unsigned ret, bool eol)
 {
+  _error = 0;
+  stream << _error; stream.pad(6);
+  stream << (uint64_t)ret;
+  stream << _dthack;
+
   for (unsigned i=1; i <= n_vars; i++) {
     stream << _sim->_vdcstack.top()[i];
   }
-  stream << SocketStream::eol;
+
+  // OUCH, move to main loop.
+  if(eol) {
+    stream << SocketStream::eol;
+  }
 }
 
-void SOCK::transtep_gc_reply()
+void SOCK::transtep_gc_reply(unsigned ret)
 { itested();
-  for (unsigned i=1; i <= n_vars; i++) { itested();
-    stream << _sim->_vdcstack.top()[i];
-  }
+  transtep_reply(ret, false);
 
   for (unsigned i=1; i <= n_vars; i++)
   {
@@ -1099,8 +1120,8 @@ void SOCK::transtep_gc_reply()
 /*--------------------------------------------------------------------------*/
 void SOCK::verainit_reply()
 {
-  trace4("SOCK::verainit_reply ", error, n_vars, length, var_namen_total_size);
-  stream << error;   stream.pad(6);
+  trace4("SOCK::verainit_reply ", _error, n_vars, length, var_namen_total_size);
+  stream << _error;   stream.pad(6);
   stream << int32_t (n_vars);  stream.pad(4);
   stream << int32_t (var_namen_total_size);  stream.pad(4);
 
@@ -1129,7 +1150,7 @@ void SOCK::veraop_reply()
 {
   assert(n_vars==_sim->_total_nodes);
   trace1("SOCK::veraop_reply ", n_vars);
-  stream << error; stream.pad(6);
+  stream << _error; stream.pad(6);
   for (unsigned i=1; i <= n_vars; i++)         /* Variablen-Werte */
   {
     stream << _sim->vdc()[i];
@@ -1154,7 +1175,7 @@ void SOCK::veraop_reply()
   if (printlevel >= 1)
   {
     userinfo(1,"vera_titan_ak","Sende: Error %i Framenumber %i, Laenge %i\n",
-        error,frame_number,total);
+        _error,frame_number,total);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1239,4 +1260,4 @@ SOCK::~SOCK()
   trace0("SOCK::~SOCK()");
 }
 /*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:et:
+// vim:ts=8:sw=2:noet:
