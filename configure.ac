@@ -102,24 +102,6 @@ fi
 ])
 AC_OUTPUT([modules/Makefile])
 AM_CONDITIONAL([MODULES], [test x$enable_modules != xno] )
-dnl --------------- lib -----------------
-dnl SHARED_LIB=
-AC_MSG_CHECKING([if library shall be installed])
-AC_ARG_ENABLE([lib],
-[  --enable-lib            Build and install shared library. [[default: disabled]]],
-[
-if test "X$enable_lib" = "Xno" ; then
-	AC_MSG_RESULT([no])
-else
-	AC_MSG_RESULT([yes])
-	enable_lib=yes
-fi
-],
-[
-	AC_MSG_RESULT([no])
-	enable_lib=no
-])
-AM_CONDITIONAL([SHARED_LIB], [test x$enable_lib != xno] )
 
 dnl ------------------- debugging -------------------
 AC_MSG_CHECKING([if debug code should be compiled in])

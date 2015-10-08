@@ -46,7 +46,6 @@ d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
 d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
 d_rcd.cc d_bti.cc  d_branchvs.cc d_hci.cc
 
-RAW_HDRS=
 lib_LTLIBRARIES=
 
 # matrix_example_LDADD = libgnucap.la
@@ -82,13 +81,16 @@ measure_max.cc measure_min.cc measure_slewrate.cc measure_cross.cc \
 measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 #------------------------------------------------------------------------
 RAW_SRCS = \
-globals.cc \
 $(BM_SRCS) \
 $(D_SRCS) \
 $(C_SRCS) \
 $(S_SRCS) \
 $(LANG_SRCS) \
-$(FUNC_SRCS) \
+$(FUNC_SRCS)
+
+#------------------------------------------------------------------------
+libgnucap_uf_la_SOURCES = \
+globals.cc \
 m_expression_dump.cc m_expression_in.cc m_expression_reduce.cc \
 m_base_in.cc m_base_math.cc m_fft.cc  m_spline.cc \
 ap_construct.cc ap_convert.cc ap_error.cc ap_get.cc ap_match.cc ap_skip.cc \
@@ -105,8 +107,10 @@ c__cmd.cc c_attach.cc c_file.cc c_genrat.cc c_debug.cc \
 c_nodeset.cc \
 findbr.cc plot.cc e_adp.cc e_adp_mos.cc \
 startup.cc m_matrix.cc
+
+libgnucap_uf_la_CPPFLAGS = $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
 #------------------------------------------------------------------------
-RAW_HDRS += \
+RAW_HDRS = \
 startup.h md.h ap.h mode.h constant.h declare.h \
 l_compar.h l_dispatcher.h l_denoise.h \
 l_lib.h l_stlextra.h l_timer.h \
@@ -151,7 +155,6 @@ m_matrix_example_CPPFLAGS = $(AM_CPPFLAGS)
 
 SRCS1= 
 SRCS2= ${RAW_SRCS} 
-#${RAW_HDRS}
 
 # make all of the model object files depend on all of the model sources
 # this is a bit overkill, but for example the bjt model makes use of the
@@ -168,12 +171,10 @@ Makefile.am
 
 GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 
-#matrix_example
 noinst_SCRIPTS = gnucap
 bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
 gnucap_real_SOURCES = ${SRCS2} main.cc ${SRCS1} ${MODELSRCS}
-#gnucap_SOURCES += ${SRCS1} ${MODELSRCS} ${SRCS2}
 
 gnucap_real_LDFLAGS = -Wl,--enable-new-dtags -rpath ${plugindir_transformed}
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
@@ -182,18 +183,9 @@ gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
 #for now (ddc). fix later
 gnucap_real_LDFLAGS+= $(LAPACK_LIBS)
 
-if SHARED_LIB
-
-lib_LTLIBRARIES += libgnucap.la
-libgnucap_la_SOURCES = ${SRCS1} ${MODELSRCS} ${SRCS2}
-#gnucap_real_LDADD = libgnucap.la
+lib_LTLIBRARIES += libgnucap-uf.la
+gnucap_real_LDADD = libgnucap-uf.la
 #libgnucap_la_CFLAGS = $(AM_CFLAGS)
-
-#else
-
-
-endif
-
 
 
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")
