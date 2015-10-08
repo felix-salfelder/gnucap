@@ -103,7 +103,7 @@ private:
 
 private: //vera stuff.
   void main_loop();
-  void verainit();
+  void verainit(unsigned, unsigned, unsigned);
   void verakons();
   void veraop();
   void verainit_reply();
@@ -111,16 +111,16 @@ private: //vera stuff.
   void veraop_reply();
   void ev_iter();
   void set_param();
-  void transtep(unsigned init);
-  void transtep_reply();
-  void transtep_gc_reply();
+  unsigned transtep(unsigned init, double dt);
+  void transtep_reply(unsigned, bool eol=true);
+  void transtep_gc_reply(unsigned);
 
   char* var_names_buf;
 
-  uint16_t verbose;
+  unsigned _verbose;
   size_t total;
-  uint16_t n_inputs;
-  vector<string> input_names;
+  size_t n_inputs() const{return _input_names.size();}
+  vector<string> _input_names;
   vector<ELEMENT*> _input_devs;
   unsigned n_vars;
   unsigned n_vars_square;
@@ -130,7 +130,9 @@ private: //vera stuff.
   SocketStream stream;
   //unsigned BUFSIZE;
   unsigned n_bytes;
-  uint16_t error;
+
+  uint16_t _error; // transport between method and method_reply
+  double _dthack; // same
 
   double *dc_werteA,*dc_loesungA,*kons_loesungA,*kons_residuumA;
 
@@ -143,6 +145,7 @@ private: //vera stuff.
   bool _client_mode;
   bool _server_mode;
   unsigned _bufsize;
+  bool _bigarg;
   string _host;
   int reuseaddr;
   struct sockaddr_in sin;
@@ -224,7 +227,7 @@ void SOCK::setup(CS& Cmd)
   IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
   initio(_out);
 
-  error = 0; /* verainit(v_flag, n_inputs, &n_vars, charbuf, &length); */
+  _error = 0; /* verainit(v_flag, n_inputs, &n_vars, charbuf, &length); */
   n_vars = static_cast<uint16_t>( _sim->_total_nodes) ; // _sim->total_nodes doesnt include gnd
   // do this also in sweep to initialize the socket streaM
   var_namen_arr.resize( n_vars, string("unset"));
@@ -253,6 +256,7 @@ void SOCK::options(CS& Cmd, int Nest)
   _sim->_uic = _loop[Nest] = _reverse_in[Nest] = false;
   _port = "1400";
   _bufsize = BUFSIZE;
+  _bigarg = true;
   unsigned here = Cmd.cursor();
   do{
     ONE_OF
@@ -264,6 +268,7 @@ void SOCK::options(CS& Cmd, int Nest)
       || Get(Cmd, "c{ontinue}",   &_cont)
       || Get(Cmd, "port" ,        &_port)
       || Get(Cmd, "listen{port}", &_port)
+      || Get(Cmd, "bigarg",       &_bigarg)
       || Get(Cmd, "host" ,        &_host)
       || Get(Cmd, "tr{s}",        &_do_tran_step)
       || Get(Cmd, "dm",           &_dump_matrix)
@@ -365,26 +370,26 @@ void SOCK::fillnames( const CARD_LIST* scope){
   }
 
   for (CARD_LIST::const_iterator i = scope->begin(); i != scope->end(); ++i) {
-    const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i);
-    assert(s);
-    if (!s->is_device()){ untested();
-    }else if ( s->subckt() ) {
-      fillnames( s->subckt() );
+    if(const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i)){
+      if (!s->is_device()){ untested();
+      }else if ( s->subckt() ) {
+        fillnames( s->subckt() );
+      }
+    }else{ untested();
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::findcaps( CARD_LIST* scope){
   for (CARD_LIST::iterator i = scope->begin(); i != scope->end(); ++i) {
-    if ( COMPONENT* c = dynamic_cast< COMPONENT*>(*i) )
-    {
+    if ( COMPONENT* c = dynamic_cast< COMPONENT*>(*i) ) { untested();
       if (c->is_device() && c->has_memory()){
         trace1("found cap", c->long_label());
         _caplist.push_back( c );
       }
     }
-    if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) )
-    {
+    if (!(*i)->is_device()){ untested();
+    } else if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) ) { untested();
       trace1("going down", s->long_label());
       findcaps( s->subckt() );
     }
@@ -407,34 +412,67 @@ static void register_status()
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
+static unsigned argc(unsigned opcode)
+{
+  switch(opcode){
+    case 51: untested();
+      return 3;
+    case 52: untested();
+      return 0;
+    case 53: untested();
+      return 0;
+    case 104: untested();
+    case 102:
+      return 1;
+    default:
+      return 0;
+  }
+}
 /*--------------------------------------------------------------------------*/
 void SOCK::main_loop()
 {
   trace0("SOCK::main_loop");
 
-  unsigned char opcode=-1;
-  unsigned char arg0=-1;
+  uint16_t opcode=-1;
+  uint16_t arg[3];
+  unsigned char tmp;
+  arg[0] = -1;
   bool init_done=false;
 
-  while(true)
-  {
+  while(true) {
     trace0("SOCK::main_loop waiting for opcode");
 
-    stream >> opcode;
-    stream >> arg0;
-    stream >> 6;
+    if(_bigarg){
+      stream >> tmp >> 7; // sic!
+      opcode = tmp;
+      for(unsigned i=0; i<argc(opcode); ++i){
+        stream >> arg[i] >> 6;
+      }
+    }else{
+      stream >> opcode;
+      stream >> arg[0];
+      stream >> arg[1];
+      stream >> arg[2];
+    }
 
     _sim->_mode = s_SOCK; // nonsense.
                           // use respective built-in mode!
-    ::error(bDEBUG, "sock opcode %d %d\n", opcode, arg0);
+                          //
+    if(_bigarg) {
+      ::error(bDEBUG, "sock opcode %d\n", opcode);
+    }else{
+      ::error(bDEBUG, "sock opcode %d %d %d %d\n", opcode, arg[0], arg[1], arg[2]);
+    }
 
+    double dt;
+    unsigned status;
     switch (opcode) {
       case '\0': // 0
         return;
         break;
       case '3': // 51
         if(init_done) throw Exception("init twice??");
-        verainit();
+        verainit(arg[0], arg[1], arg[2]);
         verainit_reply();
         init_done=true;
         break;
@@ -450,21 +488,25 @@ void SOCK::main_loop()
         ev_iter();
         break;
       case 102:
-        transtep(arg0);
-        transtep_reply();
+        stream >> dt;
+        status = transtep(arg[0], dt);
+        transtep_reply(status);
         break;
       case 103: untested();
         set_param();
         break;
       case 104: itested();
-        transtep(arg0);
-        transtep_gc_reply();
+        stream >> dt;
+        status = transtep(arg[0], dt);
+        transtep_gc_reply(status);
 	break;
       default:
         ::error(bDANGER, "unknown opcode %i\n", opcode);
         throw Exception("unknown opcode");
         break;
     }
+    _sim->reset_iteration_counter(iPRINTSTEP); // used by solve_with_homotopy
+                                               // reset in outdata (not called)
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -479,20 +521,16 @@ static void putstring8(SocketStream* s, const string x)
   }
 }
 /*--------------------------------------------------------------------------*/
-void SOCK::verainit()
-{
-  trace0("SOCK::verainit");
-  stream >> verbose >> 6;
-  stream >> n_inputs >> 6;
-  stream >> length >> 6;
-
-  trace3("SOCK::verainit", verbose, n_inputs, length );
-
+void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
+{ untested();
+  _verbose = verbose;
   char input_namen[length+1];
   unsigned here =0;
   unsigned n=0;
-  input_names.resize(n_inputs);
-  _input_devs.resize(n_inputs);
+  _input_names.resize(n_in);
+  _input_devs.resize(n_in);
+  trace3("verainit: ", verbose,n_inputs(),length);
+  assert(n_inputs()==n_in);
 
   for (unsigned i=0; i < length; i++) {
     stream >> input_namen[i] >> 7;
@@ -500,18 +538,18 @@ void SOCK::verainit()
       input_namen[i] = 0;
       trace1("input_namen", string(input_namen+here));
       trace5("input_namen",input_namen[i-2],input_namen[i-1], input_namen[i-0],here,i );
-      input_names[n] = string(input_namen+here);
+      _input_names[n] = string(input_namen+here);
       here = i+1;
 
-      trace1("looking out for", input_names[n]);
-      CARD_LIST::fat_iterator ci = findbranch(input_names[n], &CARD_LIST::card_list);
+      trace1("looking out for", _input_names[n]);
+      CARD_LIST::fat_iterator ci = findbranch(_input_names[n], &CARD_LIST::card_list);
       if (ci.is_end()){
-        throw Exception("cannot find voltage source \"" +  input_names[n] +"\", giving up");
+        throw Exception("cannot find voltage source \"" + _input_names[n] +"\", giving up");
       }
       trace0("found input device");
       ELEMENT* d = prechecked_cast<ELEMENT*>(*ci);
       if (!d){
-        throw Exception("not something we can use as source, \"" +  input_names[n] +"\", giving up");
+        throw Exception("not something we can use as source, \"" +  _input_names[n] +"\", giving up");
       }
       _input_devs[n] = d;
       assert(_input_devs[n]);
@@ -561,14 +599,14 @@ void SOCK::veraop()
   dc_werteA = (double*) malloc(sizeof(double)*n_vars);
   trace1("fetching ",n_vars);
   assert(_sim->vdc()[0] == 0 );
-  for (unsigned i=0; i < n_inputs; i++) {
+  for (unsigned i=0; i < n_inputs(); i++) {
     double d;
     stream >> d;
     trace3("SOCK::veraop setting input", _input_devs[i]->long_label(), i, d);
     _input_devs[i]->set_value(d);
   }
 
-  error = 0; /* veraop(sweep_val, x_new, G, C); */
+  _error = 0; /* veraop(sweep_val, x_new, G, C); */
 
   // ================do_dc========
   _sim->_uic = false;
@@ -594,7 +632,7 @@ void SOCK::veraop()
   }
 
   if(!converged){ itested();
-    error = 1;
+    _error = 1;
   }else{
 
     ::status.accept.start();
@@ -635,13 +673,14 @@ void SOCK::verakons()
   _sim->_phase = p_INIT_DC;
   total =  n_eingaenge + n_vars + 1;
 
-  for (unsigned i=0; i < n_inputs; i++) {
+  for (unsigned i=0; i < n_inputs(); i++) {
     double d;
     stream >> d;
     trace3("SOCK::verakons setting input", _input_devs[i]->long_label(), i, d);
     _input_devs[i]->set_value(d);
   }
 
+  assert(_sim->_v0);
   for (unsigned i=1; i <= n_vars; i++) {
     stream >> _sim->_v0[i];
     //    trace2("SOCK::kons start ", i,  _sim->_v0[i] );
@@ -651,12 +690,12 @@ void SOCK::verakons()
   }
   _sim->keep_voltages(); // v0->vdc
 
-  error = 0; /* verakons(Dwork, x_new, q_dot, G, C); */
+  _error = 0; /* verakons(Dwork, x_new, q_dot, G, C); */
   //	n_vars = A->n_var;
 
   for( unsigned i = 0; i < _caplist.size(); i++) {
+    trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->keep_ic(); // latch voltage applied to _v0
-    //    trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->set_constant(true);
     _caplist[i]->q_eval();		// so it will be updated
   }
@@ -688,7 +727,7 @@ void SOCK::verakons()
     converged = solve_with_homotopy(itl,_trace);
     if (!converged) {
       ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
-      error=1;
+      _error = 1;
     }
   }
   ::status.accept.start();
@@ -771,8 +810,7 @@ void SOCK::ev_iter()
   _sim->_aa.rmul(tmp-1,xiin-1);
   untested();
   tmp[n_vars] = 0;
-  untested();
-  for (unsigned i=0; i <= n_vars; i++){
+  for (unsigned i=0; i <= n_vars; i++){ untested();
     trace2("rhs",i,tmp[i]);
   }
 
@@ -791,7 +829,7 @@ void SOCK::ev_iter()
   trace0("SOCK::ev_iter done");
   _sim->_aa.deaugment();
   assert(_sim->_aa.size()==n_vars);
-  stream << ((uint16_t)error); stream.pad(6);
+  stream << ((uint16_t)_error); stream.pad(6);
   double resnormsq = 0;
   for (unsigned i=0; i < n_vars; i++) { untested();
     resnormsq+=tmp[i]*tmp[i];
@@ -846,18 +884,16 @@ enum{
 // dt. positive timestep, use instead in next call.
 //
 //
-void SOCK::transtep(unsigned init)
+unsigned SOCK::transtep(unsigned init, double dt)
 {
-  uint64_t ret = sOK;
-  trace2("SOCK::transtep", n_vars, init);
+  unsigned ret = sOK;
+  _error = 0;
+  trace3("SOCK::transtep", n_vars, init, dt);
   _sim->set_command_tran();
   _sim->restore_voltages(); //     _vt1[ii] = _v0[ii] = vdc[ii];
   _sim->_uic = false;
   _sim->_phase = p_RESTORE;
 
-
-  double dt;
-  stream >> dt;
   unsigned stepno=-1;
   double reftime = _sim->_time0;
 
@@ -911,8 +947,9 @@ void SOCK::transtep(unsigned init)
   assert(_sim->analysis_is_tran());
 
 
+  bool tr_converged;
   for (unsigned i = stepno; i>0; --i) {
-    bool tr_converged = false;
+    tr_converged = false;
     try {
       tr_converged = solve(OPT::TRHIGH, _trace);
     }catch (Exception e) { incomplete();
@@ -950,6 +987,7 @@ void SOCK::transtep(unsigned init)
   double time_by_error_estimate = time_by._error_estimate;
   assert(time_by_error_estimate>=0);
 
+  // if(!tr_converged?) { ... } else
   if (time_by_error_estimate > _sim->_time0) {
     dt = time_by_error_estimate - _sim->_time0;
     ::status.accept.start();
@@ -971,11 +1009,17 @@ void SOCK::transtep(unsigned init)
     tr_reject();
   }
 
+#ifndef NDEBUG
+  for (unsigned i=1; i <= n_vars; i++) {
+    if(isnan(_sim->_i[i])||isnan(_sim->_vdcstack.top()[i]) ) {
+      _error = 1;
+      assert(!tr_converged);
+    }
+  }
+#endif
 
-  stream.pad(8);
-  stream << ret;
-  stream << dt;
-
+  _dthack = dt;
+  return ret; // FIXME: proper status.
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::tr_reject()
@@ -988,7 +1032,7 @@ void SOCK::tr_reject()
 /*--------------------------------------------------------------------------*/
 void SOCK::verakons_reply()
 {
-  stream << ((uint16_t)error); stream.pad(6);
+  stream << ((uint16_t)_error); stream.pad(6);
   for (unsigned i=1; i <= n_vars; i++) {
     trace1("SOCK::kons_reply", _sim->vdc()[i]);
     stream << _sim->vdc()[i];
@@ -1040,19 +1084,26 @@ void SOCK::verakons_reply()
 
 }
 
-void SOCK::transtep_reply()
+void SOCK::transtep_reply(unsigned ret, bool eol)
 {
+  _error = 0;
+  stream << _error; stream.pad(6);
+  stream << (uint64_t)ret;
+  stream << _dthack;
+
   for (unsigned i=1; i <= n_vars; i++) {
     stream << _sim->_vdcstack.top()[i];
   }
-  stream << SocketStream::eol;
+
+  // OUCH, move to main loop.
+  if(eol) {
+    stream << SocketStream::eol;
+  }
 }
 
-void SOCK::transtep_gc_reply()
+void SOCK::transtep_gc_reply(unsigned ret)
 { itested();
-  for (unsigned i=1; i <= n_vars; i++) { itested();
-    stream << _sim->_vdcstack.top()[i];
-  }
+  transtep_reply(ret, false);
 
   for (unsigned i=1; i <= n_vars; i++)
   {
@@ -1069,8 +1120,8 @@ void SOCK::transtep_gc_reply()
 /*--------------------------------------------------------------------------*/
 void SOCK::verainit_reply()
 {
-  trace4("SOCK::verainit_reply ", error, n_vars, length, var_namen_total_size);
-  stream << error;   stream.pad(6);
+  trace4("SOCK::verainit_reply ", _error, n_vars, length, var_namen_total_size);
+  stream << _error;   stream.pad(6);
   stream << int32_t (n_vars);  stream.pad(4);
   stream << int32_t (var_namen_total_size);  stream.pad(4);
 
@@ -1099,7 +1150,7 @@ void SOCK::veraop_reply()
 {
   assert(n_vars==_sim->_total_nodes);
   trace1("SOCK::veraop_reply ", n_vars);
-  stream << error; stream.pad(6);
+  stream << _error; stream.pad(6);
   for (unsigned i=1; i <= n_vars; i++)         /* Variablen-Werte */
   {
     stream << _sim->vdc()[i];
@@ -1124,7 +1175,7 @@ void SOCK::veraop_reply()
   if (printlevel >= 1)
   {
     userinfo(1,"vera_titan_ak","Sende: Error %i Framenumber %i, Laenge %i\n",
-        error,frame_number,total);
+        _error,frame_number,total);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1152,16 +1203,16 @@ void SOCK::send_matrix()
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::cap_prepare(void)
-{
+{ untested();
   trace1("SOCK::cap_prepare", _caplist.size() );
   assert(!_capstash);
   _capstash = new CARDSTASH[_caplist.size()];
 
-  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) {
+  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) { untested();
     _caplist[ii]->inc_probes();			// we need to keep track of it
     _capstash[ii] = _caplist[ii];			// stash the std value
 
-    if(_caplist[ii]->has_common()){
+    if(_caplist[ii]->has_common()){ untested();
       trace1("SOCK::cap_prepare. have common", _caplist[ii]->value());
 //      _caplist[ii]->set_value(_caplist[ii]->value(), 0); // zap out extensions
 //      _caplist[ii]->set_constant(false);		 // update HACK?
@@ -1169,19 +1220,22 @@ void SOCK::cap_prepare(void)
 //    all devices need individual commons.
       _caplist[ii]->attach_common(_caplist[ii]->common()->clone());
       assert(_caplist[ii]->has_common());
-    }else{
-      trace1("SOCK::cap_prepare, attaching common", _caplist[ii]->long_label());
+    }else{ untested();
       //      _sweepval[ii] = _zap[ii]->set__value();	// point to value to patch
       COMMON_COMPONENT* c = bm_dispatcher.clone("eval_bm_value");
-      c->set_value( (double)_caplist[ii]->value() );
+      double capval = _caplist[ii]->value();
+      trace2("SOCK::cap_prepare, attaching common", _caplist[ii]->long_label(), capval);
+      c->set_value(capval);
       COMMON_COMPONENT* dc = c->deflate();
       assert(dc);
       //
       _caplist[ii]->set_value(_caplist[ii]->value(), dc);	// zap out extensions
       _caplist[ii]->set_constant(false);		// so it will be updated
-      trace1("SOCK::cap_prepare", _caplist[ii]->long_label());
+      trace1("SOCK::cap_prepare calling precalc_first", _caplist[ii]->long_label());
       _caplist[ii]->precalc_first();
+      trace0("SOCK::cap_prepare calling precalc_last");
       _caplist[ii]->precalc_last();
+      trace0("SOCK::cap_prepare calling trbegin");
       _caplist[ii]->tr_begin();
     }
   }
@@ -1206,4 +1260,4 @@ SOCK::~SOCK()
   trace0("SOCK::~SOCK()");
 }
 /*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:et:
+// vim:ts=8:sw=2:noet:

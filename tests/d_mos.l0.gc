@@ -1,0 +1,12 @@
+spice
+* zero length mosfet. does not work as expected
+
+Mpch (d g s b) pchh l=0
+
+.model pchh pmos()
+
+.print tran v(nodes)
+.tran 0 1 .1 trace=all
+
+.end
+
