@@ -4,12 +4,11 @@ the main TODO is folding back into (modules for) upstream gnucap.
 
 others are
 
-- empty this list.
-- OPT:: doesnt read from params
-- Inf-Inf repair (nan)
-- rcm node ordering (?)
 - fix/reenable modelgen (or replace)
-- global nodes
+- global nodes (other than gnd)
 - finally remove obsolete callbacks
 - shared library
 - output plugins
+- discrete time
+- relative time
+- plggable nodes (dispatcher)

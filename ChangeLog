@@ -2,7 +2,12 @@ Gnucap revision history
  ------------------------------------------------------------------
 gnucap-uf 0.0.2
 
-* this does not work. see git
+1. several device and bm bugfixes
+2. make subckt pluggable
+3. ageing simulation improvements
+4. period detection in tran (experimental)
+5. sock continued
+6. fold in upstream changes
 
 gnucap-uf 0.0.1
 
