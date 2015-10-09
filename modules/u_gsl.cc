@@ -22,6 +22,7 @@
  * gsl supplementary stuff
  */
 #include "u_gsl.h"
+#include "io_trace.h"
 
 // int dgelss_(int *m, int *n, int *nrhs, double *a, int *lda, double *b, int
 //     *ldb, double *s, double *rcond, int *rank, double *work, int *lwork, int

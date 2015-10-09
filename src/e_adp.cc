@@ -22,7 +22,7 @@
 
 #include "e_adp.h"
 #include "m_divdiff.h"
-#ifdef HAVE_GSL
+#ifdef HAVE_GSL_FIT_H
 # include <gsl/gsl_fit.h>
 #endif
 #define DEBUG_ADP
@@ -480,7 +480,7 @@ void ADP_NODE::tr_expect_3_linear(){
 
   double c0=0, c1=0;
   double cov00, cov01, cov11, sumsq;
-#ifdef HAVE_GSL
+#ifdef HAVE_GSL_FIT_H
   gsl_fit_linear( x, 1, y, 1, 3, &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
 #else
   USE(x); USE(y); USE(cov00); USE(cov01); USE(cov11); USE(sumsq);
