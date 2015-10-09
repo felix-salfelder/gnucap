@@ -89,6 +89,7 @@ $(LANG_SRCS) \
 $(FUNC_SRCS)
 
 #------------------------------------------------------------------------
+libgnucap_uf_la_LDFLAGS = $(AM_LDFLAGS) -Wl,--enable-new-dtags -Wl,-rpath -Wl,${plugindir_transformed}
 libgnucap_uf_la_SOURCES = \
 globals.cc \
 m_expression_dump.cc m_expression_in.cc m_expression_reduce.cc \
