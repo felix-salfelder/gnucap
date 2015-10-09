@@ -12,7 +12,10 @@ AM_TESTS_ENVIRONMENT = \
            MAKEFLAGS=--no-print-directory \
            srcdir='$(srcdir)';
 AM_TESTS_FD_REDIRECT = 9>&2
-TEST_EXTENSIONS = .sh
+TEST_EXTENSIONS = .sh .gc
+
+GC_LOG_COMPILER = $(top_srcdir)/tests/gc_log_compiler
+SH_LOG_COMPILER = $(SHELL)
 
 TESTS = \
     gnucap_run.sh \
@@ -511,19 +514,19 @@ CKT_TESTS = \
 XFAIL_TESTS = list.1.sh
 
 # recheck
-XFAIL_TESTS += lang_verilog.3.sh
+XFAIL_TESTS += lang_verilog.3.gc
 
 # typename issue, some other bugs
-XFAIL_TESTS += lang_spectre.2.sh
+XFAIL_TESTS += lang_spectre.2.gc
 
 # something wrong with .op command
-XFAIL_TESTS += lang_spice.1b.sh
+XFAIL_TESTS += lang_spice.1b.gc
 
 # needs work
 XFAIL_TESTS += d_bjt-diffpair-tr2.sh
 
 # interactive mode broken?
-XFAIL_TESTS += c_attach.1.sh
+XFAIL_TESTS += c_attach.1.gc
 
 # cond parser broken
 XFAIL_TESTS+= param.2c.sh
@@ -563,205 +566,211 @@ XFAIL_TESTS+= c_measure.1.sh
 XFAIL_TESTS+= print_v.sh
 
 if USE_GSL
-TESTS_GSL = \
-    d_ttcap.1.sh \
-    pfet_shutdown.sh
+# don't skip GSL tests
+else
+d_ttcap.1.log: GC_LOG_FLAGS += SKIP
 endif
 
-SUSPENDED_TESTS = \
-    d_bti.2.sh
+GSL_TESTS = \
+    d_ttcap.1.gc \
+    pfet_shutdown.gc
+
+# suspended.
+d_bti.2.log: GC_LOG_FLAGS += SKIP
 
 GC_TESTS = \
-    $(TESTS_GSL) \
-    ac_lp.sh \
-    ac_noise.sh \
-    alter.sh \
-    bm_pulse.4.sh \
-    bm_pulse.5.sh \
-    bm_pulse.6.sh \
-    bm_pulse.7.sh \
-    bm_pulse.8.sh \
-    bm_pulse.9.sh \
-    bm_pulse.10.sh \
-    bm_pulse.11.sh \
-    bm_pulse.periodic.sh \
-    c_attach.1.sh \
-    c_attach.2.sh \
-    c_echo.1.sh \
-    c_for.1.sh \
-    c_for.2.sh \
-    c_for.3.sh \
-    c_save.sh \
-    c_printf.1.sh \
-    c_printf.2.sh \
-    c_wave.1.sh \
-    c_wave.2.sh \
-    c_wave.3.sh \
-    c_wave.4.sh \
-    c_wave.5.sh \
-    c_wave.6.sh \
-    c_wave.build.sh \
-    c_wave.dump.sh \
-    d_branchvs.1.sh \
-    d_branchvs.2.sh \
-    d_bti.1.sh \
-    d_bti.3.sh \
-    d_bti.steps.sh \
-    d_bti.symm.sh \
-    d_coil.brl.1.sh \
-    d_coil.brl.2.sh \
-    d_coil.brl.3.sh \
-    d_hci.1.sh \
-    d_hci.2.sh \
-    d_hci.3.sh \
-    d_hci.4.sh \
-    d_hci.5.sh \
-    d_hci.6.sh \
-    d_hci.7.sh \
-    d_hci_pd.sh \
-    d_mos.l0.sh \
-    d_mos8.np.sh \
-    d_res.sh \
-    d_subckt.parm.sh \
-    d_switch.disc.sh \
-    d_switch.ic.sh \
-    d_switch.tt.sh \
-    d_rcd.1.sh \
-    d_rcd.2.sh \
-    d_rcd.3.sh \
-    d_rcd.neg.sh \
-    dc_reverse.sh \
-    dc_sweep.sh \
-    dc_trace.sh \
-    dc_twice.sh \
-    ddc_brl.sh \
-    ddc_bug.sh \
-    ddc_cc.sh \
-    ddc_coil.sh \
-    ddc_osc.sh \
-    ddc_rc.sh \
-    ddc_simple.sh \
-    ddc_param.sh \
-    ddc_sweep_twice.sh \
-    ddc_v.1.sh \
-    d_vs.1.sh \
-    eval_param.sh \
-    gnd.sh \
-    hangbug.sh \
-    hci_dumpload.sh \
-    hci_mos.sh \
-    hci_stepping.sh \
-    lang_verilog.1a.sh \
-    lang_verilog.1.sh \
-    lang_verilog.2a.sh \
-    lang_verilog.2b.sh \
-    lang_verilog.2.sh \
-    lang_verilog.3.sh \
-    lang_verilog.comm.sh \
-    lang_spectre.1.sh \
-    lang_spectre.1a.sh \
-    lang_spectre.2.sh \
-    lang_spice.1.sh \
-    lang_spice.1a.sh \
-    lang_spice.1b.sh \
-    lang_spice.comm.sh \
-    LogicAND.sh \
-    lring.sh \
-    mark_dc_cont.sh \
-    mosbug.2.sh \
-    no_hci.sh \
-    nodeorder.sh \
-    node.sh \
-    nodis.sh \
-    param.13.sh \
-    param.14.sh \
-    param_simple.sh \
-    param_scopes.sh \
-    paramtest.sh \
-    pfet_age.sh \
-    pfet_btisum.sh \
-    pfet_age_pd.sh \
-    pfet_age_pd.1.sh \
-    pfet_age_tr.sh \
-    pfet_rcd_param.sh \
-    poly1_parse.sh \
-    pulse.sh \
-    rcd_param.sh \
-    rcd_tr.sh \
-    rcd_tr.1.sh \
-    rcd_tr.2.sh \
-    rcd_tw.sh \
-    rcd_tw_dumpload.sh \
-    rcd_ueff.sh \
-    ring.sh \
-    s_sock.1.sh \
-    s_sock.1b.sh \
-    s_sock.2.sh \
-    s_tr.cont.sh \
-    s_tr.lrc.sh \
-    s_ttt.1.sh \
-    s_ttt.label.sh \
-    s_ttt.rc.sh \
-    s_ttt.lc.sh \
-    s_ttt.lrc.sh \
-    s_ttt.vib.sh \
-    sens_inv.sh \
-    sens_mos8.sh \
-    sens_rr.sh \
-    sens_uic.sh \
-    spectre_param.sh \
-    spice_comment_continuation.sh \
-    spice_mos.sh \
-    tran_temp.sh \
-    tr_bug.sh \
-    tr_cont.sh \
-    tr_cont.1.sh \
-    tr_cont.2.sh \
-    tr_cont.3.sh \
-    tr_cont.4.sh \
-    tr_cont_dc.sh \
-    tr_mark.1.sh \
-    tr_mark.2.sh \
-    tr_mark.3.sh \
-    tr_mark.sh \
-    tr_nothing.sh \
-    tt_twice.sh \
-    ttr_cont.sh \
-    tw_steps.sh \
-    uic_cap.sh \
-    v_uic.sh \
-    vrc_cont.1.sh \
-    vrc_evt.sh \
-    Xnodeorder.sh \
-    Xprobes.sh
+    $(GSL_TESTS) \
+    ac_lp.gc \
+    ac_noise.gc \
+    alter.gc \
+    bm_pulse.4.gc \
+    bm_pulse.5.gc \
+    bm_pulse.6.gc \
+    bm_pulse.7.gc \
+    bm_pulse.8.gc \
+    bm_pulse.9.gc \
+    bm_pulse.10.gc \
+    bm_pulse.11.gc \
+    bm_pulse.periodic.gc \
+    c_attach.1.gc \
+    c_attach.2.gc \
+    c_echo.1.gc \
+    c_for.1.gc \
+    c_for.2.gc \
+    c_for.3.gc \
+    c_save.gc \
+    c_printf.1.gc \
+    c_printf.2.gc \
+    c_wave.1.gc \
+    c_wave.2.gc \
+    c_wave.3.gc \
+    c_wave.4.gc \
+    c_wave.5.gc \
+    c_wave.6.gc \
+    c_wave.build.gc \
+    c_wave.dump.gc \
+    d_branchvs.1.gc \
+    d_branchvs.2.gc \
+    d_bti.1.gc \
+    d_bti.2.gc \
+    d_bti.3.gc \
+    d_bti.steps.gc \
+    d_bti.symm.gc \
+    d_coil.brl.1.gc \
+    d_coil.brl.2.gc \
+    d_coil.brl.3.gc \
+    d_hci.1.gc \
+    d_hci.2.gc \
+    d_hci.3.gc \
+    d_hci.4.gc \
+    d_hci.5.gc \
+    d_hci.6.gc \
+    d_hci.7.gc \
+    d_hci_pd.gc \
+    d_mos.l0.gc \
+    d_mos8.np.gc \
+    d_res.gc \
+    d_subckt.parm.gc \
+    d_switch.disc.gc \
+    d_switch.ic.gc \
+    d_switch.tt.gc \
+    d_rcd.1.gc \
+    d_rcd.2.gc \
+    d_rcd.3.gc \
+    d_rcd.neg.gc \
+    dc_reverse.gc \
+    dc_sweep.gc \
+    dc_trace.gc \
+    dc_twice.gc \
+    ddc_brl.gc \
+    ddc_bug.gc \
+    ddc_cc.gc \
+    ddc_coil.gc \
+    ddc_osc.gc \
+    ddc_rc.gc \
+    ddc_simple.gc \
+    ddc_param.gc \
+    ddc_sweep_twice.gc \
+    ddc_v.1.gc \
+    d_vs.1.gc \
+    eval_param.gc \
+    gnd.gc \
+    hangbug.gc \
+    hci_dumpload.gc \
+    hci_mos.gc \
+    hci_stepping.gc \
+    lang_verilog.1a.gc \
+    lang_verilog.1.gc \
+    lang_verilog.2a.gc \
+    lang_verilog.2b.gc \
+    lang_verilog.2.gc \
+    lang_verilog.3.gc \
+    lang_verilog.comm.gc \
+    lang_spectre.1.gc \
+    lang_spectre.1a.gc \
+    lang_spectre.2.gc \
+    lang_spice.1.gc \
+    lang_spice.1a.gc \
+    lang_spice.1b.gc \
+    lang_spice.comm.gc \
+    LogicAND.gc \
+    lring.gc \
+    mark_dc_cont.gc \
+    mosbug.2.gc \
+    no_hci.gc \
+    nodeorder.gc \
+    node.gc \
+    nodis.gc \
+    param.13.gc \
+    param.14.gc \
+    param_simple.gc \
+    param_scopes.gc \
+    paramtest.gc \
+    pfet_age.gc \
+    pfet_btisum.gc \
+    pfet_age_pd.gc \
+    pfet_age_pd.1.gc \
+    pfet_age_tr.gc \
+    pfet_rcd_param.gc \
+    poly1_parse.gc \
+    pulse.gc \
+    rcd_param.gc \
+    rcd_tr.gc \
+    rcd_tr.1.gc \
+    rcd_tr.2.gc \
+    rcd_tw.gc \
+    rcd_tw_dumpload.gc \
+    rcd_ueff.gc \
+    ring.gc \
+    s_sock.1.gc \
+    s_sock.1b.gc \
+    s_sock.2.gc \
+    s_tr.cont.gc \
+    s_tr.lrc.gc \
+    s_ttt.1.gc \
+    s_ttt.label.gc \
+    s_ttt.rc.gc \
+    s_ttt.lc.gc \
+    s_ttt.lrc.gc \
+    s_ttt.vib.gc \
+    sens_inv.gc \
+    sens_mos8.gc \
+    sens_rr.gc \
+    sens_uic.gc \
+    spectre_param.gc \
+    spice_comment_continuation.gc \
+    spice_mos.gc \
+    tran_temp.gc \
+    tr_bug.gc \
+    tr_cont.gc \
+    tr_cont.1.gc \
+    tr_cont.2.gc \
+    tr_cont.3.gc \
+    tr_cont.4.gc \
+    tr_cont_dc.gc \
+    tr_mark.1.gc \
+    tr_mark.2.gc \
+    tr_mark.3.gc \
+    tr_mark.gc \
+    tr_nothing.gc \
+    tt_twice.gc \
+    ttr_cont.gc \
+    tw_steps.gc \
+    uic_cap.gc \
+    v_uic.gc \
+    vrc_cont.1.gc \
+    vrc_evt.gc \
+    Xnodeorder.gc \
+    Xprobes.gc
 
 #this is not ready yet.
-XFAIL_TESTS+= s_tr.cont.sh
-XFAIL_TESTS+= s_tr.lrc.sh
+XFAIL_TESTS+= s_tr.cont.gc
+XFAIL_TESTS+= s_tr.lrc.gc
 
 #reltol problem.
-XFAIL_TESTS+= d_coil.brl.3.sh
+XFAIL_TESTS+= d_coil.brl.3.gc
 
 # not implemented
-XFAIL_TESTS+= c_for.3.sh
+XFAIL_TESTS+= c_for.3.gc
 
 # abother bug
-XFAIL_TESTS+= ddc_v.1.sh
+XFAIL_TESTS+= ddc_v.1.gc
 
 # hmmm
-XFAIL_TESTS+= ac_noise.sh
+XFAIL_TESTS+= ac_noise.gc
 
 # somethings wrong
-XFAIL_TESTS+= d_mos.l0.sh
+XFAIL_TESTS+= d_mos.l0.gc
 
 # does not converge (why?)
-XFAIL_TESTS+= mosbug.2.sh
+XFAIL_TESTS+= mosbug.2.gc
 
 CUSTOM_TESTS = c_attach.1.sh nosuchfile.sh
 
-AUTO_TESTS = $(CKT_TESTS) $(GC_TESTS) $(CUSTOM_TESTS)
+AUTO_TESTS = $(CKT_TESTS) $(CUSTOM_TESTS)
 
-gc_tests: $(GC_TESTS:%.sh=%.log)
+gsl_tests: $(GSL_TESTS:%.gc=%.log)
+gc_tests: $(GC_TESTS:%.gc=%.log)
 ckt_tests: $(CKT_TESTS:%.sh=%.log)
 
 .PHONY: .P
@@ -769,7 +778,9 @@ ckt_tests: $(CKT_TESTS:%.sh=%.log)
 .P:
 	@:
 
-$(AUTO_TESTS:%.sh=%.out) $(GC_TESTS:%.sh=%.log): .P $(FILTER)
+$(AUTO_TESTS:%.sh=%.out): .P $(FILTER)
+$(GC_TESTS:%.gc=%.gc.out): .P $(FILTER)
+$(GC_TESTS:%.gc=%.log): .P $(FILTER)
 
 $(CKT_TESTS): %.sh: %.out
 
@@ -782,7 +793,7 @@ c_getckt.out: | $(PWD)/d_cccs.1.ckt
 c_lib.1.out: | $(PWD)/c_lib.1.ckt
 
 lang_spice.1a.log lang_verilog.1a.log: soclean | $(PWD)/bm_wrapper.cc
-lang_spice.1a.sh lang_verilog.1a.sh: POSTDIFF+= '/^CXX/d'
+lang_spice.1a.gc.out lang_verilog.1a.gc.out: POSTDIFF+= '/^CXX/d'
 
 soclean:
 	rm -f bm_wrapper.so
@@ -820,7 +831,7 @@ bm_poly.%.out: POSTDIFF+= '30·s/-.\.f/·0.·/g'
 bm_poly.%.out: POSTDIFF+= '30·s/-..\.f/·0.··/g'
 
 # output seems to depend on lapack/architecture.
-ddc_cc.sh: POSTDIFF+= 's/NaN/0.·/g'
+ddc_cc.gc.out: POSTDIFF+= 's/NaN/0.·/g'
 
 # same
 trcurve2.out: POSTDIFF+= 's/·[0-9]\.E-21/·0.····/'
@@ -856,10 +867,10 @@ endef
 $(CKT_TESTS): %.sh: $(REF)/%.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
-$(GC_TESTS:%.sh=%.out): %.out: %.gc
+$(GC_TESTS:%.gc=%.gc.out): %.gc.out: %.gc
 	$(AM_V_GEN)$(GNUCAP) $(GNUCAP_PLUGINS:%=-a ../modules/.libs/%) $(GNUCAP_ARGS) < $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
-	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.out
+	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.gc.out
 
 # nosuchfile.out c_attach.1.out: %.out: %.gc
 # 	-$(GNUCAP) < $< | \
@@ -874,7 +885,7 @@ lang_verilog.1a.sh: LT=<
 lang_spice.1.sh: LT=<
 c_attach.1.sh: I=-i
 
-nosuchfile.sh $(GC_TESTS): %.sh: %.gc Makefile %.ref
+nosuchfile.sh: %.sh: %.gc Makefile %.ref
 	@echo "#!/bin/sh" > $@
 	@echo "set -e" >> $@
 	@echo "GNUCAP=\$${GNUCAP-gnucap}" >> $@
@@ -901,7 +912,7 @@ endif
 EXTRA_DIST = gnucap_run.sh \
              $(CKT_TESTS:%.sh=%.ckt) $(CKT_TESTS:%.sh===out/%.ckt.ref) \
              $(LOGIC_TESTS:%.sh=%.ckt) $(LOGIC_TESTS:%.sh===out/%.ckt.ref) \
-             $(GC_TESTS:%.sh=%.gc) $(GC_TESTS:%.sh=%.ref) \
+             $(GC_TESTS) $(GC_TESTS:%.gc=%.ref) \
              c_attach.1.gc \
              bm_wrapper.cc \
              bm_generator.doc bm_pulse.doc bm_pwl.doc bm_sin.doc d_cap.doc d_diode.doc \

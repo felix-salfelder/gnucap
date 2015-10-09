@@ -278,16 +278,11 @@ AC_ARG_WITH([gsl],
 
 HAVE_GSL_H=0
 if test "x$with_gsl" != xno ; then
-	AC_CHECK_HEADER([gsl/gsl.h],
-	[AC_DEFINE([HAVE_GSL_FIT_H], [1],
-		[Define to 1 if you have gsl/gsl.h])
-		HAVE_GSL_H=1
-	],
-	[AC_MSG_NOTICE([consider installing the libgsl0-dev package])])
-
 	AC_CHECK_HEADER([gsl/gsl_fit.h],
 	[AC_DEFINE([HAVE_GSL_FIT_H], [1],
-		[Define to 1 if you have gsl/gsl_fit.h])],
+		[Define to 1 if you have gsl/gsl_fit.h])
+		HAVE_GSL_H=1
+	],
 	[AC_MSG_NOTICE([consider installing the libgsl0-dev package])])
 fi
 AM_CONDITIONAL([USE_GSL], [test $HAVE_GSL_H -eq 1])
