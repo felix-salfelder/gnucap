@@ -7,7 +7,7 @@ others are
 - fix/reenable modelgen (or replace)
 - global nodes (other than gnd)
 - finally remove obsolete callbacks
-- shared library
+- default plugins
 - output plugins
 - discrete time
 - relative time
