@@ -1,0 +1,38 @@
+options picky
+
+echo load test, module built as intended
+load s_sock.so
+
+echo
+echo kernel newer
+load ./bogus4.so
+detach ./bogus4.so
+echo kernel newer (lazy)
+load lazy ./bogus4.so
+echo done
+
+echo
+echo loading with unresolved symbol
+load ./bogus1.so
+echo lazy loading with unresolved symbol
+load lazy ./bogus1.so
+
+echo
+echo loading without "interface_name".
+echo fails for backwards compatibility.
+load ./bogus2.so
+detach ./bogus2.so
+echo now lazy
+load lazy ./bogus2.so
+echo unloading
+detach ./bogus2.so
+echo unloading twice
+detach ./bogus2.so
+
+echo
+echo too old kernel (should fail)
+load ./bogus3.so
+detach ./bogus3.so
+load lazy ./bogus3.so
+echo done
+

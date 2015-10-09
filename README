@@ -1,12 +1,12 @@
-Readme for gnucap-uf 0.0.0
+Readme for gnucap-uf 0.0.2
 
-(this forks from gnucap and includes several experiments, there exist plans to
-seperate out improvements and fold back to upstream)
+this forks from gnucap and includes several experiments and workarounds.
+there exist plans to seperate out improvements and fold back to upstream.
 
 === build system ===
 
 see INSTALL. for better coexistance with other gnucap releases, you may want to
-configure --with-program-suffix=-uf
+configure --with-program-suffix=-uf.
 
 === regression test suite ===
 
