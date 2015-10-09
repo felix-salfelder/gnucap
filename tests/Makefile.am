@@ -21,6 +21,13 @@ TESTS = \
 
 REF = ==out
 
+patchlev_fake_%.h: $(top_builddir)/src/patchlev.h
+	sed 's/e VERSION_REVISION.*/e VERSION_REVISION $*/' < $< > $@
+patchlev_other.h: $(top_builddir)/src/patchlev.h
+	sed 's/e VERSION_CURRENT .*/e VERSION_CURRENT 99999/' < $< > $@
+
+BUILT_SOURCES = patchlev_fake_999.h patchlev_fake_0.h patchlev_other.h
+
 transform=s&\.real$$&&;$(program_transform_name)
 plugindir_transformed = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
 plugindir:= $(plugindir_transformed)
@@ -579,6 +586,7 @@ GC_TESTS = \
     bm_pulse.11.sh \
     bm_pulse.periodic.sh \
     c_attach.1.sh \
+    c_attach.2.sh \
     c_echo.1.sh \
     c_for.1.sh \
     c_for.2.sh \
@@ -923,14 +931,15 @@ EXTRA_DIST = gnucap_run.sh \
 
 .PHONY: check
 
-AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
 AM_DEFAULT_SOURCE_EXT = .cc
 AM_LDFLAGS = -module -avoid-version -rpath /dev/null
-check_LTLIBRARIES = bogus.la
+check_LTLIBRARIES = bogus.la bogus1.la bogus2.la bogus3.la bogus4.la
 
 # $(CUSTOM_TESTS:%.sh=%.log): %.log: %.out
 	
 c_attach.1.out: empty.cc bogus.so d_vs.cc loadtestdir loadtestdirro attachclean
+c_attach.2.out c_attach.2.log: bogus.so bogus1.so bogus2.so bogus3.so bogus4.so
 
 attachclean:
 	rm -f d_vs.so load*/*.so empty.so
@@ -950,7 +959,7 @@ empty.cc:
 d_vs.cc: | $(top_srcdir)/src/d_vs.cc
 	$(LN_S) $| .
 
-bogus.so: %.so: %.la
+bogus.so bogus1.so bogus2.so bogus3.so bogus4.so: %.so: %.la
 	[ -f $@ ] || $(LN_S) .libs/$@ .
 
 .PHONY: c_attach.1.out attachclean soclean
@@ -965,6 +974,7 @@ sedscript: 2
 EXTRA_DIST += \
 bm_pulse.1a.ckt \
 bogus.cc \
+bogus2.cc \
 bti_dumpload.gc \
 dc_sweep.ckt \
 dc_sweeps.gc \

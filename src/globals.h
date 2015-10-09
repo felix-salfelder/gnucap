@@ -31,6 +31,7 @@ extern const char*  lib_version();
 extern "C" {
 const char* interface_name();
 unsigned interface_version();
+extern unsigned INTERFACE_VERSION();
 }
 
 class CMD;

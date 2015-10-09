@@ -243,6 +243,7 @@ CLEANFILES = patchlev.h
 #
 patchlev.h: $(srcdir)/patchlev.h.in $(top_srcdir)/.git
 	@echo "// this file has been created from patchlev.h.in, don't edit" > patchlev.tmp
+	@echo "#line 0 \"$<\"" >> patchlev.tmp
 	@sed -e "s\\@""GIT_BRANCH@\\`git rev-parse --abbrev-ref HEAD`\\" \
 	     -e "s/@""INTERFACE_VERSION@/0x$(GIT_COMMIT_SHORT)/" \
 	     -e "s/@""PACKAGE_VERSION@/$(PACKAGE_VERSION)/" \
