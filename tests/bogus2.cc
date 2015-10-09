@@ -8,7 +8,7 @@
 
 static class versioncheck{
 	public:
-	versioncheck(){ untested();
+	versioncheck(){
 		if(version_revision() < VERSION_REVISION){ untested();
 			printf("bogus4: built against %d revision %d\n",
 					VERSION_CURRENT, VERSION_REVISION);

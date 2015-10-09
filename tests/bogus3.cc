@@ -5,7 +5,7 @@
 
 static class versioncheck{
 	public:
-	versioncheck(){ untested();
+	versioncheck(){
 		if(version_revision() > VERSION_REVISION){
 			printf("bogus3: loading, although kernel revision higher\n");
 	   }	
