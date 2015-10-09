@@ -71,10 +71,10 @@ int swp_nest;			/* sweep nesting (recursion) level	*/
 /*--------------------------------------------------------------------------*/
 extern "C" {
 void VERSION_CURRENT_SYMBOL (){}
-unsigned version_current(){ untested();
+unsigned version_current(){
   return VERSION_CURRENT;
 }
-unsigned version_revision(){ untested();
+unsigned version_revision(){
   return VERSION_REVISION;
 }
 }

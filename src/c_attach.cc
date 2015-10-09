@@ -85,7 +85,7 @@ public:
 	dl_scope = RTLD_GLOBAL;
 	// RTLD_GLOBAL means symbols defined in a plugin are global
 	// Use this when a plugin depends on another.
-      }else if (cmd.umatch("lazy|force")) { itested();
+      }else if (cmd.umatch("lazy|force")) {
 	check = RTLD_LAZY;
 	// RTLD_LAZY means to defer resolving symbols until needed
 	// Use when a plugin will not load because of unresolved symbols,
@@ -163,13 +163,13 @@ public:
 
     handle = dlopen(file_name.c_str(), check | dl_scope);
     const char* e = dlerror();
-    if (handle) { itested();
+    if (handle) {
       const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
       if((check != RTLD_LAZY) && !name){ untested();
 	e = dlerror();
       }
     }
-    if (e){untested();
+    if (e){
       cmd.reset(here);
       throw Exception_CS(e, cmd);
     }
@@ -321,7 +321,7 @@ public:
       if (handle) {
 	dlclose(handle);
 	attach_list[file_name] = NULL;
-      }else{itested();
+      }else{
 	cmd.reset(here);
 	throw Exception_CS("plugin not attached", cmd);
       }
