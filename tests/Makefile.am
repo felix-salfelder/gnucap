@@ -785,7 +785,7 @@ lang_spice.1a.log lang_verilog.1a.log: soclean | $(PWD)/bm_wrapper.cc
 lang_spice.1a.sh lang_verilog.1a.sh: POSTDIFF+= '/^CXX/d'
 
 soclean:
-	rm -f *.so
+	rm -f bm_wrapper.so
 
 PREDIFF= \
    '1,/^core-lib·version/d' \
