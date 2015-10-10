@@ -27,8 +27,6 @@
 #include "u_gsl.h"
 #include <map>
 
-using std::map;
-using std::string;
 /*--------------------------------------------------------------------------*/
 class SSP_VECTOR {
 	public:
@@ -88,7 +86,7 @@ class SSP_TREE {
 		static unsigned num_spls(){return _num_spls;}
 
 	protected:
-		typedef map<SSP_VECTOR, SSP_TREE*> list_t;
+		typedef std::map<SSP_VECTOR, SSP_TREE*> list_t;
 		typedef list_t::const_iterator const_iterator;
 		typedef list_t::iterator iterator;
 		list_t _list;

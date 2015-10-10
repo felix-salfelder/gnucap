@@ -1,16 +1,15 @@
 #           v(nctrl)   v(ndd)     v(nddext)  v(ng)      v(nin)     s0(sw1)    s1(sw1)    vin(sw1)   ic(sw1)    converged(sw1) v(c1)     
- 0.         2.         5.         5.         3.1        3.1        1.         0.         0.         0.         1.         2.        
+ 0.         2.         5.         5.         3.1        3.1        1.         0.         0.         0.         11.        2.        
 #x tsw1_5 tsw2 dvth1_5 dvth2 
 * .sweep 3 x -1e-2 1e-2 
-MP1.BTI.RCD0:~bisect monotony violation at 0.4~7028, delta 0.000014
--0.010000 35.539147 41.382453 0.061305 0.063880
+-0.010000 38.862978 41.196916 0.062795 0.063801
 * .sweep 3 x~-1e-2 1e-~ 
-0.000000 59.556640 69.611310 0.070740 0.073904
+0.000000 67.492084 68.164988 0.073270 0.073472
 * .sweep 3 x~-1e-2 1e-2 
-0.010000 96.834451 100.000000 0.080812 0.081487
+0.010000 96.174333 100.000000 0.080669 0.081487
 Gnucap   System status
-iterations: op=0, dc=6, tran=0, fourier=0, total=225083
-transient timesteps: accepted=53630, rejected=418, total=54048
-twotime timesteps: accepted=255, rejected=9, total=3368
+iterations: op=0, dc=6, tran=0, fourier=0, total=241658
+transient timesteps: accepted=57626, rejected=649, total=58275
+twotime timesteps: accepted=281, rejected=7, total=3582
 nodes: user=5, subckt=0, model=0, total=5
 dctran density=76.0%, ac density=76.0%

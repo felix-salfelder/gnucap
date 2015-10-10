@@ -30,8 +30,8 @@
 #include "e_card.h"
 #include <typeinfo>
 //HACK
-#include "s_tr.h"
-#include "s__.h"
+// #include "s_tr.h"
+// #include "s__.h"
 //#include "u_adp.h"
 #include "e_adplist.h"
 #include "globals.h"
@@ -347,15 +347,11 @@ protected:
   void tr_behaviour(){ tt_behaviour_update(); }
 
   virtual void tt_init_i(){
-          std::cerr << short_label() << " COMP:init_i have " << net_nodes() <<
-            "nodes "<< TRANSIENT::steps_total_out() << "\n";
 	  // _amps = (double*) malloc(sizeof (double) * net_nodes() * TRANSIENT::total_outsteps() );
 	  _amps=NULL;
 	  // _amps_new = (double*) malloc(sizeof (double) * net_nodes() * TRANSIENT::total_outsteps() );
-          _amps_new = new double[net_nodes() * TRANSIENT::steps_total_out()];
+         // _amps_new = new double[net_nodes() * TRANSIENT::steps_total_out()];
 
-	  std::cerr << "COMPONENT::tt_init_i: allocated " 
-                    << net_nodes() * TRANSIENT::steps_total_out() << "doubles  for " << short_label() << ": " << _amps  << "\n";
   }
 
   void tr_dinge(){
