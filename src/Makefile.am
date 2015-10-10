@@ -44,7 +44,7 @@ d_meter.cc \
 d_ttcap.cc \
 d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
 d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
-d_rcd.cc d_bti.cc  d_branchvs.cc d_hci.cc
+d_branchvs.cc
 
 # matrix_example_LDADD = libgnucap.la
 
@@ -102,8 +102,8 @@ e_adplist.h \
 e_elemnt.h e_ccsrc.h e_storag.h e_cardlist.h \
 d_coment.h d_dot.h d_logic.h d_subckt.h \
 bm.h \
-c_comand.h globals.h extlib.h d_cap.h d_bti.h d_rcd.h m_matrix_extra.h \
-u_sock.h s_ddc.h u_atlas.h e_adp_mos.h
+c_comand.h globals.h extlib.h d_cap.h m_matrix_extra.h \
+u_sock.h s_ddc.h u_atlas.h
 
 noinst_HEADERS = d_coil.h
 #------------------------------------------------------------------------ 
@@ -114,11 +114,6 @@ MODELSRCS= ${MODELS:.model=.cc} ${MODELS:.model=.h}
 #
 plugindir_transformed = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
 plugindir = $(plugindir_transformed)
-plugin_LTLIBRARIES = lars_bjt.la
-lars_bjt_la_LDFLAGS = -module -avoid-version
-lars_bjt_la_SOURCES = d_bjt.cc
-lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS) \
-                       -I$(top_builddir)/include -I$(top_srcdir)/include
 
 # henjo:
 MODELCODE= ${MODELS:.model=.cc}
