@@ -1,3 +1,4 @@
+load public models-uf.so
 spice
 .options numdgt 4
 .load rcd_sym.so

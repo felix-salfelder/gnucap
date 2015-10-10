@@ -30,6 +30,8 @@
 #include "d_bti.h"
 #include "e_adp.h"
 #include "e_adplist.h"
+
+namespace UF{
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -667,4 +669,5 @@ double MODEL_BUILT_IN_MOS_BASE::dgmdw_in(const DEV_BUILT_IN_MOS* d)const
   return m->dgmdw_eff(d) * s->dw_effdw_in(c);
 }
 /*--------------------------------------------------------------------------*/
+}
 // * vim:ts=8:sw=2:et:

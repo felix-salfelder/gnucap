@@ -1061,13 +1061,13 @@ double DEV_BUILT_IN_BTI::vw()const
 double DEV_BUILT_IN_BTI::vth()const
 {
   assert(owner());
-  const DEV_BUILT_IN_MOS* md = prechecked_cast<const DEV_BUILT_IN_MOS*>(owner());
+  const UF::DEV_BUILT_IN_MOS* md = prechecked_cast<const UF::DEV_BUILT_IN_MOS*>(owner());
   assert(md);
-  const COMMON_BUILT_IN_MOS* mc = prechecked_cast<const COMMON_BUILT_IN_MOS*>(md->common());
+  const UF::COMMON_BUILT_IN_MOS* mc = prechecked_cast<const UF::COMMON_BUILT_IN_MOS*>(md->common());
   assert(mc);
 //  const MODEL_BUILT_IN_MOS8* mm = prechecked_cast<const MODEL_BUILT_IN_MOS8*>(mc->model());
 //  assert(mm);
-  const SDP_BUILT_IN_MOS8* ms = prechecked_cast<const SDP_BUILT_IN_MOS8*>(mc->sdp());
+  const UF::SDP_BUILT_IN_MOS8* ms = prechecked_cast<const UF::SDP_BUILT_IN_MOS8*>(mc->sdp());
   if(!ms){incomplete();
   }else{
   }

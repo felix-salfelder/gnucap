@@ -6,6 +6,7 @@ spice
 V1 nin 0 pulse iv=-1 pv=1 rise=1 delay=-.75 width=1 fall=.5
 * V1 nin 0 -1
 
+.load public models-uf.so
 .load rcd_sym.so
 .model my_rcd rcd_exp
 

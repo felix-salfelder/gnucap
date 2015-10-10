@@ -1,3 +1,4 @@
+load models-uf.so
 spice
 .options insensitive=0
 

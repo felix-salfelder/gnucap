@@ -1,3 +1,4 @@
+load models-uf.so
 spice
 
 .MODEL nohci NMOS (

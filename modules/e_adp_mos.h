@@ -1,6 +1,8 @@
 #ifndef ADPMOS_H
 #define ADPMOS_H
 
+namespace UF{
+
 class ADP_BUILT_IN_MOS :public ADP_BUILT_IN_DIODE{
 public:
   explicit ADP_BUILT_IN_MOS( COMPONENT* c, const std::string n);
@@ -49,4 +51,5 @@ public:
   virtual void tr_accept();
 };
 /*--------------------------------------------------------------------------*/
+}
 #endif

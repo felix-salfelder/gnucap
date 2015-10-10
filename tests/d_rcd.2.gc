@@ -1,5 +1,6 @@
 spice
 .options numdgt 9
+.load public models-uf.so
 .load rcd_sym.so
 .options ttcorr=true
 

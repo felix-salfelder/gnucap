@@ -1,4 +1,5 @@
 * bias runaway...
+load models-uf.so
 
 options TEMP=25
 options numdgt 10

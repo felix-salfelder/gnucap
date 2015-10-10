@@ -1,4 +1,5 @@
 load c_nodeset.so
+load public models-uf.so
 spice
 *.options numdgt 9
 
