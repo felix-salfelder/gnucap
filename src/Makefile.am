@@ -177,12 +177,11 @@ bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
 gnucap_real_SOURCES = ${SRCS2} main.cc ${SRCS1} ${MODELSRCS}
 
-gnucap_real_LDFLAGS = -Wl,--enable-new-dtags -rpath ${plugindir_transformed}
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
 gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
 
 #for now (ddc). fix later
-gnucap_real_LDFLAGS+= $(LAPACK_LIBS)
+gnucap_real_LDFLAGS = $(LAPACK_LIBS)
 
 lib_LTLIBRARIES += libgnucap-uf.la
 gnucap_real_LDADD = libgnucap-uf.la
