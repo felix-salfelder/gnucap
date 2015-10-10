@@ -184,13 +184,13 @@ MODELGEN= @MODELGEN@
 
 MAKEDEPEND = gcc -M $(CPPFLAGS) -o $*.d $<
 
-#%.cc : %.model %.h ${MODELGEN}${EXEEXT}
-#	${MODELGEN} -cc $<
+%.cc : %.model %.h ${MODELGEN}${EXEEXT}
+	${MODELGEN} -cc $<
 
 # #############################################
 
-#%.h : %.model ${MODELGEN}${EXEEXT}
-#	${MODELGEN} -h $<
+%.h : %.model ${MODELGEN}${EXEEXT}
+	${MODELGEN} -h $<
 
 $(D_IVL_O): CPPFLAGS+= IVL_CPPFLAGS
 
