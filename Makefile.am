@@ -22,6 +22,7 @@ DIST_SUBDIRS = modelgen $(SUBDIRS) doc
 
 SUBDIRS = \
     include \
+    lib \
     $(DOC_DIR) \
     examples \
     $(MODELGEN) \
