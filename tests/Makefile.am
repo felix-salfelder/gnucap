@@ -979,9 +979,9 @@ bogus.so bogus1.so bogus2.so bogus3.so bogus4.so: %.so: %.la
 
 # bug: @@@ also catches incomplete
 # bug: case labels don't end with {
-sedscript: *.log
+sedscript:
 	grep -e ^@@@ -e ^@i@ *.log | sort -u | tr : " " | \
-		$(AWK) '{printf "sed -i %s -e '"'"'%s s/\\({\\|:\\)\\(\\ \\|\\t\\)\\?\\(un\\|i\\)tested();$$/\\1/'"'"' # %s +%s\n", $$2, $$3, $$2, $$3}' > $@
+		$(AWK) '{printf "sed -i %s -e '"'"'%s s/\\({\\|:\\)\\(\\ \\|\\t\\)\\?\\(un\\|i\\)tested();$$/\\1/'"'"' # %s +%s\n", $$3, $$4, $$3, $$4}' > $@
 
 # checked in files. sort out later.
 EXTRA_DIST += \

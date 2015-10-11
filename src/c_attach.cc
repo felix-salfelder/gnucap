@@ -149,7 +149,7 @@ public:
       source_filename = "";
     }
 
-    if (source_filename!="") { untested();
+    if (source_filename!="") {
       trace1("attach", source_filename);
       assert(source_filename[0]=='/');
       try {
@@ -166,7 +166,7 @@ public:
     if (check == RTLD_LAZY) {
     }else if (handle) {
       const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
-      if (name){untested();
+      if (name){
       }else{
 	dlclose(handle);
 	handle = NULL;
@@ -242,7 +242,7 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 {
   struct stat ccattrib;
   int ccstat = stat(source_filename.c_str(), &ccattrib);
-  if (ccstat) { untested();
+  if (ccstat) {
     throw Exception("cannot compile: " + source_filename +
 		    " does not exist (" + to_string(ccstat) + ")\n");
   } else {
