@@ -565,15 +565,15 @@ XFAIL_TESTS+= c_measure.1.sh
 # something wrong with probes
 XFAIL_TESTS+= print_v.sh
 
-if USE_GSL
-# don't skip GSL tests
-else
-d_ttcap.1.log: GC_LOG_FLAGS += SKIP
-endif
-
 GSL_TESTS = \
     d_ttcap.1.gc \
     pfet_shutdown.gc
+
+if USE_GSL
+# don't skip GSL tests
+else
+$(GSL_TESTS:%.gc=%.log): GC_LOG_FLAGS=SKIP
+endif
 
 # suspended.
 d_bti.2.log: GC_LOG_FLAGS += SKIP

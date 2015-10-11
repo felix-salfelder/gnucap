@@ -272,7 +272,7 @@ AC_CHECK_HEADER([readline/history.h],
 
 AC_ARG_WITH([gsl],
 [AS_HELP_STRING([--with-gsl],
-  [support gls @<:@default=yes@:>@])],
+  [support gsl @<:@default=yes@:>@])],
 [],
 [with_gsl=yes])
 
