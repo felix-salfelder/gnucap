@@ -28,9 +28,6 @@
 #include "md.h"
 #include <vector>
 /*--------------------------------------------------------------------------*/
-// using namespace std;
-using std::vector;
-/*--------------------------------------------------------------------------*/
 char* getcmd(const char*,char*,int);
 /*--------------------------------------------------------------------------*/
 enum AP_MOD{
@@ -156,7 +153,7 @@ public:
   CS&         operator>>(double& x)	 {x=ctof();return *this;}
   CS&	      operator>>(std::string& x) {x=ctos();return *this;}
   template<class T>
-  CS&	      operator>>(vector<T>& x);
+  CS&	      operator>>(std::vector<T>& x);
 
   // skip (ap_skip.cc) possibly consuming, sets _ok
   CS&	      skip(int c=1) 
@@ -228,7 +225,7 @@ inline CS& operator>>(CS& cmd, T& val)
 }
 /*--------------------------------------------------------------------------*/
 template<class T>
-inline CS&     CS::operator>>(vector<T>& x){
+inline CS&     CS::operator>>(std::vector<T>& x){
   incomplete(); USE(x);
   return *this;
 }
