@@ -676,6 +676,7 @@ GC_TESTS = \
     LogicAND.gc \
     lring.gc \
     mark_dc_cont.gc \
+    models-uf.gc \
     mosbug.2.gc \
     no_hci.gc \
     nodeorder.gc \

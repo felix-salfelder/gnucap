@@ -149,7 +149,7 @@ public:
       source_filename = "";
     }
 
-    if (source_filename!="") {
+    if (source_filename!="") { untested();
       trace1("attach", source_filename);
       assert(source_filename[0]=='/');
       try {
@@ -158,15 +158,19 @@ public:
 	cmd.reset(here);
 	throw Exception_CS(e.message(), cmd);
       }
+    }else{untested();
     }
-
 
     handle = dlopen(file_name.c_str(), check | dl_scope);
     const char* e = dlerror();
-    if (handle) {
+    if (check == RTLD_LAZY) { untested();
+    }else if (handle) { untested();
       const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
-      if((check != RTLD_LAZY) && !name){ untested();
-	e = dlerror();
+      if (name){untested();
+      }else{untested();
+	dlclose(handle);
+	handle = NULL;
+	throw Exception_CS("missing interface", cmd);
       }
     }
     if (e){

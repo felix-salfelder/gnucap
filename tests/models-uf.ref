@@ -1,0 +1,8 @@
+loading.
+load models-uf.so
+                 ^ ? missing interface
+lazy
+again
+load lazy models-uf.so
+          ^ ? "models-uf.so": already loaded, replacing
+

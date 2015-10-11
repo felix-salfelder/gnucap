@@ -1,0 +1,6 @@
+echo loading.
+load models-uf.so
+echo lazy
+load lazy models-uf.so
+echo again
+load lazy models-uf.so
