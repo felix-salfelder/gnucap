@@ -217,17 +217,17 @@ inline bool Set(CS& cmd, const std::string& key, T* val, T newval)
   }
 }
 /*--------------------------------------------------------------------------*/
+template<class T>
+inline CS& CS::operator>>(std::vector<T>&){
+  incomplete();
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 template <class T>
 inline CS& operator>>(CS& cmd, T& val)
 {
   val.parse(cmd);
   return cmd;
-}
-/*--------------------------------------------------------------------------*/
-template<class T>
-inline CS&     CS::operator>>(std::vector<T>& x){
-  incomplete(); USE(x);
-  return *this;
 }
 /*--------------------------------------------------------------------------*/
 #endif
