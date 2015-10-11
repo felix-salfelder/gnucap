@@ -158,16 +158,16 @@ public:
 	cmd.reset(here);
 	throw Exception_CS(e.message(), cmd);
       }
-    }else{untested();
+    }else{
     }
 
     handle = dlopen(file_name.c_str(), check | dl_scope);
     const char* e = dlerror();
-    if (check == RTLD_LAZY) { untested();
-    }else if (handle) { untested();
+    if (check == RTLD_LAZY) {
+    }else if (handle) {
       const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
       if (name){untested();
-      }else{untested();
+      }else{
 	dlclose(handle);
 	handle = NULL;
 	throw Exception_CS("missing interface", cmd);
