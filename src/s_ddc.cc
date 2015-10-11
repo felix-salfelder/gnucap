@@ -829,6 +829,7 @@ void DDC_BASE::old_solver()
 
 #ifndef HAVE_LIBGSLCBLAS
   incomplete();
+  USE(alpha);
 #else
   // dv = U * app
   cblas_dgemv(CblasColMajor,

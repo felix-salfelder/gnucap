@@ -20,7 +20,15 @@ endif
 MODELGEN =
 DIST_SUBDIRS = modelgen $(SUBDIRS) doc
 
-SUBDIRS = $(DOC_DIR) examples $(MODELGEN) src $(MODULES_DIR) plugins tests
+SUBDIRS = \
+    include \
+    $(DOC_DIR) \
+    examples \
+    $(MODELGEN) \
+    src \
+    $(MODULES_DIR) \
+    plugins \
+    tests
 
 EXTRA_DIST = \
     extern/README \

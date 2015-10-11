@@ -71,7 +71,7 @@ MODEL_BUILT_IN_BTI::MODEL_BUILT_IN_BTI(const BASE_SUBCKT* p)
    weight(0.199),
    symmetric(false)
 {
-  if (ENV::run_mode != rPRE_MAIN) { untested();
+  if (ENV::run_mode != rPRE_MAIN) {
     ++_count;
   }else{
   }

@@ -27,6 +27,7 @@
 #include "e_cardlist.h"
 #include "e_adplist.h"
 #include "u_status.h"
+
 /*--------------------------------------------------------------------------*/
 // here to make sure they get constructed and destructed in proper order
 // first construct, last destruct
@@ -68,4 +69,13 @@ int swp_type[swp_nest_max];	/* type of sweep (log or linear)	*/
 int swp_nest;			/* sweep nesting (recursion) level	*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+extern "C" {
+void VERSION_CURRENT_SYMBOL (){}
+unsigned version_current(){
+  return VERSION_CURRENT;
+}
+unsigned version_revision(){
+  return VERSION_REVISION;
+}
+}
 // vim:ts=8:sw=2:noet:

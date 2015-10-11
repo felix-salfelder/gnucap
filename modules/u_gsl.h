@@ -21,7 +21,10 @@
  *------------------------------------------------------------------
  * gsl supplementary header
  */
-#if !defined(GNUCAP_GSL) && defined(HAVE_GSL)
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+#if !defined(GNUCAP_GSL) && defined(HAVE_GSL_FIT_H)
 #define GNUCAP_GSL
 
 #ifdef NDEBUG
@@ -34,6 +37,7 @@
 #include <gsl/gsl_sort_vector.h>
 #include <gsl/gsl_permute_vector.h>
 #include <gsl/gsl_complex_math.h>
+#include <gsl/gsl_matrix_complex_double.h>
 
 #include "m_matrix.h"
 

@@ -1,0 +1,62 @@
+#ifndef PATCHLEVEL_H
+#define PATCHLEVEL_H
+
+#define SOME_NUMBER "138"
+#define PATCHLEVEL "@PACKAGE_VERSION@ GIT @INTERFACE_VERSION@." SOME_NUMBER
+
+// interface version. refuse to load if it's different
+// (override with RTLD_LAZY)
+#define VERSION_CURRENT 1
+
+// implementation revision. complain if loaded into older kernel
+// during development, VERSION_REVISION might become the distance to the last
+// gittag?
+#define VERSION_REVISION 1
+
+/// ----------------
+/// maybe move to different place.
+#define mkvsym_(a) gnucap_uf_interface_ ## a
+#define mkvsym(a) mkvsym_(a)
+#define VERSION_CURRENT_SYMBOL mkvsym(VERSION_CURRENT)
+#ifdef ADD_VERSION
+#include "md.h"
+#include "io_error.h"
+
+static const unsigned iv = @INTERFACE_VERSION@;
+static const char* in = @INTERFACE_NAME@;
+extern "C" {
+unsigned interface_version(){return iv;}
+const char* interface_name(){return in;}
+
+
+extern void VERSION_CURRENT_SYMBOL ();
+
+extern unsigned version_current(); // interface version
+extern unsigned version_revision(); // kernel revision
+
+void versioncheck(){
+	VERSION_CURRENT_SYMBOL ();
+}
+
+} // extern "C"
+
+namespace{
+static class verschk{
+	public:
+		verschk(){
+			if(version_current() != VERSION_CURRENT){
+				// getting here with RTLD_LAZY
+				error(bDANGER, "module built against %d, this is %d\n", VERSION_CURRENT, version_current());
+			}else if (VERSION_REVISION < version_revision()){
+				error(bWARNING, "module built against lower revision: %d, loading into %d\n",
+						VERSION_REVISION, version_revision());
+			}else if (VERSION_REVISION > version_revision()){
+				error(bPICKY, "module built against higher revision: %d, loading into %d\n",
+						VERSION_REVISION, version_revision());
+			}else{
+			}
+		}
+}a;
+}
+#endif
+#endif

@@ -457,7 +457,6 @@ COMPONENT::COMPONENT()
    _q_for_eval(-1),
    _time_by(),
    _amps(0),
-   _amps_new(0),
    _adp(0)
 {
   trace1("COMPONENT::COMPONENT", long_label());
@@ -477,7 +476,6 @@ COMPONENT::COMPONENT(const COMPONENT& p)
    _q_for_eval(-1),
    _time_by(p._time_by),
    _amps(0),
-   _amps_new(0),
    _adp(0)
 {
   if (_sim) {
@@ -495,7 +493,6 @@ COMPONENT::COMPONENT(const COMPONENT& p)
 COMPONENT::~COMPONENT()
 {
   if (_amps)     free (_amps);
-  if (_amps_new) free (_amps_new);
   detach_common();
   if (_sim) {
     _sim->uninit();
@@ -1210,9 +1207,9 @@ void COMPONENT::tt_accept()
 {
 
   // not here...
-  double* tmp = _amps;
-  _amps = _amps_new;
-  _amps_new = tmp;
+  // double* tmp = _amps;
+  //_amps = _amps_new;
+  //_amps_new = tmp;
 
   tt_behaviour_del /= (_sim->_dT0);
   tt_behaviour_rel /= (_sim->_dT0);

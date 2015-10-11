@@ -102,24 +102,6 @@ fi
 ])
 AC_OUTPUT([modules/Makefile])
 AM_CONDITIONAL([MODULES], [test x$enable_modules != xno] )
-dnl --------------- lib -----------------
-dnl SHARED_LIB=
-AC_MSG_CHECKING([if library shall be installed])
-AC_ARG_ENABLE([lib],
-[  --enable-lib            Build and install shared library. [[default: disabled]]],
-[
-if test "X$enable_lib" = "Xno" ; then
-	AC_MSG_RESULT([no])
-else
-	AC_MSG_RESULT([yes])
-	enable_lib=yes
-fi
-],
-[
-	AC_MSG_RESULT([no])
-	enable_lib=no
-])
-AM_CONDITIONAL([SHARED_LIB], [test x$enable_lib != xno] )
 
 dnl ------------------- debugging -------------------
 AC_MSG_CHECKING([if debug code should be compiled in])
@@ -290,22 +272,17 @@ AC_CHECK_HEADER([readline/history.h],
 
 AC_ARG_WITH([gsl],
 [AS_HELP_STRING([--with-gsl],
-  [support gls @<:@default=yes@:>@])],
+  [support gsl @<:@default=yes@:>@])],
 [],
 [with_gsl=yes])
 
 HAVE_GSL_H=0
 if test "x$with_gsl" != xno ; then
-	AC_CHECK_HEADER([gsl/gsl.h],
-	[AC_DEFINE([HAVE_GSL_FIT_H], [1],
-		[Define to 1 if you have gsl/gsl.h])
-		HAVE_GSL_H=1
-	],
-	[AC_MSG_NOTICE([consider installing the libgsl0-dev package])])
-
 	AC_CHECK_HEADER([gsl/gsl_fit.h],
 	[AC_DEFINE([HAVE_GSL_FIT_H], [1],
-		[Define to 1 if you have gsl/gsl_fit.h])],
+		[Define to 1 if you have gsl/gsl_fit.h])
+		HAVE_GSL_H=1
+	],
 	[AC_MSG_NOTICE([consider installing the libgsl0-dev package])])
 fi
 AM_CONDITIONAL([USE_GSL], [test $HAVE_GSL_H -eq 1])
@@ -469,6 +446,7 @@ AC_OUTPUT([
 	Makefile
 	modelgen/Makefile
 	plugins/Makefile
+	include/Makefile
 	src/Makefile
 	tests/Makefile
 	examples/Makefile])

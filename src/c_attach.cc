@@ -77,23 +77,19 @@ public:
     unsigned here = cmd.cursor();
     int dl_scope = RTLD_LOCAL;
     int check = RTLD_NOW;
-    bool force = false;
     string make = OS::getenv("GNUCAP_MAKE", GNUCAP_MAKE);
     // RTLD_NOW means to resolve symbols on loading
     // RTLD_LOCAL means symbols defined in a plugin are local
     do {
-      if (cmd.umatch("public ")) {
+      if (cmd.umatch("public ")) { untested();
 	dl_scope = RTLD_GLOBAL;
 	// RTLD_GLOBAL means symbols defined in a plugin are global
 	// Use this when a plugin depends on another.
-      }else if (cmd.umatch("lazy ")) {
+      }else if (cmd.umatch("lazy|force")) {
 	check = RTLD_LAZY;
 	// RTLD_LAZY means to defer resolving symbols until needed
 	// Use when a plugin will not load because of unresolved symbols,
 	// but it may work without it.
-      }else if (cmd.umatch("force ")) {
-	force = true;
-	// ignore version mismatch of some kind
       }else{
 	Get(cmd,"make{file}", &make);
       }
@@ -162,8 +158,26 @@ public:
 	cmd.reset(here);
 	throw Exception_CS(e.message(), cmd);
       }
+    }else{
     }
 
+    handle = dlopen(file_name.c_str(), check | dl_scope);
+    const char* e = dlerror();
+    if (check == RTLD_LAZY) {
+    }else if (handle) {
+      const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
+      if (name){
+      }else{
+	dlclose(handle);
+	handle = NULL;
+	throw Exception_CS("missing interface", cmd);
+      }
+    }
+    if (e){
+      cmd.reset(here);
+      throw Exception_CS(e, cmd);
+    }
+#if 0
     try {
       assert(!handle);
       handle = do_attach(file_name, check | dl_scope, force);
@@ -172,29 +186,32 @@ public:
       cmd.reset(here);
       throw Exception_CS(e.message(), cmd);
     }
+#endif
     trace0("done attach");
   }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "attach|load", &p1);
 /*--------------------------------------------------------------------------*/
+// overengineered gncap-uf approach
 void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
-{
+{ untested();
   void* handle = dlopen(file_name.c_str(), flags);
   char* e = dlerror();
-  if(e || !handle ) {
+  if(e || !handle ) { untested();
     throw Exception("cannot attach (" + string(e) + ")");
-  }else if (handle) {
+  }else if (handle) { untested();
     const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
     e = dlerror();
-    if (force) {
+    if (force) { untested();
       trace1("forced load...", file_name);
-    } else if (e && !force) {
+    } else if (e && !force) { untested();
       dlclose(handle);
       throw Exception(file_name + " lacks interface information");
     } else if ((e || !name) && !force) { untested();
       dlclose(handle); untested();
       throw Exception("lacks interface name");
-    } else {}
+    } else { untested();
+    }
 
     unsigned (*version)() = (unsigned(*)()) dlsym(handle, "interface_version");
     e = dlerror();
@@ -225,7 +242,7 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 {
   struct stat ccattrib;
   int ccstat = stat(source_filename.c_str(), &ccattrib);
-  if (ccstat) { untested();
+  if (ccstat) {
     throw Exception("cannot compile: " + source_filename +
 		    " does not exist (" + to_string(ccstat) + ")\n");
   } else {
@@ -308,7 +325,7 @@ public:
       if (handle) {
 	dlclose(handle);
 	attach_list[file_name] = NULL;
-      }else{itested();
+      }else{
 	cmd.reset(here);
 	throw Exception_CS("plugin not attached", cmd);
       }

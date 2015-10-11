@@ -46,7 +46,6 @@ d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
 d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
 d_rcd.cc d_bti.cc  d_branchvs.cc d_hci.cc
 
-RAW_HDRS=
 lib_LTLIBRARIES=
 
 # matrix_example_LDADD = libgnucap.la
@@ -82,13 +81,17 @@ measure_max.cc measure_min.cc measure_slewrate.cc measure_cross.cc \
 measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 #------------------------------------------------------------------------
 RAW_SRCS = \
-globals.cc \
 $(BM_SRCS) \
 $(D_SRCS) \
 $(C_SRCS) \
 $(S_SRCS) \
 $(LANG_SRCS) \
-$(FUNC_SRCS) \
+$(FUNC_SRCS)
+
+#------------------------------------------------------------------------
+libgnucap_uf_la_LDFLAGS = $(AM_LDFLAGS) -Wl,--enable-new-dtags -Wl,-rpath -Wl,${plugindir_transformed}
+libgnucap_uf_la_SOURCES = \
+globals.cc \
 m_expression_dump.cc m_expression_in.cc m_expression_reduce.cc \
 m_base_in.cc m_base_math.cc m_fft.cc  m_spline.cc \
 ap_construct.cc ap_convert.cc ap_error.cc ap_get.cc ap_match.cc ap_skip.cc \
@@ -105,8 +108,11 @@ c__cmd.cc c_attach.cc c_file.cc c_genrat.cc c_debug.cc \
 c_nodeset.cc \
 findbr.cc plot.cc e_adp.cc e_adp_mos.cc \
 startup.cc m_matrix.cc
+
+libgnucap_uf_la_CPPFLAGS = $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\" \
+                           -I$(top_builddir)/include -I$(top_srcdir)/include
 #------------------------------------------------------------------------
-RAW_HDRS += \
+RAW_HDRS = \
 startup.h md.h ap.h mode.h constant.h declare.h \
 l_compar.h l_dispatcher.h l_denoise.h \
 l_lib.h l_stlextra.h l_timer.h \
@@ -136,7 +142,8 @@ plugindir = $(plugindir_transformed)
 plugin_LTLIBRARIES = lars_bjt.la
 lars_bjt_la_LDFLAGS = -module -avoid-version
 lars_bjt_la_SOURCES = d_bjt.cc
-lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS)
+lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS) \
+                       -I$(top_builddir)/include -I$(top_srcdir)/include
 
 # henjo:
 MODELCODE= ${MODELS:.model=.cc}
@@ -151,7 +158,6 @@ m_matrix_example_CPPFLAGS = $(AM_CPPFLAGS)
 
 SRCS1= 
 SRCS2= ${RAW_SRCS} 
-#${RAW_HDRS}
 
 # make all of the model object files depend on all of the model sources
 # this is a bit overkill, but for example the bjt model makes use of the
@@ -168,37 +174,25 @@ Makefile.am
 
 GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 
-#matrix_example
 noinst_SCRIPTS = gnucap
 bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
 gnucap_real_SOURCES = ${SRCS2} main.cc ${SRCS1} ${MODELSRCS}
-#gnucap_SOURCES += ${SRCS1} ${MODELSRCS} ${SRCS2}
 
-gnucap_real_LDFLAGS = -Wl,--enable-new-dtags -rpath ${plugindir_transformed}
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
 gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
 
 #for now (ddc). fix later
-gnucap_real_LDFLAGS+= $(LAPACK_LIBS)
+gnucap_real_LDFLAGS = $(LAPACK_LIBS)
 
-if SHARED_LIB
-
-lib_LTLIBRARIES += libgnucap.la
-libgnucap_la_SOURCES = ${SRCS1} ${MODELSRCS} ${SRCS2}
-#gnucap_real_LDADD = libgnucap.la
+lib_LTLIBRARIES += libgnucap-uf.la
+gnucap_real_LDADD = libgnucap-uf.la
 #libgnucap_la_CFLAGS = $(AM_CFLAGS)
-
-#else
-
-
-endif
-
 
 
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")
 libgnucap_includedir = $(includedir_transformed)
-libgnucap_include_HEADERS = ${RAW_HDRS} spice-wrapper.cc patchlev.h
+libgnucap_include_HEADERS = ${RAW_HDRS} spice-wrapper.cc
  
 #gnucap_include_HEADERS = ${RAW_HDRS}
 
@@ -240,33 +234,8 @@ $(D_IVL_O): CPPFLAGS+= IVL_CPPFLAGS
 .PRECIOUS: %.cc %.h %.hxx
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
-EXTRA_DIST+= patchlev.h.in c_expect.cc
-BUILT_SOURCES = patchlev.h
-if HAVE_GIT_REPO
-CLEANFILES = patchlev.h
-# the values for GIT_BRANCH and GIT_COMMIT are unknown to configure, so this is
-# done manually (for now). see config.status for a more portable way.
-#
-# don't touch patchlev.h if it's not necessary, to prevent rebuilds.
-#
-patchlev.h: $(srcdir)/patchlev.h.in $(top_srcdir)/.git
-	@echo "// this file has been created from patchlev.h.in, don't edit" > patchlev.tmp
-	@sed -e "s\\@""GIT_BRANCH@\\`git rev-parse --abbrev-ref HEAD`\\" \
-	     -e "s/@""INTERFACE_VERSION@/0x$(GIT_COMMIT_SHORT)/" \
-	     -e "s/@""PACKAGE_VERSION@/$(PACKAGE_VERSION)/" \
-	     -e "s\\@""INTERFACE_NAME@\\\"`git rev-parse --abbrev-ref HEAD`\"\\" \
-	     -e "s/@""GIT_COMMIT@/`git rev-parse HEAD`/" $< >> patchlev.tmp
-	@diff patchlev.tmp patchlev.h 2>/dev/null >/dev/null; \
-	ret=$$?; \
-	if [ $$ret -eq 0 ]; then \
-	  echo git revision unchanged; \
-	  rm patchlev.tmp; \
-	else \
-	  echo updating $@; \
-	  mv patchlev.tmp $@; \
-	fi;
-# else patchlev.h is already there
-endif
+EXTRA_DIST += c_expect.cc
+
 
 # embers of vvp attempts. sort out later
 EXTRA_DIST+= \

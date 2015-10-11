@@ -85,7 +85,7 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
     if (c) {
       c->do_it(cmd, scope);
       didsomething = true;
-    }else{ itested();
+    }else{
       cmd.warn(bWARNING, here, "cmd: what's this?");
     }
   }else if (!didsomething) {
@@ -118,7 +118,7 @@ void CMD::command(const std::string& cs, CARD_LIST* scope)
   CMD* c = command_dispatcher[s];
   if (c) {
     c->do_it(cmd, scope);
-  }else{ itested();
+  }else{
     throw Exception("bad internal command: " + s);
   }
 }

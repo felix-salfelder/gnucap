@@ -8,8 +8,15 @@ plugin_LTLIBRARIES =
 
 AM_LDFLAGS = -shared -module -avoid-version
 
-AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
+AM_CPPFLAGS = \
+	-I$(top_builddir)/include -I$(top_srcdir)/include \
+	-I$(top_builddir)/src -I$(top_srcdir)/src
 
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += models-uf.la
+models_uf_la_SOURCES = empty.cc
+empty.cc:
+	touch $@
 #------------------------------------------------------------------------
 plugin_LTLIBRARIES += rcd_sym.la
 rcd_sym_la_SOURCES = d_rcd_sym.cc d_rcd_exp.cc
