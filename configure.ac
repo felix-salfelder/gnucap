@@ -446,6 +446,7 @@ AC_OUTPUT([
 	Makefile
 	modelgen/Makefile
 	plugins/Makefile
+	include/Makefile
 	src/Makefile
 	tests/Makefile
 	examples/Makefile])

@@ -109,7 +109,8 @@ c_nodeset.cc \
 findbr.cc plot.cc e_adp.cc e_adp_mos.cc \
 startup.cc m_matrix.cc
 
-libgnucap_uf_la_CPPFLAGS = $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
+libgnucap_uf_la_CPPFLAGS = $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\" \
+                           -I$(top_builddir)/include -I$(top_srcdir)/include
 #------------------------------------------------------------------------
 RAW_HDRS = \
 startup.h md.h ap.h mode.h constant.h declare.h \
@@ -141,7 +142,8 @@ plugindir = $(plugindir_transformed)
 plugin_LTLIBRARIES = lars_bjt.la
 lars_bjt_la_LDFLAGS = -module -avoid-version
 lars_bjt_la_SOURCES = d_bjt.cc
-lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS)
+lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS) \
+                       -I$(top_builddir)/include -I$(top_srcdir)/include
 
 # henjo:
 MODELCODE= ${MODELS:.model=.cc}
@@ -190,7 +192,7 @@ gnucap_real_LDADD = libgnucap-uf.la
 
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")
 libgnucap_includedir = $(includedir_transformed)
-libgnucap_include_HEADERS = ${RAW_HDRS} spice-wrapper.cc patchlev.h
+libgnucap_include_HEADERS = ${RAW_HDRS} spice-wrapper.cc
  
 #gnucap_include_HEADERS = ${RAW_HDRS}
 
@@ -232,34 +234,8 @@ $(D_IVL_O): CPPFLAGS+= IVL_CPPFLAGS
 .PRECIOUS: %.cc %.h %.hxx
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
-EXTRA_DIST+= patchlev.h.in c_expect.cc
-BUILT_SOURCES = patchlev.h
-if HAVE_GIT_REPO
-CLEANFILES = patchlev.h
-# the values for GIT_BRANCH and GIT_COMMIT are unknown to configure, so this is
-# done manually (for now). see config.status for a more portable way.
-#
-# don't touch patchlev.h if it's not necessary, to prevent rebuilds.
-#
-patchlev.h: $(srcdir)/patchlev.h.in $(top_srcdir)/.git
-	@echo "// this file has been created from patchlev.h.in, don't edit" > patchlev.tmp
-	@echo "#line 0 \"$<\"" >> patchlev.tmp
-	@sed -e "s\\@""GIT_BRANCH@\\`git rev-parse --abbrev-ref HEAD`\\" \
-	     -e "s/@""INTERFACE_VERSION@/0x$(GIT_COMMIT_SHORT)/" \
-	     -e "s/@""PACKAGE_VERSION@/$(PACKAGE_VERSION)/" \
-	     -e "s\\@""INTERFACE_NAME@\\\"`git rev-parse --abbrev-ref HEAD`\"\\" \
-	     -e "s/@""GIT_COMMIT@/`git rev-parse HEAD`/" $< >> patchlev.tmp
-	@diff patchlev.tmp patchlev.h 2>/dev/null >/dev/null; \
-	ret=$$?; \
-	if [ $$ret -eq 0 ]; then \
-	  echo git revision unchanged; \
-	  rm patchlev.tmp; \
-	else \
-	  echo updating $@; \
-	  mv patchlev.tmp $@; \
-	fi;
-# else patchlev.h is already there
-endif
+EXTRA_DIST += c_expect.cc
+
 
 # embers of vvp attempts. sort out later
 EXTRA_DIST+= \

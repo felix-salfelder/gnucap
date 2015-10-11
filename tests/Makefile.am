@@ -24,9 +24,9 @@ TESTS = \
 
 REF = ==out
 
-patchlev_fake_%.h: $(top_builddir)/src/patchlev.h
+patchlev_fake_%.h: $(top_builddir)/include/patchlev.h
 	sed 's/e VERSION_REVISION.*/e VERSION_REVISION $*/' < $< > $@
-patchlev_other.h: $(top_builddir)/src/patchlev.h
+patchlev_other.h: $(top_builddir)/include/patchlev.h
 	sed 's/e VERSION_CURRENT .*/e VERSION_CURRENT 99999/' < $< > $@
 
 BUILT_SOURCES = patchlev_fake_999.h patchlev_fake_0.h patchlev_other.h
@@ -565,9 +565,13 @@ XFAIL_TESTS+= c_measure.1.sh
 # something wrong with probes
 XFAIL_TESTS+= print_v.sh
 
+# these tests require gsl
 GSL_TESTS = \
     d_ttcap.1.gc \
-    pfet_shutdown.gc
+    pfet_shutdown.gc \
+    s_ttt.rc.gc \
+    s_ttt.lc.gc \
+    s_ttt.lrc.gc
 
 if USE_GSL
 # don't skip GSL tests
@@ -710,9 +714,6 @@ GC_TESTS = \
     s_tr.lrc.gc \
     s_ttt.1.gc \
     s_ttt.label.gc \
-    s_ttt.rc.gc \
-    s_ttt.lc.gc \
-    s_ttt.lrc.gc \
     s_ttt.vib.gc \
     sens_inv.gc \
     sens_mos8.gc \
