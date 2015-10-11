@@ -60,6 +60,14 @@ plugin_LTLIBRARIES += c_wave.la
 c_wave_la_SOURCES = c_wave.cc
 c_wave_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 c_wave_la_CXXFLAGS = -std=c++11 $(AM_CXXFLAGS)
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += c_debug.la
+c_debug_la_LDFLAGS = -module -avoid-version
+c_debug_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += c_nodeset.la
+c_nodeset_la_LDFLAGS = -module -avoid-version
+c_nodeset_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 
 #needed?
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")

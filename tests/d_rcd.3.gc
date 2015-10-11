@@ -1,3 +1,5 @@
+load c_debug.so
+load c_nodeset.so
 spice
 
 .load rcd_sym.so

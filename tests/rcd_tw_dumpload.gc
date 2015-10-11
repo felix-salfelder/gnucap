@@ -1,3 +1,4 @@
+load c_nodeset.so
 spice
 *.options numdgt 9
 

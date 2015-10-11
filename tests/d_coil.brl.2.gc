@@ -1,3 +1,4 @@
+load c_debug.so
 *>options numdgt 30
 spice
 v1 nin 0 1 ac 1

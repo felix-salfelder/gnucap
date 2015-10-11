@@ -1,3 +1,4 @@
+load c_debug.so
 
 param a=1
 param q=1

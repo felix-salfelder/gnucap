@@ -1,3 +1,4 @@
+load c_debug.so
 spice
 
 .print tw ttime(0) control(0)
