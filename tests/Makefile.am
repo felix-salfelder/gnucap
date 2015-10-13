@@ -623,6 +623,7 @@ GC_TESTS = \
     d_coil.brl.1.gc \
     d_coil.brl.2.gc \
     d_coil.brl.3.gc \
+    d_cpoly_g.1.gc \
     d_hci.1.gc \
     d_hci.2.gc \
     d_hci.3.gc \
