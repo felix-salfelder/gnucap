@@ -117,7 +117,8 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
    _old_values(NULL),
    _n_ports(p._n_ports),
    _time(NOT_VALID),
-   _inputs(NULL)
+   _inputs(NULL),
+   _poly(NULL)
 {
   // not really a copy .. only valid to copy a default
   // too lazy to do it right, and that's all that is being used
@@ -135,7 +136,8 @@ DEV_CPOLY_G::DEV_CPOLY_G()
    _old_values(NULL),
    _n_ports(0),
    _time(NOT_VALID),
-   _inputs(NULL)
+   _inputs(NULL),
+   _poly(NULL)
 {
 }
 /*--------------------------------------------------------------------------*/
