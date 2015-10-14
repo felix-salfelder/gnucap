@@ -236,10 +236,11 @@ static unsigned count_ports(CS& cmd, uint_t maxnodes, uint_t minnodes,
   //BUG// assert fails on current controlled sources with (node node dev) syntax
   // it's ok with (node node) dev syntax or node node dev syntax
   if(num_nodes > maxnodes){
-    error(bDANGER, "Something wrong with nodecount %i %i, while parsing %s\n",num_nodes, maxnodes, string(cmd).c_str() );
+    error(bDANGER, "Something wrong with nodecount %i %i, while parsing %s\n",
+	num_nodes, maxnodes, string(cmd).c_str() );
   }
   assert(num_nodes <= maxnodes);
-  trace2("count_ports", num_nodes, cmd.tail());
+  trace2("count_ports done", num_nodes, cmd.tail());
   return unsigned(num_nodes);
 }
 static unsigned count_ports(CS& cmd, int maxnodes, int minnodes, int leave_tail, int start)
@@ -513,18 +514,18 @@ void LANG_SPICE_BASE::parse_type(CS& cmd, CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 {
-  trace0(("LANG_SPICE_BASE::parse_args " + (std::string) cmd).c_str() );
+  trace1("LANG_SPICE_BASE::parse_args", cmd.tail());
   assert(x);
   COMPONENT* xx = dynamic_cast<COMPONENT*>(x);
 
   cmd >> "params:";	// optional, skip it.
 
   if (!x->use_obsolete_callback_parse()) {
-    trace1("LANG_SPICE_BASE::parse_args !ocp", cmd.tail().c_str() );
+    trace1("LANG_SPICE_BASE::parse_args !ocp", cmd.tail());
     int paren = cmd.skip1b('(');
     if (xx && cmd.is_float()) {		// simple unnamed value
       std::string value;
-      trace0("LANG_SPICE_BASE::parse_args simple");
+      trace1("LANG_SPICE_BASE::parse_args simple", xx->value_name());
       cmd >> value;
       x->set_param_by_name(xx->value_name(), value);
     }else if (cmd.match1("'{")) {	// quoted unnamed value
@@ -535,7 +536,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
     }else{				// only name=value pairs
        trace0("LANG_SPICE_BASE::parse_args else");
     }
-    trace0(("LANG_SPICE_BASE::parsedone " + (std::string) cmd.tail()).c_str() );
+    trace1("LANG_SPICE_BASE::parsedone", cmd.tail());
     unsigned here = cmd.cursor();
     for (int i=0; ; ++i) {
       if (paren && cmd.skip1b(')')) {
@@ -662,7 +663,7 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
     unsigned num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(),
 				0u/*no unnamed par*/, 0u/*start*/);
 
-    trace1("LANG_SPICE_BASE::parse_module ", num_nodes );
+    trace2("LANG_SPICE_BASE::parse_module", x->long_label(), num_nodes);
     cmd.reset(here);
     parse_ports(cmd, x, int(x->min_nodes()), 0/*start*/, int(num_nodes), true/*all new*/);
   }
@@ -710,21 +711,23 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
 
     
     if (x->use_obsolete_callback_parse()) {
-      trace0(("LANG_SPICE_BASE::parse_instance obs. cb"));
+      trace1("LANG_SPICE_BASE::parse_instance obs. cb", x->long_label());
       parse_element_using_obsolete_callback(cmd, x);
     }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) {
       trace0(("LANG_SPICE_BASE::parse_logic_instance obs. cb"));
       parse_logic_using_obsolete_callback(cmd, xx);
     }else{
+      trace4("parse without cb", x->long_label(), x->max_nodes(), x->min_nodes(), x->tail_size());
       {
 	unsigned here = cmd.cursor();
 	unsigned num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(), x->tail_size(), 0u);
+	trace2("parse without cb found", x->long_label(), num_nodes);
 	cmd.reset(here);
 	parse_ports(cmd, x, int(x->min_nodes()), 0/*start*/, int(num_nodes), false);
         trace0(("LANG_SPICE_BASE::parse_instance parsed ports " + (std::string) cmd.tail()).c_str() );
       }
       if (x->print_type_in_spice()) {
-        trace0(("LANG_SPICE_BASE::parse_instance ptis " + (std::string) cmd.tail()).c_str() );
+        trace1("LANG_SPICE_BASE::parse_instance ptis", cmd.tail());
 	parse_type(cmd, x);
       }else{
       }

@@ -324,6 +324,8 @@ void DEV_CPOLY_G::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::precalc_last()
 {
+  trace3("DEV_CPOLY_G::precalc_last", long_label(), net_nodes(), matrix_nodes());
+
   if(_values){ untested();
     // hack: done by set_parameters
     // move to common somehow
@@ -337,7 +339,6 @@ void DEV_CPOLY_G::precalc_last()
       _old_values = new double[_n_ports*2];
     }
   }
-  untested();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
