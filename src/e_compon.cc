@@ -597,13 +597,14 @@ void COMPONENT::set_dev_type(const std::string& new_type)
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::print_args_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
+{ untested();
   assert(lang);
   assert(has_common());
   trace0(("COMPONENT::print_args_obsolete_callback "+ short_label()).c_str());
   common()->print_common_obsolete_callback(o, lang);
-  if(comment()!=""){
+  if(comment()!=""){ untested();
     o << " ; " << comment();
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

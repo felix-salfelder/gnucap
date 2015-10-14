@@ -52,6 +52,7 @@ private: // override virtual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_COND(*this);}
   void  parse_common_obsolete_callback(CS&);
   void  print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
+  bool use_obsolete_callback_print()const;
   
   void  	precalc_first(const CARD_LIST*);
   void		expand(const COMPONENT*);
@@ -132,6 +133,15 @@ int EVAL_BM_COND::param_count()const
   // they are all the same.  Take one of them.
   untested();
   return _func[s_NONE]->param_count();
+}
+/*--------------------------------------------------------------------------*/
+bool EVAL_BM_COND::use_obsolete_callback_print()const
+{
+  if (_func[s_NONE]) { untested();
+    return _func[s_NONE]->use_obsolete_callback_print();
+  }else{ untested();
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_COND::param_is_printable(int i)const
@@ -352,13 +362,13 @@ void EVAL_BM_COND::precalc_last(const CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_COND::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
+{ untested();
   assert(lang);
   bool more = false;
-  if (_set[s_NONE]) {
+  if (_set[s_NONE]) { untested();
     _func[s_NONE]->print_common_obsolete_callback(o, lang);
     more = true;
-  }else{
+  }else{ untested();
   }
   for (int i = sCOUNT-1; i != s_NONE; --i) {
     if (_set[i]) {

@@ -42,7 +42,7 @@ nmos bsim3, linear, vbs=0
  9.         9.         0.0099964  0.01      -3.5786u   
  10.        10.        0.0099962  0.01      -3.8256u   
 Vgs ( 1 0 )  DC  3.236734
-M1 ( 2 1 0 0 )  cmosn  l=.9u w=.9u nrd=1. nrs=1.
+M1 ( 2 1 0 0 ) cmosn l=.9u w=.9u nrd=1. nrs=1.
 Vds ( 3 0 )  DC  0.01
 Rds ( 2 3 )  1.
 .model cmosn nmos7 ( level=7 cdsc=NA( 240.u) cdscb=NA( 0.) cdscd=NA( 0.)

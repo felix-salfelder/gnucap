@@ -624,6 +624,7 @@ GC_TESTS = \
     d_coil.brl.2.gc \
     d_coil.brl.3.gc \
     d_cpoly_g.1.gc \
+    d_cpoly_g.2.gc \
     d_hci.1.gc \
     d_hci.2.gc \
     d_hci.3.gc \
@@ -867,7 +868,7 @@ define testgen
 	@chmod +x $@
 endef
 
-$(CKT_TESTS): %.sh: $(REF)/%.ckt.ref
+$(CKT_TESTS): %.sh: %.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
 $(GC_TESTS:%.gc=%.gc.out): %.gc.out: %.gc

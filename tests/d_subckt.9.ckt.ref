@@ -276,7 +276,7 @@ c99 ( na n99 )  1.
 c100 ( na n100 )  1.
 c101 ( na n101 )  1.
 .ends test
-Xt ( 1 0 )  test 
+Xt ( 1 0 ) test
 tran   
 tw     
 ac     

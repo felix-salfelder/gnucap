@@ -4,16 +4,16 @@ R1 ( a b ) r
 .ends dumb_resistor
 .subckt foo ( vcc in out )
 Rc ( c vcc ) z
-q1 ( c b e )  Zz NA( 1.)
-XRe ( e 0 )  dumb_resistor  r=abs(-z)/10
+q1 ( c b e ) Zz NA( 1.)
+XRe ( e 0 ) dumb_resistor r=abs(-z)/10
 Rb1 ( b vcc ) 100k
-XRb2 ( b 0 )  dumb_resistor  r=r
+XRb2 ( b 0 ) dumb_resistor r=r
 Cin ( b in )  1.u
 Cout ( c out )  1.u
 Rin ( in 0 )  100.K
 Rout ( out 0 )  100.K
 .ends foo
-X1 ( v_cc amp_in out )  foo  r=10k
+X1 ( v_cc amp_in out ) foo r=10k
 Rin1 ( in amp_in ) 10*(1-gain)
 Rin2 ( amp_in 0 ) 10*gain
 Vcc ( v_cc 0 )  DC  20.

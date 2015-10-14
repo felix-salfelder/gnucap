@@ -9,8 +9,8 @@ R3 ( 4 3 )  2.Meg
 R4 ( 4 out )  50.K
 R5 ( 2 0 )  500.K
 R6 ( 3 0 )  500.K
-MN1 ( 1 2 0 0 )  nmos  l=8u w=NA( 100.u)
-MN2 ( out 3 0 0 )  nmos  l=8u w=NA( 100.u)
+MN1 ( 1 2 0 0 ) nmos l=8u w=NA( 100.u)
+MN2 ( out 3 0 0 ) nmos l=8u w=NA( 100.u)
 .model nmos nmos1 ( level=1 lambda=3e-2 tox=8n nsub=2.5e17 nss=NA( 0.) uo=NA( 600.) tpg=1 tnom=NA( 27.) fc=NA( 0.5) pb=0.7256 cj=1e-3 mj=0.315 cjsw=4.054e-10 mjsw=0.2313 is=1E-21 cbd=1f cgso=0.3n cgdo=0.3n cgbo=NA( 0.) ld=NA( 0.))
 #           v(1)       v(2)       v(3)       v(4)       v(out)    
  0.         0.064086   1.         25.p       5.         5.        
