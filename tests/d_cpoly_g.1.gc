@@ -1,10 +1,11 @@
+load d_gpolyk_wrap.so
 verilog
 
-cpoly_g #(.nports(2),.c(0,1,0))   id(1,0,c1,0);
-cpoly_g #(.nports(2),.c(0,0,1))   square(1,0,c1,0);
-cpoly_g #(.nports(3),.c(0,0,0,0,1)) mul(1,0,c1,0,c2,0);
-cpoly_g #(.nports(3),.c(0,1,0,0,0)) p1(1,0,c1,0,c2,0);
-cpoly_g #(.nports(3),.c(0,0,1,0,0)) p2(1,0,c1,0,c2,0);
+h_poly_k #(.nports(2),.c(0,1,0))     id(1,0,c1,0);
+h_poly_k #(.nports(2),.c(0,0,1))     square(1,0,c1,0);
+h_poly_k #(.nports(3),.c(0,0,0,0,1)) mul(1,0,c1,0,c2,0);
+h_poly_k #(.nports(3),.c(0,1,0,0,0)) p1(1,0,c1,0,c2,0);
+h_poly_k #(.nports(3),.c(0,0,1,0,0)) p2(1,0,c1,0,c2,0);
 
 list
 spice

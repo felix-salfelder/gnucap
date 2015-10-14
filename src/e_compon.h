@@ -131,7 +131,7 @@ public:
   virtual void	ac_eval(ELEMENT*)const;
   virtual TIME_PAIR tr_review(COMPONENT*)const {return TIME_PAIR(NEVER,NEVER);}
   virtual void  tr_accept(COMPONENT*)const {}
-  virtual bool	has_tr_eval()const	{untested0( name().c_str() ); return false;}
+  virtual bool	has_tr_eval()const	{untested(); return false;}
   virtual bool	has_ac_eval()const	{untested(); return false;}
   virtual void  set_ic(double){ error(bWARNING, "set_ic not implemented for %s\n", typeid(*this).name()); }
   virtual double* set__ic() { return NULL; }

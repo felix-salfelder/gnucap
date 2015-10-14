@@ -789,6 +789,7 @@ class PARAMETER<std::vector<PARAMETER<T> > > : public PARA_BASE{
     void	operator=(const std::string& s);
     void	operator=(const PARAMETER<std::vector<PARAMETER<T> > >& p)	{_v = p._v; _s = p._s;}
     void	operator=(const std::vector<PARAMETER<T> >& v)		{_v = v; _s = "#";}
+    bool operator==(const PARAMETER<std::vector<PARAMETER<double> > >& p)const;
     std::vector<PARAMETER<T> >	e_val(const std::vector<PARAMETER<T> >& def,
         const CARD_LIST* scope)const;
     std::string to_string(std::vector< PARAMETER<T> > n) const;

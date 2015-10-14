@@ -821,9 +821,9 @@ void ELEMENT::set_param_by_name(string Name, string Value)
 /*--------------------------------------------------------------------------*/
 string ELEMENT::dev_type()const
 {
-  if (common()) {
+  if (common()) { untested();
     return common()->modelname();
-  }else{
+  }else{ untested();
     return element_type();
   }
 }

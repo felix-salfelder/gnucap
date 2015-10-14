@@ -583,15 +583,15 @@ void COMPONENT::set_port_to_ground(uint_t num)
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
   trace1("COMPONENT::set_dev_type", new_type);
-  if (common()) {
-    if (new_type != dev_type()) {
+  if (common()) { untested();
+    if (new_type != dev_type()) { untested();
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
       c->set_modelname(new_type);
       attach_common(c);
     }else{
     }
-  }else{
+  }else{ untested();
     CARD::set_dev_type(new_type);
   }
 }

@@ -29,33 +29,119 @@
  * node[2] up are inputs.
  * node[2*i] and node[2*i+1] correspond to val[i+1]
  */
-//testing=script 2006.07.17
+#include <vector>
+#include "u_parameter.h"
+/*--------------------------------------------------------------------------*/
 #include "e_elemnt.h"
 #include "m_mvpoly.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+class COMMON_G_POLY_K : public EVAL_BM_ACTION_BASE {
+public:
+  explicit COMMON_G_POLY_K(int x) :
+    EVAL_BM_ACTION_BASE(x),
+    _poly(NULL),
+    _n_ports(0)
+  {}
+  COMMON_G_POLY_K(const COMMON_G_POLY_K& p) :
+    EVAL_BM_ACTION_BASE(p),
+    _coeffs(p._coeffs),
+    _poly(NULL),
+    _n_ports(p._n_ports)
+  {}
+  COMMON_COMPONENT* clone()const{return new COMMON_G_POLY_K(*this);}
+  bool operator==(const COMMON_COMPONENT&x)const { untested();
+    const COMMON_G_POLY_K* p = dynamic_cast<const COMMON_G_POLY_K*>(&x);
+    bool rv = p
+      && _n_ports == p->_n_ports
+      && _coeffs == p->_coeffs
+      && EVAL_BM_ACTION_BASE::operator==(x);
+    return rv;
+  }
+
+  bool use_obsolete_callback_parse()const {return false;}
+  bool use_obsolete_callback_print()const {return false;}
+  bool has_parse_params_obsolete_callback()const {return false;}
+  std::string name()const{untested(); return "poly_k";}
+  bool has_tr_eval()const{return true;}
+  bool ac_too()const {untested();return false;}
+  void set_param_by_name(std::string Name, std::string Value)
+  { untested();
+    if (Umatch(Name, "c{oeffs} ")) { untested();
+      _coeffs = Value;
+    }else{
+      EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+    }
+  }
+  void set_param_by_index(int i, std::string& s, int)
+  { untested();
+//    unsigned i = COMMON_G_POLY_K::param_count() - 1 - I;
+    if(i < int(_coeff.size())) {
+      //ok.
+    }else{
+      _coeff.resize(i+1);
+    }
+    _coeff[i] = s;
+  }
+  void set_nports(unsigned n_ports)
+  {
+    _n_ports = n_ports;
+  }
+
+  void precalc_first(const CARD_LIST* scope)
+  { untested();
+    trace2("COMMON_G_POLY_K::precfirst", _coeffs, _n_ports);
+    _coeffs.e_val(vector<PARAMETER<double> >(), scope);
+    if(_coeffs.has_hard_value()){ untested();
+    }else if(_coeff.size()==0){ untested();
+    }else if(_coeff[0].has_hard_value()){ untested();
+      _coeffs = _coeff;
+    }
+    if(_poly){ untested();
+    }else{untested();
+      _poly = new MV_POLY<double>(vector<PARAMETER<double> >(_coeffs), _n_ports-1);
+    }
+  }
+  void precalc_last(const CARD_LIST* scope)
+  { untested();
+    _coeffs.e_val(vector<PARAMETER<double> >(), scope);
+    if(_poly){ untested();
+    }else{untested();
+      _poly = new MV_POLY<double>(vector<PARAMETER<double> >(_coeffs), _n_ports-1);
+    }
+  }
+  void tr_eval(ELEMENT* e) const;
+private:
+  PARAMETER<vector<PARAMETER<double> > > _coeffs;
+  vector<PARAMETER<double> > _coeff; // one by one...
+  MV_POLY<double>* _poly;
+  unsigned _n_ports;
+};
+/*--------------------------------------------------------------------------*/
 class DEV_CPOLY_G : public ELEMENT {
+  friend class COMMON_G_POLY_K;
 protected:
   hp_float_t*  _values;
   hp_float_t*  _old_values;
   uint_t       _n_ports;
   double   _time;
-  PARAMETER<vector<PARAMETER<double> > > _coeffs;
   const double** _inputs;
 protected:
   explicit DEV_CPOLY_G(const DEV_CPOLY_G& p);
 public:
+  explicit DEV_CPOLY_G(COMMON_COMPONENT* c);
   explicit DEV_CPOLY_G();
   ~DEV_CPOLY_G();
 protected: // override virtual
   char	   id_letter()const	{unreachable(); return '\0';}
-  std::string value_name()const	{incomplete(); return "";}
-  std::string dev_type()const	{untested(); return "cpoly_g";}
-  uint_t	   max_nodes()const	{return net_nodes();}
+  std::string value_name()const	{return "p0";}
+//  std::string dev_type()const	{untested(); return "cpoly_g";}
+  uint_t	   max_nodes()const	{return 99; /*incomplete*/}
   uint_t	   min_nodes()const	{return net_nodes();}
   uint_t	   matrix_nodes()const	{return _n_ports*2;}
-  uint_t	   net_nodes()const	{return _n_ports*2;}
+  uint_t	   net_nodes()const	{untested(); return _net_nodes;}
+  uint_t	   ext_nodes()const	{return net_nodes();}
   CARD*	   clone()const		{return new DEV_CPOLY_G(*this);}
   void	   tr_iwant_matrix()	{tr_iwant_matrix_extended();}
   bool	   do_tr();
@@ -86,14 +172,31 @@ public:
 		      uint_t state_count, hp_float_t state[],
 		      uint_t node_count, const node_t nodes[]);
   //		      const double* inputs[]=0);
+  void set_param_by_index(int, std::string&, int);
   void set_param_by_name(const std::string, const std::string);
   void expand();
   void precalc_last();
 protected:
   bool do_tr_con_chk_and_q();
-private:
-  MV_POLY<double>* _poly;
 };
+/*--------------------------------------------------------------------------*/
+void COMMON_G_POLY_K::tr_eval(ELEMENT* e) const
+{
+  DEV_CPOLY_G* d = prechecked_cast<DEV_CPOLY_G*>(e);
+  for(unsigned i=2; i<=_n_ports; ++i) { itested();
+    d->_values[i] = dn_diff(d->n_(2*i-2).v0(),d->n_(2*i-1).v0());
+  }
+  trace2("b4", d->_values[2], d->_values[3]);
+  d->_values[1] = _poly->eval(d->_values+2);
+  trace1("evald", d->_values[1]);
+  trace2("deriv", d->_values[2], d->_values[3]);
+
+  for(unsigned i=2; i<=_n_ports; ++i) { itested();
+    d->_values[1] -= dn_diff(d->n_(2*i-2).v0(),d->n_(2*i-1).v0()) * d->_values[i];
+  }
+
+  trace3("after", d->_values[0], d->_values[1], d->_values[2]);
+}
 /*--------------------------------------------------------------------------*/
 #if 0
 class DEV_FPOLY_G : public DEV_CPOLY_G {
@@ -117,8 +220,7 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
    _old_values(NULL),
    _n_ports(p._n_ports),
    _time(NOT_VALID),
-   _inputs(NULL),
-   _poly(NULL)
+   _inputs(NULL)
 {
   // not really a copy .. only valid to copy a default
   // too lazy to do it right, and that's all that is being used
@@ -136,9 +238,19 @@ DEV_CPOLY_G::DEV_CPOLY_G()
    _old_values(NULL),
    _n_ports(0),
    _time(NOT_VALID),
-   _inputs(NULL),
-   _poly(NULL)
+   _inputs(NULL)
 {
+}
+/*--------------------------------------------------------------------------*/
+DEV_CPOLY_G::DEV_CPOLY_G(COMMON_COMPONENT* c)
+  :ELEMENT(),
+   _values(NULL),
+   _old_values(NULL),
+   _n_ports(0),
+   _time(NOT_VALID),
+   _inputs(NULL)
+{ untested();
+  attach_common(c);
 }
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_G::~DEV_CPOLY_G()
@@ -166,20 +278,10 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_G::do_tr()
 {
-  if(_poly){ // move to common
-    for(unsigned i=2; i<=_n_ports; ++i) { itested();
-      _values[i] = dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0());
-    }
-    trace2("b4", _values[2], _values[3]);
-    _values[1] = _poly->eval(_values+2);
-    trace1("evald", _values[1]);
-    trace2("deriv", _values[2], _values[3]);
-
-    for(unsigned i=2; i<=_n_ports; ++i) { itested();
-      _values[1] -= dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _values[i];
-    }
-
-    trace3("after", _values[0], _values[1], _values[2]);
+  if (using_tr_eval()) { untested();
+    assert(dynamic_cast<COMMON_G_POLY_K const*>(common())); // for now.
+    tr_eval();
+  }else{ untested();
   }
   assert(_values);
   _m0 = CPOLY1(0., _values[0], _values[1]);
@@ -269,10 +371,10 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
     assert(!_old_values);
     _old_values = new hp_float_t[n_states];
 
-    if (net_nodes() > NODES_PER_BRANCH) {
-      trace1("DEV_CPOLY_G::set_parameters", net_nodes());
+    if (matrix_nodes() > NODES_PER_BRANCH) {
+      trace1("DEV_CPOLY_G::set_parameters, more nodes", matrix_nodes());
       // allocate a bigger node list
-      _n = new node_t[net_nodes()];
+      _n = new node_t[matrix_nodes()];
     }else{
       // use the default node list, already set
     }      
@@ -292,25 +394,77 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
+void DEV_CPOLY_G::set_param_by_index(int pos, std::string& Value, int slot)
+{
+  trace2("DEV_CPOLY_G::set_param_by_index", pos, Value);
+  if (common()){ untested();
+    COMMON_COMPONENT* m = common()->clone();
+    try{ untested();
+      unsigned count=0; // incomplete;
+      m->set_param_by_index(pos+count, Value, slot);
+    }catch(...){ untested();
+      delete m;
+      throw;
+    }
+    attach_common(m);
+
+  }else{ incomplete();
+  }
+}
+/*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
 {
-  if (Umatch(Name, "nports ")) {
+  bool retry = false;
+  if (!common()){ incomplete();
+  }else if (Umatch(Name, "p0 ")) {
+    incomplete();
+  }else if (Umatch(Name, "nports ")) {
     if(_n_ports){ untested();
       throw Exception("only one nports allowed right now.");
     }
     _n_ports = atoi(Value.c_str());
-    if (net_nodes() > NODES_PER_BRANCH) { untested();
+    if (matrix_nodes() > NODES_PER_BRANCH) { untested();
       // allocate a bigger node list
-      _n = new node_t[net_nodes()];
+      trace3("DEV_CPOLY_G more nodes", long_label(), matrix_nodes(), Value);
+      _n = new node_t[matrix_nodes()];
     }else{ untested();
+      trace3("DEV_CPOLY_G enough nodes", long_label(), matrix_nodes(), NODES_PER_BRANCH);
       // use the default node list, already set
     }
+
+    // HACK
+    assert(common());
+    COMMON_COMPONENT* m = common()->clone();
+    assert(m);
+    COMMON_G_POLY_K* p = dynamic_cast<COMMON_G_POLY_K*>(m);
+    assert(p);
+    p->set_nports(_n_ports);
+    attach_common(p);
+    _values = new double[_n_ports*2];
+    _values[0] = 0;
+    _old_values = new double[_n_ports*2];
   }else if (Umatch(Name, "c{oeffs} ")) { untested();
-    _coeffs = Value;
+    assert(common());
+    COMMON_COMPONENT* m = common()->clone();
+    try{ untested();
+      m->set_param_by_name(Name,Value);
+    }catch(Exception){untested();
+      retry = true;
+      delete m;
+      m = NULL;
+    }
+    if(m){ untested();
+      attach_common(m);
+    }else{ untested();
+    }
   }else{
-    ELEMENT::set_param_by_name(Name, Value);
+   retry = true;
   }
 
+  if(retry){ untested();
+    ELEMENT::set_param_by_name(Name, Value);
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand()
@@ -330,20 +484,20 @@ void DEV_CPOLY_G::precalc_last()
     // hack: done by set_parameters
     // move to common somehow
   }else{ untested();
-    _coeffs.e_val(vector<PARAMETER<double> >(), scope());
-    if(_poly){ untested();
-    }else{untested();
-      _poly = new MV_POLY<double>(vector<PARAMETER<double> >(_coeffs), _n_ports-1);
-      _values = new double[_n_ports*2];
-      _values[0] = 0;
-      _old_values = new double[_n_ports*2];
-    }
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// raw device. used by modelgen
 DEV_CPOLY_G p4;
 DISPATCHER<CARD>::INSTALL d4(&device_dispatcher, "cpoly_g", &p4);
+
+COMMON_G_POLY_K poly(CC_STATIC);
+DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher, "poly_k", &poly);
+
+// not required, maybe. using bm_wrapper
+// DEV_CPOLY_G p5(&poly);
+// DISPATCHER<CARD>::INSTALL d5(&device_dispatcher, "g_poly_k", &p5);
 }
 /*--------------------------------------------------------------------------*/
 // hack: put it here, for now.
