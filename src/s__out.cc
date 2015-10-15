@@ -53,7 +53,7 @@ const PROBELIST& SIM::storelist()const
 void SIM::expect_results(double t){
   CS* c = _sim->expect_file();
 
-  vector<double> last_raw(_sim->_expect_raw);
+  std::vector<double> last_raw(_sim->_expect_raw);
 
   if (!c) return;
   trace2("SIM::expect_results",t,  c->fullstring() );

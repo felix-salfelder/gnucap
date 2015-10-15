@@ -271,7 +271,7 @@ public:
   void invalidate_tt();
   void force_tt_order(uint_t i){_tt_order = i;}
   unsigned total_outsteps()const;
-  vector<double>_expect_raw;
+  std::vector<double>_expect_raw;
 
   public:
   void expect(CS* x){ assert (!_expect_file); _expect_file = x; }
