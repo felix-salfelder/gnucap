@@ -63,9 +63,7 @@ enum {
   OUT2 = 1,
   IN1 = 2,
   IN2 = 3,
-  IN3,
-  IN4,
-  NODES_PER_BRANCH = 6
+  NODES_PER_BRANCH = 4
 };
 #define INVALID_NODE uint_t(-1)
 #define	qBAD	 (0)
