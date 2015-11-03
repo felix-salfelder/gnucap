@@ -42,14 +42,24 @@ public:
   explicit COMMON_G_POLY_K(int x) :
     EVAL_BM_ACTION_BASE(x),
     _poly(NULL),
-    _n_ports(0)
-  {}
+    _n_ports(0),
+    _minnodes(2),
+    _maxnodes(4)
+  {
+    // set_modelname("poly");
+  }
   COMMON_G_POLY_K(const COMMON_G_POLY_K& p) :
     EVAL_BM_ACTION_BASE(p),
     _coeffs(p._coeffs),
+    _coeff(p._coeff),
     _poly(NULL),
-    _n_ports(p._n_ports)
-  {}
+    _n_ports(p._n_ports),
+    _minnodes(p._minnodes),
+    _maxnodes(p._maxnodes)
+  {
+    trace1("copy. coeffs", _coeffs);
+    trace1("copy. coeff", _coeff);
+  }
   COMMON_COMPONENT* clone()const{return new COMMON_G_POLY_K(*this);}
   bool operator==(const COMMON_COMPONENT&x)const { untested();
     const COMMON_G_POLY_K* p = dynamic_cast<const COMMON_G_POLY_K*>(&x);
@@ -60,18 +70,37 @@ public:
     return rv;
   }
 
+  int param_count()const {return 1 + EVAL_BM_ACTION_BASE::param_count(); }
+  void parse_type_tail(CS&);
   bool use_obsolete_callback_parse()const {return false;}
   bool use_obsolete_callback_print()const {return false;}
   bool has_parse_params_obsolete_callback()const {return false;}
-  std::string name()const{untested(); return "poly_k";}
+  std::string name()const
+  { untested();
+    if(_n_ports){
+      return "poly(" + to_string(_n_ports-1) + ")";
+    }else{
+      return "poly";
+    }
+  }
   bool has_tr_eval()const{return true;}
   bool ac_too()const {untested();return false;}
   void set_param_by_name(std::string Name, std::string Value)
   { untested();
+    trace2("", Name, Value);
     if (Umatch(Name, "c{oeffs} ")) { untested();
       _coeffs = Value;
-    }else{
+      trace1("coeffs", _coeffs);
+    }else{ untested();
       EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+    }
+  }
+  std::string param_name(int i, int j)const{return j?"":param_name(i); }
+  std::string param_name(int i)const
+  {
+    switch (COMMON_G_POLY_K::param_count() - 1 - i) {
+      case 0: return "coeffs";
+      default: return EVAL_BM_ACTION_BASE::param_name(i);
     }
   }
   void set_param_by_index(int i, std::string& s, int)
@@ -84,22 +113,42 @@ public:
     }
     _coeff[i] = s;
   }
+  bool param_is_printable(int i)const
+  {
+    switch (COMMON_G_POLY_K::param_count() - 1 - i) {
+      case 0: return true;
+      default: return EVAL_BM_ACTION_BASE::param_is_printable(i);
+    }
+  }
+  std::string param_value(int i)const
+  {
+    switch (COMMON_G_POLY_K::param_count() - 1 - i) {
+      case 0: return _coeffs.string();
+      default: return EVAL_BM_ACTION_BASE::param_value(i);
+    }
+  }
   void set_nports(unsigned n_ports)
   {
     _n_ports = n_ports;
+    _maxnodes = 2*n_ports;
+    _minnodes = 2*n_ports;
   }
 
   void precalc_first(const CARD_LIST* scope)
   { untested();
-    trace2("COMMON_G_POLY_K::precfirst", _coeffs, _n_ports);
+    trace3("COMMON_G_POLY_K::precfirst", _coeffs, _n_ports, hp(this));
     _coeffs.e_val(vector<PARAMETER<double> >(), scope);
+    trace2("COMMON_G_POLY_K::precfirst", _coeffs, _n_ports);
     if(_coeffs.has_hard_value()){ untested();
     }else if(_coeff.size()==0){ untested();
     }else if(_coeff[0].has_hard_value()){ untested();
       _coeffs = _coeff;
+      _coeffs.e_val(vector<PARAMETER<double> >(), scope);
     }
     if(_poly){ untested();
+    }else if(_n_ports<2){ untested();
     }else{untested();
+      trace2("COMMON_G_POLY_K::new poly", _coeffs, _n_ports);
       _poly = new MV_POLY<double>(vector<PARAMETER<double> >(_coeffs), _n_ports-1);
     }
   }
@@ -117,7 +166,27 @@ private:
   vector<PARAMETER<double> > _coeff; // one by one...
   MV_POLY<double>* _poly;
   unsigned _n_ports;
+public: // HACK?
+  unsigned _minnodes;
+  unsigned _maxnodes;
 };
+/*--------------------------------------------------------------------------*/
+void COMMON_G_POLY_K::parse_type_tail(CS& cmd)
+{
+  assert(0); // unnneeded
+// BUG:  must resize _n
+  unsigned ret;
+  int paren = cmd.skip1b('(');
+  cmd >> ret;
+  paren -= cmd.skip1b(')');
+  if(paren){
+    cmd.warn(bWARNING, "need )");
+  }
+
+//  set_nports(1+ret);
+//  _maxnodes = 2*_n_ports;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class DEV_CPOLY_G : public ELEMENT {
   friend class COMMON_G_POLY_K;
@@ -134,14 +203,16 @@ public:
   explicit DEV_CPOLY_G();
   ~DEV_CPOLY_G();
 protected: // override virtual
-  char	   id_letter()const	{unreachable(); return '\0';}
+  char id_letter()const	{return 'G';}
+  bool print_type_in_spice()const {untested(); return false;}
   std::string value_name()const	{return "p0";}
-//  std::string dev_type()const	{untested(); return "cpoly_g";}
-  uint_t	   max_nodes()const	{return 99; /*incomplete*/}
-  uint_t	   min_nodes()const	{return net_nodes();}
-  uint_t	   matrix_nodes()const	{return _n_ports*2;}
-  uint_t	   net_nodes()const	{untested(); return _net_nodes;}
+//  std::string dev_type()const; // element
+  uint_t	   max_nodes()const;
+  uint_t	   min_nodes()const;
+  uint_t	   matrix_nodes()const	{return net_nodes();}
+  uint_t	   net_nodes()const;
   uint_t	   ext_nodes()const	{return net_nodes();}
+  uint_t	   int_nodes()const	{return 0;}
   CARD*	   clone()const		{return new DEV_CPOLY_G(*this);}
   void	   tr_iwant_matrix()	{tr_iwant_matrix_extended();}
   bool	   do_tr();
@@ -167,11 +238,38 @@ protected: // override virtual
     }
   }
 public:
+  void set_port_by_index(uint_t num, std::string& ext_name);
+  void alloc_values();
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
 		      uint_t state_count, hp_float_t state[],
 		      uint_t node_count, const node_t nodes[]);
   //		      const double* inputs[]=0);
+  int param_count()const { return 0 + ELEMENT::param_count(); }
+  std::string param_name(int i, int)const{ return param_name(i); }
+  std::string param_name(int i)const
+  {
+    switch (DEV_CPOLY_G::param_count() - 1 - i) {
+//      case 0: return "coeffs";
+      default: return ELEMENT::param_name(i);
+    }
+  }
+//  std::string param_value(int i)const
+//  {
+//    COMMON_G_POLY_K const* p = dynamic_cast<COMMON_G_POLY_K const*>(common());
+//    assert(p);
+//    switch (DEV_CPOLY_G::param_count() - 1 - i) {
+//      case 0: return p->_coeffs.string();
+//      default: return ELEMENT::param_value(i);
+//    }
+//  }
+  bool param_is_printable(int i)const
+  {
+    switch (DEV_CPOLY_G::param_count() - 1 - i) {
+      case 0: return true;
+      default: return ELEMENT::param_is_printable(i);
+    }
+  }
   void set_param_by_index(int, std::string&, int);
   void set_param_by_name(const std::string, const std::string);
   void expand();
@@ -180,19 +278,88 @@ protected:
   bool do_tr_con_chk_and_q();
 };
 /*--------------------------------------------------------------------------*/
+uint_t DEV_CPOLY_G::net_nodes()const
+{
+  if(!common()){
+    return _n_ports*2;
+  }else{
+    assert(max_nodes()<100);
+    return max_nodes();
+  }
+}
+/*--------------------------------------------------------------------------*/
+uint_t DEV_CPOLY_G::min_nodes()const
+{
+  if(!common()){
+    return net_nodes();
+  }else if (COMMON_G_POLY_K const* p=dynamic_cast<COMMON_G_POLY_K const*>(common())){
+    // not necessary...
+    return p->_minnodes;
+  }else{
+    assert(max_nodes()<100);
+    return max_nodes();
+  }
+}
+/*--------------------------------------------------------------------------*/
+uint_t DEV_CPOLY_G::max_nodes() const
+{
+  // various cases
+  //
+  // Gfoo 1 2 poly(k) n1....n2k p0...p
+  // need (should use?) max_nodes to find p0 (?)
+  //
+  // Gfoo ( 1 2 n1 n2k ) poly(k) p0...p
+  // need max_nodes >> 1, check later
+  //
+  // g_poly_k #(.nports(3),.c(0,0,1,0,0)) p3( ... )
+  // nports sets max_nodes
+  //
+  if(!common()){
+  // modelgen: no common here, max_nodes() == net_nodes()
+    return net_nodes();
+  }else if (COMMON_G_POLY_K const* p=dynamic_cast<COMMON_G_POLY_K const*>(common())){
+    return p->_maxnodes;
+  }else{
+    return 4;
+  }
+}
+/*--------------------------------------------------------------------------*/
+//std::string DEV_CPOLY_G::dev_type()const
+//{
+//  if(common()){ untested();
+//    return common()->modelname();
+//  }else{ untested();
+//    return "cpoly_g";
+//  }
+//}
+/*--------------------------------------------------------------------------*/
+void DEV_CPOLY_G::set_port_by_index(uint_t num, std::string& ext_name)
+{
+  trace3("DEV_CPOLY_G::set_port_by_index", num, ext_name, max_nodes());
+  if (num < max_nodes()) {
+    _n[num].new_node(ext_name, this);
+    if (num+1 > _net_nodes) {
+      _net_nodes = num+1;
+    }else{
+      // it's already big enough, probably assigning out of order
+    }
+  }else{
+    throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void COMMON_G_POLY_K::tr_eval(ELEMENT* e) const
 {
   DEV_CPOLY_G* d = prechecked_cast<DEV_CPOLY_G*>(e);
-  for(unsigned i=2; i<=_n_ports; ++i) { itested();
-    d->_values[i] = dn_diff(d->n_(2*i-2).v0(),d->n_(2*i-1).v0());
-  }
+  trace3("COMMON_G_POLY_K::tr_eval", e->long_label(), _n_ports, d->net_nodes());
   trace2("b4", d->_values[2], d->_values[3]);
-  d->_values[1] = _poly->eval(d->_values+2);
+  d->_values[0] = _poly->eval(d->_values+2);
   trace1("evald", d->_values[1]);
   trace2("deriv", d->_values[2], d->_values[3]);
 
+  // bool DEV_FPOLY_G::do_tr()?
   for(unsigned i=2; i<=_n_ports; ++i) { itested();
-    d->_values[1] -= dn_diff(d->n_(2*i-2).v0(),d->n_(2*i-1).v0()) * d->_values[i];
+    d->_values[0] -= dn_diff(d->n_(2*i-2).v0(),d->n_(2*i-1).v0()) * d->_values[i];
   }
 
   trace3("after", d->_values[0], d->_values[1], d->_values[2]);
@@ -221,15 +388,19 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
    _n_ports(p._n_ports),
    _time(NOT_VALID),
    _inputs(NULL)
-{
-  // not really a copy .. only valid to copy a default
-  // too lazy to do it right, and that's all that is being used
-  // to do it correctly requires a deep copy
-  // just filling in defaults is better than a shallow copy, hence this:
+{ untested();
   assert(!p._values);
   assert(!p._old_values);
   assert(p._n_ports == 0);
   assert(!p._inputs);
+
+  if (p.net_nodes() > NODES_PER_BRANCH) { untested();
+    _n = new node_t[net_nodes()];
+
+    for (uint_t ii = 0; ii<net_nodes(); ++ii) { untested();
+      _n[ii] = p._n[ii];
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_G::DEV_CPOLY_G()
@@ -257,7 +428,8 @@ DEV_CPOLY_G::~DEV_CPOLY_G()
 {
   delete [] _old_values;
   if (net_nodes() > NODES_PER_BRANCH) {
-    delete [] _n;
+    // delete [] _n;
+    incomplete();
   }else{
     // it is part of a base class
   }
@@ -278,10 +450,15 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
 /*--------------------------------------------------------------------------*/
 bool DEV_CPOLY_G::do_tr()
 {
-  if (using_tr_eval()) { untested();
+  trace3("DEV_CPOLY_G::do_tr", long_label(), _n_ports, hp(&n_(0)));
+  if (using_tr_eval()) { itested();
+    for(unsigned i=2; i<=_n_ports; ++i) { itested();
+      trace2("", long_label(), i);
+      _values[i] = dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0());
+    }
     assert(dynamic_cast<COMMON_G_POLY_K const*>(common())); // for now.
     tr_eval();
-  }else{ untested();
+  }else{ itested();
   }
   assert(_values);
   _m0 = CPOLY1(0., _values[0], _values[1]);
@@ -315,10 +492,12 @@ bool DEV_FPOLY_G::do_tr()
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::tr_load()
 {
+  trace3("tr_load", long_label(),_values[0], _values[1]);
   tr_load_passive();
   _old_values[0] = _values[0];
   _old_values[1] = _values[1];
   for (uint_t i=2; i<=_n_ports; ++i) {
+    trace4("tr_load", i, _values[i], _n[2*i-2].v0(), _n[2*i-1].v0());
     tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_values[i]), &(_old_values[i]));
   }
 }
@@ -366,6 +545,7 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
 
   if (first_time) {
     _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
+    _net_nodes = n_nodes;
     assert(_n_ports+1 == n_states);
 
     assert(!_old_values);
@@ -390,8 +570,8 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
   _values = states;
   std::fill_n(_values, n_states, 0.);
   std::fill_n(_old_values, n_states, 0.);
-  notstd::copy_n(nodes, net_nodes(), _n); // copy to _n
-  assert(net_nodes() == _n_ports * 2);
+  notstd::copy_n(nodes, matrix_nodes(), _n); // copy to _n
+  assert(matrix_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::set_param_by_index(int pos, std::string& Value, int slot)
@@ -412,38 +592,60 @@ void DEV_CPOLY_G::set_param_by_index(int pos, std::string& Value, int slot)
   }
 }
 /*--------------------------------------------------------------------------*/
-void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
+void DEV_CPOLY_G::alloc_values()
 {
+//  assert(common());
+//  COMMON_G_POLY_K const* p = dynamic_cast<COMMON_G_POLY_K const*>(common());
+//  assert(p);
+//  _n_ports = p->_maxnodes/2;
+//  trace3("alloc_values", long_label(), _n_ports, matrix_nodes());
+//  assert(matrix_nodes() == _n_ports*2);
+  _values = new double[matrix_nodes()];
+  _values[0] = 0;
+  _values[1] = 0; // self admittance
+  _old_values = new double[matrix_nodes()];
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
+{ untested();
   bool retry = false;
   if (!common()){ incomplete();
   }else if (Umatch(Name, "p0 ")) {
     incomplete();
-  }else if (Umatch(Name, "nports ")) {
+  }else if (Umatch(Name, "bmarg|nports")) {
     if(_n_ports){ untested();
       throw Exception("only one nports allowed right now.");
     }
-    _n_ports = atoi(Value.c_str());
-    if (matrix_nodes() > NODES_PER_BRANCH) { untested();
-      // allocate a bigger node list
-      trace3("DEV_CPOLY_G more nodes", long_label(), matrix_nodes(), Value);
-      _n = new node_t[matrix_nodes()];
-    }else{ untested();
-      trace3("DEV_CPOLY_G enough nodes", long_label(), matrix_nodes(), NODES_PER_BRANCH);
-      // use the default node list, already set
-    }
+    _n_ports = atoi(Value.c_str()) + 1;
 
     // HACK
-    assert(common());
     COMMON_COMPONENT* m = common()->clone();
     assert(m);
     COMMON_G_POLY_K* p = dynamic_cast<COMMON_G_POLY_K*>(m);
     assert(p);
     p->set_nports(_n_ports);
+    // m->set_param_by_name("nports",_n_ports);
     attach_common(p);
-    _values = new double[_n_ports*2];
-    _values[0] = 0;
-    _old_values = new double[_n_ports*2];
+
+    if (max_nodes() > NODES_PER_BRANCH) { untested();
+      // allocate a bigger node list
+      trace3("DEV_CPOLY_G more nodes", long_label(), max_nodes(), Value);
+      node_t* oldn = _n;
+      _n = new node_t[max_nodes()];
+      for (uint_t ii = 0; ii<NODES_PER_BRANCH; ++ii) { untested();
+	_n[ii] = oldn[ii];
+      }
+
+    }else{ untested();
+      trace3("DEV_CPOLY_G enough nodes", long_label(), max_nodes(), NODES_PER_BRANCH);
+      // use the default node list, already set
+    }
+
+
+    // HACK
+    alloc_values();
   }else if (Umatch(Name, "c{oeffs} ")) { untested();
+    // HACK. try all names.
     assert(common());
     COMMON_COMPONENT* m = common()->clone();
     try{ untested();
@@ -455,6 +657,7 @@ void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
     }
     if(m){ untested();
       attach_common(m);
+      trace2("coeffs attached", common()->param_value(m->param_count()-1), hp(common()));
     }else{ untested();
     }
   }else{
@@ -480,10 +683,11 @@ void DEV_CPOLY_G::precalc_last()
 {
   trace3("DEV_CPOLY_G::precalc_last", long_label(), net_nodes(), matrix_nodes());
 
-  if(_values){ untested();
+  if(_values){ itested();
     // hack: done by set_parameters
     // move to common somehow
   }else{ untested();
+    alloc_values();
   }
 }
 /*--------------------------------------------------------------------------*/

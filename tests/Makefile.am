@@ -83,6 +83,7 @@ CKT_TESTS = \
     bmm_res.4p.sh \
     bmm_res.5.sh \
     bmm_res.5p.sh \
+    bm_poly.0.sh \
     bm_poly.1.sh \
     bm_poly.2.sh \
     bm_posy.1.sh \
@@ -625,6 +626,8 @@ GC_TESTS = \
     d_coil.brl.3.gc \
     d_cpoly_g.1.gc \
     d_cpoly_g.2.gc \
+    d_cpoly_g.3.gc \
+    d_cpoly_g.4.gc \
     d_hci.1.gc \
     d_hci.2.gc \
     d_hci.3.gc \
