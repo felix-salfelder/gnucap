@@ -127,14 +127,14 @@ bool EVAL_BM_SIN::operator==(const COMMON_COMPONENT& x)const
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_SIN::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
+{ untested();
   assert(lang);
   o << name();
   print_pair(o, lang, "offset",	   _offset);
   print_pair(o, lang, "amplitude", _amplitude);
   print_pair(o, lang, "frequency", _frequency);
-  print_pair(o, lang, "delay",     _delay);
-  print_pair(o, lang, "damping",   _damping);
+  print_pair(o, lang, "delay",     _delay,   _delay.has_hard_value());
+  print_pair(o, lang, "damping",   _damping, _damping.has_hard_value());
   print_pair(o, lang, "samples",   _samples, _samples.has_hard_value());
   print_pair(o, lang, "zero",      _zero,    _zero.has_hard_value());
   print_pair(o, lang, "peak",      _peak,    _peak.has_hard_value());
