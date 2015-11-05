@@ -1104,7 +1104,7 @@ bool DEV_BUILT_IN_RCD::tr_needs_eval()const
 long double MODEL_BUILT_IN_RCD::__step(long double s, long double cur, double deltat, const COMMON_COMPONENT* c ) const
 {
 //  trace3("MODEL_BUILT_IN_RCD::__step", s, cur, deltat);
-  assert(deltat>=0);
+  assert(deltat>=0.);
   assert(is_number(s));
   assert(is_number(cur));
   assert(cur>-.1 && cur <1.1);
@@ -1176,9 +1176,9 @@ long double DEV_BUILT_IN_RCD::extrapolate(const double* tr0)const
   }else{ itested();
   }
 
-  fill_new = m->__step( eff1, fill_new, ex_time/2.0, c );
+  fill_new = m->__step( eff1, fill_new, ex_time*.5, c );
   assert(is_number(fill_new));
-  fill_new = m->__step( eff2, fill_new, ex_time/2.0, c );
+  fill_new = m->__step( eff2, fill_new, ex_time*.5, c );
   assert(is_number(fill_new));
   assert(1.01 > fill_new && fill_new > -.01);
 
@@ -1300,11 +1300,13 @@ void DEV_BUILT_IN_RCD::tr_advance()
   double stress = involts() * value();
   _time1 = _time0;
   double _dt = _sim->_time0 - _time1;
-  if(_dt < 0){ // BUG in tr_begin?. tt_advance?. should not be here
+  if(_dt < 0){ unreachable();
+    // BUG in tr_begin?. tt_advance?. should not be here
     _dt = 0.;
   }
   _time0 = _sim->_time0;
   long double newtrhack;
+  assert(_dt>=0.);
   if(_dt){
     trace3("??", _dt, stress, long_label());
     newtrhack = m->__step( stress, a->tt() + _tr_dfill + c->_zero, _dt, c ) - c->_zero;
@@ -1333,6 +1335,10 @@ void DEV_BUILT_IN_RCD::tr_regress()
   double _dt = _sim->_time0 - _time1;
   trace8("",_sim->_time0, a->trhack, a->State(), _dt, a->tr(), stress, a->tt(), _tr_dfill);
 
+  if(_dt < 0){ unreachable();
+    // BUG in tr_begin?. tt_advance?. should not be here
+    _dt = 0.;
+  }
   // predictor...
   a->trhack = double(m->__step( stress, a->tt() + _tr_dfill + c->_zero, _dt, c ) - c->_zero);
 }
