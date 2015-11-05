@@ -701,7 +701,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
   for (uint_t ii = 1;  ii < 1+num_nodes_in_subckt; ++ii) {
     map[ii] = unsigned(-1);
   }
-  set<unsigned>external; //collect numbers of external nodes
+  std::set<unsigned>external; //collect numbers of external nodes
   {
     map[0] = 0;
     // self test: verify that port node numbering is correct

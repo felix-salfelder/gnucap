@@ -1,5 +1,5 @@
 .model my_rcd rcd ( tnom=NA( 27.) anneal=NA(1) rem=NA( 1.Meg) Re=NA( 1.) Rc=NA( 1.))
-z3 ( nin 0 )  my_rcd  weight=100 rc1=-3 rc0=11 re1=10 re0=10 mu=NA( 10.u)
+z3 ( nin 0 ) my_rcd weight=100 rc1=-3 rc0=11 re1=10 re0=10 mu=NA( 10.u)
 #TTime     ueff(z3)  P(z3)    
  0.       -Inf       0.       
  10.       2.195     8.329    

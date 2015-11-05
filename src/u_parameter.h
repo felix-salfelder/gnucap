@@ -766,32 +766,33 @@ inline std::string to_string( PARAMETER<T> n) {
 #include <vector>
 #include "md.h"
 
-typedef vector<PARAMETER<double> > dpv;
-typedef vector<PARAMETER<dpv> > dpvv;
+typedef std::vector<PARAMETER<double> > dpv;
+typedef std::vector<PARAMETER<dpv> > dpvv;
 
 template <class T>
-class PARAMETER<vector<PARAMETER<T> > > : public PARA_BASE{
+class PARAMETER<std::vector<PARAMETER<T> > > : public PARA_BASE{
   private:
-    mutable vector<PARAMETER<T> > _v;
-    vector<PARAMETER<T> > _NOT_INPUT() const;
+    mutable std::vector<PARAMETER<T> > _v;
+    std::vector<PARAMETER<T> > _NOT_INPUT() const;
   public:
-    operator vector<PARAMETER<T> >()const { return _v;}
+    operator std::vector<PARAMETER<T> >()const { return _v;}
     explicit PARAMETER(T v) : PARA_BASE("#"), _v(v) {}
-    PARAMETER() : PARA_BASE(), _v(vector<PARAMETER<T> >()) {}
-    PARAMETER(const PARAMETER<vector<PARAMETER<T> > >& p) :
+    PARAMETER() : PARA_BASE(), _v(std::vector<PARAMETER<T> >()) {}
+    PARAMETER(const PARAMETER<std::vector<PARAMETER<T> > >& p) :
       PARA_BASE(p), _v(p._v){ }
 
     //		void	print(OMSTREAM& o)const		{o << string();}
     //		void	print(ostream& o)const		{o << string();}
 
     std::string string()const;
-    //vector<PARAMETER<T> >  _NOT_INPUT() const;
+    //std::vector<PARAMETER<T> >  _NOT_INPUT() const;
     void	operator=(const std::string& s);
-    void	operator=(const PARAMETER<vector<PARAMETER<T> > >& p)	{_v = p._v; _s = p._s;}
-    void	operator=(const vector<PARAMETER<T> >& v)		{_v = v; _s = "#";}
-    vector<PARAMETER<T> >	e_val(const vector<PARAMETER<T> >& def,
+    void	operator=(const PARAMETER<std::vector<PARAMETER<T> > >& p)	{_v = p._v; _s = p._s;}
+    void	operator=(const std::vector<PARAMETER<T> >& v)		{_v = v; _s = "#";}
+    bool operator==(const PARAMETER<std::vector<PARAMETER<double> > >& p)const;
+    std::vector<PARAMETER<T> >	e_val(const std::vector<PARAMETER<T> >& def,
         const CARD_LIST* scope)const;
-    std::string to_string(vector< PARAMETER<T> > n) const;
+    std::string to_string(std::vector< PARAMETER<T> > n) const;
 
     operator std::string()const;
     size_t size()const{return _v.size();}
@@ -801,15 +802,15 @@ class PARAMETER<vector<PARAMETER<T> > > : public PARA_BASE{
 };
 /*--------------------------------------------------------------------------*/
 template <class T>
-PARAMETER<vector<PARAMETER<T> > >::operator std::string()const
+PARAMETER<std::vector<PARAMETER<T> > >::operator std::string()const
 {
   return string();
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-inline std::string PARAMETER<vector<PARAMETER<T> > >::string()const{
+inline std::string PARAMETER<std::vector<PARAMETER<T> > >::string()const{
   std::string ret("");
-  if (PARAMETER<vector<PARAMETER<T> > >::_s == "#") {
+  if (PARAMETER<std::vector<PARAMETER<T> > >::_s == "#") {
     ret+= "(";
   }else if (_s == "") {
     ret+= "NA(";
@@ -827,12 +828,12 @@ inline std::string PARAMETER<vector<PARAMETER<T> > >::string()const{
 //typedef PARAMETER<double> dp;
 //============================================================
 template <class T>
-inline vector<PARAMETER<T> > PARAMETER<vector<PARAMETER<T> > >::_NOT_INPUT() const {
-  return vector<PARAMETER< T> > ();
+inline std::vector<PARAMETER<T> > PARAMETER<std::vector<PARAMETER<T> > >::_NOT_INPUT() const {
+  return std::vector<PARAMETER< T> > ();
 }
 /*--------------------------------------------------------------------------*/
 template<class T>
-void PARAMETER<vector<PARAMETER<T> > >::operator=(const std::string& s){
+void PARAMETER<std::vector<PARAMETER<T> > >::operator=(const std::string& s){
   trace1("PARAMETER dv::operator=" , s);
 
   CS cmd(CS::_STRING, s);
@@ -870,11 +871,11 @@ void PARAMETER<vector<PARAMETER<T> > >::operator=(const std::string& s){
 
 //#include "u_parameter.h"
 template<>
-inline CS&     CS::operator>>(vector<PARAMETER<vector<PARAMETER<double> > > >& x);
+inline CS&     CS::operator>>(std::vector<PARAMETER<std::vector<PARAMETER<double> > > >& x);
 //----------------------------------------------------------------
 /*--------------------------------------------------------------------------*/
   template<class T>
-inline string to_string(vector<PARAMETER<T> > n)
+inline string to_string(std::vector<PARAMETER<T> > n)
 {
 
   return n; // use operator.
@@ -918,8 +919,8 @@ inline string to_string(vector<PARAMETER<T> > n)
 //}
 /*-----------------------------------*/
 template <class T>
-inline vector<PARAMETER<T> >
-PARAMETER<vector<PARAMETER<T> > >::e_val(const vector<PARAMETER<T> >& def, const CARD_LIST* scope)const
+inline std::vector<PARAMETER<T> >
+PARAMETER<std::vector<PARAMETER<T> > >::e_val(const std::vector<PARAMETER<T> >& def, const CARD_LIST* scope)const
 {
   trace2("PARAMETER dv::e_val", _s, _v.size());
   trace1("PARAMETER dv::e_val", (std::string)(*this));
@@ -940,11 +941,11 @@ PARAMETER<vector<PARAMETER<T> > >::e_val(const vector<PARAMETER<T> >& def, const
 }
 /*--------------------------------------------------------------------------*/
 template <class S>
-inline S& operator<<( S& o, const vector<PARAMETER<double> >  &m)
+inline S& operator<<( S& o, const std::vector<PARAMETER<double> >  &m)
 {
   o << "(";
 
-  for ( vector<PARAMETER<double> >::const_iterator ci=m.begin();
+  for ( std::vector<PARAMETER<double> >::const_iterator ci=m.begin();
       ci!=m.end();)
   {
     o << " " << *(ci) << " ";

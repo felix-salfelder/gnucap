@@ -1,6 +1,6 @@
 * test poly(1) 
-V1 ( nin 0 ) sin offset=NA( 0.) amplitude= 1. frequency= 1. delay=NA( 0.) damping=NA( 0.)
-E4 ( nsk 0 nin 0 ) poly( 0.  0.  1. )
+V1 ( nin 0 ) sin offset=NA( 0.) amplitude= 1. frequency= 1.
+E4 ( nsk 0 nin 0 )  poly( 0.  0.  1. )
 #Time       v(nin)     v(nsk)    
  0.         0.         0.        
  0.05       0.30902    0.095492  

@@ -49,6 +49,7 @@ private: // override vitrual
   bool		operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_POLY(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
+// not yet  bool use_obsolete_callback_print()const {return false;}
 
   void		precalc_first(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
@@ -96,7 +97,7 @@ bool EVAL_BM_POLY::operator==(const COMMON_COMPONENT& x)const
 void EVAL_BM_POLY::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
 {
   assert(lang);
-  o << name() << '(';
+  o << ' ' << name() << '(';
   for (std::vector<PARAMETER<double> >::const_iterator
 	 p = _c.begin();  p != _c.end();  ++p) {
     o << *p << ' ';

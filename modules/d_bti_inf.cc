@@ -144,7 +144,7 @@ std::string MODEL_BUILT_IN_BTI_INF::RCD_name(uint_t i) const{
   uint_t col=0;
   uint_t pos=0;
   uint_t find=0;
-  vector<PARAMETER<double> > mat=matrix;
+  std::vector<PARAMETER<double> > mat=matrix;
 
   while( true ){
     row = pos/WS_COLS;
@@ -176,7 +176,7 @@ void MODEL_BUILT_IN_BTI_INF::attach_rcds(COMMON_BUILT_IN_RCD** _RCD) const
   uint_t row, col;
   uint_t cols = WS_COLS;
   uint_t rows = 10;
-  vector<PARAMETER<double> > mat=matrix;
+  std::vector<PARAMETER<double> > mat=matrix;
 
   long double up = pow(10, -7.5);
   double base=10;

@@ -1,5 +1,5 @@
 .model my_rcd rcd ( tnom=NA( 27.) anneal=NA(1) rem=NA( 1.Meg) Re=NA( 1.) Rc=NA( 1.))
-z3 ( nin 0 )  my_rcd  weight=1 rc1=-1 rc0=0 re1=1 re0=-1 mu=NA( 10.u)
+z3 ( nin 0 ) my_rcd weight=1 rc1=-1 rc0=0 re1=1 re0=-1 mu=NA( 10.u)
 #Time           stress(z3)     E(z3)          tau(z3)        zero(z3)       order(z3)     
  0.             0.             0.268941421    0.268941421    0.268941421    0.            
  100.E-6        0.             0.268941421    0.268941421    0.268941421    0.            

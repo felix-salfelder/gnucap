@@ -5,10 +5,10 @@ v ( p n )  DC val
 .subckt VOLTAGE_SOURCE_PULSE ( p n )
 v ( p n ) pulse iv=iv pv=pv delay=delay rise=rise fall=fall width=width period=NA( Inf)
 .ends VOLTAGE_SOURCE_PULSE
-X1 ( 1 0 )  VOLTAGE_SOURCE_PULSE  delay=1n
-X2 ( 2 0 )  VOLTAGE_SOURCE_PULSE  delay=2n
-X3 ( 3 0 )  VOLTAGE_SOURCE_CONST  val=3
-X4 ( 4 0 )  VOLTAGE_SOURCE_CONST  val=4
+X1 ( 1 0 ) VOLTAGE_SOURCE_PULSE delay=1n
+X2 ( 2 0 ) VOLTAGE_SOURCE_PULSE delay=2n
+X3 ( 3 0 ) VOLTAGE_SOURCE_CONST val=3
+X4 ( 4 0 ) VOLTAGE_SOURCE_CONST val=4
 #Time       v(1)       v(2)       v(3)       v(4)       r(X3.r)    r(X4.r)    const(X3.r) const(X3.v)
  0.         0.         0.         3.         4.         3.         4.         1.         0.        
  1.n        0.         0.         3.         4.         3.         4.         1.         0.        

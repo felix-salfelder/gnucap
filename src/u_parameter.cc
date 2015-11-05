@@ -40,6 +40,13 @@ PARAMETER<double>::PARAMETER(const PARAMETER<double>& p) :
   PARA_BASE(p), _v(p._v)
 {  }
 /*--------------------------------------------------------------------------*/
+template<>
+bool PARAMETER<std::vector<PARAMETER<double> > >::operator==(
+    const PARAMETER<std::vector<PARAMETER<double> > >& p)const
+{ untested();
+  return (_v == p._v && _s == p._s);
+}
+/*--------------------------------------------------------------------------*/
 
 //template <>
 //MODEL_BUILT_IN_BTI PARAMETER<MODEL_BUILT_IN_BTI>::_NOT_INPUT(){ return MODEL_BUILT_IN_BTI() ;}

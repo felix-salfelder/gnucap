@@ -1,0 +1,19 @@
+load d_gpolyk_wrap.so
+spice
+gadd 0 1 poly(2) c1 0 c2 0 0 1 1
+Gsquare ( 0 2 c1 0 ) poly(1) 0 0 1
+.list
+
+.verilog
+list
+spice
+
+R1 1 0 1
+R3 2 0 1
+Vc1 c1 0 1
+Vc2 c2 0 1
+
+.print dc v(vc1) v(vc2) v(nodes) i(gadd)
+.dc Vc1 0 2 1 Vc2 0 2 1
+
+.end

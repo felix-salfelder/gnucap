@@ -582,28 +582,29 @@ void COMPONENT::set_port_to_ground(uint_t num)
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
-  trace0("COMPONENT::set_dev_type " + new_type);
-  if (common()) {
-    if (new_type != dev_type()) {
+  trace1("COMPONENT::set_dev_type", new_type);
+  if (common()) { untested();
+    if (new_type != dev_type()) { untested();
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
       c->set_modelname(new_type);
       attach_common(c);
     }else{
     }
-  }else{
+  }else{ untested();
     CARD::set_dev_type(new_type);
   }
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::print_args_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
+{ untested();
   assert(lang);
   assert(has_common());
   trace0(("COMPONENT::print_args_obsolete_callback "+ short_label()).c_str());
   common()->print_common_obsolete_callback(o, lang);
-  if(comment()!=""){
+  if(comment()!=""){ untested();
     o << " ; " << comment();
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

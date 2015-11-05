@@ -195,7 +195,7 @@ bool EVAL_BM_PULSE::operator==(const COMMON_COMPONENT& x)const
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_PULSE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
+{ incomplete();
   assert(lang);
   o << name();
   print_pair(o, lang, "iv", _iv_in);

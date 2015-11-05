@@ -115,9 +115,6 @@
 #include <iostream>
 #include <fstream>
 #include <set>
-using std::set;
-using std::vector;
-using std::deque;
 /*--------------------------------------------------------------------------*/
 enum needed_t  {nNO=0, nYES, nFILL};
 /*--------------------------------------------------------------------------*/
@@ -140,8 +137,8 @@ private:
   T	_trash;		// depository for row and col 0, write only
   T	_min_pivot;	// minimum pivot value
   unsigned _bandwidth;  // (0=diagonal)
-  vector<set<unsigned> > _adj;
-  vector<set<unsigned> > _adj_ordered;
+  std::vector<std::set<unsigned> > _adj;
+  std::vector<std::set<unsigned> > _adj_ordered;
 public:
   enum REAL {_REAL};
   enum IMAG {_IMAG};
@@ -369,7 +366,7 @@ void BSMATRIX<T>::iwant(unsigned* nm)
   _adj_ordered.clear();
   _adj_ordered.resize(_adj.size());
   for( unsigned j=0; j<size(); ++j ){
-    for( set<unsigned>::const_iterator ii=_adj[j].begin();
+    for(std::set<unsigned>::const_iterator ii=_adj[j].begin();
         ii != _adj[j].end(); ++ii )
     {
       i_do_want(nm[j],nm[*ii]);

@@ -83,6 +83,7 @@ CKT_TESTS = \
     bmm_res.4p.sh \
     bmm_res.5.sh \
     bmm_res.5p.sh \
+    bm_poly.0.sh \
     bm_poly.1.sh \
     bm_poly.2.sh \
     bm_posy.1.sh \
@@ -623,6 +624,10 @@ GC_TESTS = \
     d_coil.brl.1.gc \
     d_coil.brl.2.gc \
     d_coil.brl.3.gc \
+    d_cpoly_g.1.gc \
+    d_cpoly_g.2.gc \
+    d_cpoly_g.3.gc \
+    d_cpoly_g.4.gc \
     d_hci.1.gc \
     d_hci.2.gc \
     d_hci.3.gc \
@@ -820,7 +825,7 @@ trcurve.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
                         '513·s/438\.4E-18/0.·······/g'
 
 $(CKT_TESTS:%.sh=%.out): %.out: %.ckt
-	$(AM_V_at)LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
+	@LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
 	    ../src/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
 	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.out
@@ -866,7 +871,7 @@ define testgen
 	@chmod +x $@
 endef
 
-$(CKT_TESTS): %.sh: $(REF)/%.ckt.ref
+$(CKT_TESTS): %.sh: %.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
 $(GC_TESTS:%.gc=%.gc.out): %.gc.out: %.gc
@@ -898,7 +903,10 @@ nosuchfile.sh: %.sh: %.gc Makefile %.ref
 	@echo "rm $*.out" >> $@
 	@chmod +x $@
 
-CLEANFILES = *.out $(AUTO_TESTS) core
+CLEANFILES = *.out $(AUTO_TESTS) core \
+             patchlev_fake_0.h \
+             patchlev_fake_999.h \
+             patchlev_other.h
 
 # hmmm.
 if VPATH_BUILD
@@ -912,6 +920,7 @@ CLEANFILES+= d_cccs.1.ckt c_lib.1.ckt bm_wrapper.so
 endif
 
 EXTRA_DIST = gnucap_run.sh \
+             gc_log_compiler \
              $(CKT_TESTS:%.sh=%.ckt) $(CKT_TESTS:%.sh===out/%.ckt.ref) \
              $(LOGIC_TESTS:%.sh=%.ckt) $(LOGIC_TESTS:%.sh===out/%.ckt.ref) \
              $(GC_TESTS) $(GC_TESTS:%.gc=%.ref) \

@@ -65,7 +65,7 @@ public:
 public:
   void		precalc_first(const CARD_LIST*);
   void		precalc_last(const CARD_LIST*);
-  std::string	name()const		{untested(); return "transline";}
+  std::string	name()const {untested(); return "";}
 };
 /*--------------------------------------------------------------------------*/
 class DEV_TRANSLINE : public ELEMENT {

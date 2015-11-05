@@ -46,7 +46,7 @@ public:
     :COMMON_COMPONENT(c), ic(0), _ic(_UNKNOWN) {}
   bool operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const {return new COMMON_SWITCH(*this);}
-  std::string name()const	 {untested(); return "switch";}
+  std::string name()const	 {untested(); return "";}
 
   bool		param_is_printable(int)const;
   std::string	param_name(int)const;
