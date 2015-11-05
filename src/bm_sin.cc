@@ -128,7 +128,7 @@ bool EVAL_BM_SIN::operator==(const COMMON_COMPONENT& x)const
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_SIN::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{ untested();
+{
   assert(lang);
   o << name();
   print_pair(o, lang, "offset",	   _offset);

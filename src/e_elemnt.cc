@@ -800,8 +800,8 @@ void ELEMENT::set_param_by_name(string Name, string Value)
     COMMON_COMPONENT* c = mutable_common()->clone();
     try{
       c->set_param_by_name(Name,Value);
-    }catch(Exception_No_Match){ itested();
-      if(!isvalue){ itested();
+    }catch(Exception_No_Match){
+      if(!isvalue){
 	delete c;
 	throw;
       }
@@ -821,9 +821,9 @@ void ELEMENT::set_param_by_name(string Name, string Value)
 /*--------------------------------------------------------------------------*/
 string ELEMENT::dev_type()const
 {
-  if (common()) { untested();
+  if (common()) {
     return common()->modelname();
-  }else{ untested();
+  }else{
     return element_type();
   }
 }

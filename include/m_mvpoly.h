@@ -52,10 +52,10 @@ inline unsigned row(unsigned dim, unsigned pos)
 }
 /*--------------------------------------------------------------------------*/
 inline unsigned total_degree( unsigned dim, size_t s )
-{ untested();
-  if(!s){untested();
+{
+  if(!s){
     return 0;
-  }else{untested();
+  }else{
     return row(dim, unsigned(s-1));
   }
 }
@@ -123,7 +123,7 @@ class MV_POLY : MV_POLY_BASE {
     template<class S>
     MV_POLY(S poly, unsigned dim=1) :
       _dim(dim), _size(unsigned(poly.size()))
-    { untested();
+    {
       if (!_dim){ untested();
 	if(poly.size()){
 	  _coeffs = new pd(poly[0]);
@@ -136,7 +136,7 @@ class MV_POLY : MV_POLY_BASE {
       unsigned td = total_degree( _dim, poly.size());
 
       _datasize=0;
-      for(unsigned a=0; a<=_dim; ++a){ untested();
+      for(unsigned a=0; a<=_dim; ++a){
 	_datasize += spn(td+1, a);
       }
       _datasize += 1*_dim+1;
@@ -146,7 +146,7 @@ class MV_POLY : MV_POLY_BASE {
 
       pd*here = _coeffs;
 
-      for (unsigned dim=0; dim<_dim; ++dim) { untested();
+      for (unsigned dim=0; dim<_dim; ++dim) {
 	here->set_ptr( here + spn(td+1, dim ) + 1 );
 	here = here->_next;
       }
@@ -266,7 +266,7 @@ T MV_POLY<T>::eval(const double* x)const
 /*--------------------------------------------------------------------------*/
 template<class T>
 T MV_POLY<T>::eval(double* x)const
-{ itested();
+{
   trace2("eval", _dim, x[0]);
   trace2("eval", _dim, x[1]);
   return _eval(_coeffs, _dim, x+_dim-1);
@@ -292,7 +292,7 @@ T MV_POLY<T>::_eval(const pd* p, unsigned d, const double* x)const
 // evaluate and write derivative into input vector
 template<class T>
 T MV_POLY<T>::_eval(const pd* p, unsigned d, double* x)const
-{ itested();
+{
   if(!d) return p[0]._val;
 
   assert(d>0);

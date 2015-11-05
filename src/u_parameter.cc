@@ -43,7 +43,7 @@ PARAMETER<double>::PARAMETER(const PARAMETER<double>& p) :
 template<>
 bool PARAMETER<std::vector<PARAMETER<double> > >::operator==(
     const PARAMETER<std::vector<PARAMETER<double> > >& p)const
-{ untested();
+{
   return (_v == p._v && _s == p._s);
 }
 /*--------------------------------------------------------------------------*/

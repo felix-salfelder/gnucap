@@ -182,48 +182,48 @@ static unsigned count_ports(CS& cmd, uint_t maxnodes, uint_t minnodes,
   // loop over the tokens to try to guess where the nodes end
   // and other stuff begins
   spots.push_back(cmd.cursor());
-  for (;;) { untested();
+  for (;;) {
     ++i;
     //cmd.skiparg();
     std::string node_name;
     cmd >> node_name;
     spots.push_back(cmd.cursor());
 
-    if (paren && cmd.skip1b(')')) { untested();
+    if (paren && cmd.skip1b(')')) {
       num_nodes = i;
       break;
-    }else if (cmd.is_end()) { untested();
+    }else if (cmd.is_end()) {
       // found the end, no '='
       if (i <= minnodes) { untested();
 	num_nodes = i;
-      }else if (i <= minnodes + leave_tail) { untested();
+      }else if (i <= minnodes + leave_tail) {
 	num_nodes = minnodes;
-      }else if (i <= maxnodes + leave_tail) { untested();
+      }else if (i <= maxnodes + leave_tail) {
         assert(i>=leave_tail);
 	num_nodes = i - leave_tail;
-      }else{ untested();
+      }else{
 	num_nodes = maxnodes;
       }
       break;
-    }else if (cmd.skip1b("({})")) { untested();
+    }else if (cmd.skip1b("({})")) {
       // found '(', it's past the end of nodes
-      if (i > maxnodes + leave_tail) { untested();
+      if (i > maxnodes + leave_tail) {
 	num_nodes = maxnodes;
-      }else{ untested();
+      }else{
         assert(i>=leave_tail);
 	num_nodes = i - leave_tail;
       }
       break;
-    }else if (cmd.skip1b(';') || cmd.skip1b('=')) { untested();
+    }else if (cmd.skip1b(';') || cmd.skip1b('=')) {
       // found '=', it's past the end of nodes
-      if (i > maxnodes + leave_tail + 1) { untested();
+      if (i > maxnodes + leave_tail + 1) {
 	num_nodes = maxnodes;
-      }else{ untested();
+      }else{
         assert(i>leave_tail);
 	num_nodes = i - leave_tail - 1;
       }
       break;
-    }else if(paren && i>=maxnodes){ untested();
+    }else if(paren && i>=maxnodes){
       // caught later.
     }else{
     }
@@ -309,7 +309,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (ii >= unsigned(num_nodes)) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {untested();
+      }else if (!cmd.more()) {
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -317,7 +317,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 		 || cmd.umatch("vccap ")
 		 || cmd.umatch("vcg ")
 		 || cmd.umatch("vcr "))
-		) { untested();
+		) {
 	cmd.reset(here1);
 	break; // done, found reserved word between nodes
       }else{
@@ -349,33 +349,33 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	}
       }
     }
-  }catch (Exception& e) { itested();
+  }catch (Exception& e) {
     cmd.warn(bDANGER, here1, e.message());
   }
-  if (ii < unsigned(minnodes)) { itested();
+  if (ii < unsigned(minnodes)) {
     cmd.warn(bDANGER, "need " + to_string(minnodes-int(ii)) +" more nodes");
   }else{
   }
-  if (paren != 0) {untested();
+  if (paren != 0) {
     cmd.warn(bWARNING, "need )");
   }else{
   }
   //assert(x->_net_nodes == ii);
   
   // ground unused input nodes
-  for (uint_t iii = ii;  iii < unsigned(minnodes);  ++iii) { itested();
+  for (uint_t iii = ii;  iii < unsigned(minnodes);  ++iii) {
     x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= ii);
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* x)
-{ untested();
+{
   assert(x);
   ELEMENT* xx = dynamic_cast<ELEMENT*>(x);
   assert(xx);
 
-  { untested();
+  {
     unsigned here = cmd.cursor();
     assert(x->max_nodes() >= x->num_current_ports());
     unsigned stop_nodes = unsigned(int(x->max_nodes()) - int(x->num_current_ports()));
@@ -413,10 +413,10 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
     // Normal mode.  nodes first, then data.
   }
 
-  if (!c) { untested();
+  if (!c) {
     xx->skip_dev_type(cmd); // (redundant)
     c = bm_dispatcher.clone("eval_bm_cond");
-  }else{ untested();
+  }else{
   }
   if (!c) {untested();
     c = bm_dispatcher.clone("eval_bm_value");
@@ -543,7 +543,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
       if(xx->print_type_in_spice()){ untested();
 	 // D1   2  0  ddd   2.
 	xx->set_param_by_name(xx->value_name(), value);
-      }else if(cc){ itested();
+      }else if(cc){
 	cc = c->common()->clone();
 	cc->set_param_by_index(0, value, 0);
 	c->attach_common(cc);
@@ -566,7 +566,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
     }
     trace1("LANG_SPICE_BASE::parsedone", cmd.fullstring());
     unsigned here = cmd.cursor();
-    for (int i=1; ; ++i) { untested();
+    for (int i=1; ; ++i) {
       trace1("LANG_SPICE_BASE args", cmd.tail());
       if (paren && cmd.skip1b(')')) {
 	break;
@@ -576,8 +576,8 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	trace1("name value pair?", cmd.tail());
 	std::string Name;
 	std::string value;
-	if (cmd.is_float()) { untested();
-	}else{ untested();
+	if (cmd.is_float()) {
+	}else{
 	  Name = cmd.ctos("=", "", "");
 	}
 	cmd >> '=';
@@ -586,11 +586,11 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	unsigned there = here;
 	if (cmd.stuck(&here)) {untested();
 	  break;
-	}else{ untested();
-	  try{ untested();
-	    if (Name == "") {untested();
+	}else{
+	  try{
+	    if (Name == "") {
 	      Name = "pos"+::to_string(i);
-	      if(cc){ untested();
+	      if(cc){
 		cc = c->common()->clone();
 		cc->set_param_by_index(i, value, 0);
 		c->attach_common(cc);
@@ -600,11 +600,11 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	      }
 	    }else if (value == "") {untested();
 	      cmd.warn(bDANGER, there, x->long_label() + ": " + Name + " has no value?");
-	    }else{ untested();
+	    }else{
 	      x->set_param_by_name(Name, value);
 	      untested();
 	    }
-	  }catch (Exception_No_Match&) { itested();
+	  }catch (Exception_No_Match&) {
 	    cmd.warn(bDANGER, there, x->long_label() + ": bad parameter " + Name + " ignored");
 	  }
 	}
@@ -777,9 +777,9 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
       // somehow move to ELEMENT?...
       if (!x->has_common()){untested();
       }else if(!OPT::keys_between_nodes ){ untested();
-      }else if(x->common()->name()==""){untested();
+      }else if(x->common()->name()==""){
         trace0("parse_instance no name, not a key between nodes");
-      }else if((cmd.umatch(x->common()->name())) ){ untested();
+      }else if((cmd.umatch(x->common()->name())) ){
 	std::string L(1,x->id_letter());
 	x->set_dev_type(L + SPICE_INFIX + cmd.last_match());
 	{
@@ -789,7 +789,7 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
 	  paren -= cmd.skip1b(')');
 	  if(paren){ untested();
 	    cmd.warn(bWARNING, "need )");
-	  }else{untested();
+	  }else{
 	  }
 	  x->set_param_by_name("bmarg", arg);
 	}
@@ -800,10 +800,10 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
       }else{
         trace2("no keys between nodes", x->common()->name(), cmd.tail());
       }
-      if (x->print_type_in_spice()) { untested();
+      if (x->print_type_in_spice()) {
         trace1("LANG_SPICE_BASE::parse_instance ptis", cmd.tail());
 	parse_type(cmd, x);
-      }else{ untested();
+      }else{
       }
       parse_args(cmd, x);
     }
@@ -846,14 +846,14 @@ std::string LANG_SPICE_BASE::find_type_in_string(CS& cmd) const
     if (cmd.scan("vccap |vcg |vcr |vccs ")) {
       // stuff like Gv2  4  0  vcr 3  0  10k
       s = cmd.trimmed_last_match();
-    }else if (cmd.scan("poly(0) |poly(1) |poly(2) |poly(3) ")) { untested();
+    }else if (cmd.scan("poly(0) |poly(1) |poly(2) |poly(3) ")) {
       s = "G" SPICE_INFIX "poly"; // common already attached, no obsolete_callback stuff
-      if(device_dispatcher[s]){ untested();
-      }else{ untested();
+      if(device_dispatcher[s]){
+      }else{
 	// fallback to ocb stuff
 	s = "G";
       }
-    }else{ untested();
+    }else{
       s = "G";
     }
     break;
@@ -966,22 +966,22 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
   if(x->use_obsolete_callback_print()){ incomplete();
     if (x->print_type_in_spice()) { untested();
       o << " " << x->dev_type();
-    }else{untested();
+    }else{
     }
-  }else if (dynamic_cast<const ELEMENT*>(x)) { untested();
-    if(!x->common()){ untested();
-    }else if (x->print_type_in_spice()) { untested();
+  }else if (dynamic_cast<const ELEMENT*>(x)) {
+    if(!x->common()){
+    }else if (x->print_type_in_spice()) {
       // switch w/model
       o << " " << x->dev_type();
-    }else if(x->common()->name()!=""){ untested();
+    }else if(x->common()->name()!=""){
       // common type. such as "sin" or "poly(3)"
       o << " " << x->common()->name();
     }else{ untested();
     }
-  }else if (x->print_type_in_spice()) { untested();
+  }else if (x->print_type_in_spice()) {
     // incomplete();
     o << " " << x->dev_type();
-  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) { untested();
+  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {
     o << " " << x->dev_type();
   }else{
     // don't print type
@@ -989,12 +989,12 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
-{ untested();
+{
   assert(x);
   if (x->use_obsolete_callback_print()) { incomplete();
     o << ' ';
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
-  }else{ untested();
+  }else{
     for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
       if (x->param_is_printable(ii)) {
 	o << " ";
@@ -1013,22 +1013,22 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
 void LANG_SPICE_BASE::print_label(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  if(x->print_type_in_spice()){ untested();
-  }else if(!x->id_letter()){ untested();
-  }else if(x->id_letter()!=toupper(x->short_label().c_str()[0])){ untested();
+  if(x->print_type_in_spice()){
+  }else if(!x->id_letter()){
+  }else if(x->id_letter()!=toupper(x->short_label().c_str()[0])){
     o << x->id_letter();
-  }else{ untested();
+  }else{
   }
   o << x->short_label();
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_ports(OMSTREAM& o, const COMPONENT* x)
-{ untested();
+{
   assert(x);
 
   o <<  " ( ";
   std::string sep = "";
-  for (uint_t ii = 0;  x->port_exists(ii);  ++ii) { untested();
+  for (uint_t ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep << x->port_value(ii);
     sep = " ";
   }

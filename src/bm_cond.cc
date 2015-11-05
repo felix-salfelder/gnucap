@@ -136,9 +136,9 @@ int EVAL_BM_COND::param_count()const
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_COND::use_obsolete_callback_print()const
-{ untested();
-  for (unsigned i = 1; i < sCOUNT; ++i) { untested();
-    if (_func[i] != _func[s_DC]) { untested();
+{
+  for (unsigned i = 1; i < sCOUNT; ++i) {
+    if (_func[i] != _func[s_DC]) {
       // they are not all the same.
       return true;
     }
@@ -365,13 +365,13 @@ void EVAL_BM_COND::precalc_last(const CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_COND::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{ untested();
+{
   assert(lang);
   bool more = false;
-  if (_set[s_NONE]) { untested();
+  if (_set[s_NONE]) {
     _func[s_NONE]->print_common_obsolete_callback(o, lang);
     more = true;
-  }else{ untested();
+  }else{
   }
   for (int i = sCOUNT-1; i != s_NONE; --i) {
     if (_set[i]) {

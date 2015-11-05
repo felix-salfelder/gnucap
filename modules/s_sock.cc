@@ -382,7 +382,7 @@ void SOCK::fillnames( const CARD_LIST* scope){
 /*--------------------------------------------------------------------------*/
 void SOCK::findcaps( CARD_LIST* scope){
   for (CARD_LIST::iterator i = scope->begin(); i != scope->end(); ++i) {
-    if ( COMPONENT* c = dynamic_cast< COMPONENT*>(*i) ) { untested();
+    if ( COMPONENT* c = dynamic_cast< COMPONENT*>(*i) ) {
       if (c->is_device() && c->has_memory()){
         trace1("found cap", c->long_label());
         _caplist.push_back( c );
@@ -1203,7 +1203,7 @@ void SOCK::send_matrix()
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::cap_prepare(void)
-{ untested();
+{
   trace1("SOCK::cap_prepare", _caplist.size() );
   assert(!_capstash);
   _capstash = new CARDSTASH[_caplist.size()];

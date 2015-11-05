@@ -10,7 +10,7 @@ class DEV_G_POLY_K : public COMPONENT { //
 		string port_name(uint_t) const { return "dummy"; }
 
 		CARD* clone()const
-		{ untested();
+		{
 			const CARD* c = device_dispatcher["cpoly_g"];
 			assert(c);
 			CARD* c2 = c->clone();

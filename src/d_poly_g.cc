@@ -61,7 +61,7 @@ public:
     trace1("copy. coeff", _coeff);
   }
   COMMON_COMPONENT* clone()const{return new COMMON_G_POLY_K(*this);}
-  bool operator==(const COMMON_COMPONENT&x)const { untested();
+  bool operator==(const COMMON_COMPONENT&x)const {
     const COMMON_G_POLY_K* p = dynamic_cast<const COMMON_G_POLY_K*>(&x);
     bool rv = p
       && _n_ports == p->_n_ports
@@ -76,7 +76,7 @@ public:
   bool use_obsolete_callback_print()const {return false;}
   bool has_parse_params_obsolete_callback()const {return false;}
   std::string name()const
-  { untested();
+  {
     if(_n_ports){
       return "poly(" + to_string(_n_ports-1) + ")";
     }else{
@@ -86,12 +86,12 @@ public:
   bool has_tr_eval()const{return true;}
   bool ac_too()const {untested();return false;}
   void set_param_by_name(std::string Name, std::string Value)
-  { untested();
+  {
     trace2("", Name, Value);
-    if (Umatch(Name, "c{oeffs} ")) { untested();
+    if (Umatch(Name, "c{oeffs} ")) {
       _coeffs = Value;
       trace1("coeffs", _coeffs);
-    }else{ untested();
+    }else{
       EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
     }
   }
@@ -104,7 +104,7 @@ public:
     }
   }
   void set_param_by_index(int i, std::string& s, int)
-  { untested();
+  {
 //    unsigned i = COMMON_G_POLY_K::param_count() - 1 - I;
     if(i < int(_coeff.size())) {
       //ok.
@@ -135,19 +135,19 @@ public:
   }
 
   void precalc_first(const CARD_LIST* scope)
-  { untested();
+  {
     trace3("COMMON_G_POLY_K::precfirst", _coeffs, _n_ports, hp(this));
     _coeffs.e_val(vector<PARAMETER<double> >(), scope);
     trace2("COMMON_G_POLY_K::precfirst", _coeffs, _n_ports);
-    if(_coeffs.has_hard_value()){ untested();
-    }else if(_coeff.size()==0){ untested();
-    }else if(_coeff[0].has_hard_value()){ untested();
+    if(_coeffs.has_hard_value()){
+    }else if(_coeff.size()==0){
+    }else if(_coeff[0].has_hard_value()){
       _coeffs = _coeff;
       _coeffs.e_val(vector<PARAMETER<double> >(), scope);
     }
-    if(_poly){ untested();
-    }else if(_n_ports<2){ untested();
-    }else{untested();
+    if(_poly){
+    }else if(_n_ports<2){
+    }else{
       trace2("COMMON_G_POLY_K::new poly", _coeffs, _n_ports);
       _poly = new MV_POLY<double>(vector<PARAMETER<double> >(_coeffs), _n_ports-1);
     }
@@ -226,7 +226,7 @@ protected: // override virtual
   COMPLEX  ac_involts()const	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const	{itested(); return NOT_VALID;}
 
-  std::string port_name(uint_t n)const {itested();
+  std::string port_name(uint_t n)const {
     if(n==0){
       return "p";
     }else if(n==1){
@@ -358,7 +358,7 @@ void COMMON_G_POLY_K::tr_eval(ELEMENT* e) const
   trace2("deriv", d->_values[2], d->_values[3]);
 
   // bool DEV_FPOLY_G::do_tr()?
-  for(unsigned i=2; i<=_n_ports; ++i) { itested();
+  for(unsigned i=2; i<=_n_ports; ++i) {
     d->_values[0] -= dn_diff(d->n_(2*i-2).v0(),d->n_(2*i-1).v0()) * d->_values[i];
   }
 
@@ -388,7 +388,7 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
    _n_ports(p._n_ports),
    _time(NOT_VALID),
    _inputs(NULL)
-{ untested();
+{
   assert(!p._values);
   assert(!p._old_values);
   assert(p._n_ports == 0);
@@ -451,14 +451,14 @@ bool DEV_CPOLY_G::do_tr_con_chk_and_q()
 bool DEV_CPOLY_G::do_tr()
 {
   trace3("DEV_CPOLY_G::do_tr", long_label(), _n_ports, hp(&n_(0)));
-  if (using_tr_eval()) { itested();
-    for(unsigned i=2; i<=_n_ports; ++i) { itested();
+  if (using_tr_eval()) {
+    for(unsigned i=2; i<=_n_ports; ++i) {
       trace2("", long_label(), i);
       _values[i] = dn_diff(n_(2*i-2).v0(), n_(2*i-1).v0());
     }
     assert(dynamic_cast<COMMON_G_POLY_K const*>(common())); // for now.
     tr_eval();
-  }else{ itested();
+  }else{
   }
   assert(_values);
   _m0 = CPOLY1(0., _values[0], _values[1]);
@@ -607,7 +607,7 @@ void DEV_CPOLY_G::alloc_values()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
-{ untested();
+{
   bool retry = false;
   if (!common()){ incomplete();
   }else if (Umatch(Name, "p0 ")) {
@@ -627,16 +627,16 @@ void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
     // m->set_param_by_name("nports",_n_ports);
     attach_common(p);
 
-    if (max_nodes() > NODES_PER_BRANCH) { untested();
+    if (max_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
       trace3("DEV_CPOLY_G more nodes", long_label(), max_nodes(), Value);
       node_t* oldn = _n;
       _n = new node_t[max_nodes()];
-      for (uint_t ii = 0; ii<NODES_PER_BRANCH; ++ii) { untested();
+      for (uint_t ii = 0; ii<NODES_PER_BRANCH; ++ii) {
 	_n[ii] = oldn[ii];
       }
 
-    }else{ untested();
+    }else{
       trace3("DEV_CPOLY_G enough nodes", long_label(), max_nodes(), NODES_PER_BRANCH);
       // use the default node list, already set
     }
@@ -644,18 +644,18 @@ void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
 
     // HACK
     alloc_values();
-  }else if (Umatch(Name, "c{oeffs} ")) { untested();
+  }else if (Umatch(Name, "c{oeffs} ")) {
     // HACK. try all names.
     assert(common());
     COMMON_COMPONENT* m = common()->clone();
-    try{ untested();
+    try{
       m->set_param_by_name(Name,Value);
     }catch(Exception){untested();
       retry = true;
       delete m;
       m = NULL;
     }
-    if(m){ untested();
+    if(m){
       attach_common(m);
       trace2("coeffs attached", common()->param_value(m->param_count()-1), hp(common()));
     }else{ untested();
@@ -664,15 +664,15 @@ void DEV_CPOLY_G::set_param_by_name(std::string Name, std::string Value)
    retry = true;
   }
 
-  if(retry){ untested();
+  if(retry){
     ELEMENT::set_param_by_name(Name, Value);
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CPOLY_G::expand()
 {
-  if(_values){ untested();
+  if(_values){
     // hack: done by set_parameters
     // move to common somehow
   }else{ untested();
@@ -683,7 +683,7 @@ void DEV_CPOLY_G::precalc_last()
 {
   trace3("DEV_CPOLY_G::precalc_last", long_label(), net_nodes(), matrix_nodes());
 
-  if(_values){ itested();
+  if(_values){
     // hack: done by set_parameters
     // move to common somehow
   }else{ untested();
