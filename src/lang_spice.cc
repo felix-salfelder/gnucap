@@ -194,7 +194,7 @@ static unsigned count_ports(CS& cmd, uint_t maxnodes, uint_t minnodes,
       break;
     }else if (cmd.is_end()) {
       // found the end, no '='
-      if (i <= minnodes) { untested();
+      if (i <= minnodes) {
 	num_nodes = i;
       }else if (i <= minnodes + leave_tail) {
 	num_nodes = minnodes;
@@ -540,14 +540,14 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
       std::string value;
       trace1("LANG_SPICE_BASE::parse_args simple", xx->value_name());
       cmd >> value;
-      if(xx->print_type_in_spice()){ untested();
+      if(xx->print_type_in_spice()){
 	 // D1   2  0  ddd   2.
 	xx->set_param_by_name(xx->value_name(), value);
       }else if(cc){
 	cc = c->common()->clone();
 	cc->set_param_by_index(0, value, 0);
 	c->attach_common(cc);
-      }else{ untested();
+      }else{
 	x->set_param_by_name(xx->value_name(), value);
       }
     }else if (cmd.match1("'{")) {	// quoted unnamed value
@@ -558,7 +558,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	cc = c->common()->clone();
 	cc->set_param_by_index(0, value, 0);
 	c->attach_common(cc);
-      }else{ untested();
+      }else{
 	x->set_param_by_name(xx->value_name(), value);
       }
     }else{				// only name=value pairs
@@ -614,7 +614,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
     // used only for "table"
     int paren = cmd.skip1b('(');
     bool in_error = false;
-    for (;;) { untested();
+    for (;;) {
       unsigned here = cmd.cursor();
       pp->parse_params_obsolete_callback(cmd);  //BUG//callback//
       if (!cmd.more()) {
@@ -775,7 +775,7 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
         trace1("LANG_SPICE_BASE::parse_instance parsed ports", cmd.tail());
       }
       // somehow move to ELEMENT?...
-      if (!x->has_common()){untested();
+      if (!x->has_common()){
       }else if(!OPT::keys_between_nodes ){ untested();
       }else if(x->common()->name()==""){
         trace0("parse_instance no name, not a key between nodes");
@@ -976,7 +976,7 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
     }else if(x->common()->name()!=""){
       // common type. such as "sin" or "poly(3)"
       o << " " << x->common()->name();
-    }else{ untested();
+    }else{
     }
   }else if (x->print_type_in_spice()) {
     // incomplete();
@@ -1032,7 +1032,7 @@ void LANG_SPICE_BASE::print_ports(OMSTREAM& o, const COMPONENT* x)
     o << sep << x->port_value(ii);
     sep = " ";
   }
-  for (uint_t ii = 0;  x->current_port_exists(ii);  ++ii) { untested();
+  for (uint_t ii = 0;  x->current_port_exists(ii);  ++ii) {
     o << sep << x->current_port_value(ii);
     sep = " ";
   }
@@ -1076,7 +1076,7 @@ class CMD_MODEL : public CMD {
       }else{untested();
 	cmd.warn(bDANGER, here1, "model: base has incorrect type");
       }
-    }else{ untested();
+    }else{
       cmd.warn(bDANGER, here1, "model: \"" + base_name + "\" no match");
     }
   }
