@@ -136,12 +136,15 @@ int EVAL_BM_COND::param_count()const
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_COND::use_obsolete_callback_print()const
-{
-  if (_func[s_NONE]) { untested();
-    return _func[s_NONE]->use_obsolete_callback_print();
-  }else{ untested();
-    return true;
+{ untested();
+  for (unsigned i = 1; i < sCOUNT; ++i) { untested();
+    if (_func[i] != _func[s_DC]) { untested();
+      // they are not all the same.
+      return true;
+    }
   }
+  assert(_func[s_DC]);
+  return _func[s_DC]->use_obsolete_callback_print();
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_COND::param_is_printable(int i)const
