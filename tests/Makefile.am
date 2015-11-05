@@ -12,14 +12,16 @@ AM_TESTS_ENVIRONMENT = \
            MAKEFLAGS=--no-print-directory \
            srcdir='$(srcdir)';
 AM_TESTS_FD_REDIRECT = 9>&2
-TEST_EXTENSIONS = .sh .gc
+TEST_EXTENSIONS = .sh .gc .ckt
 
 GC_LOG_COMPILER = $(top_srcdir)/tests/gc_log_compiler
+CKT_LOG_COMPILER = $(top_srcdir)/tests/ckt_log_compiler
 SH_LOG_COMPILER = $(SHELL)
 
 TESTS = \
     gnucap_run.sh \
     $(GC_TESTS) \
+    $(LOGIC_TESTS) \
     $(CKT_TESTS)
 
 REF = ==out
@@ -534,23 +536,23 @@ XFAIL_TESTS+= param.2c.sh
 
 # logic is broken. needs work
 LOGIC_TESTS = \
-    d_logic_nand-dc.sh \
-    d_logic_tr_ab1.sh \
-    d_logic_tr_ab2.sh \
-    d_logic_tr_an1.sh \
-    d_logic_tr_an2.sh \
-    d_logic_tr_db1.sh \
-    d_logic_tr_db2.sh \
-    d_logic_tr_dn1.sh \
-    d_logic_tr_dn2.sh \
-    d_logic_tr_mb1a.sh \
-    d_logic_tr_mb1b.sh \
-    d_logic_tr_mb2a.sh \
-    d_logic_tr_mb2b.sh \
-    d_logic_tr_mn1a.sh \
-    d_logic_tr_mn1b.sh \
-    d_logic_tr_mn2a.sh \
-    d_logic_tr_mn2b.sh
+    d_logic_nand-dc.ckt \
+    d_logic_tr_ab1.ckt \
+    d_logic_tr_ab2.ckt \
+    d_logic_tr_an1.ckt \
+    d_logic_tr_an2.ckt \
+    d_logic_tr_db1.ckt \
+    d_logic_tr_db2.ckt \
+    d_logic_tr_dn1.ckt \
+    d_logic_tr_dn2.ckt \
+    d_logic_tr_mb1a.ckt \
+    d_logic_tr_mb1b.ckt \
+    d_logic_tr_mb2a.ckt \
+    d_logic_tr_mb2b.ckt \
+    d_logic_tr_mn1a.ckt \
+    d_logic_tr_mn1b.ckt \
+    d_logic_tr_mn2a.ckt \
+    d_logic_tr_mn2b.ckt
 
 # these are really broken...
 XFAIL_TESTS += \
@@ -779,6 +781,7 @@ AUTO_TESTS = $(CKT_TESTS) $(CUSTOM_TESTS)
 gsl_tests: $(GSL_TESTS:%.gc=%.log)
 gc_tests: $(GC_TESTS:%.gc=%.log)
 ckt_tests: $(CKT_TESTS:%.sh=%.log)
+logic_tests: $(LOGIC_TESTS:%.ckt=%.log)
 
 .PHONY: .P
 
@@ -788,6 +791,8 @@ ckt_tests: $(CKT_TESTS:%.sh=%.log)
 $(AUTO_TESTS:%.sh=%.out): .P $(FILTER)
 $(GC_TESTS:%.gc=%.gc.out): .P $(FILTER)
 $(GC_TESTS:%.gc=%.log): .P $(FILTER)
+$(LOGIC_TESTS:%.ckt=%.log): .P $(FILTER)
+$(LOGIC_TESTS:%=%.out): .P $(FILTER)
 
 $(CKT_TESTS): %.sh: %.out
 
@@ -825,6 +830,12 @@ trcurve.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
                         '513·s/438\.4E-18/0.·······/g'
 
 $(CKT_TESTS:%.sh=%.out): %.out: %.ckt
+	@LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
+	    ../src/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
+	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
+	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.out
+
+$(LOGIC_TESTS:%=%.out): %.out: %
 	@LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
 	    ../src/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \

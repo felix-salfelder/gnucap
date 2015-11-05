@@ -215,8 +215,8 @@ LOGIC_NODE& node_t::data()const
 }
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
-{
-  if (Umatch(x, "v ")) {
+{ untested();
+  if (Umatch(x, "v ")) { untested();
     // return v0(); denoised
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "v1 ")) {
@@ -274,7 +274,7 @@ double NODE::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 double LOGIC_NODE::tr_probe_num(const std::string& x)const
-{
+{ untested();
   if (Umatch(x, "l{ogic} ")) {
     return annotated_logic_value();
   }else if (Umatch(x, "la{stchange} ")) {
@@ -285,7 +285,7 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
     return static_cast<double>(_d_iter);
   }else if (Umatch(x, "ai{ter} ")) {
     return static_cast<double>(_a_iter);
-  }else{
+  }else{ untested();
     return NODE_BASE::tr_probe_num(x);
   }
 }
