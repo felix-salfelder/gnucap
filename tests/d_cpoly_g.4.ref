@@ -1,0 +1,19 @@
+gerror1 1 0 poly(2) c1 0 
+                         ^ ? need 2 more nodes
+* incomplete.
+Gsquare ( 0 s c1 0 ) poly coeffs=(0,0,1)
+gerror1 ( 1 0 c1 0 0 0 ) poly(2) coeffs=NA()
+Something wrong with nodecount 6 4, while parsing gerror2 (1 0 2 2 2 2) poly(1) 0 0 1 
+gerror2 (1 0 2 2 2 2) poly(1) 0 0 1 
+                 ^ ? too many: requested=5 max=4
+gerror2 (1 0 2 2 2 2) poly(1) 0 0 1 
+                   ^ ? need )
+gerror2 (1 0 2 2 2 2) poly(1) 0 0 1 
+                    ^ ? gerror2: bad parameter ) ignored
+gerror2 (1 0 2 2 2 2) poly(1) 0 0 1 
+                            ^ ? gerror2: bad parameter ) ignored
+* incomplete.
+Gsquare ( 0 s c1 0 ) poly coeffs=(0,0,1)
+gerror1 ( 1 0 c1 0 0 0 ) poly(2) coeffs=NA()
+*BUG: not caught. 
+gerror2 ( 1 0 2 2 ) poly coeffs=(2,NA( NA),NA( NA),0,1)

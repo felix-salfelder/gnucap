@@ -1,0 +1,13 @@
+# plain POLY
+.width out=120
+v1 1 0 dc 1 ac 1
+g8 8 0 POLY 1 0  0 0 10 0
+r8 8 0 10k
+.list
+.print op v(nodes)
+.op
+.print dc v(nodes)
+.dc v1 -10 10 1
+.dc v1 1 100 decade 5
+.dc v1 32 68 9
+.end

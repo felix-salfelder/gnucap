@@ -1,0 +1,10 @@
+ga ( 0 1a c1 0 ) poly(1) coeffs=(0,1)
+* pseudo-spice 
+gb ( 0 1b c1 0 ) poly(1) coeffs=(0,1)
+G_poly #(.coeffs((0,1))) ga (.p(0),.n(1a),.cp0(c1),.cn0(0));
+//* pseudo-spice 
+G_poly #(.coeffs((0,1))) gb (.p(0),.n(1b),.cp0(c1),.cn0(0));
+#           v(1)       v(1a)      v(1b)      v(c1)     
+ 0.         1.         0.         0.         0.        
+ 1.         1.         1.         1.         1.        
+ 2.         1.         2.         2.         2.        
