@@ -394,10 +394,12 @@ DEV_CPOLY_G::DEV_CPOLY_G(const DEV_CPOLY_G& p)
   assert(p._n_ports == 0);
   assert(!p._inputs);
 
-  if (p.net_nodes() > NODES_PER_BRANCH) { untested();
-    _n = new node_t[net_nodes()];
+  assert(p.max_nodes() == max_nodes());
+  if (max_nodes() > NODES_PER_BRANCH) { untested();
+    trace1("DEV_CPOLY_G, copy more nodes", net_nodes());
+    _n = new node_t[max_nodes()];
 
-    for (uint_t ii = 0; ii<net_nodes(); ++ii) { untested();
+    for (uint_t ii = 0; ii<max_nodes(); ++ii) { untested();
       _n[ii] = p._n[ii];
     }
   }
@@ -427,9 +429,8 @@ DEV_CPOLY_G::DEV_CPOLY_G(COMMON_COMPONENT* c)
 DEV_CPOLY_G::~DEV_CPOLY_G()
 {
   delete [] _old_values;
-  if (net_nodes() > NODES_PER_BRANCH) {
-    // delete [] _n;
-    incomplete();
+  if (max_nodes() > NODES_PER_BRANCH) { untested();
+    delete [] _n;
   }else{
     // it is part of a base class
   }
@@ -551,10 +552,11 @@ void DEV_CPOLY_G::set_parameters(const std::string& Label, CARD *Owner,
     assert(!_old_values);
     _old_values = new hp_float_t[n_states];
 
-    if (matrix_nodes() > NODES_PER_BRANCH) {
-      trace1("DEV_CPOLY_G::set_parameters, more nodes", matrix_nodes());
+    assert(net_nodes() == max_nodes());
+    if (net_nodes() > NODES_PER_BRANCH) {
+      trace1("DEV_CPOLY_G::set_parameters, more nodes", net_nodes());
       // allocate a bigger node list
-      _n = new node_t[matrix_nodes()];
+      _n = new node_t[net_nodes()];
     }else{
       // use the default node list, already set
     }      
