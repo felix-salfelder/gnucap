@@ -75,7 +75,7 @@ class DEV_MEAS : public ELEMENT {
 		bool tr_needs_eval()const{return true;}
 		double tr_probe_num(const std::string& )const;
 //		void tr_begin(){q_eval();}
-		void tr_begin(){q_accept(); _m = _v1 = 0; }
+		void tr_begin(){q_accept(); _m = _v1 = _last =0.;}
 		bool do_tr(){ 
 			q_accept();
 			return ELEMENT::do_tr(); // true.
@@ -85,14 +85,13 @@ class DEV_MEAS : public ELEMENT {
 			tr_stress();
 		}
 		void tr_stress(){
-			if(_sim->is_initial_step()){
+			if(_sim->is_initial_step()){ untested();
 				_m = 0;
 				_v1 = tr_involts();
 			} else if( _last<_sim->_time0){
 				_m += _sim->_dt0 * ( tr_involts() + _v1 ) ;
 				_v1 = tr_involts();
-			}else{
-				// untested();
+			}else{ untested();
 			}
 			_last= _sim->_time0;
 
@@ -291,7 +290,7 @@ class DEV_MEAS2 : public ELEMENT {
 		bool tr_needs_eval()const{return true;}
 		double tr_probe_num(const std::string& )const;
 //		void tr_begin(){q_eval();}
-		void tr_begin(){q_accept(); _m = _v1 = -BIGBIG; }
+		void tr_begin(){q_accept(); _m=_v1=-BIGBIG; _last=0.;}
 		bool do_tr(){ 
 			q_accept();
 			return ELEMENT::do_tr(); // true.
