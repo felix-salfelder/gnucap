@@ -429,7 +429,7 @@ DEV_CPOLY_G::DEV_CPOLY_G(COMMON_COMPONENT* c)
 DEV_CPOLY_G::~DEV_CPOLY_G()
 {
   delete [] _old_values;
-  if (max_nodes() > NODES_PER_BRANCH) { untested();
+  if (max_nodes() > NODES_PER_BRANCH) {
     delete [] _n;
   }else{
     // it is part of a base class

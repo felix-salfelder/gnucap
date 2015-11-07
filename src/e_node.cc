@@ -215,8 +215,8 @@ LOGIC_NODE& node_t::data()const
 }
 /*--------------------------------------------------------------------------*/
 double NODE_BASE::tr_probe_num(const std::string& x)const
-{ untested();
-  if (Umatch(x, "v ")) { untested();
+{
+  if (Umatch(x, "v ")) {
     // return v0(); denoised
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else{
@@ -225,7 +225,7 @@ double NODE_BASE::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
-{ untested();
+{
   if (Umatch(x, "v1 ")) {
     return floor(vt1()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
@@ -281,7 +281,7 @@ double NODE::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 double LOGIC_NODE::tr_probe_num(const std::string& x)const
-{ untested();
+{
   if (Umatch(x, "l{ogic} ")) {
     return annotated_logic_value();
   }else if (Umatch(x, "la{stchange} ")) {
@@ -292,7 +292,7 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
     return static_cast<double>(_d_iter);
   }else if (Umatch(x, "ai{ter} ")) {
     return static_cast<double>(_a_iter);
-  }else{ untested();
+  }else{
     return NODE_BASE::tr_probe_num(x);
   }
 }
@@ -474,7 +474,7 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
 	/* state (rise/fall)  unchanged */
       }
     }
-    if (sv > 1.+f->over || sv < -f->over) { untested();
+    if (sv > 1.+f->over || sv < -f->over) {
       trace2("out of range", sv, f->over);
       // out of range
       set_bad_quality("out of range");
@@ -494,7 +494,7 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
 void LOGIC_NODE::set_process(const MODEL_LOGIC* f) {_family = f->logic_hash();}
 /*--------------------------------------------------------------------------*/
 double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
-{ untested();
+{
   assert(f);
   if (process() && process() != f->logic_hash()) {untested();
     error(bWARNING, "node " + long_label() 
@@ -510,21 +510,21 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
   double risefall = NOT_VALID;
 
   switch (lv()) {
-  case lvRISING: untested();
+  case lvRISING:
     risefall = f->rise;
     del = risefall * (1 - f->th1);
     set_final_time_a(final_time()+ del);
-  case lvSTABLE1: untested();
+  case lvSTABLE1:
     risefall = f->rise;
     start = f->vmin;
     end = f->vmax;
     //end = f->vmax;
     break;
-  case lvFALLING: untested();
+  case lvFALLING:
     risefall = f->fall;
     del = risefall *  f->th0;
     set_final_time_a(final_time()+ del);
-  case lvSTABLE0: untested();
+  case lvSTABLE0:
     risefall = f->fall;
     start = f->vmax;
     end = f->vmin;
@@ -534,7 +534,7 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
     return f->unknown;
   }
 
-  if(_sim->_time0 > final_time_a()){ untested();
+  if(_sim->_time0 > final_time_a()){
     return end;
   }
 
@@ -542,12 +542,12 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
   assert(end != NOT_VALID);
   assert(risefall != NOT_VALID);
 
-  if (_sim->_time0 <= (final_time_a()-risefall)) { untested();
+  if (_sim->_time0 <= (final_time_a()-risefall)) {
     trace1("", final_time_a());
     return start;
-  }else if (_sim->_time0 >= final_time_a()) { untested();
+  }else if (_sim->_time0 >= final_time_a()) {
     return end;
-  }else{ untested();
+  }else{
     double share = (final_time_a() - _sim->_time0) / risefall;
     trace4("LOGIC_NODE::to_analog in between", _sim->_time0, final_time(),
         risefall, share );
@@ -598,7 +598,7 @@ bool LOGIC_NODE::in_transit()const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void LOGIC_NODE::set_event_abs(double time, LOGICVAL v)
-{ untested();
+{
   trace2("LOGIC_NODE::set_event_abs", time, v);
   _lv.set_in_transition(v);
   if (_sim->analysis_is_tran_dynamic()  &&  in_transit()) {untested();

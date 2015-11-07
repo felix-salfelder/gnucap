@@ -284,7 +284,7 @@ void TRANSIENT::set_step_cause(STEP_CAUSE C)
     break;
   case scNO_ADVANCE:untested();
   case scZERO:untested();
-  case scSMALL:untested();
+  case scSMALL:
   case scREJECT:
     ::status.control += C;
     break;
@@ -571,7 +571,7 @@ bool TRANSIENT::next()
   trace4("TRANSIENT::next got it i think", newtime, new_control, newtime-_sim->_time0, _time_by_user_request);
   
   /* check to be sure */
-  if (newtime < _time1 + _sim->_dtmin) {untested();
+  if (newtime < _time1 + _sim->_dtmin) {
     /* It's really bad. */
     /* Reject the most recent step, back up as much as possible, */
     /* and creep along */
