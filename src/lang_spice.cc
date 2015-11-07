@@ -31,6 +31,8 @@
 // header hack
 #include "d_logic.h"
 #include "bm.h"
+
+#define SPICE_INFIX "_"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -221,6 +223,8 @@ static unsigned count_ports(CS& cmd, uint_t maxnodes, uint_t minnodes,
 	num_nodes = i - leave_tail - 1;
       }
       break;
+    }else if(paren && i>=maxnodes){
+      // caught later.
     }else{
     }
   }
@@ -236,10 +240,10 @@ static unsigned count_ports(CS& cmd, uint_t maxnodes, uint_t minnodes,
   //BUG// assert fails on current controlled sources with (node node dev) syntax
   // it's ok with (node node) dev syntax or node node dev syntax
   if(num_nodes > maxnodes){
-    error(bDANGER, "Something wrong with nodecount %i %i, while parsing %s\n",num_nodes, maxnodes, string(cmd).c_str() );
+    error(bDANGER, "Something wrong with nodecount %i %i, while parsing %s\n",
+	num_nodes, maxnodes, string(cmd).c_str() );
   }
-  assert(num_nodes <= maxnodes);
-  trace2("count_ports", num_nodes, cmd.tail());
+  trace2("count_ports done", num_nodes, cmd.tail());
   return unsigned(num_nodes);
 }
 static unsigned count_ports(CS& cmd, int maxnodes, int minnodes, int leave_tail, int start)
@@ -305,7 +309,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (ii >= unsigned(num_nodes)) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {untested();
+      }else if (!cmd.more()) {
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -345,21 +349,21 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	}
       }
     }
-  }catch (Exception& e) { itested();
+  }catch (Exception& e) {
     cmd.warn(bDANGER, here1, e.message());
   }
-  if (ii < unsigned(minnodes)) { itested();
+  if (ii < unsigned(minnodes)) {
     cmd.warn(bDANGER, "need " + to_string(minnodes-int(ii)) +" more nodes");
   }else{
   }
-  if (paren != 0) {untested();
+  if (paren != 0) {
     cmd.warn(bWARNING, "need )");
   }else{
   }
   //assert(x->_net_nodes == ii);
   
   // ground unused input nodes
-  for (uint_t iii = ii;  iii < unsigned(minnodes);  ++iii) { itested();
+  for (uint_t iii = ii;  iii < unsigned(minnodes);  ++iii) {
     x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= ii);
@@ -513,50 +517,94 @@ void LANG_SPICE_BASE::parse_type(CS& cmd, CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 {
-  trace0(("LANG_SPICE_BASE::parse_args " + (std::string) cmd).c_str() );
+  trace1("LANG_SPICE_BASE::parse_args", cmd.tail());
   assert(x);
   COMPONENT* xx = dynamic_cast<COMPONENT*>(x);
+
+  COMPONENT* c = dynamic_cast<COMPONENT*>(x);
+  COMMON_COMPONENT const* ccc=NULL;
+  if(c){
+    ccc = c->common();
+  }
+  COMMON_COMPONENT* cc=NULL;
+  if(ccc){
+    cc = ccc->clone();
+  }
 
   cmd >> "params:";	// optional, skip it.
 
   if (!x->use_obsolete_callback_parse()) {
-    trace1("LANG_SPICE_BASE::parse_args !ocp", cmd.tail().c_str() );
+    trace1("LANG_SPICE_BASE::parse_args !ocp", cmd.tail());
     int paren = cmd.skip1b('(');
     if (xx && cmd.is_float()) {		// simple unnamed value
       std::string value;
-      trace0("LANG_SPICE_BASE::parse_args simple");
+      trace1("LANG_SPICE_BASE::parse_args simple", xx->value_name());
       cmd >> value;
-      x->set_param_by_name(xx->value_name(), value);
+      if(xx->print_type_in_spice()){
+	 // D1   2  0  ddd   2.
+	xx->set_param_by_name(xx->value_name(), value);
+      }else if(cc){
+	cc = c->common()->clone();
+	cc->set_param_by_index(0, value, 0);
+	c->attach_common(cc);
+      }else{
+	x->set_param_by_name(xx->value_name(), value);
+      }
     }else if (cmd.match1("'{")) {	// quoted unnamed value
       std::string value;
       cmd >> value; // strips off the quotes
       value = '{' + value + '}'; // put them back
-      x->set_param_by_name(xx->value_name(), value);
+      if(cc){ untested();
+	cc = c->common()->clone();
+	cc->set_param_by_index(0, value, 0);
+	c->attach_common(cc);
+      }else{
+	x->set_param_by_name(xx->value_name(), value);
+      }
     }else{				// only name=value pairs
        trace0("LANG_SPICE_BASE::parse_args else");
     }
-    trace0(("LANG_SPICE_BASE::parsedone " + (std::string) cmd.tail()).c_str() );
+    trace1("LANG_SPICE_BASE::parsedone", cmd.fullstring());
     unsigned here = cmd.cursor();
-    for (int i=0; ; ++i) {
+    for (int i=1; ; ++i) {
+      trace1("LANG_SPICE_BASE args", cmd.tail());
       if (paren && cmd.skip1b(')')) {
 	break;
       }else if (!cmd.more()) {
 	break;
       }else{
-	std::string Name  = cmd.ctos("=", "", "");
+	trace1("name value pair?", cmd.tail());
+	std::string Name;
+	std::string value;
+	if (cmd.is_float()) {
+	}else{
+	  Name = cmd.ctos("=", "", "");
+	}
 	cmd >> '=';
-	std::string value = cmd.ctos(",=;)", "\"'{(", "\"'})");
+	value = cmd.ctos(",=;)", "\"'{(", "\"'})");
+	trace2("name value pair?", Name, value);
 	unsigned there = here;
 	if (cmd.stuck(&here)) {untested();
 	  break;
 	}else{
 	  try{
-	    if (value == "") {untested();
+	    if (Name == "") {
+	      Name = "pos"+::to_string(i);
+	      if(cc){
+		cc = c->common()->clone();
+		cc->set_param_by_index(i, value, 0);
+		c->attach_common(cc);
+	      }else{ incomplete();
+		trace2("problem.", x->long_label(), cmd.fullstring());
+		// x->set_param_by_index?
+	      }
+	    }else if (value == "") {untested();
 	      cmd.warn(bDANGER, there, x->long_label() + ": " + Name + " has no value?");
 	    }else{
+	      x->set_param_by_name(Name, value);
+	      untested();
 	    }
-	    x->set_param_by_name(Name, value);
-	  }catch (Exception_No_Match&) { itested();
+	  }catch (Exception_No_Match&) {
 	    cmd.warn(bDANGER, there, x->long_label() + ": bad parameter " + Name + " ignored");
 	  }
 	}
@@ -590,6 +638,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
   }else{untested();
     // using obsolete_callback
   }
+  trace1("LANG_SPICE_BASE::parse_args done", cmd.tail());
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_label(CS& cmd, CARD* x)
@@ -662,7 +711,7 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
     unsigned num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(),
 				0u/*no unnamed par*/, 0u/*start*/);
 
-    trace1("LANG_SPICE_BASE::parse_module ", num_nodes );
+    trace2("LANG_SPICE_BASE::parse_module", x->long_label(), num_nodes);
     cmd.reset(here);
     parse_ports(cmd, x, int(x->min_nodes()), 0/*start*/, int(num_nodes), true/*all new*/);
   }
@@ -710,21 +759,49 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
 
     
     if (x->use_obsolete_callback_parse()) {
-      trace0(("LANG_SPICE_BASE::parse_instance obs. cb"));
+      trace1("LANG_SPICE_BASE::parse_instance obs. cb", x->long_label());
       parse_element_using_obsolete_callback(cmd, x);
     }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) {
       trace0(("LANG_SPICE_BASE::parse_logic_instance obs. cb"));
       parse_logic_using_obsolete_callback(cmd, xx);
     }else{
+      trace4("parse without cb", x->long_label(), x->max_nodes(), x->min_nodes(), x->tail_size());
       {
 	unsigned here = cmd.cursor();
 	unsigned num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(), x->tail_size(), 0u);
+	trace2("parse without cb found", x->long_label(), num_nodes);
 	cmd.reset(here);
-	parse_ports(cmd, x, int(x->min_nodes()), 0/*start*/, int(num_nodes), false);
-        trace0(("LANG_SPICE_BASE::parse_instance parsed ports " + (std::string) cmd.tail()).c_str() );
+	parse_ports(cmd, x, x->min_nodes(), 0u/*start*/, num_nodes, false);
+        trace1("LANG_SPICE_BASE::parse_instance parsed ports", cmd.tail());
+      }
+      // somehow move to ELEMENT?...
+      if (!x->has_common()){
+      }else if(!OPT::keys_between_nodes ){ untested();
+      }else if(x->common()->name()==""){
+        trace0("parse_instance no name, not a key between nodes");
+      }else if((cmd.umatch(x->common()->name())) ){
+	std::string L(1,x->id_letter());
+	x->set_dev_type(L + SPICE_INFIX + cmd.last_match());
+	{
+	  std::string arg;
+	  int paren = cmd.skip1b('(');
+	  cmd >> arg;
+	  paren -= cmd.skip1b(')');
+	  if(paren){ untested();
+	    cmd.warn(bWARNING, "need )");
+	  }else{
+	  }
+	  x->set_param_by_name("bmarg", arg);
+	}
+	uint_t gotnodes = x->_net_nodes; // probably 2, min_nodes()
+        trace2("LANG_SPICE_BASE::parse_instance kludge", cmd.tail(), gotnodes);
+	// assert(gotnodes==2); no. Gsquare ( 1 0 c1 0 ) poly(2) 0 0 1
+	parse_ports(cmd, x, x->min_nodes(), gotnodes, x->max_nodes(), false);
+      }else{
+        trace2("no keys between nodes", x->common()->name(), cmd.tail());
       }
       if (x->print_type_in_spice()) {
-        trace0(("LANG_SPICE_BASE::parse_instance ptis " + (std::string) cmd.tail()).c_str() );
+        trace1("LANG_SPICE_BASE::parse_instance ptis", cmd.tail());
 	parse_type(cmd, x);
       }else{
       }
@@ -767,7 +844,15 @@ std::string LANG_SPICE_BASE::find_type_in_string(CS& cmd) const
     here = cmd.cursor();
 
     if (cmd.scan("vccap |vcg |vcr |vccs ")) {
+      // stuff like Gv2  4  0  vcr 3  0  10k
       s = cmd.trimmed_last_match();
+    }else if (cmd.scan("poly(0) |poly(1) |poly(2) |poly(3) ")) {
+      s = "G" SPICE_INFIX "poly"; // common already attached, no obsolete_callback stuff
+      if(device_dispatcher[s]){
+      }else{
+	// fallback to ocb stuff
+	s = "G";
+      }
     }else{
       s = "G";
     }
@@ -862,7 +947,7 @@ void LANG_SPICE_BASE::print_command(OMSTREAM& o, const DEV_DOT* x)
 void LANG_SPICE_BASE::print_args(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
-  if (x->use_obsolete_callback_print()) {
+  if (x->use_obsolete_callback_print()) { incomplete();
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
     for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
@@ -878,10 +963,26 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const MODEL_CARD* x)
 void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  if (x->print_type_in_spice()) {
-    o << "  " << x->dev_type();
+  if(x->use_obsolete_callback_print()){ incomplete();
+    if (x->print_type_in_spice()) { untested();
+      o << " " << x->dev_type();
+    }else{
+    }
+  }else if (dynamic_cast<const ELEMENT*>(x)) {
+    if(!x->common()){
+    }else if (x->print_type_in_spice()) {
+      // switch w/model
+      o << " " << x->dev_type();
+    }else if(x->common()->name()!=""){
+      // common type. such as "sin" or "poly(3)"
+      o << " " << x->common()->name();
+    }else{
+    }
+  }else if (x->print_type_in_spice()) {
+    // incomplete();
+    o << " " << x->dev_type();
   }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {
-    o << "  " << x->dev_type();
+    o << " " << x->dev_type();
   }else{
     // don't print type
   }
@@ -890,15 +991,16 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
 void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  o << ' ';
-  if (x->use_obsolete_callback_print()) {
+  if (x->use_obsolete_callback_print()) { incomplete();
+    o << ' ';
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
     for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
       if (x->param_is_printable(ii)) {
+	o << " ";
 	if ((ii != x->param_count() - 1) || (x->param_name(ii) != x->value_name())) {
 	  // skip name if plain value
-	  o << " " << x->param_name(ii) << "=";
+	  o << x->param_name(ii) << "=";
 	}else{
 	}
 	o << x->param_value(ii);
@@ -911,6 +1013,12 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
 void LANG_SPICE_BASE::print_label(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
+  if(x->print_type_in_spice()){
+  }else if(!x->id_letter()){
+  }else if(x->id_letter()!=toupper(x->short_label().c_str()[0])){
+    o << x->id_letter();
+  }else{
+  }
   o << x->short_label();
 }
 /*--------------------------------------------------------------------------*/

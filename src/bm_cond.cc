@@ -52,6 +52,7 @@ private: // override virtual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_COND(*this);}
   void  parse_common_obsolete_callback(CS&);
   void  print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
+  bool use_obsolete_callback_print()const;
   
   void  	precalc_first(const CARD_LIST*);
   void		expand(const COMPONENT*);
@@ -132,6 +133,18 @@ int EVAL_BM_COND::param_count()const
   // they are all the same.  Take one of them.
   untested();
   return _func[s_NONE]->param_count();
+}
+/*--------------------------------------------------------------------------*/
+bool EVAL_BM_COND::use_obsolete_callback_print()const
+{
+  for (unsigned i = 1; i < sCOUNT; ++i) {
+    if (_func[i] != _func[s_DC]) {
+      // they are not all the same.
+      return true;
+    }
+  }
+  assert(_func[s_DC]);
+  return _func[s_DC]->use_obsolete_callback_print();
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_COND::param_is_printable(int i)const

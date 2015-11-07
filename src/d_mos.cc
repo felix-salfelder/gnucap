@@ -2005,7 +2005,7 @@ TIME_PAIR  DEV_BUILT_IN_MOS::tr_review()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_BUILT_IN_MOS::tr_unload()
-{ untested();
+{
   BASE_SUBCKT::tr_unload();
 #ifndef BTI_IN_SUBCKT
   const COMMON_BUILT_IN_MOS* c = static_cast<const COMMON_BUILT_IN_MOS*>(common());

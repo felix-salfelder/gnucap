@@ -486,7 +486,6 @@ double ELEMENT::tr_probe_num(const std::string& x)const
     if(input_order()>1){
       const ELEMENT* more = prechecked_cast<const ELEMENT*>(*(subckt()->begin()));
       return more->tr_involts();
-      return fixzero(dn_diff(_n[IN3].v0(),_n[IN2].v0()),1);
     }
     return NOT_VALID;
   }else if (Umatch(x, "i ")) {
@@ -801,8 +800,8 @@ void ELEMENT::set_param_by_name(string Name, string Value)
     COMMON_COMPONENT* c = mutable_common()->clone();
     try{
       c->set_param_by_name(Name,Value);
-    }catch(Exception_No_Match){ itested();
-      if(!isvalue){ itested();
+    }catch(Exception_No_Match){
+      if(!isvalue){
 	delete c;
 	throw;
       }

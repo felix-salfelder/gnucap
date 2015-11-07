@@ -12,11 +12,16 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/include -I$(top_srcdir)/include \
 	-I$(top_builddir)/src -I$(top_srcdir)/src
 
+AM_DEFAULT_SOURCE_EXT = .cc
+
 #------------------------------------------------------------------------
 plugin_LTLIBRARIES += models-uf.la
 models_uf_la_SOURCES = empty.cc
 empty.cc:
 	touch $@
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += d_gpolyk_wrap.la
+d_gpolyk_wrap_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 #------------------------------------------------------------------------
 plugin_LTLIBRARIES += rcd_sym.la
 rcd_sym_la_SOURCES = d_rcd_sym.cc d_rcd_exp.cc

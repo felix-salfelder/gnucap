@@ -169,8 +169,8 @@
  0.0019896 -0.70731   -0.60901   -0.065434   0.0020054  0.002      0.0020071  0.        
  0.002      ~~.f       0.         0.         0.0020135  0.0020208  0.0020155  0.        
 V1 ( 1 0 ) sffm offset= 0. amplitude= 1. carrier= 10.K modindex= 2. signal= 1.K samples= 0.
-V3 ( 3 0 ) sin offset=NA( 0.) amplitude=NA( 1.) frequency= 10.K delay=NA( 0.) damping=NA( 0.) samples= 0.
-V4 ( 4 0 ) sin offset=NA( 0.) amplitude=NA( 1.) frequency= 1.K delay=NA( 0.) damping=NA( 0.) samples= 0.
+V3 ( 3 0 ) sin offset=NA( 0.) amplitude=NA( 1.) frequency= 10.K samples= 0.
+V4 ( 4 0 ) sin offset=NA( 0.) amplitude=NA( 1.) frequency= 1.K samples= 0.
 Gnucap   System status
 iterations: op=0, dc=0, tran=503, fourier=0, total=671
 transient timesteps: accepted=168, rejected=0, total=168

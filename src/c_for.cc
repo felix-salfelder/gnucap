@@ -36,7 +36,7 @@ namespace {
   using std::string;
   static string tempfile = STEPFILE;
   char my_tempfile[swp_nest_max][128];
-  vector<string> body[swp_nest_max];
+  std::vector<string> body[swp_nest_max];
   std::string para_name[swp_nest_max];
   double start[swp_nest_max];
   double last[swp_nest_max];

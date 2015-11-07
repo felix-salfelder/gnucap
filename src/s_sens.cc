@@ -72,8 +72,8 @@ private:
     string label;
     CKT_BASE* brh[2];
   };
-  vector<output_t> _output;
-  vector<output_t>::iterator _output_iter;
+  std::vector<output_t> _output;
+  std::vector<output_t>::iterator _output_iter;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -1,8 +1,8 @@
 V1 ( nin 0 ) pulse iv=-1. pv= 1. delay=-0.75 rise= 1. fall= 0.5 width= 1. period=NA( Inf)
 * V1 nin 0 -1 
 .model my_rcd rcd ( tnom=NA( 27.) anneal=NA(1) rem=NA( 1.Meg) Re=NA( 1.) Rc=NA( 1.))
-rcdpos ( nin 0 )  my_rcd  weight=1 rc1=-2 rc0=5 re1=3 re0=4 positive=1 mu=NA( 10.u)
-rcdneg ( nin 0 )  my_rcd  weight=1 rc1=-2 rc0=5 re1=3 re0=4 positive=0 mu=NA( 10.u)
+rcdpos ( nin 0 ) my_rcd weight=1 rc1=-2 rc0=5 re1=3 re0=4 positive=1 mu=NA( 10.u)
+rcdneg ( nin 0 ) my_rcd weight=1 rc1=-2 rc0=5 re1=3 re0=4 positive=0 mu=NA( 10.u)
 #Time            P(rcdpos)       P(rcdneg)       v(nin)          stress(rcdpos)  stress(rcdneg) 
  0.              0.              0.              0.5             0.5             0.5            
  0.002           24.82216403E-6  24.82216403E-6  0.504           0.504           0.504          

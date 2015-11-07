@@ -1,0 +1,21 @@
+load d_gpolyk_wrap.so
+spice
+ga 0 1a poly(1) c1 0 0 1
+
+* pseudo-spice
+gb ( 0 1b c1 0 ) poly(1) coeffs=(0,1)
+
+.list
+.verilog
+list
+spice
+
+R1a 1a 0 1
+R1b 1b 0 1
+Vc1 c1 0 1
+
+Vbias 1 0 1
+.print dc v(nodes)
+.dc Vc1 0 2 1
+
+.end
