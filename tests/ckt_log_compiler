@@ -1,10 +1,14 @@
 #!/bin/bash
 
-[ x$1 = xSKIP ] && exit 77
+[ x$2 = xSKIP ] && exit 77
 
-base=`basename $1`
+base=`basename $2`
 out=${base}.out
-ref=${1}.ref
+ref=${2}.ref
+if [ ! -f $ref ]; then
+   ref=${1}/$ref
+fi
+
 make $out
 # diff $out $ref
 ./gnucap-testfilter $out < $ref | diff -up - $ref --label $ref || exit 1
