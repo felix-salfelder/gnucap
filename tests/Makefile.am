@@ -12,14 +12,18 @@ AM_TESTS_ENVIRONMENT = \
            MAKEFLAGS=--no-print-directory \
            srcdir='$(srcdir)';
 AM_TESTS_FD_REDIRECT = 9>&2
-TEST_EXTENSIONS = .sh .gc
+TEST_EXTENSIONS = .gc .ckt
 
 GC_LOG_COMPILER = $(top_srcdir)/tests/gc_log_compiler
+CKT_LOG_COMPILER = $(top_srcdir)/tests/ckt_log_compiler
 SH_LOG_COMPILER = $(SHELL)
+
+AM_CKT_LOG_FLAGS = $(srcdir)
 
 TESTS = \
     gnucap_run.sh \
     $(GC_TESTS) \
+    $(LOGIC_TESTS) \
     $(CKT_TESTS)
 
 REF = ==out
@@ -40,479 +44,480 @@ empty=
 $(empty)install-pluginPROGRAMS: transform=
 
 CKT_TESTS = \
-    1lin.sh \
-    ap_ctof.2.sh \
-    ap_ctof.sh \
-    basic.sh \
-    bm_complex.1a.sh \
-    bm_complex.1.sh \
-    bm_complex.2.sh \
-    bm_complex.3.sh \
-    bm_complex.4.sh \
-    bm_cond.1.sh \
-    bm_cond.2.sh \
-    bm_cond.3.sh \
-    bm_exp.1.sh \
-    bm_exp.1p.sh \
-    bm_exp.2.sh \
-    bm_exp.3.sh \
-    bm_exp.3p.sh \
-    bm_exp.4p.sh \
-    bm_exp.5p.sh \
-    bm_fit.0.1.sh \
-    bm_fit.1.1.sh \
-    bm_fit.2.1.sh \
-    bm_fit.2.2.sh \
-    bm_fit.2.3.sh \
-    bm_fit.2.4.sh \
-    bm_fit.3.1.sh \
-    bm_fit.3.2.sh \
-    bm_fit.3.3.sh \
-    bmm_cap.1.sh \
-    bmm_cap.2.sh \
-    bmm_cap.3.sh \
-    bmm_cap.4.sh \
-    bmm_cap.5.sh \
-    bmm_res.1.sh \
-    bmm_res.1p.sh \
-    bmm_res.2.sh \
-    bmm_res.2p.sh \
-    bmm_res.3.sh \
-    bmm_res.3p.sh \
-    bmm_res.4.sh \
-    bmm_res.4p.sh \
-    bmm_res.5.sh \
-    bmm_res.5p.sh \
-    bm_poly.0.sh \
-    bm_poly.1.sh \
-    bm_poly.2.sh \
-    bm_posy.1.sh \
-    bm_pulse.1.sh \
-    bm_pulse.2.sh \
-    bm_pulse.3.sh \
-    bm_pwl.1.sh \
-    bm_pwl.2.sh \
-    bm_pwl.3.sh \
-    bm_pwl.4.sh \
-    bm_pwl.5.sh \
-    bm_sffm.1.sh \
-    bm_sffm.2.sh \
-    bm_sffm.3.sh \
-    bm_sffm.4.sh \
-    bm_sffm.5.sh \
-    bm_sffm.6.sh \
-    bm_sin.1.sh \
-    bm_sin.2.sh \
-    bm_sin.3.sh \
-    bm_sin.4.sh \
-    bm_sin.5.sh \
-    bm_sin.6.sh \
-    bm_sin.7.sh \
-    bm_sin.8.sh \
-    bm_sin.9.sh \
-    bm_table.1.1.sh \
-    bm_table.2.1.sh \
-    bm_table.2.2.sh \
-    bm_table.2.3.sh \
-    bm_table.2.4.sh \
-    bm_table.3.1.sh \
-    bm_table.3.2.sh \
-    bm_table.3.3.sh \
-    bm_table.error1.sh \
-    bm_tanh.1.sh \
-    bm_tanh.2.sh \
-    cc.sh \
-    c.sh \
-    c_delete.2.sh \
-    c_delete.3.sh \
-    c_delete.4.sh \
-    c_delete.5.sh \
-    c_delete.6.sh \
-    c_delete.7.sh \
-    c_delete.sh \
-    c_eval.1.sh \
-    c_getckt.sh \
-    charge-cons2.sh \
-    charge-cons3.sh \
-    charge-cons.sh \
-    c_help.1.sh \
-    c_lib.1.sh \
-    c_list.sh \
-    c_list.1.sh \
-    c_measure.1.sh \
-    c_measure.2.sh \
-    c_modify.sh \
-    cont.1.sh \
-    cont.2.sh \
-    cont.3.sh \
-    current.sh \
-    d_bjt.2.sh \
-    d_bjt.sh \
-    d_bjt-diffpair-ccs.sh \
-    d_bjt-diffpair-cjc.sh \
-    d_bjt-diffpair-dc.sh \
-    d_bjt-diffpair-nocap.sh \
-    d_bjt-diffpair-tf.sh \
-    d_bjt-diffpair-tran.sh \
-    d_bjt-diffpair-tr.sh \
-    d_bjt-diffpair-tr2.sh \
-    d_bjt.error1.sh \
-    d_bjt-pnp.sh \
-    d_bjt-rca3040.sh \
-    d_bjt-rtlinv.sh \
-    d_bjt-schmitt-bypass.sh \
-    d_bjt-schmitt-nobypass.sh \
-    d_cap.1.sh \
-    d_cap.2.sh \
-    d_cap.3a.sh \
-    d_cap.3.sh \
-    d_cap.4.sh \
-    d_cap.5.sh \
-    d_cap.6.sh \
-    d_cap.ic1.sh \
-    d_cap.ic2.sh \
-    d_cap.ic4.sh \
-    d_cccs.1.sh \
-    d_cccs.2.sh \
-    d_cccs.3.sh \
-    d_cccs.4.sh \
-    d_cccs.5.sh \
-    d_cccs.6.sh \
-    d_ccvs.1.sh \
-    d_ccvs.2.sh \
-    d_ccvs.3.sh \
-    d_coil.1a.sh \
-    d_coil.1b.sh \
-    d_coil.1c.sh \
-    d_coil.1.sh \
-    d_coil.1d.sh \
-    d_coil.1e.sh \
-    d_coil.2.sh \
-    d_coil.3.sh \
-    d_coil.4.sh \
-    d_coil.5.sh \
-    d_coil.error1.sh \
-    d_coil.error2.sh \
-    d_coil.error3.sh \
-    d_coil.error4.sh \
-    d_coil.error5.sh \
-    d_coil.m3a.sh \
-    d_coil.m3.sh \
-    d_diode.10a.sh \
-    d_diode.10.sh \
-    d_diode.11a.sh \
-    d_diode.11b.sh \
-    d_diode.11c.sh \
-    d_diode.11.sh \
-    d_diode.11d.sh \
-    d_diode.12.sh \
-    d_diode.1.sh \
-    d_diode.2.sh \
-    d_diode.3.sh \
-    d_diode.4.sh \
-    d_diode.5.sh \
-    d_diode.6.sh \
-    d_diode.7.sh \
-    d_diode.8.sh \
-    d_diode.9.sh \
-    d_diode.error1.sh \
-    d_logic.1.sh \
-    d_logic.1a.sh \
-    d_logic.2.sh \
-    d_logic.3.sh \
-    d_logic.4.sh \
-    d_logic.5.sh \
-    d_logic.6.sh \
-    d_logic.7.sh \
-    d_logic.error1.sh \
-    d_macro.1.sh \
-    d_mos1.bin1.sh \
-    d_mos1.bin2.sh \
-    d_mos1.bin3.sh \
-    d_mos1.inv1.sh \
-    d_mos1.inv2.sh \
-    d_mos1.inv3.sh \
-    d_mos1.lin1.sh \
-    d_mos1.lin1.late.sh \
-    d_mos1.lin1.none.sh \
-    d_mos1.lin2.sh \
-    d_mos1.lin3.sh \
-    d_mos1.lin4.sh \
-    d_mos1.lin5.sh \
-    d_mos1.n0.sh \
-    d_mos1.n-1.sh \
-    d_mos1.n+1.sh \
-    d_mos1.nand1.sh \
-    d_mos1.nand2.sh \
-    d_mos1.p0.sh \
-    d_mos1.p-1.sh \
-    d_mos1.p+1.sh \
-    d_mos1.plin.sh \
-    d_mos1.psat1.sh \
-    d_mos1.psat2.sh \
-    d_mos1.psat3.sh \
-    d_mos1.sat1.sh \
-    d_mos1.sat2.sh \
-    d_mos1.sat3.sh \
-    d_mos1.sat4.sh \
-    d_mos1.sat5.sh \
-    d_mos1.sat6.sh \
-    d_mos1.sat7.sh \
-    d_mos1.sts.sh \
-    d_mos1.zero.sh \
-    d_mos2.inv1.sh \
-    d_mos2.lin1.sh \
-    d_mos2.lin1.late.sh \
-    d_mos2.lin1r.sh \
-    d_mos2.lin1z.sh \
-    d_mos2.lin2.sh \
-    d_mos2.lin3.sh \
-    d_mos2.lin4.sh \
-    d_mos2.lin5.sh \
-    d_mos2.n0.sh \
-    d_mos2.n-1.sh \
-    d_mos2.n+1.sh \
-    d_mos2.nand1.sh \
-    d_mos2.p0.sh \
-    d_mos2.p-1.sh \
-    d_mos2.p+1.sh \
-    d_mos2.plin.sh \
-    d_mos2.psat1.sh \
-    d_mos2.psat2.sh \
-    d_mos2.psat3.sh \
-    d_mos2.sat1.sh \
-    d_mos2.sat2.sh \
-    d_mos2.sat3.sh \
-    d_mos2.sat4.sh \
-    d_mos2.sat5.sh \
-    d_mos2.sat6.sh \
-    d_mos2.sat7.sh \
-    d_mos2.sts.sh \
-    d_mos2.zero.sh \
-    d_mos3.inv1.sh \
-    d_mos3.lin1.sh \
-    d_mos3.lin1r.sh \
-    d_mos3.lin1z.sh \
-    d_mos3.lin2.sh \
-    d_mos3.lin3.sh \
-    d_mos3.lin4.sh \
-    d_mos3.lin5.sh \
-    d_mos3.n0.sh \
-    d_mos3.n-1.sh \
-    d_mos3.n+1.sh \
-    d_mos3.nand1.sh \
-    d_mos3.p0.sh \
-    d_mos3.p-1.sh \
-    d_mos3.p+1.sh \
-    d_mos3.plin.sh \
-    d_mos3.psat1.sh \
-    d_mos3.psat2.sh \
-    d_mos3.psat3.sh \
-    d_mos3.sat000.sh \
-    d_mos3.sat007.sh \
-    d_mos3.sat1.sh \
-    d_mos3.sat2.sh \
-    d_mos3.sat3.sh \
-    d_mos3.sat4.sh \
-    d_mos3.sat5.sh \
-    d_mos3.sat6.sh \
-    d_mos3.sat7.sh \
-    d_mos3.sts000.sh \
-    d_mos3.sts.sh \
-    d_mos3.zero.sh \
-    d_mos4.1.sh \
-    d_mos4.2.sh \
-    d_mos4.3.sh \
-    d_mos49.nand1.sh \
-    d_mos5.1.sh \
-    d_mos6.inv1.sh \
-    d_mos6.lin1.sh \
-    d_mos6.lin1r.sh \
-    d_mos6.lin1z.sh \
-    d_mos6.lin2.sh \
-    d_mos6.lin2r.sh \
-    d_mos6.lin2z.sh \
-    d_mos6.n0.sh \
-    d_mos6.n-1.sh \
-    d_mos6.n+1.sh \
-    d_mos6.nand1.sh \
-    d_mos6.p0.sh \
-    d_mos6.p-1.sh \
-    d_mos6.p+1.sh \
-    d_mos6.plin.sh \
-    d_mos6.psat1.sh \
-    d_mos6.psat2.sh \
-    d_mos6.psat3.sh \
-    d_mos6.sat1.sh \
-    d_mos6.sat1r.sh \
-    d_mos6.sat1s.sh \
-    d_mos6.sat1v.sh \
-    d_mos6.sat2.sh \
-    d_mos6.sat2r.sh \
-    d_mos6.sat3.sh \
-    d_mos6.sat3r.sh \
-    d_mos6.sts000.sh \
-    d_mos6.sts.sh \
-    d_mos6.zero.sh \
-    d_mos7.alpha.sh \
-    d_mos7.inv1.sh \
-    d_mos7.lin1.sh \
-    d_mos7.lin2.sh \
-    d_mos7.nand1.sh \
-    d_mos7.nand1.nobypass.sh \
-    d_mos7.plin.sh \
-    d_mos7.psat.sh \
-    d_mos7.sat1.sh \
-    d_mos7.sat2.sh \
-    d_mos7.sat3.sh \
-    d_mos7.sts.sh \
-    d_mos7.zero.sh \
-    d_mos8c2.nand1.sh \
-    d_mos8c2.nand1.nobypass.sh \
-    d_mos8.nand1.sh \
-    d_mos8.sat2.sh \
-    d_mos8.sat3.sh \
-    d_mos8.sat4.sh \
-    d_mos.error1.sh \
-    d_mos.error2.sh \
-    d_mos.error3.sh \
-    d_mos.error4.sh \
-    d_subckt.1.sh \
-    d_subckt.2.sh \
-    d_subckt.3.sh \
-    d_subckt.4.sh \
-    d_subckt.5.sh \
-    d_subckt.6.sh \
-    d_subckt.7.sh \
-    d_subckt.8.sh \
-    d_subckt.9.sh \
-    d_subckt.error1.sh \
-    d_subckt.error2.sh \
-    d_subckt.error3.sh \
-    d_subckt.error4.sh \
-    d_switch.c0.sh \
-    d_switch.c1a.sh \
-    d_switch.c1.sh \
-    d_switch.c1.inc.sh \
-    d_switch.c1.noinc.sh \
-    d_switch.c1r.sh \
-    d_switch.c2a.sh \
-    d_switch.c2.sh \
-    d_switch.c2r.sh \
-    d_switch.c3.sh \
-    d_switch.error1.sh \
-    d_switch.error2.sh \
-    d_switch.error3.sh \
-    d_switch.nro.1.sh \
-    d_switch.nro.1e.sh \
-    d_switch.nro.1g.sh \
-    d_switch.nro.1gr.sh \
-    d_switch.nro.2.sh \
-    d_switch.nro.3.sh \
-    d_switch.nro.3h.sh \
-    d_switch.nro.4.sh \
-    d_switch.v.cont.sh \
-    d_switch.v.sh \
-    d_switch.vr.sh \
-    d_tcap.1.sh \
-    d_tcap.2.sh \
-    d_tcap.3.sh \
-    d_tcap.4.sh \
-    d_trln.ac.sh \
-    d_trln.tr.100.im.sh \
-    d_trln.tr.100.nim.sh \
-    d_trln.tr.300.im.sh \
-    d_trln.tr.300.nim.sh \
-    d_trln.tr.im.sh \
-    d_trln.tr.m.sh \
-    d_trln.tr.nim.sh \
-    d_vccap.1.sh \
-    d_vccap.2.sh \
-    d_vcg.1.sh \
-    d_vcg.2.sh \
-    d_vcg.3.sh \
-    d_vcg.4.sh \
-    d_vcg.5.sh \
-    d_vcr.1.sh \
-    d_vcr.2.sh \
-    d_vcr.3.sh \
-    d_vcr.4.sh \
-    d_vcr.5.sh \
-    d_vcvs.1.sh \
-    dc_temp.sh \
-    dcsweep.sh \
-    e_ccsrc.1.sh \
-    e_ccsrc.2.sh \
-    e_node_probes.sh \
-    eq3-1153.sh \
-    eq3-1153.fg2.sh \
-    eq3-1153.fg.sh \
-    eq3-1153.tr-b.sh \
-    eq3-1153.tr-nb.sh \
-    eq3-1153.tr-ni.sh \
-    eq4-9217.tran.sh \
-    eqb1.sh \
-    eqboost.sh \
-    eqflat.sh \
-    eqmodify.sh \
-    e_storag.1.sh \
-    list.1.sh \
-    l2.sh \
-    l.sh \
-    ll1.sh \
-    ll.sh \
-    lll.sh \
-    llll.sh \
-    m_expression.1.sh \
-    m_expression.2.sh \
-    m_expression.3.sh \
-    m_expression.error.1.sh \
-    named_nodes.sh \
-    nmos100.1.sh \
-    nmos100.sh \
-    nmos15a.sh \
-    nmos15.sh \
-    nmp100.sh \
-    nothing.sh \
-    opamp-ol.sh \
-    opamp-ol-disto.2.sh \
-    opamp-ol-disto.sh \
-    opamp-vf.1.sh \
-    opamp-vf.1d.sh \
-    opamp-vf.2.sh \
-    opamp-vf.3.sh \
-    opamp-vf.sh \
-    oscillator.1.sh \
-    oscillator.2.sh \
-    oscillator.3.sh \
-    oscillator.4.sh \
-    oscillator.5.sh \
-    oscillator.6.sh \
-    oscillator.7.sh \
-    param.0a.sh \
-    param.0.sh \
-    param.10.sh \
-    param.11.sh \
-    param.12.sh \
-    param.1.sh \
-    param.2a.sh \
-    param.2b.sh \
-    param.2c.sh \
-    param.2.sh \
-    param.3.sh \
-    param.4.sh \
-    param.5.sh \
-    param.6.sh \
-    param.7.sh \
-    param.8.sh \
-    param.9.sh \
-    parse.1.sh \
-    sl.sh \
-    trcurve2.sh \
-    trcurve.sh \
-    trcurves.sh
+    1lin.ckt \
+    ap_ctof.2.ckt \
+    ap_ctof.ckt \
+    basic.ckt \
+    bm_complex.1a.ckt \
+    bm_complex.1.ckt \
+    bm_complex.2.ckt \
+    bm_complex.3.ckt \
+    bm_complex.4.ckt \
+    bm_cond.1.ckt \
+    bm_cond.2.ckt \
+    bm_cond.3.ckt \
+    bm_exp.1.ckt \
+    bm_exp.1p.ckt \
+    bm_exp.2.ckt \
+    bm_exp.3.ckt \
+    bm_exp.3p.ckt \
+    bm_exp.4p.ckt \
+    bm_exp.5p.ckt \
+    bm_fit.0.1.ckt \
+    bm_fit.1.1.ckt \
+    bm_fit.2.1.ckt \
+    bm_fit.2.2.ckt \
+    bm_fit.2.3.ckt \
+    bm_fit.2.4.ckt \
+    bm_fit.3.1.ckt \
+    bm_fit.3.2.ckt \
+    bm_fit.3.3.ckt \
+    bmm_cap.1.ckt \
+    bmm_cap.2.ckt \
+    bmm_cap.3.ckt \
+    bmm_cap.4.ckt \
+    bmm_cap.5.ckt \
+    bmm_res.1.ckt \
+    bmm_res.1p.ckt \
+    bmm_res.2.ckt \
+    bmm_res.2p.ckt \
+    bmm_res.3.ckt \
+    bmm_res.3p.ckt \
+    bmm_res.4.ckt \
+    bmm_res.4p.ckt \
+    bmm_res.5.ckt \
+    bmm_res.5p.ckt \
+    bm_poly.0.ckt \
+    bm_poly.1.ckt \
+    bm_poly.2.ckt \
+    bm_posy.1.ckt \
+    bm_pulse.1.ckt \
+    bm_pulse.2.ckt \
+    bm_pulse.3.ckt \
+    bm_pwl.1.ckt \
+    bm_pwl.2.ckt \
+    bm_pwl.3.ckt \
+    bm_pwl.4.ckt \
+    bm_pwl.5.ckt \
+    bm_sffm.1.ckt \
+    bm_sffm.2.ckt \
+    bm_sffm.3.ckt \
+    bm_sffm.4.ckt \
+    bm_sffm.5.ckt \
+    bm_sffm.6.ckt \
+    bm_sin.1.ckt \
+    bm_sin.2.ckt \
+    bm_sin.3.ckt \
+    bm_sin.4.ckt \
+    bm_sin.5.ckt \
+    bm_sin.6.ckt \
+    bm_sin.7.ckt \
+    bm_sin.8.ckt \
+    bm_sin.9.ckt \
+    bm_table.1.1.ckt \
+    bm_table.2.1.ckt \
+    bm_table.2.2.ckt \
+    bm_table.2.3.ckt \
+    bm_table.2.4.ckt \
+    bm_table.3.1.ckt \
+    bm_table.3.2.ckt \
+    bm_table.3.3.ckt \
+    bm_table.error1.ckt \
+    bm_tanh.1.ckt \
+    bm_tanh.2.ckt \
+    cc.ckt \
+    c.ckt \
+    c_delete.2.ckt \
+    c_delete.3.ckt \
+    c_delete.4.ckt \
+    c_delete.5.ckt \
+    c_delete.6.ckt \
+    c_delete.7.ckt \
+    c_delete.ckt \
+    c_eval.1.ckt \
+    c_getckt.ckt \
+    charge-cons2.ckt \
+    charge-cons3.ckt \
+    charge-cons.ckt \
+    c_help.1.ckt \
+    c_lib.1.ckt \
+    c_list.ckt \
+    c_list.1.ckt \
+    c_measure.1.ckt \
+    c_measure.2.ckt \
+    c_modify.ckt \
+    cont.1.ckt \
+    cont.2.ckt \
+    cont.3.ckt \
+    current.ckt \
+    d_bjt.2.ckt \
+    d_bjt.ckt \
+    d_bjt-diffpair-ccs.ckt \
+    d_bjt-diffpair-cjc.ckt \
+    d_bjt-diffpair-dc.ckt \
+    d_bjt-diffpair-nocap.ckt \
+    d_bjt-diffpair-tf.ckt \
+    d_bjt-diffpair-tran.ckt \
+    d_bjt-diffpair-tr.ckt \
+    d_bjt-diffpair-tr2.ckt \
+    d_bjt.error1.ckt \
+    d_bjt-pnp.ckt \
+    d_bjt-rca3040.ckt \
+    d_bjt-rtlinv.ckt \
+    d_bjt-schmitt-bypass.ckt \
+    d_bjt-schmitt-nobypass.ckt \
+    d_cap.1.ckt \
+    d_cap.2.ckt \
+    d_cap.3a.ckt \
+    d_cap.3.ckt \
+    d_cap.4.ckt \
+    d_cap.5.ckt \
+    d_cap.6.ckt \
+    d_cap.ic1.ckt \
+    d_cap.ic2.ckt \
+    d_cap.ic4.ckt \
+    d_cccs.1.ckt \
+    d_cccs.2.ckt \
+    d_cccs.3.ckt \
+    d_cccs.4.ckt \
+    d_cccs.5.ckt \
+    d_cccs.6.ckt \
+    d_ccvs.1.ckt \
+    d_ccvs.2.ckt \
+    d_ccvs.3.ckt \
+    d_coil.1a.ckt \
+    d_coil.1b.ckt \
+    d_coil.1c.ckt \
+    d_coil.1.ckt \
+    d_coil.1d.ckt \
+    d_coil.1e.ckt \
+    d_coil.2.ckt \
+    d_coil.3.ckt \
+    d_coil.4.ckt \
+    d_coil.5.ckt \
+    d_coil.error1.ckt \
+    d_coil.error2.ckt \
+    d_coil.error3.ckt \
+    d_coil.error4.ckt \
+    d_coil.error5.ckt \
+    d_coil.m3a.ckt \
+    d_coil.m3.ckt \
+    d_diode.10a.ckt \
+    d_diode.10.ckt \
+    d_diode.11a.ckt \
+    d_diode.11b.ckt \
+    d_diode.11c.ckt \
+    d_diode.11.ckt \
+    d_diode.11d.ckt \
+    d_diode.12.ckt \
+    d_diode.1.ckt \
+    d_diode.2.ckt \
+    d_diode.3.ckt \
+    d_diode.4.ckt \
+    d_diode.5.ckt \
+    d_diode.6.ckt \
+    d_diode.7.ckt \
+    d_diode.8.ckt \
+    d_diode.9.ckt \
+    d_diode.error1.ckt \
+    d_logic.1.ckt \
+    d_logic.1a.ckt \
+    d_logic.2.ckt \
+    d_logic.3.ckt \
+    d_logic.4.ckt \
+    d_logic.5.ckt \
+    d_logic.6.ckt \
+    d_logic.7.ckt \
+    d_logic.error1.ckt \
+    d_macro.1.ckt \
+    d_mos1.bin1.ckt \
+    d_mos1.bin2.ckt \
+    d_mos1.bin3.ckt \
+    d_mos1.inv1.ckt \
+    d_mos1.inv2.ckt \
+    d_mos1.inv3.ckt \
+    d_mos1.lin1.ckt \
+    d_mos1.lin1.late.ckt \
+    d_mos1.lin1.none.ckt \
+    d_mos1.lin2.ckt \
+    d_mos1.lin3.ckt \
+    d_mos1.lin4.ckt \
+    d_mos1.lin5.ckt \
+    d_mos1.n0.ckt \
+    d_mos1.n-1.ckt \
+    d_mos1.n+1.ckt \
+    d_mos1.nand1.ckt \
+    d_mos1.nand2.ckt \
+    d_mos1.p0.ckt \
+    d_mos1.p-1.ckt \
+    d_mos1.p+1.ckt \
+    d_mos1.plin.ckt \
+    d_mos1.psat1.ckt \
+    d_mos1.psat2.ckt \
+    d_mos1.psat3.ckt \
+    d_mos1.sat1.ckt \
+    d_mos1.sat2.ckt \
+    d_mos1.sat3.ckt \
+    d_mos1.sat4.ckt \
+    d_mos1.sat5.ckt \
+    d_mos1.sat6.ckt \
+    d_mos1.sat7.ckt \
+    d_mos1.sts.ckt \
+    d_mos1.zero.ckt \
+    d_mos2.inv1.ckt \
+    d_mos2.lin1.ckt \
+    d_mos2.lin1.late.ckt \
+    d_mos2.lin1r.ckt \
+    d_mos2.lin1z.ckt \
+    d_mos2.lin2.ckt \
+    d_mos2.lin3.ckt \
+    d_mos2.lin4.ckt \
+    d_mos2.lin5.ckt \
+    d_mos2.n0.ckt \
+    d_mos2.n-1.ckt \
+    d_mos2.n+1.ckt \
+    d_mos2.nand1.ckt \
+    d_mos2.p0.ckt \
+    d_mos2.p-1.ckt \
+    d_mos2.p+1.ckt \
+    d_mos2.plin.ckt \
+    d_mos2.psat1.ckt \
+    d_mos2.psat2.ckt \
+    d_mos2.psat3.ckt \
+    d_mos2.sat1.ckt \
+    d_mos2.sat2.ckt \
+    d_mos2.sat3.ckt \
+    d_mos2.sat4.ckt \
+    d_mos2.sat5.ckt \
+    d_mos2.sat6.ckt \
+    d_mos2.sat7.ckt \
+    d_mos2.sts.ckt \
+    d_mos2.zero.ckt \
+    d_mos3.inv1.ckt \
+    d_mos3.lin1.ckt \
+    d_mos3.lin1r.ckt \
+    d_mos3.lin1z.ckt \
+    d_mos3.lin2.ckt \
+    d_mos3.lin3.ckt \
+    d_mos3.lin4.ckt \
+    d_mos3.lin5.ckt \
+    d_mos3.n0.ckt \
+    d_mos3.n-1.ckt \
+    d_mos3.n+1.ckt \
+    d_mos3.nand1.ckt \
+    d_mos3.p0.ckt \
+    d_mos3.p-1.ckt \
+    d_mos3.p+1.ckt \
+    d_mos3.plin.ckt \
+    d_mos3.psat1.ckt \
+    d_mos3.psat2.ckt \
+    d_mos3.psat3.ckt \
+    d_mos3.sat000.ckt \
+    d_mos3.sat007.ckt \
+    d_mos3.sat1.ckt \
+    d_mos3.sat2.ckt \
+    d_mos3.sat3.ckt \
+    d_mos3.sat4.ckt \
+    d_mos3.sat5.ckt \
+    d_mos3.sat6.ckt \
+    d_mos3.sat7.ckt \
+    d_mos3.sts000.ckt \
+    d_mos3.sts.ckt \
+    d_mos3.zero.ckt \
+    d_mos4.1.ckt \
+    d_mos4.2.ckt \
+    d_mos4.3.ckt \
+    d_mos49.nand1.ckt \
+    d_mos5.1.ckt \
+    d_mos6.inv1.ckt \
+    d_mos6.lin1.ckt \
+    d_mos6.lin1r.ckt \
+    d_mos6.lin1z.ckt \
+    d_mos6.lin2.ckt \
+    d_mos6.lin2r.ckt \
+    d_mos6.lin2z.ckt \
+    d_mos6.n0.ckt \
+    d_mos6.n-1.ckt \
+    d_mos6.n+1.ckt \
+    d_mos6.nand1.ckt \
+    d_mos6.p0.ckt \
+    d_mos6.p-1.ckt \
+    d_mos6.p+1.ckt \
+    d_mos6.plin.ckt \
+    d_mos6.psat1.ckt \
+    d_mos6.psat2.ckt \
+    d_mos6.psat3.ckt \
+    d_mos6.sat1.ckt \
+    d_mos6.sat1r.ckt \
+    d_mos6.sat1s.ckt \
+    d_mos6.sat1v.ckt \
+    d_mos6.sat2.ckt \
+    d_mos6.sat2r.ckt \
+    d_mos6.sat3.ckt \
+    d_mos6.sat3r.ckt \
+    d_mos6.sts000.ckt \
+    d_mos6.sts.ckt \
+    d_mos6.zero.ckt \
+    d_mos7.alpha.ckt \
+    d_mos7.inv1.ckt \
+    d_mos7.lin1.ckt \
+    d_mos7.lin2.ckt \
+    d_mos7.nand1.ckt \
+    d_mos7.nand1.nobypass.ckt \
+    d_mos7.plin.ckt \
+    d_mos7.psat.ckt \
+    d_mos7.sat1.ckt \
+    d_mos7.sat2.ckt \
+    d_mos7.sat3.ckt \
+    d_mos7.sts.ckt \
+    d_mos7.zero.ckt \
+    d_mos8c2.nand1.ckt \
+    d_mos8c2.nand1.nobypass.ckt \
+    d_mos8.nand1.ckt \
+    d_mos8.sat2.ckt \
+    d_mos8.sat3.ckt \
+    d_mos8.sat4.ckt \
+    d_mos.error1.ckt \
+    d_mos.error2.ckt \
+    d_mos.error3.ckt \
+    d_mos.error4.ckt \
+    d_subckt.1.ckt \
+    d_subckt.2.ckt \
+    d_subckt.3.ckt \
+    d_subckt.4.ckt \
+    d_subckt.5.ckt \
+    d_subckt.6.ckt \
+    d_subckt.7.ckt \
+    d_subckt.8.ckt \
+    d_subckt.9.ckt \
+    d_subckt.error1.ckt \
+    d_subckt.error2.ckt \
+    d_subckt.error3.ckt \
+    d_subckt.error4.ckt \
+    d_switch.c0.ckt \
+    d_switch.c1a.ckt \
+    d_switch.c1.ckt \
+    d_switch.c1.inc.ckt \
+    d_switch.c1.noinc.ckt \
+    d_switch.c1r.ckt \
+    d_switch.c2a.ckt \
+    d_switch.c2.ckt \
+    d_switch.c2r.ckt \
+    d_switch.c3.ckt \
+    d_switch.error1.ckt \
+    d_switch.error2.ckt \
+    d_switch.error3.ckt \
+    d_switch.nro.1.ckt \
+    d_switch.nro.1e.ckt \
+    d_switch.nro.1g.ckt \
+    d_switch.nro.1gr.ckt \
+    d_switch.nro.2.ckt \
+    d_switch.nro.3.ckt \
+    d_switch.nro.3h.ckt \
+    d_switch.nro.4.ckt \
+    d_switch.v.cont.ckt \
+    d_switch.v.ckt \
+    d_switch.vr.ckt \
+    d_tcap.1.ckt \
+    d_tcap.2.ckt \
+    d_tcap.3.ckt \
+    d_tcap.4.ckt \
+    d_trln.ac.ckt \
+    d_trln.tr.100.im.ckt \
+    d_trln.tr.100.nim.ckt \
+    d_trln.tr.300.im.ckt \
+    d_trln.tr.300.nim.ckt \
+    d_trln.tr.im.ckt \
+    d_trln.tr.m.ckt \
+    d_trln.tr.nim.ckt \
+    d_vccap.1.ckt \
+    d_vccap.2.ckt \
+    d_vcg.1.ckt \
+    d_vcg.2.ckt \
+    d_vcg.3.ckt \
+    d_vcg.4.ckt \
+    d_vcg.5.ckt \
+    d_vcr.1.ckt \
+    d_vcr.2.ckt \
+    d_vcr.3.ckt \
+    d_vcr.4.ckt \
+    d_vcr.5.ckt \
+    d_vcvs.1.ckt \
+    dc_temp.ckt \
+    dcsweep.ckt \
+    e_ccsrc.1.ckt \
+    e_ccsrc.2.ckt \
+    e_node_probes.ckt \
+    eq3-1153.ckt \
+    eq3-1153.fg2.ckt \
+    eq3-1153.fg.ckt \
+    eq3-1153.tr-b.ckt \
+    eq3-1153.tr-nb.ckt \
+    eq3-1153.tr-ni.ckt \
+    eq4-9217.tran.ckt \
+    eqb1.ckt \
+    eqboost.ckt \
+    eqflat.ckt \
+    eqmodify.ckt \
+    e_storag.1.ckt \
+    list.1.ckt \
+    l2.ckt \
+    l.ckt \
+    ll1.ckt \
+    ll.ckt \
+    lll.ckt \
+    llll.ckt \
+    m_expression.1.ckt \
+    m_expression.2.ckt \
+    m_expression.3.ckt \
+    m_expression.error.1.ckt \
+    named_nodes.ckt \
+    nmos100.1.ckt \
+    nmos100.ckt \
+    nmos15a.ckt \
+    nmos15.ckt \
+    nmp100.ckt \
+    nothing.ckt \
+    opamp-ol.ckt \
+    opamp-ol-disto.2.ckt \
+    opamp-ol-disto.ckt \
+    opamp-vf.1.ckt \
+    opamp-vf.1d.ckt \
+    opamp-vf.2.ckt \
+    opamp-vf.3.ckt \
+    opamp-vf.ckt \
+    oscillator.1.ckt \
+    oscillator.2.ckt \
+    oscillator.3.ckt \
+    oscillator.4.ckt \
+    oscillator.5.ckt \
+    oscillator.6.ckt \
+    oscillator.7.ckt \
+    param.0a.ckt \
+    param.0.ckt \
+    param.10.ckt \
+    param.11.ckt \
+    param.12.ckt \
+    param.1.ckt \
+    param.2a.ckt \
+    param.2b.ckt \
+    param.2c.ckt \
+    param.2.ckt \
+    param.3.ckt \
+    param.4.ckt \
+    param.5.ckt \
+    param.6.ckt \
+    param.7.ckt \
+    param.8.ckt \
+    param.9.ckt \
+    parse.1.ckt \
+    sl.ckt \
+    trcurve2.ckt \
+    trcurve.ckt \
+    trcurves.ckt
 
-XFAIL_TESTS = list.1.sh
+# bm_cond stuff
+XFAIL_TESTS = list.1.ckt
 
 # recheck
 XFAIL_TESTS += lang_verilog.3.gc
@@ -524,44 +529,44 @@ XFAIL_TESTS += lang_spectre.2.gc
 XFAIL_TESTS += lang_spice.1b.gc
 
 # needs work
-XFAIL_TESTS += d_bjt-diffpair-tr2.sh
+XFAIL_TESTS += d_bjt-diffpair-tr2.ckt
 
 # interactive mode broken?
 XFAIL_TESTS += c_attach.1.gc
 
 # cond parser broken
-XFAIL_TESTS+= param.2c.sh
+XFAIL_TESTS+= param.2c.ckt
 
 # logic is broken. needs work
 LOGIC_TESTS = \
-    d_logic_nand-dc.sh \
-    d_logic_tr_ab1.sh \
-    d_logic_tr_ab2.sh \
-    d_logic_tr_an1.sh \
-    d_logic_tr_an2.sh \
-    d_logic_tr_db1.sh \
-    d_logic_tr_db2.sh \
-    d_logic_tr_dn1.sh \
-    d_logic_tr_dn2.sh \
-    d_logic_tr_mb1a.sh \
-    d_logic_tr_mb1b.sh \
-    d_logic_tr_mb2a.sh \
-    d_logic_tr_mb2b.sh \
-    d_logic_tr_mn1a.sh \
-    d_logic_tr_mn1b.sh \
-    d_logic_tr_mn2a.sh \
-    d_logic_tr_mn2b.sh
+    d_logic_nand-dc.ckt \
+    d_logic_tr_ab1.ckt \
+    d_logic_tr_ab2.ckt \
+    d_logic_tr_an1.ckt \
+    d_logic_tr_an2.ckt \
+    d_logic_tr_db1.ckt \
+    d_logic_tr_db2.ckt \
+    d_logic_tr_dn1.ckt \
+    d_logic_tr_dn2.ckt \
+    d_logic_tr_mb1a.ckt \
+    d_logic_tr_mb1b.ckt \
+    d_logic_tr_mb2a.ckt \
+    d_logic_tr_mb2b.ckt \
+    d_logic_tr_mn1a.ckt \
+    d_logic_tr_mn1b.ckt \
+    d_logic_tr_mn2a.ckt \
+    d_logic_tr_mn2b.ckt
 
 # these are really broken...
 XFAIL_TESTS += \
-    c_delete.6.sh \
-    c_delete.7.sh \
-    m_expression.3.sh \
-    param.9.sh \
-    param.8.sh
+    c_delete.6.ckt \
+    c_delete.7.ckt \
+    m_expression.3.ckt \
+    param.9.ckt \
+    param.8.ckt
 
 # functions need to return expressions, not doubles
-XFAIL_TESTS+= c_measure.1.sh
+XFAIL_TESTS+= c_measure.1.ckt
 
 # something wrong with probes
 XFAIL_TESTS+= print_v.sh
@@ -778,26 +783,31 @@ AUTO_TESTS = $(CKT_TESTS) $(CUSTOM_TESTS)
 
 gsl_tests: $(GSL_TESTS:%.gc=%.log)
 gc_tests: $(GC_TESTS:%.gc=%.log)
-ckt_tests: $(CKT_TESTS:%.sh=%.log)
+ckt_tests: $(CKT_TESTS:%.ckt=%.log)
+logic_tests: $(LOGIC_TESTS:%.ckt=%.log)
 
 .PHONY: .P
 
 .P:
 	@:
 
-$(AUTO_TESTS:%.sh=%.out): .P $(FILTER)
+# $(AUTO_TESTS:%.sh=%.out): .P $(FILTER)
 $(GC_TESTS:%.gc=%.gc.out): .P $(FILTER)
 $(GC_TESTS:%.gc=%.log): .P $(FILTER)
+$(CKT_TESTS:%.ckt=%.log): .P $(FILTER)
+$(CKT_TESTS:%.ckt=%.ckt.out): .P $(FILTER)
+# $(LOGIC_TESTS:%.ckt=%.log): .P $(FILTER)
+$(LOGIC_TESTS:%=%.out): .P $(FILTER)
 
-$(CKT_TESTS): %.sh: %.out
+# $(CKT_TESTS): %.sh: %.out
 
 # try this first
-$(CKT_TESTS:%.sh:%.log): gnucap_run.log
+$(CKT_TESTS:%.ckt:%.log): gnucap_run.log
 
 # this will trigger a warning in autogen.sh
 # (apparently this warning is s bug)
-c_getckt.out: | $(PWD)/d_cccs.1.ckt
-c_lib.1.out: | $(PWD)/c_lib.1.ckt
+c_getckt.ckt.out: | $(PWD)/d_cccs.1.ckt
+c_lib.1.ckt.out: | $(PWD)/c_lib.1.ckt
 
 lang_spice.1a.log lang_verilog.1a.log: soclean | $(PWD)/bm_wrapper.cc
 lang_spice.1a.gc.out lang_verilog.1a.gc.out: POSTDIFF+= '/^CXX/d'
@@ -816,7 +826,7 @@ PREDIFF= \
 d_logic_tr_%.out: POSTDIFF+= '3·s/[01]\.········$$/X.········/'
 
 # just zero noise
-trcurve.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
+trcurve.ckt.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
                         '411·s/727\.2E-18/0.·······/g' \
                         '411·s/317\.6E-18/0.·······/g' \
                         '462·s/795\.6E-18/0.·······/g' \
@@ -824,11 +834,11 @@ trcurve.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
                         '513·s/864\.E-18/0.······/g' \
                         '513·s/438\.4E-18/0.·······/g'
 
-$(CKT_TESTS:%.sh=%.out): %.out: %.ckt
+$(CKT_TESTS:%=%.out) $(LOGIC_TESTS:%=%.out): %.ckt.out: %.ckt
 	@LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
 	    ../src/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
-	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.out
+	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.ckt.out
 
 # close to zero...
 d_vcg.%.out: POSTDIFF+= '27·s/975\.[0-9][0-9]f/0.·····/'
@@ -841,22 +851,22 @@ bm_poly.%.out: POSTDIFF+= '30·s/-..\.f/·0.··/g'
 ddc_cc.gc.out: POSTDIFF+= 's/NaN/0.·/g'
 
 # same
-trcurve2.out: POSTDIFF+= 's/·[0-9]\.E-21/·0.····/'
-trcurve2.out: POSTDIFF+= 's/·[0-9][0-9]\.E-21/·0.·····/'
-trcurve2.out: POSTDIFF+= '11·s/.....E-30/0.·······/g'
-trcurve2.out: POSTDIFF+= '17·s/3\.628E-21/0.·······/g'
-trcurve2.out: POSTDIFF+= '17·s/110\.4E-30/0.·······/g'
-trcurve2.out: POSTDIFF+= '23·s/5\.094E-2./0.·······/g'
-trcurve2.out: POSTDIFF+= '23·s/73\.45E-21/0.·······/g'
-trcurve2.out: POSTDIFF+= '29·s/630\.3E-24/0.·······/'
-trcurve2.out: POSTDIFF+= '35·s/7\.08E-21/0.······/'
-trcurve2.out: POSTDIFF+= '35·s/13\.28E-21/0.·······/'
-trcurve2.out: POSTDIFF+= 's/[0-9]....E-30/0.·······/g'
+trcurve2.ckt.out: POSTDIFF+= 's/·[0-9]\.E-21/·0.····/'
+trcurve2.ckt.out: POSTDIFF+= 's/·[0-9][0-9]\.E-21/·0.·····/'
+trcurve2.ckt.out: POSTDIFF+= '11·s/.....E-30/0.·······/g'
+trcurve2.ckt.out: POSTDIFF+= '17·s/3\.628E-21/0.·······/g'
+trcurve2.ckt.out: POSTDIFF+= '17·s/110\.4E-30/0.·······/g'
+trcurve2.ckt.out: POSTDIFF+= '23·s/5\.094E-2./0.·······/g'
+trcurve2.ckt.out: POSTDIFF+= '23·s/73\.45E-21/0.·······/g'
+trcurve2.ckt.out: POSTDIFF+= '29·s/630\.3E-24/0.·······/'
+trcurve2.ckt.out: POSTDIFF+= '35·s/7\.08E-21/0.······/'
+trcurve2.ckt.out: POSTDIFF+= '35·s/13\.28E-21/0.·······/'
+trcurve2.ckt.out: POSTDIFF+= 's/[0-9]....E-30/0.·······/g'
 
 # negative zeroes? nice, but should not be machine dependent
 bm_sffm.%.out: POSTDIFF+= 's/-0\.000\>/·0.000/g'
 
-bm_table.2.4.out: POSTDIFF+= '54·s/[- ][0-9]\.f/·0.·/g'
+bm_table.2.4.ckt.out: POSTDIFF+= '54·s/[- ][0-9]\.f/·0.·/g'
 
 c_attach.1.out: POSTDIFF+= 's\#`.*/tests\#`.../tests\#g'
 
@@ -871,7 +881,7 @@ define testgen
 	@chmod +x $@
 endef
 
-$(CKT_TESTS): %.sh: %.ckt.ref
+$(CKT_TESTS:%.ckt=%.sh): %.sh: %.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
 $(GC_TESTS:%.gc=%.gc.out): %.gc.out: %.gc
@@ -921,7 +931,7 @@ endif
 
 EXTRA_DIST = gnucap_run.sh \
              gc_log_compiler \
-             $(CKT_TESTS:%.sh=%.ckt) $(CKT_TESTS:%.sh===out/%.ckt.ref) \
+             $(CKT_TESTS) $(CKT_TESTS:%.sh===out/%.ckt.ref) \
              $(LOGIC_TESTS:%.sh=%.ckt) $(LOGIC_TESTS:%.sh===out/%.ckt.ref) \
              $(GC_TESTS) $(GC_TESTS:%.gc=%.ref) \
              c_attach.1.gc \
@@ -998,9 +1008,7 @@ bm_pulse.1a.ckt \
 bogus.cc \
 bogus2.cc \
 bti_dumpload.gc \
-dc_sweep.ckt \
 dc_sweeps.gc \
-dc_trace.ckt \
 powerdown.gc \
 print_v.ckt \
 pulse_freq.gc \

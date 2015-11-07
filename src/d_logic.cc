@@ -158,10 +158,10 @@ void DEV_LOGIC::dc_advance()
     subckt()->dc_advance();
     break;
   case moDIGITAL:
-    if (_n[OUTNODE]->in_transit()) {
+    if (_n[OUTNODE]->in_transit()) { untested();
       //q_eval(); evalq is not used for DC
       _n[OUTNODE]->propagate();
-    }else{
+    }else{ untested();
     }
     break;
   }
@@ -187,15 +187,14 @@ void DEV_LOGIC::tr_advance()
     assert(subckt());
     subckt()->tr_advance();
     break;
-  case moDIGITAL: 
+  case moDIGITAL: untested();
     if (_n[OUTNODE]->in_transit() || _n[OUTNODE]->final_time_a()  < NEVER ) {
       q_eval();
       if (_sim->_time0 >= _n[OUTNODE]->final_time()) {
 	_n[OUTNODE]->propagate();
       }else{ // untested();
       }
-    } else if ( _n[OUTNODE]->final_time_a() < NEVER ) {
-      untested();
+    } else if ( _n[OUTNODE]->final_time_a() < NEVER ) { untested();
     }else{
     }
     break;
@@ -268,10 +267,10 @@ void DEV_LOGIC::tr_queue_eval()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::tr_eval_digital()
-{
+{ untested();
   assert(_gatemode == moDIGITAL);
   if (_sim->analysis_is_restore()) {untested();
-  }else if (_sim->analysis_is_static()) {
+  }else if (_sim->analysis_is_static()) { untested();
   }else{
   }
   if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
@@ -294,6 +293,7 @@ bool DEV_LOGIC::tr_eval_digital()
   store_values();
   q_load();
 
+  trace1(long_label(), _y[0].f1);
   return converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -430,7 +430,7 @@ void DEV_LOGIC::tr_accept()
       trace6("hmmm0", long_label(), _sim->_bypass_ok, _lastchangenode != OUTNODE,
           _sim->analysis_is_static(), _sim->analysis_is_restore(), future_state);
       if ((_n[OUTNODE]->is_unknown()) &&
-	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) {
+	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) { untested();
 	_n[OUTNODE]->force_initial_value(future_state);
 	/* This happens when initial DC is digital.
 	 * Answers could be wrong if order in netlist is reversed 
@@ -456,7 +456,11 @@ void DEV_LOGIC::tr_accept()
 	    || future_state.lv_future() != _n[OUTNODE]->lv_future()) {
           trace5( "hmmm", future_state, long_label(), _n[OUTNODE]->lv(),
               _n[BEGIN_IN]->lv(), _n[BEGIN_IN]->lv_future());
-	  _n[OUTNODE]->set_event(m->delay, future_state);
+	  if (_sim->analysis_is_static()) {untested();
+	    _n[OUTNODE]->set_event(-1e99, future_state);
+	  }else{untested();
+	    _n[OUTNODE]->set_event(m->delay, future_state);
+	  }
 	  _sim->new_event(_n[OUTNODE]->final_time());
 	  //assert(future_state == _n[OUTNODE].lv_future());
 	  if (_lastchangenode == OUTNODE) {

@@ -149,6 +149,13 @@ class NODE_BASE : public CKT_BASE {
     const CARD_LIST* scope()const{return _scope;}
     void collapse(const NODE_BASE& to) const;
     size_t how_many()const;
+
+  double      v0()const	{
+    assert(matrix_number() != INVALID_NODE );
+    assert(matrix_number() <= _sim->_total_nodes);
+    return _sim->_v0[matrix_number()];
+  }
+  uint_t	matrix_number()const	{return _sim->_nm[_user_number];}
 };
 /*--------------------------------------------------------------------------*/
 #define CKT_NODE NODE // electrical nodes...
@@ -178,11 +185,6 @@ public: // virtuals
   double	tt_probe_num(const std::string& x)const{return tr_probe_num(x);}
   XPROBE	ac_probe_ext(const std::string&)const;
 
-  hp_float_t      v0()const	{
-    assert(m_() != INVALID_NODE );
-    assert(m_() <= _sim->_total_nodes);
-    return _sim->_v0 [m_()];
-  }
   hp_float_t      vt1()const {
     assert(m_() != INVALID_NODE );
     assert(m_() <= _sim->_total_nodes);
@@ -304,9 +306,7 @@ public: // other internal
 
 public: // action, used by logic
   void	      set_event_abs(double delay, LOGICVAL v);
-  void set_event(double delay, LOGICVAL v){
-    return set_event_abs(delay+_sim->_time0,v);
-  }
+  void set_event(double delay, LOGICVAL v);
   void	      force_initial_value(LOGICVAL v);
   void	      propagate();
   double      to_analog(const MODEL_LOGIC*);
