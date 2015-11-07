@@ -214,12 +214,19 @@ LOGIC_NODE& node_t::data()const
   return CKT_BASE::_sim->_nstat[m_()];
 }
 /*--------------------------------------------------------------------------*/
-double NODE::tr_probe_num(const std::string& x)const
+double NODE_BASE::tr_probe_num(const std::string& x)const
 { untested();
   if (Umatch(x, "v ")) { untested();
     // return v0(); denoised
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
-  }else if (Umatch(x, "v1 ")) {
+  }else{
+    return CKT_BASE::tr_probe_num(x);
+  }
+}
+/*--------------------------------------------------------------------------*/
+double NODE::tr_probe_num(const std::string& x)const
+{ untested();
+  if (Umatch(x, "v1 ")) {
     return floor(vt1()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
     return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_lu, 0.);
@@ -269,7 +276,7 @@ double NODE::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "dis{cont} ")) {
     return _sim->_nstat[matrix_number()]._discont;
   }else{
-    return CKT_BASE::tr_probe_num(x);
+    return NODE_BASE::tr_probe_num(x);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -360,7 +367,7 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
   }
   set_process(f);
 
-  if (is_analog() && d_iter() < a_iter()) {
+  if (is_analog() &&  d_iter() < a_iter()) {
     if (_sim->analysis_is_restore()) {untested();
     }else if (_sim->analysis_is_static()) {
     }else{
@@ -467,7 +474,9 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
 	/* state (rise/fall)  unchanged */
       }
     }
-    if (sv > 1.+f->over || sv < -f->over) {/* out of range */
+    if (sv > 1.+f->over || sv < -f->over) { untested();
+      trace2("out of range", sv, f->over);
+      // out of range
       set_bad_quality("out of range");
     }
     if (just_reached_stable()) { /* A bad node gets a little better */
@@ -485,7 +494,7 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
 void LOGIC_NODE::set_process(const MODEL_LOGIC* f) {_family = f->logic_hash();}
 /*--------------------------------------------------------------------------*/
 double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
-{
+{ untested();
   assert(f);
   if (process() && process() != f->logic_hash()) {untested();
     error(bWARNING, "node " + long_label() 
@@ -501,21 +510,21 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
   double risefall = NOT_VALID;
 
   switch (lv()) {
-  case lvRISING:
+  case lvRISING: untested();
     risefall = f->rise;
     del = risefall * (1 - f->th1);
     set_final_time_a(final_time()+ del);
-  case lvSTABLE1:
+  case lvSTABLE1: untested();
     risefall = f->rise;
     start = f->vmin;
     end = f->vmax;
     //end = f->vmax;
     break;
-  case lvFALLING:
+  case lvFALLING: untested();
     risefall = f->fall;
     del = risefall *  f->th0;
     set_final_time_a(final_time()+ del);
-  case lvSTABLE0:
+  case lvSTABLE0: untested();
     risefall = f->fall;
     start = f->vmax;
     end = f->vmin;
@@ -525,18 +534,20 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
     return f->unknown;
   }
 
-  if(_sim->_time0 > final_time_a())
+  if(_sim->_time0 > final_time_a()){ untested();
     return end;
+  }
 
   assert(start != NOT_VALID);
   assert(end != NOT_VALID);
   assert(risefall != NOT_VALID);
 
-  if (_sim->_time0 <= (final_time_a()-risefall)) {
+  if (_sim->_time0 <= (final_time_a()-risefall)) { untested();
+    trace1("", final_time_a());
     return start;
-  }else if (_sim->_time0 >= final_time_a()) {
+  }else if (_sim->_time0 >= final_time_a()) { untested();
     return end;
-  }else{
+  }else{ untested();
     double share = (final_time_a() - _sim->_time0) / risefall;
     trace4("LOGIC_NODE::to_analog in between", _sim->_time0, final_time(),
         risefall, share );
@@ -587,7 +598,7 @@ bool LOGIC_NODE::in_transit()const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void LOGIC_NODE::set_event_abs(double time, LOGICVAL v)
-{
+{ untested();
   trace2("LOGIC_NODE::set_event_abs", time, v);
   _lv.set_in_transition(v);
   if (_sim->analysis_is_tran_dynamic()  &&  in_transit()) {untested();
@@ -617,6 +628,11 @@ void LOGIC_NODE::set_event_abs(double time, LOGICVAL v)
 	  long_label().c_str(), d_iter(), final_time());
   }
   set_last_change_time();
+}
+/*--------------------------------------------------------------------------*/
+void LOGIC_NODE::set_event(double delay, LOGICVAL v)
+{
+  return set_event_abs(delay+_sim->_time0,v);
 }
 /*--------------------------------------------------------------------------*/
 void node_t::set_to_ground(CARD* d)
@@ -827,7 +843,6 @@ void node_t::map_subckt_node(uint_t* m, const CARD* owner)
   assert(node_is_valid(_ttt));
 }
 /*--------------------------------------------------------------------------*/
-double	NODE_BASE::tr_probe_num(const std::string&)const{return NAN;}
 double	NODE_BASE::tt_probe_num(const std::string& x)const{return tr_probe_num(x);}
 XPROBE	NODE_BASE::ac_probe_ext(const std::string&)const{ return XPROBE(0);}
 /*--------------------------------------------------------------------------*/
