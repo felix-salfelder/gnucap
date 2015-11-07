@@ -931,8 +931,9 @@ endif
 
 EXTRA_DIST = gnucap_run.sh \
              gc_log_compiler \
-             $(CKT_TESTS) $(CKT_TESTS:%.sh===out/%.ckt.ref) \
-             $(LOGIC_TESTS:%.sh=%.ckt) $(LOGIC_TESTS:%.sh===out/%.ckt.ref) \
+             ckt_log_compiler \
+             $(CKT_TESTS) $(CKT_TESTS:%=%.ref) \
+             $(LOGIC_TESTS) $(LOGIC_TESTS:%=%.ref) \
              $(GC_TESTS) $(GC_TESTS:%.gc=%.ref) \
              c_attach.1.gc \
              bm_wrapper.cc \

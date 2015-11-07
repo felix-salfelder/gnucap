@@ -21,8 +21,8 @@
 ##  Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 ##  02110-1301, USA.
 
-gnucaphdrdir = $(pkgincludedir)
-gnucaphdr_HEADERS = patchlev.h
+libgnucap_includedir = $(includedir_transformed)
+libgnucap_include_HEADERS = patchlev.h m_mvpoly.h
 
 EXTRA_DIST = patchlev.h.in
 BUILT_SOURCES = patchlev.h
