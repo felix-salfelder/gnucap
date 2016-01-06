@@ -21,6 +21,7 @@
 ##  Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 ##  02110-1301, USA.
 
+includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")
 libgnucap_includedir = $(includedir_transformed)
 libgnucap_include_HEADERS = patchlev.h m_mvpoly.h
 
