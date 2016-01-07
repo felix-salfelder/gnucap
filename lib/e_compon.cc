@@ -1216,15 +1216,12 @@ void COMPONENT::tt_accept()
   tt_behaviour_rel /= (_sim->_dT0);
 }
 /*--------------------------------------------------------------------------*/
-void COMPONENT::attach_adp(ADP_CARD* a){
-  if (!a){
+void COMPONENT::attach_adp(ADP_CARD* a)
+{
+  if (!a){ untested();
     std::cerr << "not attaching adpcard " << a << " to component " << this->short_label() << "\n";
-    assert(a);
     return;
-  }
-
-  if(_adp){
-    untested();
+  } else if(_adp){ untested();
     return;
   }
   _adp = a;
