@@ -184,7 +184,7 @@ new max = 5, new limit = 5.5
 TTT sweep cont 0 cont_tt 0 new 1 cont_dc 0
 TTT sweep Tstart 0.000000 Tstop 250000000.000000 Tstep 1.200000 stepmode 2
 #TTime           dvth(MN1)       tt(MN1.HCI)     stress(MN1.HCI) v(nout)         von(MN1)        v(nin)          hidden(0)       ttorder(MN1.HCI)
- 0.              0.              0.              88.60217715E-6  0.              2.137562364     0.              0.              0.             
+ 0.              0.              0.              0.              0.              2.137562364     0.              0.              0.             
  10.E-6          19.42090948E-6  886.021772E-12  88.60217715E-6  1.139769518     1.968452089     3.              1.              0.             
  20.E-6          23.91114498E-6  1.772340205E-9  88.63184339E-6  1.139808208     1.968468445     3.              1.              1.             
 tt step rejected: MN1.HCI
