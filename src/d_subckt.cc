@@ -133,7 +133,7 @@ private: // override virtual
   uint_t	net_nodes()const;
 //  CARD*		clone_instance()const;
   void		precalc_first();
-  bool		makes_own_scope()const  {itested(); return false;}
+  bool		makes_own_scope()const  {return false;}
 
   void		expand();
 private:

@@ -602,7 +602,6 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	      cmd.warn(bDANGER, there, x->long_label() + ": " + Name + " has no value?");
 	    }else{
 	      x->set_param_by_name(Name, value);
-	      untested();
 	    }
 	  }catch (Exception_No_Match&) {
 	    cmd.warn(bDANGER, there, x->long_label() + ": bad parameter " + Name + " ignored");
@@ -964,7 +963,7 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   if(x->use_obsolete_callback_print()){ incomplete();
-    if (x->print_type_in_spice()) { untested();
+    if (x->print_type_in_spice()) {
       o << " " << x->dev_type();
     }else{
     }
