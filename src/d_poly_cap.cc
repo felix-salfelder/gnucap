@@ -1,4 +1,4 @@
-/*$Id: d_poly_cap.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+/*$Id: d_poly_cap.cc $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
