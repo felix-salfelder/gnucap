@@ -204,7 +204,7 @@ public:
   ~DEV_CPOLY_G();
 protected: // override virtual
   char id_letter()const	{return 'G';}
-  bool print_type_in_spice()const {untested(); return false;}
+  bool print_type_in_spice()const {return false;}
   std::string value_name()const	{return "p0";}
 //  std::string dev_type()const; // element
   uint_t	   max_nodes()const;

@@ -69,7 +69,7 @@ private: // override vitrual
   bool		operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_SIN(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
-  bool use_obsolete_callback_print()const {untested(); return false;}
+  bool use_obsolete_callback_print()const {return false;}
 
   void		precalc_first(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;

@@ -126,7 +126,7 @@ public:
   void     precalc_first(const CARD_LIST*);
   void     expand(const COMPONENT*);
   void     precalc_last(const CARD_LIST*);
-  std::string name()const {itested();return "diode";}
+  std::string name()const {return "diode";}
   const SDP_CARD* sdp()const {return _sdp;}
   bool     has_sdp()const {untested();return _sdp;}
   static int  count() {return _count;}
