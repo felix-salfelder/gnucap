@@ -39,7 +39,7 @@
 #include "globals.h"
 #include "e_elemnt.h"
 #ifdef LARS_BJT_HACK
-#include "d_diode.h"
+#include "d_diode.cc"
 #include "u_sdp.h"
 #include "e_node.h"
 #include "e_subckt.h"
