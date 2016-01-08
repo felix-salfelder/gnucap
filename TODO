@@ -2,9 +2,36 @@ in general, XFAIL_TESTS document bugs and todos. see tests/Makefile.am.
 
 the main TODO is folding back into (modules for) upstream gnucap.
 
-others are
+- the tr-like dc sweep makes use of a vdcstack
 
-- fix/reenable modelgen (or replace)
+currently, upstream gnucap uses keep_voltages and restore_voltages to memorize
+operating points. gnucap-uf adds optional push/pop arguments to these
+functions. with this, nested dc sweeps can stash old operating points. these
+are required for step controlled dc sweeps.
+
+- sensitivity requires more card interface functions, and transposed solver.
+
+gnucap-uf implements a sensitivity analysis. for this, some do_sens functions
+are required in CARD. the interface might be suboptimal but should be added to
+gnucap some way or other. m_matrix.h adds a transposed backward substitution
+originally implemented for gnucap-a.
+
+- the gnucap.mk thing, used in uf/c_attach.cc
+
+gnucap.mk is a makefile that takes care of compilation at runtime. it is
+invoked by the attach/load command where necessary. other extensions add more
+rules for other purposes. e.g. gnucap-adms injects a .va->.cc rule.
+
+- the geda plugins make use of the pluggable subcircuit model thing
+
+the .subckt and module commands (in lang_spice and lang_verilog) hardwire the
+subcircuit model implementation. injecting different subcircuit backends can be
+useful for model order reduction or other subcircuit manipulation. currently,
+gnucap-geda implements a custom subcircuit that collapses nodes that are
+connected by nets.
+
+other TODOs are
+
 - global nodes (other than gnd)
 - finally remove obsolete callbacks
 - default plugins
@@ -12,3 +39,4 @@ others are
 - discrete time
 - relative time
 - plggable nodes (dispatcher)
+- fix logic

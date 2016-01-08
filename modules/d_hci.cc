@@ -114,7 +114,7 @@ private:
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_HCI::tr_review()
 {
-  const DEV_BUILT_IN_MOS* d = prechecked_cast<const DEV_BUILT_IN_MOS*>(owner());
+  const UF::DEV_BUILT_IN_MOS* d = prechecked_cast<const UF::DEV_BUILT_IN_MOS*>(owner());
   assert(d);
   _time_by.reset();
 
@@ -228,6 +228,7 @@ void DEV_HCI::tt_begin()
   assert(_raw_hci_node);
   _i[0].f0 = 0;
   _i[0].f0 = 0;
+  _L = 0;
   _y[1].f0 = 0;
   _y[1].f0 = 0;
   assert(_raw_hci_node);
@@ -300,9 +301,9 @@ void DEV_HCI::tr_begin()
 /*--------------------------------------------------------------------------*/
 void DEV_HCI::do_tt()
 {
-  const COMMON_BUILT_IN_MOS* c = prechecked_cast<const COMMON_BUILT_IN_MOS*>(common());
+  const UF::COMMON_BUILT_IN_MOS* c = prechecked_cast<const UF::COMMON_BUILT_IN_MOS*>(common());
   assert(c);
-  const MODEL_BUILT_IN_MOS8* m = prechecked_cast<const MODEL_BUILT_IN_MOS8*>(c->model());
+  const UF::MODEL_BUILT_IN_MOS8* m = prechecked_cast<const UF::MODEL_BUILT_IN_MOS8*>(c->model());
   assert(m);
 
   ADP_NODE* a = _hci_node.a_();
@@ -392,7 +393,7 @@ void DEV_HCI::do_tt()
   assert(is_number(a->tt()));
 
   double H = m->h0;
-  const SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const SDP_BUILT_IN_MOS_BASE*>(c->sdp());
+  const UF::SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const UF::SDP_BUILT_IN_MOS_BASE*>(c->sdp());
   double W = s->w_eff;
 
   vthdelta_hci = pow(a->tt()/(H*W), m->hci_n);
@@ -416,10 +417,10 @@ double DEV_HCI::tr_stress_() const
   double exponent = 3; // which is m in [4]
   double hcis = 0;
   double Wg = 0.8;
-  const DEV_BUILT_IN_MOS* d = prechecked_cast<const DEV_BUILT_IN_MOS*>(owner());
-  const COMMON_BUILT_IN_MOS* c = asserted_cast<const COMMON_BUILT_IN_MOS*>(d->common());
-  const MODEL_BUILT_IN_MOS8* m = asserted_cast<const MODEL_BUILT_IN_MOS8*>(c->model());
-  const SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const SDP_BUILT_IN_MOS_BASE*>(c->sdp());
+  const UF::DEV_BUILT_IN_MOS* d = prechecked_cast<const UF::DEV_BUILT_IN_MOS*>(owner());
+  const UF::COMMON_BUILT_IN_MOS* c = asserted_cast<const UF::COMMON_BUILT_IN_MOS*>(d->common());
+  const UF::MODEL_BUILT_IN_MOS8* m = asserted_cast<const UF::MODEL_BUILT_IN_MOS8*>(c->model());
+  const UF::SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const UF::SDP_BUILT_IN_MOS_BASE*>(c->sdp());
   assert(d);
   double Ids = fabs(d->ids); // fabs?
 
@@ -469,11 +470,11 @@ double DEV_HCI::tr_stress_() const
 /*--------------------------------------------------------------------------*/
 void DEV_HCI::tr_accept()
 {
-  const DEV_BUILT_IN_MOS* d = prechecked_cast<const DEV_BUILT_IN_MOS*>(owner());
+  const UF::DEV_BUILT_IN_MOS* d = prechecked_cast<const UF::DEV_BUILT_IN_MOS*>(owner());
   assert(d);
-  const COMMON_BUILT_IN_MOS* c = asserted_cast<const COMMON_BUILT_IN_MOS*>(d->common());
-  const MODEL_BUILT_IN_MOS8* m = asserted_cast<const MODEL_BUILT_IN_MOS8*>(c->model());
-  const SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const SDP_BUILT_IN_MOS_BASE*>(c->sdp());
+  const UF::COMMON_BUILT_IN_MOS* c = asserted_cast<const UF::COMMON_BUILT_IN_MOS*>(d->common());
+  const UF::MODEL_BUILT_IN_MOS8* m = asserted_cast<const UF::MODEL_BUILT_IN_MOS8*>(c->model());
+  const UF::SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const UF::SDP_BUILT_IN_MOS_BASE*>(c->sdp());
   assert(d);
   double H = m->h0;
   double W = s->w_eff;
@@ -539,13 +540,13 @@ TIME_PAIR DEV_HCI::tt_review()
 /*--------------------------------------------------------------------------*/
 void DEV_HCI::tt_accept()
 {
-  DEV_BUILT_IN_MOS* d = asserted_cast<DEV_BUILT_IN_MOS*>(owner());
-  const COMMON_BUILT_IN_MOS* c = asserted_cast<const COMMON_BUILT_IN_MOS*>(d->common());
-  const MODEL_BUILT_IN_MOS8* m = asserted_cast<const MODEL_BUILT_IN_MOS8*>(c->model());
+  UF::DEV_BUILT_IN_MOS* d = asserted_cast<UF::DEV_BUILT_IN_MOS*>(owner());
+  const UF::COMMON_BUILT_IN_MOS* c = asserted_cast<const UF::COMMON_BUILT_IN_MOS*>(d->common());
+  const UF::MODEL_BUILT_IN_MOS8* m = asserted_cast<const UF::MODEL_BUILT_IN_MOS8*>(c->model());
   ELEMENT::tt_accept();
   ADP_NODE* _raw_hci_node = _hci_node.a_();
   assert(_raw_hci_node);
-  const SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const SDP_BUILT_IN_MOS_BASE*>(c->sdp());
+  const UF::SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const UF::SDP_BUILT_IN_MOS_BASE*>(c->sdp());
   assert(d);
   double H = m->h0;
   double W = s->w_eff;
@@ -562,29 +563,29 @@ void DEV_HCI::tt_accept()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_HCI::tr_probe_num(const std::string& x)const
-{
-  const DEV_BUILT_IN_MOS* d = prechecked_cast<const DEV_BUILT_IN_MOS*>(owner());
+{ untested();
+  const UF::DEV_BUILT_IN_MOS* d = prechecked_cast<const UF::DEV_BUILT_IN_MOS*>(owner());
   assert(d);
-  const COMMON_BUILT_IN_MOS* c = asserted_cast<const COMMON_BUILT_IN_MOS*>(d->common());
-  const MODEL_BUILT_IN_MOS8* m = asserted_cast<const MODEL_BUILT_IN_MOS8*>(c->model());
-  const SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const SDP_BUILT_IN_MOS_BASE*>(c->sdp());
+  const UF::COMMON_BUILT_IN_MOS* c = asserted_cast<const UF::COMMON_BUILT_IN_MOS*>(d->common());
+  const UF::MODEL_BUILT_IN_MOS8* m = asserted_cast<const UF::MODEL_BUILT_IN_MOS8*>(c->model());
+  const UF::SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const UF::SDP_BUILT_IN_MOS_BASE*>(c->sdp());
   ADP_NODE* a = _n[n_hci].a_(); assert(a);
   double H = m->h0; USE(H);
   double W = s->w_eff; USE(W);
   const ADP_NODE* _raw_hci_node = _hci_node.a_();
   assert(_raw_hci_node);
-  if (Umatch(x, "hci")) {
+  if (Umatch(x, "hci")) { untested();
     return _hci_tr + _raw_hci_node->tt();
-  } else if (Umatch(x, "dhci")) {
+  } else if (Umatch(x, "dhci")) { untested();
     return _hci_tr;
-  } else if (Umatch(x, "dvth")) {
+  } else if (Umatch(x, "dvth")) { untested();
   //  double vthdelta_hci = pow(_raw_hci_node->tt()/(H*W), m->hci_n);
     return vthdelta_hci;
-  } else if (Umatch(x, "stress{level}")) {
+  } else if (Umatch(x, "stress{level}")) { untested();
     return _y[0].x; // (H*W);
   } else if (Umatch(x, "tr ")) { untested();
     return _hci_tr;
-  } else if (Umatch(x, "tt ")) {
+  } else if (Umatch(x, "tt ")) { untested();
     return a->tt();
   } else if (Umatch(x, "t0 ")) { untested();
     return _time_by._error_estimate;
@@ -600,18 +601,20 @@ double DEV_HCI::tr_probe_num(const std::string& x)const
     return _c2;
   } else if (Umatch(x, "ttord{er}")) {
     return _raw_hci_node->order();
+  } else { untested();
+    return ELEMENT::tr_probe_num(x);
   }
-  return ELEMENT::tr_probe_num(x);
 }
 /*--------------------------------------------------------------------------*/
 double DEV_HCI::tt_probe_num(const std::string& x)const
 {
   if (Umatch(x, "ttf{uture}")) { untested();
     return _ttfuture;
-  } else if (Umatch(x, "stress{level} ")) {
+  } else if (Umatch(x, "stress{level} ")) { untested();
     return _L;
+  }else{untested();
+    return ELEMENT::tt_probe_num(x);
   }
-  return ELEMENT::tt_probe_num(x);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

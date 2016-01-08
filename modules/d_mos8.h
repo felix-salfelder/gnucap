@@ -43,6 +43,7 @@
 #include "e_node.h"
 #include "e_subckt.h"
 #include "e_model.h"
+namespace UF{
 /*--------------------------------------------------------------------------*/
 class ADP_BUILT_IN_MOS8 :public ADP_BUILT_IN_MOS{
   friend class MODEL_BUILT_IN_MOS8; // HACK
@@ -443,4 +444,5 @@ class DEV_BUILT_IN_MOS8 : public DEV_BUILT_IN_MOS {
 };
 #endif
 /*--------------------------------------------------------------------------*/
+}
 #endif

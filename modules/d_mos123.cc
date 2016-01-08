@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "e_elemnt.h"
 #include "d_mos123.h"
+namespace UF{
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -417,4 +418,5 @@ void MODEL_BUILT_IN_MOS123::do_tr_stress( const COMPONENT* c ) const
 //  std::cerr << "DEV_BUILT_IN_MOS::tr_stress of "<<  short_label()  << ": ids: " << ids <<  "\n";
 //  std::cerr << "DEV_BUILT_IN_MOS::tr_stress of "<<  short_label()  << ": gds: " << gds <<  "\n";
  // std::cerr << "MODEL_BUILT_IN_MOS123::tr_stress of "<<  short_label()  << ": ids_stress: " << a->ids_stress->tr_get() <<  "\n";
+}
 }

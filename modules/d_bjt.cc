@@ -44,9 +44,13 @@
 #include "e_node.h"
 #include "e_subckt.h"
 #include "e_model.h"
+namespace UF{
 namespace {
-#endif
 #include "d_bjt.h"
+#else
+#include "d_bjt.h"
+namespace UF{
+#endif
 /*--------------------------------------------------------------------------*/
 int DEV_BUILT_IN_BJT::_count = -1;
 int COMMON_BUILT_IN_BJT::_count = -1;
@@ -1924,8 +1928,9 @@ bool DEV_BUILT_IN_BJT::do_tr()
   set_converged(subckt()->do_tr());
   return converged();
 }
-#ifdef LARS_BJT_HACK
 } // namespace
+#ifdef LARS_BJT_HACK
+}
 #endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

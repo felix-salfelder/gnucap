@@ -24,6 +24,7 @@ TESTS = \
     gnucap_run.sh \
     $(GC_TESTS) \
     $(LOGIC_TESTS) \
+    $(UF_TESTS) \
     $(CKT_TESTS)
 
 REF = ==out
@@ -579,10 +580,12 @@ GSL_TESTS = \
     s_ttt.lc.gc \
     s_ttt.lrc.gc
 
+GSL_TESTS_LOG = $(GSL_TESTS:%.gc=%.log)
+
 if USE_GSL
 # don't skip GSL tests
 else
-$(GSL_TESTS:%.gc=%.log): GC_LOG_FLAGS=SKIP
+$(GSL_TESTS_LOG): GC_LOG_FLAGS=SKIP
 endif
 
 # suspended.
@@ -621,11 +624,6 @@ GC_TESTS = \
     c_wave.dump.gc \
     d_branchvs.1.gc \
     d_branchvs.2.gc \
-    d_bti.1.gc \
-    d_bti.2.gc \
-    d_bti.3.gc \
-    d_bti.steps.gc \
-    d_bti.symm.gc \
     d_coil.brl.1.gc \
     d_coil.brl.2.gc \
     d_coil.brl.3.gc \
@@ -633,14 +631,6 @@ GC_TESTS = \
     d_cpoly_g.2.gc \
     d_cpoly_g.3.gc \
     d_cpoly_g.4.gc \
-    d_hci.1.gc \
-    d_hci.2.gc \
-    d_hci.3.gc \
-    d_hci.4.gc \
-    d_hci.5.gc \
-    d_hci.6.gc \
-    d_hci.7.gc \
-    d_hci_pd.gc \
     d_mos.l0.gc \
     d_mos8.np.gc \
     d_res.gc \
@@ -648,10 +638,6 @@ GC_TESTS = \
     d_switch.disc.gc \
     d_switch.ic.gc \
     d_switch.tt.gc \
-    d_rcd.1.gc \
-    d_rcd.2.gc \
-    d_rcd.3.gc \
-    d_rcd.neg.gc \
     dc_reverse.gc \
     dc_sweep.gc \
     dc_trace.gc \
@@ -670,9 +656,6 @@ GC_TESTS = \
     eval_param.gc \
     gnd.gc \
     hangbug.gc \
-    hci_dumpload.gc \
-    hci_mos.gc \
-    hci_stepping.gc \
     lang_verilog.1a.gc \
     lang_verilog.1.gc \
     lang_verilog.2a.gc \
@@ -692,30 +675,14 @@ GC_TESTS = \
     mark_dc_cont.gc \
     models-uf.gc \
     mosbug.2.gc \
-    no_hci.gc \
     nodeorder.gc \
     node.gc \
     nodis.gc \
     param.13.gc \
-    param.14.gc \
     param_simple.gc \
-    param_scopes.gc \
     paramtest.gc \
-    pfet_age.gc \
-    pfet_btisum.gc \
-    pfet_age_pd.gc \
-    pfet_age_pd.1.gc \
-    pfet_age_tr.gc \
-    pfet_rcd_param.gc \
     poly1_parse.gc \
     pulse.gc \
-    rcd_param.gc \
-    rcd_tr.gc \
-    rcd_tr.1.gc \
-    rcd_tr.2.gc \
-    rcd_tw.gc \
-    rcd_tw_dumpload.gc \
-    rcd_ueff.gc \
     ring.gc \
     s_sock.1.gc \
     s_sock.1b.gc \
@@ -725,11 +692,7 @@ GC_TESTS = \
     s_ttt.1.gc \
     s_ttt.label.gc \
     s_ttt.vib.gc \
-    sens_inv.gc \
-    sens_mos8.gc \
     sens_rr.gc \
-    sens_uic.gc \
-    spectre_param.gc \
     spice_comment_continuation.gc \
     spice_mos.gc \
     tran_temp.gc \
@@ -783,6 +746,7 @@ AUTO_TESTS = $(CKT_TESTS) $(CUSTOM_TESTS)
 
 gsl_tests: $(GSL_TESTS:%.gc=%.log)
 gc_tests: $(GC_TESTS:%.gc=%.log)
+uf_tests: $(UF_TESTS:%.gc=%.log)
 ckt_tests: $(CKT_TESTS:%.ckt=%.log)
 logic_tests: $(LOGIC_TESTS:%.ckt=%.log)
 
@@ -798,6 +762,8 @@ $(CKT_TESTS:%.ckt=%.log): .P $(FILTER)
 $(CKT_TESTS:%.ckt=%.ckt.out): .P $(FILTER)
 # $(LOGIC_TESTS:%.ckt=%.log): .P $(FILTER)
 $(LOGIC_TESTS:%=%.out): .P $(FILTER)
+$(UF_TESTS:%.gc=%.gc.out): .P $(FILTER)
+$(UF_TESTS:%.gc=%.log): .P $(FILTER)
 
 # $(CKT_TESTS): %.sh: %.out
 
@@ -811,6 +777,50 @@ c_lib.1.ckt.out: | $(PWD)/c_lib.1.ckt
 
 lang_spice.1a.log lang_verilog.1a.log: soclean | $(PWD)/bm_wrapper.cc
 lang_spice.1a.gc.out lang_verilog.1a.gc.out: POSTDIFF+= '/^CXX/d'
+
+$(GSL_TESTS:%=%.out) $(UF_TESTS:%=%.out): POSTDIFF+='/already·installed/{N;d}'
+
+UF_TESTS = \
+    d_bti.1.gc \
+    d_bti.2.gc \
+    d_bti.3.gc \
+    d_bti.steps.gc \
+    d_bti.symm.gc \
+    d_hci.1.gc \
+    d_hci.2.gc \
+    d_hci.3.gc \
+    d_hci.4.gc \
+    d_hci.5.gc \
+    d_hci.6.gc \
+    d_hci.7.gc \
+    d_hci_pd.gc \
+    d_rcd.1.gc \
+    d_rcd.2.gc \
+    d_rcd.3.gc \
+    d_rcd.neg.gc \
+    hci_dumpload.gc \
+    hci_mos.gc \
+    hci_stepping.gc \
+    no_hci.gc \
+    param.14.gc \
+    param_scopes.gc \
+    pfet_age.gc \
+    pfet_btisum.gc \
+    pfet_age_pd.gc \
+    pfet_age_pd.1.gc \
+    pfet_age_tr.gc \
+    pfet_rcd_param.gc \
+    rcd_param.gc \
+    rcd_tr.gc \
+    rcd_tr.1.gc \
+    rcd_tr.2.gc \
+    rcd_ueff.gc \
+    rcd_tw.gc \
+    rcd_tw_dumpload.gc \
+    sens_inv.gc \
+    sens_mos8.gc \
+    sens_uic.gc \
+    spectre_param.gc
 
 soclean:
 	rm -f bm_wrapper.so
@@ -884,10 +894,12 @@ endef
 $(CKT_TESTS:%.ckt=%.sh): %.sh: %.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
-$(GC_TESTS:%.gc=%.gc.out): %.gc.out: %.gc
+$(UF_TESTS:%=%.out) $(GC_TESTS:%=%.out): %.gc.out: %.gc
 	$(AM_V_GEN)$(GNUCAP) $(GNUCAP_PLUGINS:%=-a ../modules/.libs/%) $(GNUCAP_ARGS) < $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
 	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.gc.out
+
+# $(UF_TESTS): GNUCAP_PLUGINS = 'public models-uf.so'
 
 # nosuchfile.out c_attach.1.out: %.out: %.gc
 # 	-$(GNUCAP) < $< | \
@@ -935,6 +947,7 @@ EXTRA_DIST = gnucap_run.sh \
              $(CKT_TESTS) $(CKT_TESTS:%=%.ref) \
              $(LOGIC_TESTS) $(LOGIC_TESTS:%=%.ref) \
              $(GC_TESTS) $(GC_TESTS:%.gc=%.ref) \
+             $(UF_TESTS) $(UF_TESTS:%.gc=%.ref) \
              c_attach.1.gc \
              bm_wrapper.cc \
              bm_generator.doc bm_pulse.doc bm_pwl.doc bm_sin.doc d_cap.doc d_diode.doc \

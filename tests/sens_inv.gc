@@ -1,3 +1,4 @@
+load models-uf.so
 spice
 
 *            T

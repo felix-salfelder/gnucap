@@ -1,3 +1,5 @@
+load c_nodeset.so
+load models-uf.so
 spice
 * p type inv amp w/hci
 * this is numerically unstable...

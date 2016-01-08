@@ -4,6 +4,7 @@ spice
 .options TEMP=25
 .options numdgt=10
 
+.load public models-uf.so
 .load rcd_sym.so
 
 .param pulse_iv=0

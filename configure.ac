@@ -444,6 +444,7 @@ AC_CONFIG_FILES([src/gnucap], [chmod +x src/gnucap])
 
 AC_OUTPUT([
 	Makefile
+	lib/Makefile
 	modelgen/Makefile
 	plugins/Makefile
 	include/Makefile

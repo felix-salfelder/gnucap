@@ -1,7 +1,33 @@
 loading.
-load models-uf.so
-                 ^ ? missing interface
+d: already installed, replacing
+stashing as d:0
+D: already installed, replacing
+stashing as D:0
+diode: already installed, replacing
+stashing as diode:0
+M: already installed, replacing
+stashing as M:0
+mosfet: already installed, replacing
+stashing as mosfet:0
+nmos1: already installed, replacing
+stashing as nmos1:0
+pmos1: already installed, replacing
+stashing as pmos1:0
+nmos: already installed, replacing
+stashing as nmos:0
+pmos: already installed, replacing
+stashing as pmos:0
+nmos8: already installed, replacing
+stashing as nmos8:0
+pmos8: already installed, replacing
+stashing as pmos8:0
+nmos49: already installed, replacing
+stashing as nmos49:0
+pmos49: already installed, replacing
+stashing as pmos49:0
 lazy
+load lazy models-uf.so
+          ^ ? "models-uf.so": already loaded, replacing
 again
 load lazy models-uf.so
           ^ ? "models-uf.so": already loaded, replacing

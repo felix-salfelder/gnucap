@@ -8,6 +8,8 @@ rca3040 ckt - rca 3040 wideband amplifier
 * with the "method".  Stiffly stable methods give significantly lower
 * gain at that frequency.
 
+.load c_debug.so
+
 vin 1 0 sin(0 0.1 50meg 0.5ns) ac 1
 vcc     2       0       15.0
 vee     3       0       -15.0

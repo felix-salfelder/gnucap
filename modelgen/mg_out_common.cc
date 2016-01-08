@@ -146,7 +146,6 @@ void make_common_param_names(std::ofstream& out, const Device& d)
     }else{unreachable();
     }
   }
-  assert(i == d.common().override().size());
   for (Parameter_List::const_iterator
        p = d.common().raw().begin();
        p != d.common().raw().end();
@@ -169,7 +168,6 @@ void make_common_param_names(std::ofstream& out, const Device& d)
     }else{unreachable();
     }
   }
-  assert(i == d.common().override().size());
   for (Parameter_List::const_iterator
        p = d.common().raw().begin();
        p != d.common().raw().end();
