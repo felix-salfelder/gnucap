@@ -612,7 +612,7 @@ double DEV_HCI::tt_probe_num(const std::string& x)const
     return _ttfuture;
   } else if (Umatch(x, "stress{level} ")) { untested();
     return _L;
-  }else{untested();
+  }else{
     return ELEMENT::tt_probe_num(x);
   }
 }

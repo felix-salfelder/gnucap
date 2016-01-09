@@ -81,7 +81,7 @@ public:
     // RTLD_NOW means to resolve symbols on loading
     // RTLD_LOCAL means symbols defined in a plugin are local
     do {
-      if (cmd.umatch("public ")) { untested();
+      if (cmd.umatch("public ")) {
 	dl_scope = RTLD_GLOBAL;
 	// RTLD_GLOBAL means symbols defined in a plugin are global
 	// Use this when a plugin depends on another.
