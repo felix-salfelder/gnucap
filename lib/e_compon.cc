@@ -1219,7 +1219,6 @@ void COMPONENT::tt_accept()
 void COMPONENT::attach_adp(ADP_CARD* a)
 {
   if (!a){ untested();
-    std::cerr << "not attaching adpcard " << a << " to component " << this->short_label() << "\n";
     return;
   } else if(_adp){ untested();
     return;
