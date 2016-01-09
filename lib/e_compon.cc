@@ -496,7 +496,7 @@ COMPONENT::~COMPONENT()
   detach_common();
   if (_sim) {
     _sim->uninit();
-  } else { untested();
+  } else { itested();
   }
 }
 /*--------------------------------------------------------------------------*/
