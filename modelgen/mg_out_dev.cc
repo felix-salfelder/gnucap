@@ -146,7 +146,7 @@ void make_dev_copy_constructor(std::ofstream& out, const Device& d)
 
   out << "\n{\n"
     "  _n = _nodes;\n"
-    "  for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
+    "  for (uint_t ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
     "    _n[ii] = p._n[ii];\n"
     "  }\n"
     "  ++_count;\n";

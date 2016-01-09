@@ -372,7 +372,6 @@ static void make_device(std::ofstream& out, const Device& d)
   out << "};\n"
     "  node_t _nodes[" << total_nodes << "];\n"
     "  std::string port_name(uint_t i)const {\n"
-    "    assert(i >= 0);\n"
     "    assert(i < " << d.circuit().req_nodes().size() + d.circuit().opt_nodes().size() << ");\n"
     "    static std::string names[] = {";
   for (Port_List::const_iterator
