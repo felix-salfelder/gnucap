@@ -228,7 +228,7 @@ time=    0.0~
 time=   ~~.~~
 Gnucap   System status
 command ------ last -- total
-       get     0.0~     0.0~
+       get     0.~~     0.~~
         op     0.00     0.00
         dc     0.~~     0.~~
       tran    ~~.~~    ~~.~~
@@ -259,7 +259,7 @@ dctran density=0.4%, ac density=0.4%
 time=    0.~~
 Gnucap   System status
 command ------ last -- total
-       get     0.0~     0.0~
+       get     0.~~     0.~~
         op     0.00     0.00
         dc     0.~~     0.~~
       tran    ~~.~~    ~~.~~
