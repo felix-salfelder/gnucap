@@ -1,4 +1,5 @@
 // p type inv amp w/hci
+load models-uf.so
 spice
 
 .options TEMP=25

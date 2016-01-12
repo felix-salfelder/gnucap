@@ -1,4 +1,5 @@
 spice
+.load public models-uf.so
 .load c_wave.so
 .options numdgt 9
 

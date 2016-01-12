@@ -496,7 +496,7 @@ COMPONENT::~COMPONENT()
   detach_common();
   if (_sim) {
     _sim->uninit();
-  } else { untested();
+  } else { itested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -1216,15 +1216,11 @@ void COMPONENT::tt_accept()
   tt_behaviour_rel /= (_sim->_dT0);
 }
 /*--------------------------------------------------------------------------*/
-void COMPONENT::attach_adp(ADP_CARD* a){
-  if (!a){
-    std::cerr << "not attaching adpcard " << a << " to component " << this->short_label() << "\n";
-    assert(a);
+void COMPONENT::attach_adp(ADP_CARD* a)
+{
+  if (!a){ untested();
     return;
-  }
-
-  if(_adp){
-    untested();
+  } else if(_adp){ untested();
     return;
   }
   _adp = a;

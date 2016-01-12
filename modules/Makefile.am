@@ -15,11 +15,6 @@ AM_CPPFLAGS = \
 AM_DEFAULT_SOURCE_EXT = .cc
 
 #------------------------------------------------------------------------
-plugin_LTLIBRARIES += models-uf.la
-models_uf_la_SOURCES = empty.cc
-empty.cc:
-	touch $@
-#------------------------------------------------------------------------
 plugin_LTLIBRARIES += d_gpolyk_wrap.la
 d_gpolyk_wrap_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 #------------------------------------------------------------------------
@@ -60,6 +55,44 @@ plugin_LTLIBRARIES += c_wave.la
 c_wave_la_SOURCES = c_wave.cc
 c_wave_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 c_wave_la_CXXFLAGS = -std=c++11 $(AM_CXXFLAGS)
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += c_debug.la
+c_debug_la_LDFLAGS = -module -avoid-version
+c_debug_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += c_nodeset.la
+c_nodeset_la_LDFLAGS = -module -avoid-version
+c_nodeset_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += models-uf.la
+models_uf_la_SOURCES = \
+	patchlev.cc \
+	e_adp_mos.cc \
+	d_diode.cc \
+	d_mos_base.cc \
+	d_mos.cc \
+	d_mos123.cc \
+	d_mos1.cc \
+	d_mos8.cc \
+	d_bti.cc \
+	d_hci.cc \
+	d_rcd.cc
+noinst_HEADERS += \
+	d_bjt.h \
+	d_bti.h \
+	d_diode.h \
+	d_rcd.h \
+	e_adp_mos.h \
+	d_mos_base.h \
+	d_mos.h \
+	d_mos1.h \
+	d_mos123.h \
+	d_mos8.h
+#------------------------------------------------------------------------
+plugin_LTLIBRARIES += lars_bjt.la
+lars_bjt_la_LDFLAGS = -module -avoid-version
+lars_bjt_la_SOURCES = d_bjt.cc
+lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS)
 
 #needed?
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")

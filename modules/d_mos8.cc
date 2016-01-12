@@ -43,7 +43,7 @@
 #include "e_adp.h"
 #include "e_adplist.h"
 #include "u_nodemap.h" // fixme
-
+namespace UF{
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -7110,5 +7110,6 @@ double MODEL_BUILT_IN_MOS8::dgmdl_eff(const DEV_BUILT_IN_MOS* brh) const
   const DEV_BUILT_IN_MOS* d = prechecked_cast<const DEV_BUILT_IN_MOS*>(brh);
   assert(d);
   return d->dgmdl;
+}
 }
 // vim:ts=8:sw=2:

@@ -16,12 +16,12 @@ if DOC
   DOC_DIR = doc
 endif
 
-#later..
-MODELGEN =
-DIST_SUBDIRS = modelgen $(SUBDIRS) doc
+MODELGEN = modelgen
+DIST_SUBDIRS = $(SUBDIRS) doc
 
 SUBDIRS = \
     include \
+    lib \
     $(DOC_DIR) \
     examples \
     $(MODELGEN) \

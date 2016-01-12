@@ -112,7 +112,6 @@ static void make_model(std::ofstream& out, const Model& m)
     "  void      precalc_first();\n"
     "  void      precalc_last();\n"
     "  SDP_CARD* new_sdp(COMMON_COMPONENT* c)const;\n"
-    "  ADP_CARD* new_adp(COMPONENT* c)const;\n"
     "  void      set_param_by_index(int, std::string&, int);\n"
     "  bool      param_is_printable(int)const;\n"
     "  std::string param_name(int)const;\n"
@@ -244,8 +243,8 @@ static void make_device(std::ofstream& out, const Device& d)
     "  bool      print_type_in_spice()const {return true;}\n"
     "  std::string value_name()const  {return \"area\";}\n"
     "  //std::string dev_type()const;   //BASE_SUBCKT\n"
-    "  int       max_nodes()const     {return " << d.max_nodes() << ";}\n"
-    "  int       min_nodes()const     {return " << d.min_nodes() << ";}\n";
+    "  uint_t       max_nodes()const     {return " << d.max_nodes() << ";}\n"
+    "  uint_t       min_nodes()const     {return " << d.min_nodes() << ";}\n";
   if (d.max_nodes() != d.min_nodes()) {
     out <<
       "  //int     matrix_nodes()const; //BASE_SUBCKT\n"
@@ -253,10 +252,10 @@ static void make_device(std::ofstream& out, const Device& d)
   }else{
     out <<
       "  //int     matrix_nodes()const; //BASE_SUBCKT\n"
-      "  int       net_nodes()const     {return " << d.max_nodes() << ";}\n";
+      "  uint_t       net_nodes()const     {return " << d.max_nodes() << ";}\n";
   }
   out << 
-    "  int       int_nodes()const     {return " 
+    "  uint_t       int_nodes()const     {return " 
       << d.circuit().local_nodes().size() << ";}\n"
     "  CARD*     clone()const         {return new "
       << class_name << "(*this);}\n"
@@ -372,8 +371,7 @@ static void make_device(std::ofstream& out, const Device& d)
     + d.circuit().local_nodes().size();
   out << "};\n"
     "  node_t _nodes[" << total_nodes << "];\n"
-    "  std::string port_name(int i)const {\n"
-    "    assert(i >= 0);\n"
+    "  std::string port_name(uint_t i)const {\n"
     "    assert(i < " << d.circuit().req_nodes().size() + d.circuit().opt_nodes().size() << ");\n"
     "    static std::string names[] = {";
   for (Port_List::const_iterator

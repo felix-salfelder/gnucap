@@ -4,6 +4,7 @@
 #include "e_adp_mos.h"
 #include "u_nodemap.h" // fixme?
 #include "d_bti.h"
+namespace UF{
 
 // aging helpers.
 // alpha version
@@ -517,4 +518,5 @@ void ADP_BUILT_IN_MOS8::tt_accept()
 #endif
 }
 /*------------------------------------------------------------------*/
+}
 // vim works with any ts=sw

@@ -44,15 +44,13 @@ d_meter.cc \
 d_ttcap.cc \
 d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
 d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
-d_rcd.cc d_bti.cc  d_branchvs.cc d_hci.cc
-
-lib_LTLIBRARIES=
+d_branchvs.cc
 
 # matrix_example_LDADD = libgnucap.la
 
 # behavioral modeling functions
 BM_SRCS = \
-bm_complex.cc bm_cond.cc bm_exp.cc bm_fit.cc bm_generator.cc \
+bm_complex.cc bm_exp.cc bm_fit.cc bm_generator.cc \
 bm_model.cc bm_poly.cc bm_posy.cc bm_pulse.cc bm_pwl.cc bm_sffm.cc \
 bm_sin.cc bm_tanh.cc bmm_table.cc bmm_semi.cc
 
@@ -89,29 +87,6 @@ $(LANG_SRCS) \
 $(FUNC_SRCS)
 
 #------------------------------------------------------------------------
-libgnucap_uf_la_LDFLAGS = $(AM_LDFLAGS) -Wl,--enable-new-dtags -Wl,-rpath -Wl,${plugindir_transformed}
-libgnucap_uf_la_SOURCES = \
-globals.cc \
-m_expression_dump.cc m_expression_in.cc m_expression_reduce.cc \
-m_base_in.cc m_base_math.cc m_fft.cc  m_spline.cc \
-ap_construct.cc ap_convert.cc ap_error.cc ap_get.cc ap_match.cc ap_skip.cc \
-l_ftos.cc l_pmatch.cc l_timer.cc l_trim.cc l_wmatch.cc \
-io.cc io_contr.cc io_error.cc io_findf.cc io_out.cc io_xopen.cc \
-u_function.cc u_lang.cc u_nodemap.cc u_opt1.cc u_opt2.cc u_parameter.cc \
-u_prblst.cc u_probe.cc u_sim_data.cc u_xprobe.cc \
-s__init.cc s__out.cc s__solve.cc \
-d_subckt.cc d_logic.cc d_logicmod.cc \
-e_base.cc e_card.cc e_node.cc e_model.cc e_compon.cc \
-e_elemnt.cc e_ccsrc.cc e_storag.cc e_cardlist.cc e_adplist.cc\
-bm_value.cc bm.cc \
-c__cmd.cc c_attach.cc c_file.cc c_genrat.cc c_debug.cc \
-c_nodeset.cc \
-findbr.cc plot.cc e_adp.cc e_adp_mos.cc \
-startup.cc m_matrix.cc
-
-libgnucap_uf_la_CPPFLAGS = $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\" \
-                           -I$(top_builddir)/include -I$(top_srcdir)/include
-#------------------------------------------------------------------------
 RAW_HDRS = \
 startup.h md.h ap.h mode.h constant.h declare.h \
 l_compar.h l_dispatcher.h l_denoise.h \
@@ -127,8 +102,8 @@ e_adplist.h \
 e_elemnt.h e_ccsrc.h e_storag.h e_cardlist.h \
 d_coment.h d_dot.h d_logic.h d_subckt.h \
 bm.h \
-c_comand.h globals.h extlib.h d_cap.h d_bti.h d_rcd.h m_matrix_extra.h \
-u_sock.h s_ddc.h u_atlas.h e_adp_mos.h
+c_comand.h globals.h extlib.h d_cap.h m_matrix_extra.h \
+u_sock.h s_ddc.h u_atlas.h
 
 noinst_HEADERS = d_coil.h
 #------------------------------------------------------------------------ 
@@ -139,11 +114,6 @@ MODELSRCS= ${MODELS:.model=.cc} ${MODELS:.model=.h}
 #
 plugindir_transformed = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
 plugindir = $(plugindir_transformed)
-plugin_LTLIBRARIES = lars_bjt.la
-lars_bjt_la_LDFLAGS = -module -avoid-version
-lars_bjt_la_SOURCES = d_bjt.cc
-lars_bjt_la_CPPFLAGS = -DLARS_BJT_HACK -DADD_VERSION $(AM_CPPFLAGS) \
-                       -I$(top_builddir)/include -I$(top_srcdir)/include
 
 # henjo:
 MODELCODE= ${MODELS:.model=.cc}
@@ -177,7 +147,7 @@ GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 noinst_SCRIPTS = gnucap
 bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
-gnucap_real_SOURCES = ${SRCS2} main.cc ${SRCS1} ${MODELSRCS}
+gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1} ${MODELSRCS}
 
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
 gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
@@ -185,8 +155,7 @@ gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
 #for now (ddc). fix later
 gnucap_real_LDFLAGS = $(LAPACK_LIBS)
 
-lib_LTLIBRARIES += libgnucap-uf.la
-gnucap_real_LDADD = libgnucap-uf.la
+gnucap_real_LDADD = ../lib/libgnucap-uf.la
 #libgnucap_la_CFLAGS = $(AM_CFLAGS)
 
 
@@ -210,13 +179,13 @@ MODELGEN= @MODELGEN@
 
 MAKEDEPEND = gcc -M $(CPPFLAGS) -o $*.d $<
 
-#%.cc : %.model %.h ${MODELGEN}${EXEEXT}
-#	${MODELGEN} -cc $<
+%.cc : %.model %.h ${MODELGEN}${EXEEXT}
+	${MODELGEN} -cc $<
 
 # #############################################
 
-#%.h : %.model ${MODELGEN}${EXEEXT}
-#	${MODELGEN} -h $<
+%.h : %.model ${MODELGEN}${EXEEXT}
+	${MODELGEN} -h $<
 
 $(D_IVL_O): CPPFLAGS+= IVL_CPPFLAGS
 

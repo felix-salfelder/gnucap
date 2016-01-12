@@ -54,6 +54,6 @@ ni    X2.ni matrix_number 4, user_number 11 nm[t]  vdc  1.6
 nii   X2.nii matrix_number 3, user_number 12 nm[t]  vdc  1.2
 niii  X2.niii matrix_number 2, user_number 13 nm[t]  vdc  0.8
 -m1
-id    m1.id matrix_number 1, user_number 14 nm[t]  vdc  0.
+.m1.id m1..m1.id matrix_number 1, user_number 14 nm[t]  vdc  0.
 -m1.Dsb
 -m1.Ddb

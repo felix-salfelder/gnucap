@@ -49,6 +49,7 @@
 #define HCI_IN_SUBCKT
 
 #define BTI_LATE_EVAL
+namespace UF{
 /*--------------------------------------------------------------------------*/
 const double NA(NOT_INPUT);
 const double INF(BIGBIG);
@@ -2096,4 +2097,5 @@ XPROBE DEV_BUILT_IN_MOS::sens_probe_ext(const std::string& x)const
 }
 /*-------------------------------------------------------*/
 /*-------------------------------------------------------*/
+}
 // * vim:ts=8:sw=2:noet:

@@ -1,3 +1,4 @@
+load models-uf.so
 spice
 * don't remember what this is about.
 

@@ -55,7 +55,7 @@ MODEL_CARD::~MODEL_CARD()
   trace0("MODEL_CARD::~MODEL_CARD uninit "+ dev_type());
   if (_sim) {
     _sim->uninit();
-  } else { untested();
+  } else { itested();
   }
 }
 /*--------------------------------------------------------------------------*/

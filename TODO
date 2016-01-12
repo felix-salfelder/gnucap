@@ -32,7 +32,6 @@ connected by nets.
 
 other TODOs are
 
-- fix/reenable modelgen (or replace)
 - global nodes (other than gnd)
 - finally remove obsolete callbacks
 - default plugins
@@ -40,3 +39,4 @@ other TODOs are
 - discrete time
 - relative time
 - plggable nodes (dispatcher)
+- fix logic

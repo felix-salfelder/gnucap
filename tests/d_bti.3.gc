@@ -2,6 +2,7 @@ spice
 * p type inv amp w/bti
 .options TEMP=25
 
+.load public models-uf.so
 .load rcd_sym.so
 
 .param pulse_iv=0

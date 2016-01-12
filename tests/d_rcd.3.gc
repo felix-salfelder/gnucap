@@ -1,5 +1,8 @@
+load c_debug.so
+load c_nodeset.so
 spice
 
+.load public models-uf.so
 .load rcd_sym.so
 .model my_rcd rcd_exp
 

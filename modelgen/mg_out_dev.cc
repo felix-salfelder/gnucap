@@ -146,7 +146,7 @@ void make_dev_copy_constructor(std::ofstream& out, const Device& d)
 
   out << "\n{\n"
     "  _n = _nodes;\n"
-    "  for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
+    "  for (uint_t ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
     "    _n[ii] = p._n[ii];\n"
     "  }\n"
     "  ++_count;\n";
@@ -423,7 +423,6 @@ void make_probe_parameter_list(std::ofstream& out,const Parameter_List& pl)
 /*--------------------------------------------------------------------------*/
 static void make_dev_tr_probe(std::ofstream& out, const Device& d)
 {
-  bool use_adp=false;
   make_tag();
   out << "double DEV_" << d.name() << "::tr_probe_num(const std::string& x)const\n"
     "{\n"
@@ -436,15 +435,9 @@ static void make_dev_tr_probe(std::ofstream& out, const Device& d)
     "  assert(m);\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
-    "  assert(s);\n"
-    "  const ADP_" << d.model_type() << "* a = prechecked_cast<const ADP_"
-      << d.model_type() << "*>(adp()); a=a;\n";
+    "  assert(s);\n";
 
-  if ( use_adp )
-    out << "  if(!a)untested();\n";
-
-  out << "\n"
-    "  ";
+  out << "\n";
   for (Probe_List::const_iterator
        p = d.probes().begin();
        p != d.probes().end();
@@ -477,9 +470,6 @@ static void make_dev_tt_probe(std::ofstream& out, const Device& d)
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
     "  assert(s);\n"
-    "  const ADP_" << d.model_type() << "* a = prechecked_cast<const ADP_"
-      << d.model_type() << "*>(adp());\n"
-    "  if(!a)untested0(\"no a\");\n"
     "\n"
     "  ";
   for (Probe_List::const_iterator
