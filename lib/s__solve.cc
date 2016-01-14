@@ -310,6 +310,7 @@ void SIM::solve_equations(TRACE trace)
 
 #ifndef NDEBUG
   notstd::copy_n(_sim->_v0, _sim->_total_nodes+1, v0);
+  std::string exnumbers("");
 #endif
   ::status.back.start();
   _sim->_lu.fbsub(_sim->_v0, _sim->_i, _sim->_v0);
@@ -319,11 +320,19 @@ void SIM::solve_equations(TRACE trace)
   for(unsigned i=0;i<=_sim->_total_nodes; ++i){
     if (!is_number(_sim->_v0[i])) {
       assert(i); // cannot happen in gnd
-      throw(Exception("cannot solve linear equation, encountered nan in " + to_string(i)));
+#ifdef NDEBUG
+      unreachable();
+#else
+      _sim->_v0[i] = 0;
+      exnumbers += " " + to_string(i);
     }
-#ifndef NDEBUG
     _sim->_dxm = std::max(_sim->_dxm, fabs(_sim->_v0[i] - v0[i]));
+  }
+  {
+    if(exnumbers!=""){
+      throw(Exception("cannot solve linear equation, nan in positions" + exnumbers));
 #endif
+    }
   }
 
   if (_sim->_nstat) {

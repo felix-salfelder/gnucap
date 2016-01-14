@@ -185,7 +185,6 @@ static void make_set_parameters(std::ofstream& out, const Element& e)
 /*--------------------------------------------------------------------------*/
 static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
 {
-  std::cerr << "name: " << e.name() << "\n";
   make_tag();
   if (!(e.omit().empty())) {
     out <<

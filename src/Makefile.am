@@ -169,7 +169,7 @@ gnucap_includedir = $(pkgincludedir)
 
 
 ### Clean out the modelgen generated files
-# CLEANFILES= ${MODELSRCS}
+CLEANFILES = ${MODELSRCS}
 
 ## Suffix rules for modelgen.
 ##
