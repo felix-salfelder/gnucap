@@ -234,7 +234,7 @@ void SIM::evaluate_models()
   _sim->_nstat[0].set_discont(disNONE);
   if (OPT::bypass) {
     converged = true;
-    swap(_sim->_evalq, _sim->_evalq_uc);
+    std::swap(_sim->_evalq, _sim->_evalq_uc);
     while (!_sim->_evalq->empty()) {
       converged &= _sim->_evalq->front()->do_tr();
       _sim->_evalq->pop_front();
