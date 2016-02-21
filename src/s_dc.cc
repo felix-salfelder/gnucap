@@ -385,6 +385,13 @@ void DCOP::sweep()
   set_step_cause(scUSER);
   _converged = false;
   _ever_converged = false;
+  for (int ii = 0; ii < _n_sweeps; ++ii) {itested();
+    if (!_zap[ii]) { itested();
+    }else if (_zap[ii]->is_constant()) { itested();
+      CARD_LIST::card_list.q_hack(_zap[ii]);
+    }else{ untested();
+    }
+  }
   sweep_recursive(_n_sweeps-1);
   _sim->pop_voltages();
   _sim->keep_voltages();
@@ -442,6 +449,11 @@ void DCOP::sweep_recursive(int Nest)
 	incomplete();
       }
     }else{ // leaf
+      for (int ii = 0;  ii < _n_sweeps;  ++ii) {
+	if (_zap[ii]) {
+	  _zap[ii]->do_tr();
+	}
+      }
       _converged = solve_with_homotopy(itl,_trace);
       _ever_converged |= _converged;
       ++::status.hidden_steps;
@@ -543,9 +555,13 @@ void DCOP::first(int Nest)
 
   _val_by_user_request[Nest] = _start[Nest];
   _sweepdamp[Nest] = 1;
-  if (ELEMENT* c = dynamic_cast<ELEMENT*>(_zap[Nest])) {
-  c->set_constant(false); // because of extra precalc_last
-                          // obsolete, once pointer hack is fixed
+  if (ELEMENT* c = dynamic_cast<ELEMENT*>(_zap[Nest])) { itested();
+    // because of extra precalc_last
+    // obsolete, once pointer hack is fixed
+    c->set_constant(false);
+    trace1("zapq", _zap[Nest]->long_label());
+//    CARD_LIST::card_list.q_hack(_zap[Nest]);
+  }else{ untested();
   }
   _reverse[Nest] = false;
   if (_reverse_in[Nest]) {

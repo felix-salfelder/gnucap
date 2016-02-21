@@ -197,7 +197,9 @@ void ELEMENT::tr_restore()
   }
 
   //assert(_time[0] == _sim->_time0);
-  if (_time[0] != _sim->_time0) {
+  if (is_constant()){ untested();
+
+  }else if (_time[0] != _sim->_time0) {
     error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
         _time[0], _sim->_time0);
 

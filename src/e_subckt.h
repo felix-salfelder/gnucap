@@ -77,6 +77,7 @@ protected:
   bool	  tr_needs_eval()const
 	{
 		assert(subckt()); return subckt()->tr_needs_eval();}
+public:
   void	  tr_queue_eval() {assert(subckt()); subckt()->tr_queue_eval();}
   bool	  do_tr() {
 		assert(subckt());set_converged(subckt()->do_tr());return converged();}

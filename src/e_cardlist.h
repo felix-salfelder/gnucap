@@ -51,9 +51,11 @@ private:
   mutable PARAM_LIST* _params;
   LANGUAGE* _language;
   std::list<CARD*> _cl;
+  std::list<CARD*> _eq; // eval queue
   const CARD* _owner;       // stupid hack
   const CARD_LIST* _origin; // even more stupid hack
 public:
+  static void q_hack(CARD* x);
   // internal types
   typedef std::list<CARD*>::iterator iterator;
   typedef std::list<CARD*>::const_iterator const_iterator;
