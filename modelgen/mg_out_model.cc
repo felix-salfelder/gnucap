@@ -79,6 +79,7 @@ static void make_sdp_constructor(std::ofstream& out, const Model& m)
 	<< m.name() << "*>(c->model());\n"
       "  assert(m);\n"
       "  const CARD_LIST* par_scope = m->scope();\n"
+      "  (void)par_scope;\n"
       "  assert(par_scope);\n";
     
     out << m.size_dependent().code_pre();
@@ -144,6 +145,7 @@ static void make_tdp_constructor(std::ofstream& out, const Model& m)
 	<< m.name() << "*>(c->model());\n"
       "  assert(m);\n"
       "  const CARD_LIST* par_scope = d->scope();\n"
+      "  (void)par_scope;\n"
       "  assert(par_scope);\n";
     make_final_adjust_eval_parameter_list(out, m.temperature().raw());
     make_final_adjust(out, m.temperature());
@@ -715,6 +717,7 @@ static void make_tr_eval(std::ofstream& out, const Model& m)
       "  assert(c);\n"
       "  const SDP_" << m.name() << "* s = prechecked_cast<const SDP_" 
 	<< m.name() << "*>(c->sdp());\n"
+      "  (void)s;\n"
       "  assert(s);\n"
       "  const MODEL_" << m.name() << "* m = this;\n";
     if (!m.temperature().is_empty()) {

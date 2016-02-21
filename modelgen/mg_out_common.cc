@@ -401,6 +401,7 @@ static void make_common_expand(std::ofstream& out, const Device& d)
     "  COMMON_COMPONENT::expand(d);\n"
     "  attach_model(d);\n"
     "  COMMON_" << d.name() << "* c = this;\n"
+    "  (void)c;\n"
     "  const MODEL_" << d.model_type() << "* m = dynamic_cast<const MODEL_" 
       << d.model_type() << "*>(model());\n"
     "  if (!m) {\n"
@@ -414,6 +415,7 @@ static void make_common_expand(std::ofstream& out, const Device& d)
     "  assert(_sdp);\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_" 
       << d.model_type() << "*>(_sdp);\n"
+    "  (void)s;\n"
     "  assert(s);\n"
     "\n"
     "  // subcircuit commons, recursive\n";
@@ -450,6 +452,7 @@ static void make_common_expand(std::ofstream& out, const Device& d)
     "  assert(par_scope);\n"
     "  COMMON_COMPONENT::precalc_last(par_scope);\n"
     "  COMMON_" << d.name() << "* c = this;\n"
+    "  (void)c;\n"
     "  const MODEL_" << d.model_type() << "* m = prechecked_cast<const MODEL_" 
       << d.model_type() << "*>(model());\n";
 
@@ -463,6 +466,7 @@ static void make_common_expand(std::ofstream& out, const Device& d)
     "  assert(_sdp);\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_" 
       << d.model_type() << "*>(_sdp);\n"
+    "  (void)s;\n"
     "  assert(s);\n"
     "\n"
     "  // subcircuit commons, recursive\n";

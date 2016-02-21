@@ -58,6 +58,7 @@ static void make_dev_eval(std::ofstream& out, const Eval& e,
     "  assert(c);\n"
     "  const SDP_" << model_type << "* s = prechecked_cast<const SDP_"
       << model_type << "*>(c->sdp());\n"
+    "  (void)s;\n"
     "  assert(s);\n"
     "  const MODEL_" << model_type << "* m = prechecked_cast<const MODEL_"
       << model_type << "*>(c->model());\n"
@@ -308,6 +309,7 @@ static void make_dev_expand(std::ofstream& out, const Device& d)
     "  assert(c->sdp());\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
+    "  (void)s;\n"
     "  assert(s);\n"
     "  if (!subckt()) {\n"
     "    new_subckt();\n"
@@ -431,9 +433,11 @@ static void make_dev_tr_probe(std::ofstream& out, const Device& d)
     "  assert(c);\n"
     "  const MODEL_" << d.model_type() << "* m = prechecked_cast<const MODEL_"
       << d.model_type() << "*>(c->model());\n"
+    "  (void)m;\n"
     "  assert(m);\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
+    "  (void)s;\n";
     "  assert(s);\n";
 
   out << "\n";
@@ -465,9 +469,11 @@ static void make_dev_tt_probe(std::ofstream& out, const Device& d)
     "  assert(c);\n"
     "  const MODEL_" << d.model_type() << "* m = prechecked_cast<const MODEL_"
       << d.model_type() << "*>(c->model());\n"
+    "  (void)m;\n"
     "  assert(m);\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
+    "  (void)s;\n"
     "  assert(s);\n"
     "\n"
     "  ";
