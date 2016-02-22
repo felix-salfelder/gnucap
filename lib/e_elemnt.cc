@@ -268,7 +268,7 @@ void ELEMENT::tr_advance()
 void ELEMENT::tr_regress()
 {
   trace4("ELEMENT::tr_regress", long_label(), _sim->_time0, _time[0], _time[1]);
-  assert(_time[0] >= _sim->_time0); // moving backwards
+  assert(is_constant() || _time[0] >= _sim->_time0); // moving backwards
   assert(_time[1] <= _sim->_time0); // but not too far backwards
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
