@@ -1,5 +1,5 @@
 A 9217 node circuit
-.options preq
+.options nopreq
 * .options order treedf
 * .options order comp
 .options disc none

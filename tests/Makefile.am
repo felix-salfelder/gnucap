@@ -456,6 +456,7 @@ CKT_TESTS = \
     eq3-1153.tr-nb.ckt \
     eq3-1153.tr-ni.ckt \
     eq4-9217.tran.ckt \
+    eq4-9217.tran.nopreq.ckt \
     eqb1.ckt \
     eqboost.ckt \
     eqflat.ckt \
@@ -642,6 +643,7 @@ GC_TESTS = \
     dc_sweep.gc \
     dc_trace.gc \
     dc_twice.gc \
+    dc_twice.nopreq.gc \
     ddc_brl.gc \
     ddc_bug.gc \
     ddc_cc.gc \
@@ -895,7 +897,7 @@ $(CKT_TESTS:%.ckt=%.sh): %.sh: %.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
 $(UF_TESTS:%=%.out) $(GC_TESTS:%=%.out): %.gc.out: %.gc
-	$(AM_V_GEN)$(GNUCAP) $(GNUCAP_PLUGINS:%=-a ../modules/.libs/%) $(GNUCAP_ARGS) < $< | \
+	$(AM_V_GEN)GNUCAP_PREQ=1 $(GNUCAP) $(GNUCAP_PLUGINS:%=-a ../modules/.libs/%) $(GNUCAP_ARGS) < $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
 	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.gc.out
 
