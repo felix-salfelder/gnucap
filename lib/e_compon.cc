@@ -1218,7 +1218,7 @@ void COMPONENT::tt_accept()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::attach_adp(ADP_CARD* a)
 {
-  if (!a){ untested();
+  if (!a){
     return;
   } else if(_adp){ untested();
     return;

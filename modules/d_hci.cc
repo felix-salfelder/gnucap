@@ -563,7 +563,7 @@ void DEV_HCI::tt_accept()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_HCI::tr_probe_num(const std::string& x)const
-{ untested();
+{
   const UF::DEV_BUILT_IN_MOS* d = prechecked_cast<const UF::DEV_BUILT_IN_MOS*>(owner());
   assert(d);
   const UF::COMMON_BUILT_IN_MOS* c = asserted_cast<const UF::COMMON_BUILT_IN_MOS*>(d->common());
@@ -574,18 +574,18 @@ double DEV_HCI::tr_probe_num(const std::string& x)const
   double W = s->w_eff; USE(W);
   const ADP_NODE* _raw_hci_node = _hci_node.a_();
   assert(_raw_hci_node);
-  if (Umatch(x, "hci")) { untested();
+  if (Umatch(x, "hci")) {
     return _hci_tr + _raw_hci_node->tt();
-  } else if (Umatch(x, "dhci")) { untested();
+  } else if (Umatch(x, "dhci")) {
     return _hci_tr;
-  } else if (Umatch(x, "dvth")) { untested();
+  } else if (Umatch(x, "dvth")) {
   //  double vthdelta_hci = pow(_raw_hci_node->tt()/(H*W), m->hci_n);
     return vthdelta_hci;
-  } else if (Umatch(x, "stress{level}")) { untested();
+  } else if (Umatch(x, "stress{level}")) {
     return _y[0].x; // (H*W);
   } else if (Umatch(x, "tr ")) { untested();
     return _hci_tr;
-  } else if (Umatch(x, "tt ")) { untested();
+  } else if (Umatch(x, "tt ")) {
     return a->tt();
   } else if (Umatch(x, "t0 ")) { untested();
     return _time_by._error_estimate;
@@ -601,7 +601,7 @@ double DEV_HCI::tr_probe_num(const std::string& x)const
     return _c2;
   } else if (Umatch(x, "ttord{er}")) {
     return _raw_hci_node->order();
-  } else { untested();
+  } else {
     return ELEMENT::tr_probe_num(x);
   }
 }
@@ -610,7 +610,7 @@ double DEV_HCI::tt_probe_num(const std::string& x)const
 {
   if (Umatch(x, "ttf{uture}")) { untested();
     return _ttfuture;
-  } else if (Umatch(x, "stress{level} ")) { untested();
+  } else if (Umatch(x, "stress{level} ")) {
     return _L;
   }else{
     return ELEMENT::tt_probe_num(x);
