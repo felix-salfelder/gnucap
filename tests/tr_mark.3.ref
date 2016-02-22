@@ -25,8 +25,6 @@
 
 #Time       v(H1)      i(cb)     
 //BUG// v1 restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
-//BUG// r1 restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
-//BUG// rb restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
 //BUG// cb restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
 //BUG// H1 restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
  1.        -0.81402   -0.81402   

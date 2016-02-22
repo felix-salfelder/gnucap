@@ -1,0 +1,9 @@
+options nopreq
+spice
+
+v1 1 0 1
+
+.print dc v(1)
+.dc v1 0 2 1
+.dc
+.end

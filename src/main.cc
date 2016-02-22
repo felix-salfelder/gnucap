@@ -82,7 +82,7 @@ void read_startup_files(void)
   if (!startup_recursive()) {
     trace1("read_startup_files, no cwd", name);
     name = findfile(USERSTARTFILE, USERSTARTPATH, R_OK);
-    if (name != "") {untested();
+    if (name != "") {
       try{
         CMD::command("get " + name, &CARD_LIST::card_list);
       } catch(Exception e){

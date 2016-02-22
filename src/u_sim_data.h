@@ -137,6 +137,7 @@ public:
   std::vector<CARD*> _loadq;
   std::vector<CARD*> _acceptq;
   std::vector<CARD*> _tt_acceptq;
+  std::deque<CARD*>  _pre_evalq; /* candidates for evaluation */
   std::deque<CARD*>  _evalq1; /* evaluate queues -- alternate between */
   std::deque<CARD*>  _evalq2; /* build one while other is processed */
   std::deque<CARD*>  _late_evalq; /* eval after everything else */

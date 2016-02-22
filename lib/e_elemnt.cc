@@ -197,7 +197,9 @@ void ELEMENT::tr_restore()
   }
 
   //assert(_time[0] == _sim->_time0);
-  if (_time[0] != _sim->_time0) {
+  if (is_constant()){
+
+  }else if (_time[0] != _sim->_time0) {
     error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
         _time[0], _sim->_time0);
 
@@ -753,7 +755,7 @@ void ELEMENT::tt_advance()
     _time[OPT::_keep_time_steps-1] = 0.;
     _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
   }else if (_time[0] == _sim->_time0) {
-  }else{ untested();
+  }else{
   }
 
   for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
