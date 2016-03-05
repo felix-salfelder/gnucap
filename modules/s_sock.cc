@@ -423,7 +423,7 @@ static unsigned argc(unsigned opcode)
   switch(opcode){
     case 51: untested();
       return 3;
-    case 52: untested();
+    case 52: itested();
       return 0;
     case 53: untested();
       return 0;
@@ -722,8 +722,8 @@ void SOCK::verakons()
   try{
     for( unsigned i = 0; i < _caplist.size(); i++) { untested();
       trace1("SOCK::kons",_caplist[i]->long_label());
-      assert(!_caplist[i]->is_constant());
-      _caplist[i]->q_eval(); // so it will be updated. is this sufficient?
+      // assert(!_caplist[i]->is_constant()); // NO caps are const, when they are in VS mode.
+      _caplist[i]->do_tr(); // so it will be updated. is this sufficient?
 			     // is it sufficient to only queue caps?
     }
     converged = solve(itl,_trace);
