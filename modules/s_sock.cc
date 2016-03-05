@@ -428,7 +428,7 @@ static unsigned argc(unsigned opcode)
       return 0;
     case 53: untested();
       return 0;
-    case 104: untested();
+    case 104: itested();
     case 102:
       return 1;
     default:
@@ -973,7 +973,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
   for (unsigned i = stepno; i>0; --i) {
     tr_converged = false;
     try {
-      for( unsigned i = 0; i < _caplist.size(); i++) { untested();
+      for( unsigned i = 0; i < _caplist.size(); i++) { itested();
 	trace1("SOCK::kons",_caplist[i]->long_label());
 	assert(!_caplist[i]->is_constant());
 	_caplist[i]->q_eval(); // so it will be updated. is this sufficient?
@@ -1024,7 +1024,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
     ::status.accept.stop();
     _sim->keep_voltages(); //  vdc  = v0
     assert(dt>0);
-  }else{ untested();
+  }else{ itested();
     double t1 = _sim->_time0 - _sim->_dt0;
     dt = time_by_error_estimate - t1;
     assert(dt);
