@@ -567,7 +567,7 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
       _stash[ii] = _input_devs[ii];
       _input_devs[ii]->inc_probes();
       _input_devs[ii]->set_value(_input_devs[ii]->value(),0);
-      _input_devs[ii]->set_constant(false);
+      _input_devs[ii]->set_constant(false); // <= insufficient for PREQEUE
 
       ++n;
     }
@@ -704,7 +704,7 @@ void SOCK::verakons()
   for( unsigned i = 0; i < _caplist.size(); i++) {
     trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->keep_ic(); // latch voltage applied to _v0
-    _caplist[i]->set_constant(true);
+    _caplist[i]->set_constant(true); // maybe not a good idea at all.
     _caplist[i]->q_eval();		// so it will be updated
   }
   //
@@ -766,6 +766,12 @@ void SOCK::verakons()
     trace1("verakons, loading cap", c->long_label());
     _sim->_damp = 1.; // need raw stamps
     c->tr_load();
+  }
+
+  for( unsigned i = 0; i < _caplist.size(); i++) {
+    /// oops. maybe the next command is tran?!
+    // (this is a hack!!)
+    _caplist[i]->set_constant(false);
   }
 }
 /*--------------------------------------------------------------------------*/
