@@ -248,9 +248,10 @@ void SOCK::setup(CS& Cmd)
   assert(_n_sweeps > 0);
   _sim->_freq = 0;
 
-  // please disable prequeue for vera until we have tests.
-  if(OPT::prequeue) {
+  // not implemented. need to queue sources properly (CARDLIST::q_hack..?)
+  if(OPT::prequeue) { // incomplete();
     error(bDANGER, "prequeueing is experimental, this might not work\n");
+    OPT::prequeue=false;
   }else{
   }
 }
