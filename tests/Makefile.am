@@ -688,6 +688,8 @@ GC_TESTS = \
     ring.gc \
     s_sock.1.gc \
     s_sock.1b.gc \
+    s_sock.1.preq.gc \
+    s_sock.1b.preq.gc \
     s_sock.2.gc \
     s_tr.cont.gc \
     s_tr.lrc.gc \
