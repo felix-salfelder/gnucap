@@ -249,9 +249,9 @@ void SOCK::setup(CS& Cmd)
   _sim->_freq = 0;
 
   // please disable prequeue for vera until we have tests.
-  if(OPT::prequeue) { untested();
+  if(OPT::prequeue) {
     error(bDANGER, "prequeueing is experimental, this might not work\n");
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
