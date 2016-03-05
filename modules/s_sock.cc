@@ -720,6 +720,12 @@ void SOCK::verakons()
   CARD_LIST::card_list.tr_begin();
   bool converged = false;
   try{
+    for( unsigned i = 0; i < _caplist.size(); i++) { untested();
+      trace1("SOCK::kons",_caplist[i]->long_label());
+      assert(!_caplist[i]->is_constant());
+      _caplist[i]->q_eval(); // so it will be updated. is this sufficient?
+			     // is it sufficient to only queue caps?
+    }
     converged = solve(itl,_trace);
     //    solve(OPT::TRHIGH,_trace);
     //    solve_with_homotopy(itl,_trace);
@@ -953,11 +959,19 @@ unsigned SOCK::transtep(unsigned init, double dt)
 
   assert(_sim->analysis_is_tran());
 
+  // this is too expensive here.
+  //  CARD_LIST::card_list.do_tr();
 
   bool tr_converged;
   for (unsigned i = stepno; i>0; --i) {
     tr_converged = false;
     try {
+      for( unsigned i = 0; i < _caplist.size(); i++) { untested();
+	trace1("SOCK::kons",_caplist[i]->long_label());
+	assert(!_caplist[i]->is_constant());
+	_caplist[i]->q_eval(); // so it will be updated. is this sufficient?
+			       // is it sufficient to only queue caps?
+      }
       tr_converged = solve(OPT::TRHIGH, _trace);
     }catch (Exception e) { incomplete();
       ret = sTROUBLE;
@@ -1099,6 +1113,7 @@ void SOCK::transtep_reply(unsigned ret, bool eol)
   stream << _dthack;
 
   for (unsigned i=1; i <= n_vars; i++) {
+    trace2("SOCK::transtep_reply  v ", _sim->_vdcstack.top()[i],i);
     stream << _sim->_vdcstack.top()[i];
   }
 
