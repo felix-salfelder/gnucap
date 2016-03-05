@@ -247,6 +247,12 @@ void SOCK::setup(CS& Cmd)
 
   assert(_n_sweeps > 0);
   _sim->_freq = 0;
+
+  // please disable prequeue for vera until we have tests.
+  if(OPT::prequeue) { untested();
+    error(bDANGER, "prequeueing is experimental, this might not work\n");
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::options(CS& Cmd, int Nest)
@@ -527,6 +533,7 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
   char input_namen[length+1];
   unsigned here =0;
   unsigned n=0;
+
   _input_names.resize(n_in);
   _input_devs.resize(n_in);
   trace3("verainit: ", verbose,n_inputs(),length);
