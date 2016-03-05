@@ -342,7 +342,7 @@ void STORAGE::keep_ic()
   // tr_input.. might also work for coil?
   double x = tr_input();
 
-  trace6("STORAGE::keep_ic", long_label() , x, _n[IN1].v0(), _n[IN2].v0(), _n[OUT1].v0(),_n[OUT2].v0()  );
+  trace4("STORAGE::keep_ic", long_label() , x, _n[OUT1].v0(),_n[OUT2].v0()  );
   if (has_common()) {
     mutable_common()->set_ic(x);
   } else { incomplete();

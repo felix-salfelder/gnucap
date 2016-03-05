@@ -488,11 +488,8 @@ CARD_LIST& CARD_LIST::tr_queue_eval()
   }
   for (iterator ci=Q->begin(); ci!=Q->end(); ++ci) {
     trace_func_comp();
-    if((*ci)->is_constant() ){
-      assert(!OPT::prequeue);
-    }else{
-      (**ci).tr_queue_eval();
-    }
+    assert(!OPT::prequeue || !(*ci)->is_constant());
+    (**ci).tr_queue_eval();
   }
   return *this;
 }

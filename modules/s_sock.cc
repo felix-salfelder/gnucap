@@ -247,6 +247,13 @@ void SOCK::setup(CS& Cmd)
 
   assert(_n_sweeps > 0);
   _sim->_freq = 0;
+
+  // not implemented. need to queue sources properly (CARDLIST::q_hack..?)
+  if(OPT::prequeue) { // incomplete();
+    error(bDANGER, "prequeueing is experimental, this might not work\n");
+    OPT::prequeue=false;
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::options(CS& Cmd, int Nest)
@@ -417,7 +424,7 @@ static unsigned argc(unsigned opcode)
   switch(opcode){
     case 51: untested();
       return 3;
-    case 52: untested();
+    case 52: itested();
       return 0;
     case 53: untested();
       return 0;
@@ -527,6 +534,7 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
   char input_namen[length+1];
   unsigned here =0;
   unsigned n=0;
+
   _input_names.resize(n_in);
   _input_devs.resize(n_in);
   trace3("verainit: ", verbose,n_inputs(),length);
@@ -559,7 +567,7 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
       _stash[ii] = _input_devs[ii];
       _input_devs[ii]->inc_probes();
       _input_devs[ii]->set_value(_input_devs[ii]->value(),0);
-      _input_devs[ii]->set_constant(false);
+      _input_devs[ii]->set_constant(false); // <= insufficient for PREQEUE
 
       ++n;
     }
@@ -696,7 +704,7 @@ void SOCK::verakons()
   for( unsigned i = 0; i < _caplist.size(); i++) {
     trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->keep_ic(); // latch voltage applied to _v0
-    _caplist[i]->set_constant(true);
+    _caplist[i]->set_constant(true); // maybe not a good idea at all.
     _caplist[i]->q_eval();		// so it will be updated
   }
   //
@@ -713,6 +721,12 @@ void SOCK::verakons()
   CARD_LIST::card_list.tr_begin();
   bool converged = false;
   try{
+    for( unsigned i = 0; i < _caplist.size(); i++) { untested();
+      trace1("SOCK::kons",_caplist[i]->long_label());
+      // assert(!_caplist[i]->is_constant()); // NO caps are const, when they are in VS mode.
+      _caplist[i]->do_tr(); // so it will be updated. is this sufficient?
+			     // is it sufficient to only queue caps?
+    }
     converged = solve(itl,_trace);
     //    solve(OPT::TRHIGH,_trace);
     //    solve_with_homotopy(itl,_trace);
@@ -752,6 +766,12 @@ void SOCK::verakons()
     trace1("verakons, loading cap", c->long_label());
     _sim->_damp = 1.; // need raw stamps
     c->tr_load();
+  }
+
+  for( unsigned i = 0; i < _caplist.size(); i++) {
+    /// oops. maybe the next command is tran?!
+    // (this is a hack!!)
+    _caplist[i]->set_constant(false);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -946,11 +966,19 @@ unsigned SOCK::transtep(unsigned init, double dt)
 
   assert(_sim->analysis_is_tran());
 
+  // this is too expensive here.
+  //  CARD_LIST::card_list.do_tr();
 
   bool tr_converged;
   for (unsigned i = stepno; i>0; --i) {
     tr_converged = false;
     try {
+      for( unsigned i = 0; i < _caplist.size(); i++) { untested();
+	trace1("SOCK::kons",_caplist[i]->long_label());
+	assert(!_caplist[i]->is_constant());
+	_caplist[i]->q_eval(); // so it will be updated. is this sufficient?
+			       // is it sufficient to only queue caps?
+      }
       tr_converged = solve(OPT::TRHIGH, _trace);
     }catch (Exception e) { incomplete();
       ret = sTROUBLE;
@@ -1092,6 +1120,7 @@ void SOCK::transtep_reply(unsigned ret, bool eol)
   stream << _dthack;
 
   for (unsigned i=1; i <= n_vars; i++) {
+    trace2("SOCK::transtep_reply  v ", _sim->_vdcstack.top()[i],i);
     stream << _sim->_vdcstack.top()[i];
   }
 
