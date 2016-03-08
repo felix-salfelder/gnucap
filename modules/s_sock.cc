@@ -146,6 +146,7 @@ private: //vera stuff.
   bool _server_mode;
   unsigned _bufsize;
   bool _bigarg;
+  bool _binout;
   string _host;
   int reuseaddr;
   struct sockaddr_in sin;
@@ -264,6 +265,7 @@ void SOCK::options(CS& Cmd, int Nest)
   _port = "1400";
   _bufsize = BUFSIZE;
   _bigarg = true;
+  _binout = true;
   unsigned here = Cmd.cursor();
   do{
     ONE_OF
@@ -276,6 +278,7 @@ void SOCK::options(CS& Cmd, int Nest)
       || Get(Cmd, "port" ,        &_port)
       || Get(Cmd, "listen{port}", &_port)
       || Get(Cmd, "bigarg",       &_bigarg)
+      || Get(Cmd, "binout",       &_binout)
       || Get(Cmd, "host" ,        &_host)
       || Get(Cmd, "tr{s}",        &_do_tran_step)
       || Get(Cmd, "dm",           &_dump_matrix)
@@ -339,7 +342,13 @@ void SOCK::sweep()
     trace0("SOCK::sweep simple i/o");
     socket=0;
     trace1("bufsize Stdin ", _bufsize);
-    stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
+    if (!_binout) {
+      int  devnull=open("/dev/null",O_WRONLY);
+      trace2("Socket stream for dev null" ,devnull, STDIN_FILENO);
+      stream = SocketStream( devnull, STDIN_FILENO, _bufsize);
+    } else {
+      stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
+    }
     stream << "gnucap sock ready";
   }
 
@@ -576,13 +585,6 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
   //trace0("input_namen " + string(input_namen) );
   total = (unsigned) (length+4);
   assert(stream.bufsize() >= total);
-
-  if (!stream.at_end())
-  {
-    printf("Error in Verainit! no of bytes received %i <> expected %i\n",
-        n_bytes, (int)(total*sizeof(di_union_t)));
-    throw Exception("bloed\n");
-  }
 
   assert(!var_names_buf);
   var_names_buf = (char*) malloc( n_vars * 128 * sizeof(char));

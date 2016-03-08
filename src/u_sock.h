@@ -309,9 +309,11 @@ inline SocketStream& SocketStream::operator<<(const char* data) {
 
 void SocketStream::flush() {
   ssize_t n = ::write(_fd_w, _tbuf, _tcur);
+  if(n < 0) {
+    trace5("flush failed", n,_tcur,_tbuf,_fd_w,errno);
+    throw SocketException("flush: Could not write to socket ");
+  }
   _tcur = 0;
-  if(n < 0)
-    throw SocketException("Could not write to socket");
 }
 
 inline void SocketStream::read()

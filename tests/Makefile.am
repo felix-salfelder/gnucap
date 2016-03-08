@@ -691,6 +691,7 @@ GC_TESTS = \
     s_sock.1.preq.gc \
     s_sock.1b.preq.gc \
     s_sock.2.gc \
+    s_sock.3.gc \
     s_tr.cont.gc \
     s_tr.lrc.gc \
     s_ttt.1.gc \
