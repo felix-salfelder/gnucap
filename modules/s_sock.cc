@@ -387,11 +387,11 @@ void SOCK::fillnames( const CARD_LIST* scope){
 
   for (CARD_LIST::const_iterator i = scope->begin(); i != scope->end(); ++i) {
     if(const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i)){
-      if (!s->is_device()){ untested();
+      if (!s->is_device()){
       }else if ( s->subckt() ) {
         fillnames( s->subckt() );
       }
-    }else{ untested();
+    }else{
     }
   }
 }
@@ -404,8 +404,8 @@ void SOCK::findcaps( CARD_LIST* scope){
         _caplist.push_back( c );
       }
     }
-    if (!(*i)->is_device()){ untested();
-    } else if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) ) { untested();
+    if (!(*i)->is_device()){
+    } else if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) ) {
       trace1("going down", s->long_label());
       findcaps( s->subckt() );
     }
@@ -431,11 +431,11 @@ static void register_status()
 static unsigned argc(unsigned opcode)
 {
   switch(opcode){
-    case 51: untested();
+    case 51:
       return 3;
     case 52: itested();
       return 0;
-    case 53: untested();
+    case 53:
       return 0;
     case 104: itested();
     case 102:
@@ -538,7 +538,7 @@ static void putstring8(SocketStream* s, const string x)
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
-{ untested();
+{
   _verbose = verbose;
   char input_namen[length+1];
   unsigned here =0;
@@ -695,7 +695,7 @@ void SOCK::verakons()
     stream >> _sim->_v0[i];
     //    trace2("SOCK::kons start ", i,  _sim->_v0[i] );
   }
-  if (printlist().size()) { untested();
+  if (printlist().size()) {
     outdata(0.);
   }
   _sim->keep_voltages(); // v0->vdc
@@ -717,13 +717,13 @@ void SOCK::verakons()
 
   OPT::ITL itl = OPT::DCBIAS;
 
-  if(printlist().size()) { untested();
+  if(printlist().size()) {
     head(0,0," ");
   }
   CARD_LIST::card_list.tr_begin();
   bool converged = false;
   try{
-    for( unsigned i = 0; i < _caplist.size(); i++) { untested();
+    for( unsigned i = 0; i < _caplist.size(); i++) {
       trace1("SOCK::kons",_caplist[i]->long_label());
       // assert(!_caplist[i]->is_constant()); // NO caps are const, when they are in VS mode.
       _caplist[i]->do_tr(); // so it will be updated. is this sufficient?
@@ -752,7 +752,7 @@ void SOCK::verakons()
   ::status.accept.stop();
 
   //  assert(_sim->_mode==s_SOCK);
-  if (printlist().size()) { untested();
+  if (printlist().size()) {
     outdata(_sim->_time0);
   }
   _sim->_mode = s_SOCK; // for now.
@@ -1239,11 +1239,11 @@ void SOCK::cap_prepare(void)
   assert(!_capstash);
   _capstash = new CARDSTASH[_caplist.size()];
 
-  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) { untested();
+  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) {
     _caplist[ii]->inc_probes();			// we need to keep track of it
     _capstash[ii] = _caplist[ii];			// stash the std value
 
-    if(_caplist[ii]->has_common()){ untested();
+    if(_caplist[ii]->has_common()){
       trace1("SOCK::cap_prepare. have common", _caplist[ii]->value());
 //      _caplist[ii]->set_value(_caplist[ii]->value(), 0); // zap out extensions
 //      _caplist[ii]->set_constant(false);		 // update HACK?
@@ -1251,7 +1251,7 @@ void SOCK::cap_prepare(void)
 //    all devices need individual commons.
       _caplist[ii]->attach_common(_caplist[ii]->common()->clone());
       assert(_caplist[ii]->has_common());
-    }else{ untested();
+    }else{
       //      _sweepval[ii] = _zap[ii]->set__value();	// point to value to patch
       COMMON_COMPONENT* c = bm_dispatcher.clone("eval_bm_value");
       double capval = _caplist[ii]->value();
