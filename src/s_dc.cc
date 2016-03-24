@@ -120,6 +120,7 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
   ::status.dc.reset().start();
   _sim->_temp_c = temp_c_in;
   command_base(Cmd);
+  _sim->_has_op = s_DC;
   _scope = NULL;
   ::status.dc.stop();
 }
@@ -133,6 +134,7 @@ void OP::do_it(CS& Cmd, CARD_LIST* Scope)
   ::status.op.reset().start();
   _sim->_temp_c = temp_c_in;
   command_base(Cmd);
+  _sim->_has_op = s_OP;
   _scope = NULL;
   ::status.op.stop();
 }
@@ -362,9 +364,11 @@ void DCOP::options(CS& Cmd, int Nest)
 	  )
       || _out.outset(Cmd);
   }while (Cmd.more() && !Cmd.stuck(&here));
+  _sim->_temp_c = temp_c_in;
 
   if(_dump_matrix) {
     _trace = (TRACE) (_trace | (int)tMATRIX);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -544,6 +548,14 @@ void DCOP::first(int Nest)
   assert(_start);
   assert(_sweepval);
   assert(_sweepval[Nest]);
+
+  if (ELEMENT* c = dynamic_cast<ELEMENT*>(_zap[Nest])) {
+    c->set_constant(false); 
+    // because of extra precalc_last could set constant to true
+    // obsolete, once pointer hack is fixed
+  }else{
+    // not needed if not sweeping an element
+  }
 
   *_sweepval[Nest] = _start[Nest];
   if(_converged){

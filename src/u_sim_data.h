@@ -1,5 +1,4 @@
-/*$Id: u_sim_data.h,v 1.7 2010-09-22 13:19:51 felix Exp $ -*- C++ -*-
- * vim:ts=8:sw=2:et
+/*                             -*- C++ -*-
  * Copyright (C) 2009 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -145,6 +144,7 @@ public:
   std::deque<CARD*>* _evalq_uc;/* pointer to evalq under construction */
   std::map<std::string,std::map<std::string,WAVE> > _waves; /* wave storage, "store" command */
   std::string _label;
+  SIM_MODE _has_op;
   SIM_DATA();
   ~SIM_DATA();
   bool is_first_expand() {return !_nstat;}
@@ -246,10 +246,9 @@ public:
   bool is_iteration_number(int n)const    {return (_iter[iSTEP] == n);}
   bool exceeds_iteration_limit(OPT::ITL itlnum)const {return(_iter[iSTEP] > OPT::itl[itlnum]);}
   bool uic_now() const {return _uic && analysis_is_static() && _time0==0.;}
-//  bool more_uic_now()const  {return _more_uic && analysis_is_static() && _time0==0.;}
+  SIM_MODE has_op()const {return _has_op;}
 
-
-  private:
+private:  TT stuff and hacks.
   uint_t _tt_order;
   uint_t last_order_tt;
   CS* _expect_file;
@@ -274,7 +273,7 @@ public:
   unsigned total_outsteps()const;
   std::vector<double>_expect_raw;
 
-  public:
+public: // expect (dead code...)
   void expect(CS* x){ assert (!_expect_file); _expect_file = x; }
   CS* expect_file()const { return _expect_file; }
 };

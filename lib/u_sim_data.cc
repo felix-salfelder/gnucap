@@ -1,5 +1,4 @@
-/*                                 -*- C++ -*-
- * vim:ts=8:sw=2:et
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -46,6 +45,7 @@ SIM_DATA::SIM_DATA()
    _last_time(0.),
    _last_Time(0.),
    _freezetime(false),
+   //_iter(),		//BUG// does not init non-static instances
    _user_nodes(0),
    _subckt_nodes(0),
    _model_nodes(0),
@@ -76,7 +76,9 @@ SIM_DATA::SIM_DATA()
    _evalq2(),
    _late_evalq(),
    _evalq(NULL),
-   _evalq_uc(NULL)
+   _evalq_uc(NULL),
+   _waves(NULL),
+   _has_op(s_NONE)
 {
   _evalq = &_evalq1;
   _evalq_uc = &_evalq2;
@@ -560,9 +562,15 @@ void SIM_DATA::init(bool need_precalc)
 
     trace1("SIM_DATA::init expanding...", _total_nodes);
     CARD_LIST::card_list.expand();
+<<<<<<< HEAD
     trace1("SIM_DATA::init expanded", _total_nodes);
     CARD_LIST::card_list.precalc_last();
 
+=======
+    map__nodes();
+    CARD_LIST::card_list.map_nodes();
+    alloc_hold_vectors();
+>>>>>>> precalc_last-2
     _aa.reinit(_total_nodes);
     _lu.reinit(_total_nodes);
     _acx.reinit(_total_nodes);
@@ -590,7 +598,6 @@ void SIM_DATA::init(bool need_precalc)
     _last_Time = 0;
   }else if(need_precalc){
     CARD_LIST::card_list.precalc_first();
-    CARD_LIST::card_list.precalc_last();
   }
   _tt_iter=0;
   _dT0=0;
@@ -741,6 +748,7 @@ void SIM_DATA::uninit()
     assert(!_nstat);
     assert(!_nm);
   }
+  _has_op = s_NONE;
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::update_tt_order()

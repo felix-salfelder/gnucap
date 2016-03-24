@@ -1,4 +1,4 @@
-/*$Id: bm_posy.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -52,7 +52,7 @@ private: // override vitrual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_POSY(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
 
-  void		precalc_first(const CARD_LIST*);
+  void		precalc_last(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
   std::string	name()const		{return "posy";}
   bool		ac_too()const		{untested();return false;}
@@ -114,10 +114,10 @@ void EVAL_BM_POSY::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)co
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_POSY::precalc_first(const CARD_LIST* Scope)
+void EVAL_BM_POSY::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  EVAL_BM_ACTION_BASE::precalc_first(Scope);
+  EVAL_BM_ACTION_BASE::precalc_last(Scope);
   _min.e_val(_default_min, Scope);
   _max.e_val(_default_max, Scope);
   _abs.e_val(_default_abs, Scope);

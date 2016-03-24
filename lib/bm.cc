@@ -1,4 +1,4 @@
-/*$Id: bm.cc 2015/01/21 al $ -*- C++ -*-
+/*$Id: bm.cc 2016/03/23 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -182,10 +182,10 @@ void EVAL_BM_ACTION_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* 
   COMMON_COMPONENT::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_ACTION_BASE::precalc_first(const CARD_LIST* Scope)
+void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  COMMON_COMPONENT::precalc_first(Scope);
+  COMMON_COMPONENT::precalc_last(Scope);
   _bandwidth.e_val(_default_bandwidth, Scope);
   _delay.e_val(_default_delay, Scope);
   _phase.e_val(_default_phase, Scope);
@@ -196,16 +196,16 @@ void EVAL_BM_ACTION_BASE::precalc_first(const CARD_LIST* Scope)
   _tc2.e_val(_default_tc2, Scope);
   _ic.e_val(_default_ic, Scope);
 
-  trace1("EVAL_BM_ACTION_BASE::precalc_first ", _ic);
+  trace1("EVAL_BM_ACTION_BASE::precalc_last ", _ic);
 
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
-{
-  assert(Scope);
-  COMMON_COMPONENT::precalc_first(Scope);
-  _ic.e_val(_default_ic, Scope);
-}
+// void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
+// {
+//   assert(Scope);
+//   COMMON_COMPONENT::precalc_first(Scope);
+//   _ic.e_val(_default_ic, Scope);
+// }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::ac_eval(ELEMENT* d)const 
 {

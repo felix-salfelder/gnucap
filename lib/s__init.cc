@@ -1,4 +1,4 @@
-/* $Id: s__init.cc,v 1.4 2009-12-13 17:55:02 felix Exp $
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,6 +21,8 @@
  *------------------------------------------------------------------
  * initialization (allocation, node mapping, etc)
  */
+//testing=obsolete
+#include "e_cardlist.h"
 #include "u_status.h"
 #include "u_sim_data.h"
 #include "s__.h"
@@ -45,6 +47,7 @@ void SIM::command_base(CS& cmd)
     setup(cmd);
     CARD_LIST::card_list.precalc_last();
     ::status.set_up.stop();
+
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();	break;
     case rPIPE:         untested();

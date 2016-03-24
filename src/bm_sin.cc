@@ -1,4 +1,4 @@
-/*$Id: bm_sin.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -71,7 +71,7 @@ private: // override vitrual
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
   bool use_obsolete_callback_print()const {return false;}
 
-  void		precalc_first(const CARD_LIST*);
+  void		precalc_last(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
   TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "sin";}
@@ -142,10 +142,10 @@ void EVAL_BM_SIN::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)con
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_SIN::precalc_first(const CARD_LIST* Scope)
+void EVAL_BM_SIN::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  EVAL_BM_ACTION_BASE::precalc_first(Scope);
+  EVAL_BM_ACTION_BASE::precalc_last(Scope);
   _offset.e_val(_default_offset, Scope);
   _amplitude.e_val(_default_amplitude, Scope);
   _frequency.e_val(_default_frequency, Scope);
