@@ -437,7 +437,7 @@ static void make_dev_tr_probe(std::ofstream& out, const Device& d)
     "  assert(m);\n"
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
-    "  (void)s;\n";
+    "  (void)s;\n"
     "  assert(s);\n";
 
   out << "\n";
