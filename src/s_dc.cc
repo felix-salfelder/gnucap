@@ -85,10 +85,7 @@ protected:
   bool _converged;
   bool _ever_converged;         /* don't try to step back otherwise... */
   enum {ONE_PT, LIN_STEP, LIN_PTS, TIMES, OCTAVE, DECADE} _stepmode[DCNEST];
-  static double temp_c_in;	/* ambient temperature, input and sweep variable */
 };
-/*--------------------------------------------------------------------------*/
-double	DCOP::temp_c_in = 0.;
 /*--------------------------------------------------------------------------*/
 class DC : public DCOP { //
 public:
@@ -118,7 +115,6 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_dc();
   _sim->_phase = p_INIT_DC;
   ::status.dc.reset().start();
-  _sim->_temp_c = temp_c_in;
   command_base(Cmd);
   _sim->_has_op = s_DC;
   _scope = NULL;
@@ -132,7 +128,6 @@ void OP::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_op();
   _sim->_phase = p_INIT_DC;
   ::status.op.reset().start();
-  _sim->_temp_c = temp_c_in;
   command_base(Cmd);
   _sim->_has_op = s_OP;
   _scope = NULL;
@@ -158,7 +153,8 @@ DCOP::DCOP()
     _stepmode[ii] = ONE_PT;
   }
   
-  temp_c_in=OPT::temp_c;
+  //BUG// in SIM.  should be initialized there.
+  //_sim->_genout=0.;
   _out=IO::mstdout;
 }
 /*--------------------------------------------------------------------------*/
@@ -177,6 +173,7 @@ void DCOP::finish(void)
 /*--------------------------------------------------------------------------*/
 void OP::setup(CS& Cmd)
 {
+  _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -184,13 +181,13 @@ void OP::setup(CS& Cmd)
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
 
   _zap[0] = NULL;
-  _sweepval[0] = &temp_c_in;
+  _sweepval[0] = &(_sim->_temp_c);
 
   if (Cmd.match1("'\"({") || Cmd.is_float()) {
     Cmd >> _start[0];
     if (Cmd.match1("'\"({") || Cmd.is_float()) {
       Cmd >> _stop[0];
-    }else{untested();
+    }else{
       _stop[0] = _start[0];
     }
   }else{
@@ -215,6 +212,7 @@ void OP::setup(CS& Cmd)
 /*--------------------------------------------------------------------------*/
 void DC::setup(CS& Cmd)
 {
+  _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -246,7 +244,6 @@ void DC::setup(CS& Cmd)
       }
       
       _sim->_genout = 0.;
-      temp_c_in = OPT::temp_c;
       options(Cmd,_n_sweeps);
       _sim->_temp_c = temp_c_in;
     }
@@ -345,10 +342,10 @@ void DCOP::options(CS& Cmd, int Nest)
       || (Get(Cmd, "o{ctave}",	  &_step_in[Nest]) && (_stepmode[Nest] = OCTAVE))
       || Get(Cmd, "c{ontinue}",   &_cont)
       || Get(Cmd, "uic",	  &_sim->_uic)
-      || Get(Cmd, "dt{emp}",	  &temp_c_in,   mOFFSET, OPT::temp_c)
+      || Get(Cmd, "dt{emp}",	  &(_sim->_temp_c),   mOFFSET, OPT::temp_c)
       || Get(Cmd, "lo{op}", 	  &_loop[Nest])
       || Get(Cmd, "re{verse}",	  &_reverse_in[Nest])
-      || Get(Cmd, "te{mperature}",&temp_c_in)
+      || Get(Cmd, "te{mperature}",&(_sim->_temp_c))
       || (Cmd.umatch("tr{ace} {=}") &&
 	  (ONE_OF
 	   || Set(Cmd, "n{one}",      &_trace, tNONE)
@@ -364,7 +361,6 @@ void DCOP::options(CS& Cmd, int Nest)
 	  )
       || _out.outset(Cmd);
   }while (Cmd.more() && !Cmd.stuck(&here));
-  _sim->_temp_c = temp_c_in;
 
   if(_dump_matrix) {
     _trace = (TRACE) (_trace | (int)tMATRIX);
@@ -432,8 +428,6 @@ void DCOP::sweep_recursive(int Nest)
   }
   
   trace3("DCOP::sweep_recursive", Nest, *(_sweepval[Nest]), _step[Nest]);
-
-  _sim->_temp_c = temp_c_in;
 
   bool firstloop=true;
   do {
@@ -507,7 +501,13 @@ void DCOP::sweep_recursive(int Nest)
 	trace1("didnt converge in first", Nest);
 	return;
       }
-
+      ::status.accept.start();
+      _sim->set_limit();
+      CARD_LIST::card_list.tr_accept();
+      ::status.accept.stop();
+      _sim->_has_op = _sim->_mode;
+      _sim->keep_voltages();
+      outdata(*_sweepval[Nest]);
       itl = OPT::DCXFER;
 
     }
@@ -552,7 +552,7 @@ void DCOP::first(int Nest)
   if (ELEMENT* c = dynamic_cast<ELEMENT*>(_zap[Nest])) {
     c->set_constant(false); 
     // because of extra precalc_last could set constant to true
-    // obsolete, once pointer hack is fixed
+    // will be obsolete, once pointer hack is fixed
   }else{
     // not needed if not sweeping an element
   }
@@ -674,7 +674,14 @@ bool DCOP::next(int Nest)
   }
 
   _sim->_phase = p_DC_SWEEP;
-  return ok;
+  if (ok) {
+    assert(sweepval != NOT_VALID);
+    *(_sweepval[Nest]) = sweepval;
+    return true;
+  }else{
+    //assert(sweepval == NOT_VALID);
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 static DC p2;

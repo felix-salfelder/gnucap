@@ -1,4 +1,4 @@
-/*                                -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -86,16 +86,20 @@ private: // override virtual
 void DEV_VS::precalc_last()
 {
   trace2("DEV_VS::precalc_last()", value(), has_tr_eval());
-  ELEMENT::precalc_last();
+  //ELEMENT::precalc_last();	//BUG// skip
+  COMPONENT::precalc_last();
   set_constant(!has_tr_eval());
   set_converged(!has_tr_eval());
+  set_constant(false);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_VS::tr_begin()
 {
   trace0("DEV_VS::tr_begin()");
   ELEMENT::tr_begin();
-  _y1.f0 = _y[0].f0 = 0.; // override
+  _y[0].x  = 0.;
+  _y[0].f1 = value();
+  _y1.f0 = _y[0].f0 = 0.;	//BUG// override
   _loss1 = _loss0 = 1./OPT::shortckt;
   _m0.x  = 0.;
   _m0.c0 = -_loss0 * _y[0].f1;

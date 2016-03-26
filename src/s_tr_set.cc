@@ -1,4 +1,4 @@
-/*$Id: s_tr_set.cc 2015/01/28 al $ -*- C++ -*-
+/*$Id: s_tr_set.cc 2016/03/25 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -97,15 +97,14 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstop  = arg2;
 	_tstep  = arg1;
       }
-    }else{
+    }else{				    /* 1 arg */
       assert(arg1.has_hard_value());
       arg1.e_val(0.,_scope);
-      if (arg1 > _sim->last_time()) {
-        /* 1 arg: _tstop */
+      if (arg1 > _sim->_last_time) {	    /* 1 arg: _tstop */
 	_tstart = _sim->last_time();
 	_tstop  = arg1;
 	/* _tstep unchanged */
-      }else if (arg1 == 0.) {untested();	    /* 1 arg: _tstart */
+      }else if (arg1 == 0.) {untested();    /* 1 arg: _tstart */
 	double oldrange = _tstop - _tstart;
 	_tstart = 0.;
 	_tstop  = oldrange;

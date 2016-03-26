@@ -1,4 +1,4 @@
-/*$Id: e_card.cc 2015/01/27 al $ -*- C++ -*-
+/*$Id: e_card.cc 2016/03/25 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
