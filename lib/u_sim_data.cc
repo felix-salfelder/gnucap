@@ -77,7 +77,6 @@ SIM_DATA::SIM_DATA()
    _late_evalq(),
    _evalq(NULL),
    _evalq_uc(NULL),
-   _waves(NULL),
    _has_op(s_NONE)
 {
   _evalq = &_evalq1;
@@ -562,15 +561,14 @@ void SIM_DATA::init(bool need_precalc)
 
     trace1("SIM_DATA::init expanding...", _total_nodes);
     CARD_LIST::card_list.expand();
-<<<<<<< HEAD
     trace1("SIM_DATA::init expanded", _total_nodes);
-    CARD_LIST::card_list.precalc_last();
+    CARD_LIST::card_list.precalc_last(); // uf-hack?
 
-=======
+#if 0 // merge fuzz?
     map__nodes();
     CARD_LIST::card_list.map_nodes();
     alloc_hold_vectors();
->>>>>>> precalc_last-2
+#endif
     _aa.reinit(_total_nodes);
     _lu.reinit(_total_nodes);
     _acx.reinit(_total_nodes);

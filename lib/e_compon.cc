@@ -298,25 +298,11 @@ std::string COMMON_COMPONENT::param_value(int i)const
 void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  // probably unneccessary
   _tnom_c.e_val(OPT::tnom_c, Scope);
   _dtemp.e_val(0., Scope);
   _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
   _mfactor.e_val(1, Scope);
   _value.e_val(0, Scope);
-}
-/*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
-{
-  assert(Scope);
-  _tnom_c.e_val(OPT::tnom_c, Scope);
-  _dtemp.e_val(0., Scope);
-  _temp_c.e_val(CKT_BASE::_sim->_temp_c + _dtemp, Scope);
-  _mfactor.e_val(1, Scope);
-  _value.e_val(0, Scope);
-
-  trace2("COMMON_COMPONENT::precalc_first ", _mfactor, _value );
-
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::tt_commit(ELEMENT*x)const
@@ -424,10 +410,6 @@ void COMMON_COMPONENT::Set_param_by_name(std::string Name, std::string Value)
     }
   }
   throw Exception_No_Match(Name);
-}
-/*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::expand(const COMPONENT* )
-{
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_COMPONENT::parse_numlist(CS&)

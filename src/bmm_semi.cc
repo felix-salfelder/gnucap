@@ -274,27 +274,12 @@ bool EVAL_BM_SEMI_BASE::parse_numlist(CS& cmd)
   PARAMETER<double> val(NOT_VALID);
   cmd >> val;
   if (cmd.gotit(here)) {
-    _value = val;
+//    _value = val; // upstream
+    set_value(val); // uf.
     return true;
   }else{
     return false;
   }
-}
-/*--------------------------------------------------------------------------*/
-bool EVAL_BM_SEMI_BASE::parse_numlist(CS& cmd)
-{
-  unsigned start = cmd.cursor();
-  unsigned here = cmd.cursor();
-  trace2("EVAL_BM_SEMI_BASE::parse_numlist", cmd.fullstring(), here);
-  PARAMETER<double> val(NOT_VALID);
-  cmd >> val;
-  if (cmd.stuck(&here)) {
-    trace1("stuck", here);
-  }else{
-    trace2("EVAL_BM_SEMI_BASE::parse_numlist", cmd.fullstring(), val);
-    set_value(val);
-  }
-  return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_SEMI_BASE::parse_params_obsolete_callback(CS& cmd)

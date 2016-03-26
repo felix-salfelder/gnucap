@@ -248,7 +248,7 @@ public:
   bool uic_now() const {return _uic && analysis_is_static() && _time0==0.;}
   SIM_MODE has_op()const {return _has_op;}
 
-private:  TT stuff and hacks.
+private: //  TT stuff and hacks.
   uint_t _tt_order;
   uint_t last_order_tt;
   CS* _expect_file;
