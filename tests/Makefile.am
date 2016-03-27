@@ -639,8 +639,11 @@ GC_TESTS = \
     d_switch.disc.gc \
     d_switch.ic.gc \
     d_switch.tt.gc \
+    dc_loop.gc \
+    dc_itl.gc \
     dc_reverse.gc \
     dc_sweep.gc \
+    dc_sweeps.gc \
     dc_trace.gc \
     dc_twice.gc \
     dc_twice.nopreq.gc \
@@ -701,6 +704,7 @@ GC_TESTS = \
     sens_rr.gc \
     spice_comment_continuation.gc \
     spice_mos.gc \
+    temp.1.gc \
     tran_temp.gc \
     tr_bug.gc \
     tr_cont.gc \
@@ -1028,7 +1032,6 @@ bm_pulse.1a.ckt \
 bogus.cc \
 bogus2.cc \
 bti_dumpload.gc \
-dc_sweeps.gc \
 powerdown.gc \
 print_v.ckt \
 pulse_freq.gc \
