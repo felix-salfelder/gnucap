@@ -683,7 +683,7 @@ bool DCOP::next(int Nest)
   }
 
   _sim->_phase = p_DC_SWEEP;
-  *(_sweepval[Nest]) = sweepval; // ouch.
+//  *(_sweepval[Nest]) = sweepval; // ouch.
   if (ok) { untested();
     assert(sweepval != NOT_VALID);
     // *(_sweepval[Nest]) = sweepval;
