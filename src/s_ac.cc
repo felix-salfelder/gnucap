@@ -75,25 +75,30 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
   reset_timers();
   ::status.ac.reset().start();
 
-  _sim->init();
-  _sim->alloc_vectors();
-  _sim->_acx.reallocate();
-  _sim->_acx.set_min_pivot(OPT::pivtol);
-  
-  setup(Cmd);
-  CARD_LIST::card_list.precalc_last();
+  try {
+    setup(Cmd);
+    _sim->init();
+    CARD_LIST::card_list.precalc_last();
 
-  ::status.set_up.stop();
-  switch (ENV::run_mode) {
-  case rPRE_MAIN:	unreachable();	break;
-  case rPIPE:		untested();
-  case rBATCH:
-  case rINTERACTIVE:
-  case rSCRIPT:		sweep();	break;
-  case rPRESET:		/*nothing*/	break;
+    _sim->alloc_vectors();
+    _sim->_acx.reallocate();
+    _sim->_acx.set_min_pivot(OPT::pivtol);
+    ::status.set_up.stop();
+
+    switch (ENV::run_mode) {
+    case rPRE_MAIN:	unreachable();	break;
+    case rPIPE:		untested();
+    case rBATCH:		itested();
+    case rINTERACTIVE:	itested();
+    case rSCRIPT:		sweep();	break;
+    case rPRESET:		/*nothing*/	break;
+    }
+  }catch (Exception& e) {untested();
+    error(bDANGER, e.message() + '\n');
   }
   _sim->_acx.unallocate();
   _sim->unalloc_vectors();
+
   _sim->_has_op = s_AC;
   _scope = NULL;
   

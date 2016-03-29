@@ -76,7 +76,10 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
   ::status.four.reset().start();
   
   try {
+    setup(Cmd);
     _sim->init();
+    CARD_LIST::card_list.precalc_last();
+
     _sim->alloc_vectors();    
     _sim->_aa.reallocate();
     _sim->_aa.dezero(OPT::gmin);
@@ -84,11 +87,9 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
     _sim->_lu.reallocate();
     _sim->_lu.dezero(OPT::gmin);
     _sim->_lu.set_min_pivot(OPT::pivtol);
-    
-    setup(Cmd);
     fftallocate();
-    
     ::status.set_up.stop();
+
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();		break;
 	 case rPIPE:
@@ -100,11 +101,11 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
   }
-  
   fftunallocate();
   _sim->unalloc_vectors();
   _sim->_lu.unallocate();
   _sim->_aa.unallocate();
+
   _sim->_has_op = s_FOURIER;
   _scope = NULL;
 
