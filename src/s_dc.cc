@@ -369,7 +369,7 @@ void DCOP::options(CS& Cmd, int Nest)
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep()
-{ untested();
+{
 //  _sim->_age= true; // hack?
   head(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
@@ -377,7 +377,7 @@ void DCOP::sweep()
   if (_cont) { untested();
     _sim->restore_voltages();
     CARD_LIST::card_list.tr_restore();
-  }else{ untested();
+  }else{
     _sim->clear_limit();
     CARD_LIST::card_list.tr_begin();
   }
@@ -385,8 +385,8 @@ void DCOP::sweep()
   set_step_cause(scUSER);
   _converged = false;
   _ever_converged = false;
-  for (int ii = 0; ii < _n_sweeps; ++ii) { untested();
-    if (!_zap[ii]) { untested();
+  for (int ii = 0; ii < _n_sweeps; ++ii) {
+    if (!_zap[ii]) {
     }else if (_zap[ii]->is_constant()) { untested();
       CARD_LIST::card_list.q_hack(_zap[ii]);
     }else{ untested();
@@ -606,7 +606,7 @@ void DCOP::first(int Nest)
 bool DCOP::next(int Nest)
 { itested();
   double sweepval = NOT_VALID;
-  trace1("next", Nest);
+  trace2("next", Nest, *(_sweepval[Nest]));
   bool ok = false;
   double nothing = 0;
   double (*step)(double a, double b) = add;
@@ -626,19 +626,20 @@ bool DCOP::next(int Nest)
     std::swap(step,back);
     if (_step[Nest] < 0) { untested();
       further = ge;
-    }else{ untested();
+    }else{ itested();
       further = le;
     }
     fudge = scale(_step[Nest], -1e-6);
   } else if (_step[Nest] < 0) { untested();
     further = le;
   }
-  if (_step[Nest] == nothing) { untested();
+  if (_step[Nest] == nothing) {
     ok = false;
     set_step_cause(scZERO);
   }else if (!_converged && _ever_converged) { untested();
     if (_sweepdamp[Nest]<OPT::dtmin) { untested();
       throw Exception("step too small (does not converge)");
+    }else{untested();
     }
     _sweepdamp[Nest] /= 2.;
     trace2("reducing step by", _sweepdamp[Nest], Nest);
@@ -650,13 +651,15 @@ bool DCOP::next(int Nest)
     if (_sweepdamp[Nest] != 1) { untested();
       trace3("recovered from", _sweepdamp[Nest], Nest, sweepval);
       set_step_cause(scTE);
+    }else{untested();
     }
     _sweepdamp[Nest] *= 1.4;
     _sweepdamp[Nest] = std::min(_sweepdamp[Nest],1.);
     sweepval = step(*_sweepval[Nest], scale(_step[Nest],_sweepdamp[Nest]));
     fixzero(&sweepval, _step[Nest]);
     ok = in_order(back(_start[Nest],fudge), sweepval, step(_stop[Nest],fudge));
-    if (!_reverse[Nest] && !ok && _loop[Nest]) { untested();
+    if(ok){untested();
+    }else if (!_reverse[Nest] && !ok && _loop[Nest]) { untested();
       _reverse[Nest] = true;
       if (_step[Nest] < 0) { untested();
 	further = le;
@@ -670,25 +673,31 @@ bool DCOP::next(int Nest)
       assert(ok);
       trace2("BUG?", sweepval, *_sweepval[Nest]);
       _val_by_user_request[Nest] = sweepval; // BUG: here?
+    }else if(_reverse_in[Nest]){ untested();
+      // hmm maybe _reverse_in && !_reverse?
+      trace2("reverse end?", sweepval, *_sweepval[Nest]);
+      *_sweepval[Nest] = sweepval;
     }else{ untested();
     }
   }
 
   double v = _val_by_user_request[Nest];
-  if (further(step(sweepval, scale(_step[Nest],1e-6) ), v)) { untested();
-    trace4("userstep at", v, sweepval, ok, _reverse[Nest]);
+  if(!ok){untested();
+  }else if (further(step(sweepval, scale(_step[Nest],1e-6) ), v)) { untested();
+    trace5("userstep at", v, sweepval, ok, _reverse[Nest], *_sweepval[Nest]);
     set_step_cause(scUSER); // here?!
     sweepval = v;
-  }else{ untested();
+  }else{
   }
 
   _sim->_phase = p_DC_SWEEP;
 //  *(_sweepval[Nest]) = sweepval; // ouch.
-  if (ok) { untested();
+  if (ok) {
     assert(sweepval != NOT_VALID);
-    // *(_sweepval[Nest]) = sweepval;
+    *(_sweepval[Nest]) = sweepval;
     return true;
-  }else{ untested();
+  }else{
+    trace3("not ok at", v, sweepval, *(_sweepval[Nest]));
     //assert(sweepval == NOT_VALID);
     return false;
   }
