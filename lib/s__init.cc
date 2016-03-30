@@ -31,21 +31,19 @@ void SIM::command_base(CS& cmd)
 {  reset_timers();
   _sim->reset_iteration_counter(_sim->_mode);
   _sim->reset_iteration_counter(iPRINTSTEP);
-  
-  _sim->init();
-  trace1("init done", _sim->_temp_c);
-  _sim->alloc_vectors();  
-  _sim->_aa.reallocate();
-  _sim->_aa.dezero(OPT::gmin);
-  _sim->_aa.set_min_pivot(OPT::pivtol);  
-  _sim->_lu.reallocate();
-  _sim->_lu.dezero(OPT::gmin);
-  _sim->_lu.set_min_pivot(OPT::pivtol);
-  
-  assert(_sim->_nstat);
   try {
     setup(cmd);
+    _sim->init();
     CARD_LIST::card_list.precalc_last();
+
+    _sim->alloc_vectors();
+    _sim->_aa.reallocate();
+    _sim->_aa.dezero(OPT::gmin);
+    _sim->_aa.set_min_pivot(OPT::pivtol);
+    _sim->_lu.reallocate();
+    _sim->_lu.dezero(OPT::gmin);
+    _sim->_lu.set_min_pivot(OPT::pivtol);
+    assert(_sim->_nstat);
     ::status.set_up.stop();
 
     switch (ENV::run_mode) {
@@ -56,7 +54,7 @@ void SIM::command_base(CS& cmd)
     case rSCRIPT:	trace0("SIM::command_base calling sweep");	sweep(); break;
     case rPRESET:	/*nothing*/	break;
     }
-   }catch (Exception& e) {
+  }catch (Exception& e) {
     error(bDANGER, e.message() + '\n');
     _sim->count_iterations(iTOTAL);
     _sim->_lu.unallocate();

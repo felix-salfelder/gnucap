@@ -85,10 +85,7 @@ protected:
   bool _converged;
   bool _ever_converged;         /* don't try to step back otherwise... */
   enum {ONE_PT, LIN_STEP, LIN_PTS, TIMES, OCTAVE, DECADE} _stepmode[DCNEST];
-  static double temp_c_in;	/* ambient temperature, input and sweep variable */
 };
-/*--------------------------------------------------------------------------*/
-double	DCOP::temp_c_in = 0.;
 /*--------------------------------------------------------------------------*/
 class DC : public DCOP { //
 public:
@@ -118,7 +115,6 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_dc();
   _sim->_phase = p_INIT_DC;
   ::status.dc.reset().start();
-  _sim->_temp_c = temp_c_in;
   command_base(Cmd);
   _sim->_has_op = s_DC;
   _scope = NULL;
@@ -132,7 +128,6 @@ void OP::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_op();
   _sim->_phase = p_INIT_DC;
   ::status.op.reset().start();
-  _sim->_temp_c = temp_c_in;
   command_base(Cmd);
   _sim->_has_op = s_OP;
   _scope = NULL;
@@ -158,7 +153,8 @@ DCOP::DCOP()
     _stepmode[ii] = ONE_PT;
   }
   
-  temp_c_in=OPT::temp_c;
+  //BUG// in SIM.  should be initialized there.
+  //_sim->_genout=0.;
   _out=IO::mstdout;
 }
 /*--------------------------------------------------------------------------*/
@@ -177,6 +173,7 @@ void DCOP::finish(void)
 /*--------------------------------------------------------------------------*/
 void OP::setup(CS& Cmd)
 {
+  _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -184,13 +181,13 @@ void OP::setup(CS& Cmd)
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
 
   _zap[0] = NULL;
-  _sweepval[0] = &temp_c_in;
+  _sweepval[0] = &(_sim->_temp_c);
 
   if (Cmd.match1("'\"({") || Cmd.is_float()) {
     Cmd >> _start[0];
     if (Cmd.match1("'\"({") || Cmd.is_float()) {
       Cmd >> _stop[0];
-    }else{untested();
+    }else{
       _stop[0] = _start[0];
     }
   }else{
@@ -200,7 +197,7 @@ void OP::setup(CS& Cmd)
   _sim->_genout = 0.;
 
   options(Cmd,0);
-  _sim->_temp_c = temp_c_in;
+//  _sim->_temp_c = temp_c_in;
 
   _n_sweeps = 1;
   Cmd.check(bWARNING, "what's this?");
@@ -215,6 +212,7 @@ void OP::setup(CS& Cmd)
 /*--------------------------------------------------------------------------*/
 void DC::setup(CS& Cmd)
 {
+  _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -246,9 +244,8 @@ void DC::setup(CS& Cmd)
       }
       
       _sim->_genout = 0.;
-      temp_c_in = OPT::temp_c;
       options(Cmd,_n_sweeps);
-      _sim->_temp_c = temp_c_in;
+//      _sim->_temp_c = temp_c_in;
     }
   }else{ 
   }
@@ -345,10 +342,10 @@ void DCOP::options(CS& Cmd, int Nest)
       || (Get(Cmd, "o{ctave}",	  &_step_in[Nest]) && (_stepmode[Nest] = OCTAVE))
       || Get(Cmd, "c{ontinue}",   &_cont)
       || Get(Cmd, "uic",	  &_sim->_uic)
-      || Get(Cmd, "dt{emp}",	  &temp_c_in,   mOFFSET, OPT::temp_c)
+      || Get(Cmd, "dt{emp}",	  &(_sim->_temp_c),   mOFFSET, OPT::temp_c)
       || Get(Cmd, "lo{op}", 	  &_loop[Nest])
       || Get(Cmd, "re{verse}",	  &_reverse_in[Nest])
-      || Get(Cmd, "te{mperature}",&temp_c_in)
+      || Get(Cmd, "te{mperature}",&(_sim->_temp_c))
       || (Cmd.umatch("tr{ace} {=}") &&
 	  (ONE_OF
 	   || Set(Cmd, "n{one}",      &_trace, tNONE)
@@ -364,7 +361,6 @@ void DCOP::options(CS& Cmd, int Nest)
 	  )
       || _out.outset(Cmd);
   }while (Cmd.more() && !Cmd.stuck(&here));
-  _sim->_temp_c = temp_c_in;
 
   if(_dump_matrix) {
     _trace = (TRACE) (_trace | (int)tMATRIX);
@@ -378,7 +374,7 @@ void DCOP::sweep()
   head(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
-  if (_cont) {
+  if (_cont) { untested();
     _sim->restore_voltages();
     CARD_LIST::card_list.tr_restore();
   }else{
@@ -391,13 +387,14 @@ void DCOP::sweep()
   _ever_converged = false;
   for (int ii = 0; ii < _n_sweeps; ++ii) {
     if (!_zap[ii]) {
-    }else if (_zap[ii]->is_constant()) {
+    }else if (_zap[ii]->is_constant()) { untested();
       CARD_LIST::card_list.q_hack(_zap[ii]);
     }else{ untested();
     }
   }
   sweep_recursive(_n_sweeps-1);
   _sim->pop_voltages();
+  _sim->_has_op = _sim->_mode;
   _sim->keep_voltages();
 }
 /*--------------------------------------------------------------------------*/
@@ -433,11 +430,9 @@ void DCOP::sweep_recursive(int Nest)
   
   trace3("DCOP::sweep_recursive", Nest, *(_sweepval[Nest]), _step[Nest]);
 
-  _sim->_temp_c = temp_c_in;
-
   bool firstloop=true;
   do {
-    _sim->_temp_c = temp_c_in;
+//     _sim->_temp_c = temp_c_in;
     if (Nest) {
       sweep_recursive(Nest-1);
       if(_converged || !_ever_converged){
@@ -445,6 +440,7 @@ void DCOP::sweep_recursive(int Nest)
 	_sim->pop_voltages();
 	_sim->restore_voltages();
         if(firstloop) {
+	  _sim->_has_op = _sim->_mode;
 	  _sim->keep_voltages(true); // push values for sweep. hmmm
 	}
       } else { untested();
@@ -453,6 +449,10 @@ void DCOP::sweep_recursive(int Nest)
 	incomplete();
       }
     }else{ // leaf
+      if (_sim->command_is_op()) {
+	CARD_LIST::card_list.precalc_last();
+      }else{
+      }
       for (int ii = 0;  ii < _n_sweeps;  ++ii) {
 	if (_zap[ii]) {
 	  _zap[ii]->do_tr();
@@ -488,6 +488,7 @@ void DCOP::sweep_recursive(int Nest)
         ::status.accept.stop();
         _sim->keep_voltages();
         if (firstloop) {
+	  _sim->_has_op = _sim->_mode;
 	  _sim->keep_voltages(true); // push values for sweep. hmmm
 	}
       }
@@ -507,7 +508,13 @@ void DCOP::sweep_recursive(int Nest)
 	trace1("didnt converge in first", Nest);
 	return;
       }
-
+      // ::status.accept.start();
+      // _sim->set_limit();
+      // CARD_LIST::card_list.tr_accept();
+      // ::status.accept.stop();
+      // _sim->_has_op = _sim->_mode;
+      // _sim->keep_voltages();
+      // outdata(*_sweepval[Nest]); ??
       itl = OPT::DCXFER;
 
     }
@@ -552,7 +559,7 @@ void DCOP::first(int Nest)
   if (ELEMENT* c = dynamic_cast<ELEMENT*>(_zap[Nest])) {
     c->set_constant(false); 
     // because of extra precalc_last could set constant to true
-    // obsolete, once pointer hack is fixed
+    // will be obsolete, once pointer hack is fixed
   }else{
     // not needed if not sweeping an element
   }
@@ -597,15 +604,16 @@ void DCOP::first(int Nest)
 }
 /*--------------------------------------------------------------------------*/
 bool DCOP::next(int Nest)
-{
-  trace1("next", Nest);
+{ itested();
+  double sweepval = NOT_VALID;
+  trace2("next", Nest, *(_sweepval[Nest]));
   bool ok = false;
   double nothing = 0;
   double (*step)(double a, double b) = add;
   double (*back)(double a, double b) = sub;
   bool (*further)(double a, double b) = ge;
   double (*scale)(double a, double b) = mul;
-  if (!_linswp[Nest]) {
+  if (!_linswp[Nest]) { untested();
     step = mul;
     back = div;
     scale = pow;
@@ -613,68 +621,86 @@ bool DCOP::next(int Nest)
     scale = pow;
   }
   double fudge = scale(_step[Nest], 1e-6);
-  if (_reverse[Nest]) {
+  if (_reverse[Nest]) { untested();
     trace2("next, reverse", *_sweepval[Nest], _val_by_user_request[Nest]);
     std::swap(step,back);
-    if (_step[Nest] < 0) {
+    if (_step[Nest] < 0) { untested();
       further = ge;
-    }else{
+    }else{ itested();
       further = le;
     }
     fudge = scale(_step[Nest], -1e-6);
-  } else if (_step[Nest] < 0) {
+  } else if (_step[Nest] < 0) { untested();
     further = le;
   }
   if (_step[Nest] == nothing) {
     ok = false;
     set_step_cause(scZERO);
   }else if (!_converged && _ever_converged) { untested();
-    if (_sweepdamp[Nest]<OPT::dtmin) {
+    if (_sweepdamp[Nest]<OPT::dtmin) { untested();
       throw Exception("step too small (does not converge)");
+    }else{untested();
     }
     _sweepdamp[Nest] /= 2.;
     trace2("reducing step by", _sweepdamp[Nest], Nest);
-    *(_sweepval[Nest]) = back(*(_sweepval[Nest]), scale(_step[Nest],_sweepdamp[Nest]));
-    trace2("next at", *(_sweepval[Nest]), _val_by_user_request[Nest]);
+    sweepval = back(*_sweepval[Nest], scale(_step[Nest],_sweepdamp[Nest]));
+    trace2("next at", sweepval, _val_by_user_request[Nest]);
     ok = true;
     set_step_cause(scREJECT);
-  }else{
+  }else{ untested();
     if (_sweepdamp[Nest] != 1) { untested();
-      trace3("recovered from", _sweepdamp[Nest], Nest, *(_sweepval[Nest]));
+      trace3("recovered from", _sweepdamp[Nest], Nest, sweepval);
       set_step_cause(scTE);
+    }else{untested();
     }
     _sweepdamp[Nest] *= 1.4;
     _sweepdamp[Nest] = std::min(_sweepdamp[Nest],1.);
-    *(_sweepval[Nest]) = step(*(_sweepval[Nest]), scale(_step[Nest],_sweepdamp[Nest]));
-    fixzero(_sweepval[Nest], _step[Nest]);
-    ok = in_order(back(_start[Nest],fudge), *(_sweepval[Nest]), step(_stop[Nest],fudge));
-    if (!_reverse[Nest] && !ok && _loop[Nest]) {
+    sweepval = step(*_sweepval[Nest], scale(_step[Nest],_sweepdamp[Nest]));
+    fixzero(&sweepval, _step[Nest]);
+    ok = in_order(back(_start[Nest],fudge), sweepval, step(_stop[Nest],fudge));
+    if(ok){untested();
+    }else if (!_reverse[Nest] && !ok && _loop[Nest]) { untested();
       _reverse[Nest] = true;
-      if (_step[Nest] < 0) {
+      if (_step[Nest] < 0) { untested();
 	further = le;
-      }else{
+      }else{ untested();
 	further = ge;
       }
       fudge = scale(_step[Nest], -.1);
-      *(_sweepval[Nest]) = back(*(_sweepval[Nest]), _step[Nest]);
+      sweepval = back(*_sweepval[Nest], _step[Nest]);
       std::swap(step,back);
-      ok = in_order(back(_start[Nest],fudge),*(_sweepval[Nest]),step(_stop[Nest],fudge));
+      ok = in_order(back(_start[Nest],fudge), sweepval, step(_stop[Nest],fudge));
       assert(ok);
-      _val_by_user_request[Nest] = *_sweepval[Nest]; // BUG: here?
-    }else{
+      trace2("BUG?", sweepval, *_sweepval[Nest]);
+      _val_by_user_request[Nest] = sweepval; // BUG: here?
+    }else if(_reverse_in[Nest]){ untested();
+      // hmm maybe _reverse_in && !_reverse?
+      trace2("reverse end?", sweepval, *_sweepval[Nest]);
+      *_sweepval[Nest] = sweepval;
+    }else{ untested();
     }
   }
 
   double v = _val_by_user_request[Nest];
-  if (further(step(*(_sweepval[Nest]), scale(_step[Nest],1e-6) ), v)) {
-    trace4("userstep at", v, *(_sweepval[Nest]), ok, _reverse[Nest]);
+  if(!ok){untested();
+  }else if (further(step(sweepval, scale(_step[Nest],1e-6) ), v)) { untested();
+    trace5("userstep at", v, sweepval, ok, _reverse[Nest], *_sweepval[Nest]);
     set_step_cause(scUSER); // here?!
-    *(_sweepval[Nest]) = v;
+    sweepval = v;
   }else{
   }
 
   _sim->_phase = p_DC_SWEEP;
-  return ok;
+//  *(_sweepval[Nest]) = sweepval; // ouch.
+  if (ok) {
+    assert(sweepval != NOT_VALID);
+    *(_sweepval[Nest]) = sweepval;
+    return true;
+  }else{
+    trace3("not ok at", v, sweepval, *(_sweepval[Nest]));
+    //assert(sweepval == NOT_VALID);
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 static DC p2;

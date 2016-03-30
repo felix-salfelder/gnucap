@@ -1,0 +1,14 @@
+spice
+
+.options itl2=5
+
+.model  ddd  d  ( is= 10.f  rs= 0.  n= 1.  tt= 0.  cjo= 1.p  vj= 1.  m= 0.5 
++ eg= 1.11  xti= 3.  kf= 0.  af= 1.  fc= 0.5  bv= 50  ibv= 0.001 )
+
+V1 1 0 3
+D1 2 0 ddd
+R1 2 1 1
+
+.print dc v(nodes)
+.dc V1 0 2 1 trace=a
+.end

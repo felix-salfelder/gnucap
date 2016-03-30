@@ -639,8 +639,11 @@ GC_TESTS = \
     d_switch.disc.gc \
     d_switch.ic.gc \
     d_switch.tt.gc \
+    dc_loop.gc \
+    dc_itl.gc \
     dc_reverse.gc \
     dc_sweep.gc \
+    dc_sweeps.gc \
     dc_trace.gc \
     dc_twice.gc \
     dc_twice.nopreq.gc \
@@ -701,6 +704,7 @@ GC_TESTS = \
     sens_rr.gc \
     spice_comment_continuation.gc \
     spice_mos.gc \
+    temp.1.gc \
     tran_temp.gc \
     tr_bug.gc \
     tr_cont.gc \
@@ -1020,7 +1024,7 @@ bogus.so bogus1.so bogus2.so bogus3.so bogus4.so: %.so: %.la
 # bug: case labels don't end with {
 sedscript:
 	grep -e ^@@@: -e ^@i@ *.log | sort -u | tr : " " | \
-		$(AWK) '{printf "sed -i %s -e '"'"'%s s/\\({\\|:\\)\\(\\ \\|\\t\\)\\?\\(un\\|i\\)tested();$$/\\1/'"'"' # %s +%s\n", $$3, $$4, $$3, $$4}' > $@
+		$(AWK) '{printf "sed -i %s -e '"'"'%s s/\\({\\|:\\)\\(\\ \\|\\t\\)\\?\\(un\\|i\\)tested();$$/\\1/'"'"' # %s +%s\n", $$2, $$3, $$2, $$3}' > $@
 
 # checked in files. sort out later.
 EXTRA_DIST += \
@@ -1028,7 +1032,6 @@ bm_pulse.1a.ckt \
 bogus.cc \
 bogus2.cc \
 bti_dumpload.gc \
-dc_sweeps.gc \
 powerdown.gc \
 print_v.ckt \
 pulse_freq.gc \
