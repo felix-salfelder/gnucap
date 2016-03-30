@@ -374,7 +374,7 @@ void DCOP::sweep()
   head(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
-  if (_cont) { untested();
+  if (_cont) {
     _sim->restore_voltages();
     CARD_LIST::card_list.tr_restore();
   }else{
@@ -387,9 +387,9 @@ void DCOP::sweep()
   _ever_converged = false;
   for (int ii = 0; ii < _n_sweeps; ++ii) {
     if (!_zap[ii]) {
-    }else if (_zap[ii]->is_constant()) { untested();
+    }else if (_zap[ii]->is_constant()) {
       CARD_LIST::card_list.q_hack(_zap[ii]);
-    }else{ untested();
+    }else{
     }
   }
   sweep_recursive(_n_sweeps-1);
@@ -467,7 +467,7 @@ void DCOP::sweep_recursive(int Nest)
         || (_converged && ((_trace >= tALLTIME)
         || (step_cause() == scUSER )));
       trace4("outdata?", _trace, _converged, printnow, _ever_converged);
-      if (!printnow) { untested();
+      if (!printnow) {
 	++extra_steps;
 	if(extra_steps > 100){ untested();
 	  throw Exception("dc stepping did not succeed");
@@ -501,7 +501,7 @@ void DCOP::sweep_recursive(int Nest)
 	  outdata(- *_sweepval[Nest]);
 	}
 	::status.hidden_steps = 0;
-      }else{ untested();
+      }else{
       }
 
       if (!_converged && firstloop && Nest) { untested();
@@ -520,7 +520,7 @@ void DCOP::sweep_recursive(int Nest)
     }
 
     if(firstloop){
-      if(step_cause() != scUSER){ untested();
+      if(step_cause() != scUSER){
 	trace1("firststep nouser", Nest);
 	return;
       }
@@ -613,7 +613,7 @@ bool DCOP::next(int Nest)
   double (*back)(double a, double b) = sub;
   bool (*further)(double a, double b) = ge;
   double (*scale)(double a, double b) = mul;
-  if (!_linswp[Nest]) { untested();
+  if (!_linswp[Nest]) {
     step = mul;
     back = div;
     scale = pow;
@@ -621,25 +621,25 @@ bool DCOP::next(int Nest)
     scale = pow;
   }
   double fudge = scale(_step[Nest], 1e-6);
-  if (_reverse[Nest]) { untested();
+  if (_reverse[Nest]) {
     trace2("next, reverse", *_sweepval[Nest], _val_by_user_request[Nest]);
     std::swap(step,back);
-    if (_step[Nest] < 0) { untested();
+    if (_step[Nest] < 0) {
       further = ge;
     }else{ itested();
       further = le;
     }
     fudge = scale(_step[Nest], -1e-6);
-  } else if (_step[Nest] < 0) { untested();
+  } else if (_step[Nest] < 0) {
     further = le;
   }
   if (_step[Nest] == nothing) {
     ok = false;
     set_step_cause(scZERO);
-  }else if (!_converged && _ever_converged) { untested();
+  }else if (!_converged && _ever_converged) {
     if (_sweepdamp[Nest]<OPT::dtmin) { untested();
       throw Exception("step too small (does not converge)");
-    }else{untested();
+    }else{
     }
     _sweepdamp[Nest] /= 2.;
     trace2("reducing step by", _sweepdamp[Nest], Nest);
@@ -647,23 +647,23 @@ bool DCOP::next(int Nest)
     trace2("next at", sweepval, _val_by_user_request[Nest]);
     ok = true;
     set_step_cause(scREJECT);
-  }else{ untested();
-    if (_sweepdamp[Nest] != 1) { untested();
+  }else{
+    if (_sweepdamp[Nest] != 1) {
       trace3("recovered from", _sweepdamp[Nest], Nest, sweepval);
       set_step_cause(scTE);
-    }else{untested();
+    }else{
     }
     _sweepdamp[Nest] *= 1.4;
     _sweepdamp[Nest] = std::min(_sweepdamp[Nest],1.);
     sweepval = step(*_sweepval[Nest], scale(_step[Nest],_sweepdamp[Nest]));
     fixzero(&sweepval, _step[Nest]);
     ok = in_order(back(_start[Nest],fudge), sweepval, step(_stop[Nest],fudge));
-    if(ok){untested();
-    }else if (!_reverse[Nest] && !ok && _loop[Nest]) { untested();
+    if(ok){
+    }else if (!_reverse[Nest] && !ok && _loop[Nest]) {
       _reverse[Nest] = true;
-      if (_step[Nest] < 0) { untested();
+      if (_step[Nest] < 0) {
 	further = le;
-      }else{ untested();
+      }else{
 	further = ge;
       }
       fudge = scale(_step[Nest], -.1);
@@ -673,17 +673,17 @@ bool DCOP::next(int Nest)
       assert(ok);
       trace2("BUG?", sweepval, *_sweepval[Nest]);
       _val_by_user_request[Nest] = sweepval; // BUG: here?
-    }else if(_reverse_in[Nest]){ untested();
+    }else if(_reverse_in[Nest]){
       // hmm maybe _reverse_in && !_reverse?
       trace2("reverse end?", sweepval, *_sweepval[Nest]);
       *_sweepval[Nest] = sweepval;
-    }else{ untested();
+    }else{
     }
   }
 
   double v = _val_by_user_request[Nest];
-  if(!ok){untested();
-  }else if (further(step(sweepval, scale(_step[Nest],1e-6) ), v)) { untested();
+  if(!ok){
+  }else if (further(step(sweepval, scale(_step[Nest],1e-6) ), v)) {
     trace5("userstep at", v, sweepval, ok, _reverse[Nest], *_sweepval[Nest]);
     set_step_cause(scUSER); // here?!
     sweepval = v;
