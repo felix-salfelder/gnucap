@@ -1,0 +1,14 @@
+spice
+
+V1 1 0 0
+*.dc V1 0 2 1 loop
+*.end
+.dc V1 0 1 1 loop
+.dc V1 0 2 1 loop
+.dc V1 0 3 1 loop
+.dc V1 0 4 1 loop
+
+.dc V1 0 3 2 loop
+.dc V1 0 5 2 loop
+.dc V1 0 7 2 loop
+.end
