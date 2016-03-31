@@ -111,11 +111,11 @@ model BUILT_IN_MOS_BASE {
       bool needs_isub "" default=false;
     }
     code_post {
-      if ((!has_hard_value(rs)) && has_hard_value(rd)) {untested();//106
+      if ((!has_hard_value(rs)) && has_hard_value(rd)) { //114
 	error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	      long_label() + ": rd input, but not rs. setting rs = 0.\n");
 	rs.set_default(0.);
-      }else if ((!has_hard_value(rd)) && has_hard_value(rs)) {untested();//109
+      }else if ((!has_hard_value(rd)) && has_hard_value(rs)) {untested();//118
 	error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
 	      long_label() + ": rs input, but not rd. setting rd = 0.\n");
 	rd.set_default(0.);
