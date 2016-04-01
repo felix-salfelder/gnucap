@@ -456,6 +456,7 @@ CKT_TESTS = \
     eq3-1153.tr-nb.ckt \
     eq3-1153.tr-ni.ckt \
     eq4-9217.tran.ckt \
+    eq4-9217.tran.nopreq.ckt \
     eqb1.ckt \
     eqboost.ckt \
     eqflat.ckt \
@@ -638,10 +639,14 @@ GC_TESTS = \
     d_switch.disc.gc \
     d_switch.ic.gc \
     d_switch.tt.gc \
+    dc_loop.gc \
+    dc_itl.gc \
     dc_reverse.gc \
     dc_sweep.gc \
+    dc_sweeps.gc \
     dc_trace.gc \
     dc_twice.gc \
+    dc_twice.nopreq.gc \
     ddc_brl.gc \
     ddc_bug.gc \
     ddc_cc.gc \
@@ -686,7 +691,11 @@ GC_TESTS = \
     ring.gc \
     s_sock.1.gc \
     s_sock.1b.gc \
+    s_sock.1.preq.gc \
+    s_sock.1b.preq.gc \
     s_sock.2.gc \
+    s_sock.3.gc \
+    s_sock.4.gc \
     s_tr.cont.gc \
     s_tr.lrc.gc \
     s_ttt.1.gc \
@@ -695,6 +704,7 @@ GC_TESTS = \
     sens_rr.gc \
     spice_comment_continuation.gc \
     spice_mos.gc \
+    temp.1.gc \
     tran_temp.gc \
     tr_bug.gc \
     tr_cont.gc \
@@ -895,7 +905,7 @@ $(CKT_TESTS:%.ckt=%.sh): %.sh: %.ckt.ref
 	$(AM_V_GEN)$(testgen)
 
 $(UF_TESTS:%=%.out) $(GC_TESTS:%=%.out): %.gc.out: %.gc
-	$(AM_V_GEN)$(GNUCAP) $(GNUCAP_PLUGINS:%=-a ../modules/.libs/%) $(GNUCAP_ARGS) < $< | \
+	$(AM_V_GEN)GNUCAP_PREQ=1 $(GNUCAP) $(GNUCAP_PLUGINS:%=-a ../modules/.libs/%) $(GNUCAP_ARGS) < $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
 	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.gc.out
 
@@ -1022,7 +1032,6 @@ bm_pulse.1a.ckt \
 bogus.cc \
 bogus2.cc \
 bti_dumpload.gc \
-dc_sweeps.gc \
 powerdown.gc \
 print_v.ckt \
 pulse_freq.gc \

@@ -1,4 +1,4 @@
-/*$Id: d_switch.cc,v 1.6 2010-07-09 12:14:22 felix Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -440,7 +440,7 @@ void SWITCH_BASE::precalc_last()
 {
   ELEMENT::precalc_last();
     
-  if (_sim->is_first_expand()) {
+  if (_sim->has_op() == s_NONE) {
     const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
     assert(c);
     const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());

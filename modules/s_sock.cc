@@ -146,6 +146,7 @@ private: //vera stuff.
   bool _server_mode;
   unsigned _bufsize;
   bool _bigarg;
+  bool _binout;
   string _host;
   int reuseaddr;
   struct sockaddr_in sin;
@@ -247,6 +248,13 @@ void SOCK::setup(CS& Cmd)
 
   assert(_n_sweeps > 0);
   _sim->_freq = 0;
+
+  // not implemented. need to queue sources properly (CARDLIST::q_hack..?)
+  if(OPT::prequeue) { // incomplete();
+    error(bDANGER, "prequeueing is experimental, this might not work\n");
+    OPT::prequeue=false;
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::options(CS& Cmd, int Nest)
@@ -257,6 +265,7 @@ void SOCK::options(CS& Cmd, int Nest)
   _port = "1400";
   _bufsize = BUFSIZE;
   _bigarg = true;
+  _binout = true;
   unsigned here = Cmd.cursor();
   do{
     ONE_OF
@@ -269,6 +278,7 @@ void SOCK::options(CS& Cmd, int Nest)
       || Get(Cmd, "port" ,        &_port)
       || Get(Cmd, "listen{port}", &_port)
       || Get(Cmd, "bigarg",       &_bigarg)
+      || Get(Cmd, "binout",       &_binout)
       || Get(Cmd, "host" ,        &_host)
       || Get(Cmd, "tr{s}",        &_do_tran_step)
       || Get(Cmd, "dm",           &_dump_matrix)
@@ -332,7 +342,13 @@ void SOCK::sweep()
     trace0("SOCK::sweep simple i/o");
     socket=0;
     trace1("bufsize Stdin ", _bufsize);
-    stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
+    if (!_binout) {
+      int  devnull=open("/dev/null",O_WRONLY);
+      trace2("Socket stream for dev null" ,devnull, STDIN_FILENO);
+      stream = SocketStream( devnull, STDIN_FILENO, _bufsize);
+    } else {
+      stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
+    }
     stream << "gnucap sock ready";
   }
 
@@ -371,11 +387,11 @@ void SOCK::fillnames( const CARD_LIST* scope){
 
   for (CARD_LIST::const_iterator i = scope->begin(); i != scope->end(); ++i) {
     if(const COMPONENT* s = dynamic_cast<const COMPONENT*>(*i)){
-      if (!s->is_device()){ untested();
+      if (!s->is_device()){
       }else if ( s->subckt() ) {
         fillnames( s->subckt() );
       }
-    }else{ untested();
+    }else{
     }
   }
 }
@@ -388,8 +404,8 @@ void SOCK::findcaps( CARD_LIST* scope){
         _caplist.push_back( c );
       }
     }
-    if (!(*i)->is_device()){ untested();
-    } else if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) ) { untested();
+    if (!(*i)->is_device()){
+    } else if ( BASE_SUBCKT* s = dynamic_cast< BASE_SUBCKT*>(*i) ) {
       trace1("going down", s->long_label());
       findcaps( s->subckt() );
     }
@@ -415,13 +431,13 @@ static void register_status()
 static unsigned argc(unsigned opcode)
 {
   switch(opcode){
-    case 51: untested();
+    case 51:
       return 3;
-    case 52: untested();
+    case 52: itested();
       return 0;
-    case 53: untested();
+    case 53:
       return 0;
-    case 104: untested();
+    case 104: itested();
     case 102:
       return 1;
     default:
@@ -522,11 +538,12 @@ static void putstring8(SocketStream* s, const string x)
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
-{ untested();
+{
   _verbose = verbose;
   char input_namen[length+1];
   unsigned here =0;
   unsigned n=0;
+
   _input_names.resize(n_in);
   _input_devs.resize(n_in);
   trace3("verainit: ", verbose,n_inputs(),length);
@@ -559,7 +576,7 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
       _stash[ii] = _input_devs[ii];
       _input_devs[ii]->inc_probes();
       _input_devs[ii]->set_value(_input_devs[ii]->value(),0);
-      _input_devs[ii]->set_constant(false);
+      _input_devs[ii]->set_constant(false); // <= insufficient for PREQEUE
 
       ++n;
     }
@@ -568,13 +585,6 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
   //trace0("input_namen " + string(input_namen) );
   total = (unsigned) (length+4);
   assert(stream.bufsize() >= total);
-
-  if (!stream.at_end())
-  {
-    printf("Error in Verainit! no of bytes received %i <> expected %i\n",
-        n_bytes, (int)(total*sizeof(di_union_t)));
-    throw Exception("bloed\n");
-  }
 
   assert(!var_names_buf);
   var_names_buf = (char*) malloc( n_vars * 128 * sizeof(char));
@@ -685,7 +695,7 @@ void SOCK::verakons()
     stream >> _sim->_v0[i];
     //    trace2("SOCK::kons start ", i,  _sim->_v0[i] );
   }
-  if (printlist().size()) { untested();
+  if (printlist().size()) {
     outdata(0.);
   }
   _sim->keep_voltages(); // v0->vdc
@@ -696,7 +706,7 @@ void SOCK::verakons()
   for( unsigned i = 0; i < _caplist.size(); i++) {
     trace1("SOCK::kons",_caplist[i]->long_label());
     _caplist[i]->keep_ic(); // latch voltage applied to _v0
-    _caplist[i]->set_constant(true);
+    _caplist[i]->set_constant(true); // maybe not a good idea at all.
     _caplist[i]->q_eval();		// so it will be updated
   }
   //
@@ -707,12 +717,18 @@ void SOCK::verakons()
 
   OPT::ITL itl = OPT::DCBIAS;
 
-  if(printlist().size()) { untested();
+  if(printlist().size()) {
     head(0,0," ");
   }
   CARD_LIST::card_list.tr_begin();
   bool converged = false;
   try{
+    for( unsigned i = 0; i < _caplist.size(); i++) {
+      trace1("SOCK::kons",_caplist[i]->long_label());
+      // assert(!_caplist[i]->is_constant()); // NO caps are const, when they are in VS mode.
+      _caplist[i]->do_tr(); // so it will be updated. is this sufficient?
+			     // is it sufficient to only queue caps?
+    }
     converged = solve(itl,_trace);
     //    solve(OPT::TRHIGH,_trace);
     //    solve_with_homotopy(itl,_trace);
@@ -736,7 +752,7 @@ void SOCK::verakons()
   ::status.accept.stop();
 
   //  assert(_sim->_mode==s_SOCK);
-  if (printlist().size()) { untested();
+  if (printlist().size()) {
     outdata(_sim->_time0);
   }
   _sim->_mode = s_SOCK; // for now.
@@ -752,6 +768,12 @@ void SOCK::verakons()
     trace1("verakons, loading cap", c->long_label());
     _sim->_damp = 1.; // need raw stamps
     c->tr_load();
+  }
+
+  for( unsigned i = 0; i < _caplist.size(); i++) {
+    /// oops. maybe the next command is tran?!
+    // (this is a hack!!)
+    _caplist[i]->set_constant(false);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -946,11 +968,19 @@ unsigned SOCK::transtep(unsigned init, double dt)
 
   assert(_sim->analysis_is_tran());
 
+  // this is too expensive here.
+  //  CARD_LIST::card_list.do_tr();
 
   bool tr_converged;
   for (unsigned i = stepno; i>0; --i) {
     tr_converged = false;
     try {
+      for( unsigned i = 0; i < _caplist.size(); i++) { itested();
+	trace1("SOCK::kons",_caplist[i]->long_label());
+	assert(!_caplist[i]->is_constant());
+	_caplist[i]->q_eval(); // so it will be updated. is this sufficient?
+			       // is it sufficient to only queue caps?
+      }
       tr_converged = solve(OPT::TRHIGH, _trace);
     }catch (Exception e) { incomplete();
       ret = sTROUBLE;
@@ -996,7 +1026,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
     ::status.accept.stop();
     _sim->keep_voltages(); //  vdc  = v0
     assert(dt>0);
-  }else{ untested();
+  }else{ itested();
     double t1 = _sim->_time0 - _sim->_dt0;
     dt = time_by_error_estimate - t1;
     assert(dt);
@@ -1092,6 +1122,7 @@ void SOCK::transtep_reply(unsigned ret, bool eol)
   stream << _dthack;
 
   for (unsigned i=1; i <= n_vars; i++) {
+    trace2("SOCK::transtep_reply  v ", _sim->_vdcstack.top()[i],i);
     stream << _sim->_vdcstack.top()[i];
   }
 
@@ -1208,11 +1239,11 @@ void SOCK::cap_prepare(void)
   assert(!_capstash);
   _capstash = new CARDSTASH[_caplist.size()];
 
-  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) { untested();
+  for (unsigned ii = 0;  ii < _caplist.size();  ++ii) {
     _caplist[ii]->inc_probes();			// we need to keep track of it
     _capstash[ii] = _caplist[ii];			// stash the std value
 
-    if(_caplist[ii]->has_common()){ untested();
+    if(_caplist[ii]->has_common()){
       trace1("SOCK::cap_prepare. have common", _caplist[ii]->value());
 //      _caplist[ii]->set_value(_caplist[ii]->value(), 0); // zap out extensions
 //      _caplist[ii]->set_constant(false);		 // update HACK?
@@ -1220,7 +1251,7 @@ void SOCK::cap_prepare(void)
 //    all devices need individual commons.
       _caplist[ii]->attach_common(_caplist[ii]->common()->clone());
       assert(_caplist[ii]->has_common());
-    }else{ untested();
+    }else{
       //      _sweepval[ii] = _zap[ii]->set__value();	// point to value to patch
       COMMON_COMPONENT* c = bm_dispatcher.clone("eval_bm_value");
       double capval = _caplist[ii]->value();

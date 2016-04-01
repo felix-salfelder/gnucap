@@ -156,6 +156,7 @@ public:
   static smode_t mode;	    // mixed-mode mode preference
   static int transits;	    // number of good transitions for digital
   static bool dupcheck;	    // check for duplicates on read
+  static bool prequeue;	    // prequeue model evaluation
   static bool bypass;	    // bypass model evaluation, if appropriate
   static bool incmode;	    // make incremental changes to the matrix
   static bool lcbypass;	    // bypass L and C evaluation when appropriate

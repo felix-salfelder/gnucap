@@ -11,6 +11,31 @@ parameter p/4 has no value
 parameter p/2 has no value
 parameter p/4 has no value
 parameter p has no value
+parameter p/20 has no value
+parameter p/4 has no value
+parameter p/2 has no value
+parameter p/4 has no value
+parameter p has no value
+parameter p/20 has no value
+parameter p/4 has no value
+parameter p/2 has no value
+parameter p/4 has no value
+parameter p has no value
+parameter p/20 has no value
+parameter p/4 has no value
+parameter p/2 has no value
+parameter p/4 has no value
+parameter p has no value
+parameter p/20 has no value
+parameter p/4 has no value
+parameter p/2 has no value
+parameter p/4 has no value
+parameter p has no value
+parameter p/20 has no value
+parameter p/4 has no value
+parameter p/2 has no value
+parameter p/4 has no value
+parameter p has no value
 ".param p=20n "
 ".tran 0 100n 100n trace all "
 #Time       v(1)       next(v1)   event(v1)  control(0)

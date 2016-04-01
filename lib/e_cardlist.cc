@@ -217,9 +217,15 @@ CARD_LIST& CARD_LIST::precalc_first()
 /*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::precalc_last()
 {
+  _eq.clear();
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
     (**ci).precalc_last();
+    if(!OPT::prequeue){ itested();
+    }else if((*ci)->is_constant()){ itested();
+    }else{ itested();
+      _eq.push_back(*ci);
+    }
   }
   return *this;
 }
@@ -405,7 +411,13 @@ CARD_LIST& CARD_LIST::do_forall( void (CARD::*thing)( int ), int i  )
  */
 CARD_LIST& CARD_LIST::tr_advance()
 {
-  for (iterator ci=begin(); ci!=end(); ++ci) {
+  std::list<CARD*>* Q;
+  if(!OPT::prequeue) { itested();
+    Q = &_cl;
+  }else{ itested();
+    Q = &_eq;
+  }
+  for (iterator ci=Q->begin(); ci!=Q->end(); ++ci) {
     trace_func_comp();
     (**ci).tr_advance();
   }
@@ -468,8 +480,15 @@ bool CARD_LIST::tr_needs_eval()const
  */
 CARD_LIST& CARD_LIST::tr_queue_eval()
 {
-  for (iterator ci=begin(); ci!=end(); ++ci) {
+  std::list<CARD*>* Q;
+  if(!OPT::prequeue) { itested();
+    Q = &_cl;
+  }else{ itested();
+    Q = &_eq;
+  }
+  for (iterator ci=Q->begin(); ci!=Q->end(); ++ci) {
     trace_func_comp();
+    assert(!OPT::prequeue || !(*ci)->is_constant());
     (**ci).tr_queue_eval();
   }
   return *this;
@@ -551,7 +570,13 @@ TIME_PAIR CARD_LIST::tr_review()
 {
   TIME_PAIR time_by(NEVER,NEVER);
 
-  for (iterator ci=begin(); ci!=end(); ++ci) {
+  std::list<CARD*>* Q;
+  if(!OPT::prequeue) { itested();
+    Q = &_cl;
+  }else{ itested();
+    Q = &_eq;
+  }
+  for (iterator ci=Q->begin(); ci!=Q->end(); ++ci) {
     trace_func_comp();
     time_by.min((**ci).tr_review());
   }
@@ -812,6 +837,21 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
       assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }
+}
+/*--------------------------------------------------------------------------*/
+void CARD_LIST::q_hack(CARD* x)
+{ itested();
+
+#ifndef NDEBUG
+  for (iterator i=card_list._eq.begin(); i!=card_list._eq.end(); ++i){
+    if(*i == x){ unreachable();
+      trace1("already toplevel queued", x->long_label());
+      exit(1);
+    }
+  }
+#endif
+
+  card_list._eq.push_front(x);
 }
 /*--------------------------------------------------------------------------*/
 ///ADP_NODE* CARD_LIST::new_adp_node{

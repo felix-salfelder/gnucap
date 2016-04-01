@@ -1,4 +1,4 @@
-/* $Id: s__init.cc,v 1.4 2009-12-13 17:55:02 felix Exp $
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,6 +21,8 @@
  *------------------------------------------------------------------
  * initialization (allocation, node mapping, etc)
  */
+//testing=obsolete
+#include "e_cardlist.h"
 #include "u_status.h"
 #include "u_sim_data.h"
 #include "s__.h"
@@ -29,22 +31,21 @@ void SIM::command_base(CS& cmd)
 {  reset_timers();
   _sim->reset_iteration_counter(_sim->_mode);
   _sim->reset_iteration_counter(iPRINTSTEP);
-  
-  _sim->init();
-  trace1("init done", _sim->_temp_c);
-  _sim->alloc_vectors();  
-  _sim->_aa.reallocate();
-  _sim->_aa.dezero(OPT::gmin);
-  _sim->_aa.set_min_pivot(OPT::pivtol);  
-  _sim->_lu.reallocate();
-  _sim->_lu.dezero(OPT::gmin);
-  _sim->_lu.set_min_pivot(OPT::pivtol);
-  
-  assert(_sim->_nstat);
   try {
     setup(cmd);
+    _sim->init();
     CARD_LIST::card_list.precalc_last();
+
+    _sim->alloc_vectors();
+    _sim->_aa.reallocate();
+    _sim->_aa.dezero(OPT::gmin);
+    _sim->_aa.set_min_pivot(OPT::pivtol);
+    _sim->_lu.reallocate();
+    _sim->_lu.dezero(OPT::gmin);
+    _sim->_lu.set_min_pivot(OPT::pivtol);
+    assert(_sim->_nstat);
     ::status.set_up.stop();
+
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();	break;
     case rPIPE:         untested();
@@ -53,7 +54,7 @@ void SIM::command_base(CS& cmd)
     case rSCRIPT:	trace0("SIM::command_base calling sweep");	sweep(); break;
     case rPRESET:	/*nothing*/	break;
     }
-   }catch (Exception& e) {
+  }catch (Exception& e) {
     error(bDANGER, e.message() + '\n');
     _sim->count_iterations(iTOTAL);
     _sim->_lu.unallocate();

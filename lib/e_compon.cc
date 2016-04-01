@@ -1,4 +1,4 @@
-/*$Id: e_compon.cc 2015/02/05 al $ -*- C++ -*-
+/*$Id: e_compon.cc 2016/03/23 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -295,28 +295,14 @@ std::string COMMON_COMPONENT::param_value(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::precalc_first(const CARD_LIST* Scope)
-{
-  assert(Scope);
-  // probably unneccessary
-  _tnom_c.e_val(OPT::tnom_c, Scope);
-  _dtemp.e_val(0., Scope);
-  _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
-  _mfactor.e_val(1, Scope);
-  _value.e_val(0, Scope);
-}
-/*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
   _tnom_c.e_val(OPT::tnom_c, Scope);
   _dtemp.e_val(0., Scope);
-  _temp_c.e_val(CKT_BASE::_sim->_temp_c + _dtemp, Scope);
+  _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
   _mfactor.e_val(1, Scope);
   _value.e_val(0, Scope);
-
-  trace2("COMMON_COMPONENT::precalc_first ", _mfactor, _value );
-
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::tt_commit(ELEMENT*x)const
@@ -424,10 +410,6 @@ void COMMON_COMPONENT::Set_param_by_name(std::string Name, std::string Value)
     }
   }
   throw Exception_No_Match(Name);
-}
-/*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::expand(const COMPONENT* )
-{
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_COMPONENT::parse_numlist(CS&)
@@ -643,12 +625,6 @@ void COMPONENT::expand()
   trace1("COMPONENT::expand done", long_label());
 }
 /*--------------------------------------------------------------------------*/
-COMMON_COMPONENT* COMMON_COMPONENT::deflate()
-{
-  // should/might return an identical instance that is already attached?
-  return this;
-}
-/*--------------------------------------------------------------------------*/
 void COMPONENT::precalc_first()
 {
   trace4("COMPONENT::precalc_first", long_label(), _value, *(scope()->params()), hp(mutable_common()));
@@ -663,9 +639,10 @@ void COMPONENT::precalc_first()
     _mfactor = common()->mfactor();
   }else{
   }
-  
+
+  //BUG//  _mfactor must be in precalc_first
+
   _mfactor.e_val(1, scope());
-  _value.e_val(0.,scope());
   trace2("COMPONENT::precalc_first", long_label(), double(_mfactor));
   if (const COMPONENT* o = prechecked_cast<const COMPONENT*>(owner())) {
     _mfactor_fixed = o->mfactor() * _mfactor;
@@ -687,6 +664,8 @@ void COMPONENT::precalc_last()
     }
   }else{
   }
+
+  _value.e_val(0.,scope());
   trace4("COMPONENT::precalc_last done", long_label(), _mfactor_fixed, _value, common()?common()->value():-1.);
 }
 /*--------------------------------------------------------------------------*/
@@ -1218,7 +1197,7 @@ void COMPONENT::tt_accept()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::attach_adp(ADP_CARD* a)
 {
-  if (!a){ untested();
+  if (!a){
     return;
   } else if(_adp){ untested();
     return;

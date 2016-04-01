@@ -1,4 +1,4 @@
-/*                -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -152,7 +152,7 @@ void ELEMENT::precalc_last()
 
   //BUG// This is needed for AC analysis without doing op (or dc or tran ...) first.
   // Something like it should be moved to ac_begin.
-  if (_sim->is_first_expand()) {
+  if (_sim->has_op() == s_NONE) {
     _y[0].x  = 0.;
     _y[0].f0 = LINEAR;
     _y[0].f1 = value();
@@ -197,7 +197,9 @@ void ELEMENT::tr_restore()
   }
 
   //assert(_time[0] == _sim->_time0);
-  if (_time[0] != _sim->_time0) {
+  if (is_constant()){
+
+  }else if (_time[0] != _sim->_time0) {
     error(bDANGER, "//BUG// %s restore time mismatch.  t0=%.12f, s->t=%.12f\n", long_label().c_str(),
         _time[0], _sim->_time0);
 
@@ -266,7 +268,7 @@ void ELEMENT::tr_advance()
 void ELEMENT::tr_regress()
 {
   trace4("ELEMENT::tr_regress", long_label(), _sim->_time0, _time[0], _time[1]);
-  assert(_time[0] >= _sim->_time0); // moving backwards
+  assert(is_constant() || _time[0] >= _sim->_time0); // moving backwards
   assert(_time[1] <= _sim->_time0); // but not too far backwards
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
@@ -611,7 +613,7 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
   }else if (Umatch(x, "r ")) {			/* complex "resistance" */
     if (admittance == 0.) {untested();
       return XPROBE(MAXDBL);
-    }else{untested();
+    }else{
       return XPROBE(1. / admittance);
     }
   }else if (Umatch(x, "z ")) {			/* port impedance */
@@ -753,7 +755,7 @@ void ELEMENT::tt_advance()
     _time[OPT::_keep_time_steps-1] = 0.;
     _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
   }else if (_time[0] == _sim->_time0) {
-  }else{ untested();
+  }else{
   }
 
   for (int i=OPT::_keep_time_steps-1; i>=0; --i) {

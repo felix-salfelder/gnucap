@@ -29,7 +29,6 @@ stashing as inductor:0
 
 #Time       v(nl)      v(nv)     
 //BUG// v1 restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
-//BUG// r1 restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
 //BUG// l1 restore time mismatch.  t0=1.900000000000, s->t=1.000000000000
  1.         0.36811    0.99994   
  1.1        0.33306    0.99993   

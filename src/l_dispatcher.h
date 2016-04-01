@@ -1,4 +1,4 @@
-/*$Id: l_dispatcher.h 2015/01/21 03:47:06 al Exp $ -*- C++ -*-
+/*$Id: l_dispatcher.h 2016/03/29 al -*- C++ -*-
  * Copyright (C) 2006 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *

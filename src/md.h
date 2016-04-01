@@ -89,6 +89,7 @@ enum {
 #if defined(__WIN32__)
 #define	ENDDIR		"/\\"
 #define PATHSEP		';'
+#define DEFAULT_PLUGINS "gnucap-default-plugins.dll"
 #define SYSTEMSTARTFILE	"gnucap.rc"
 #define SYSTEMSTARTPATH	OS::getenv("PATH")
 #define CWDSTARTFILE	"gnucap.rc"
@@ -100,6 +101,7 @@ enum {
 #else
 #define	ENDDIR		"/"
 #define PATHSEP		':'
+#define DEFAULT_PLUGINS "gnucap-default-plugins.so"
 #define SYSTEMSTARTFILE	"gnucap.rc"
 #define SYSTEMSTARTPATH	"/etc"
 #define CWDSTARTFILE	"gnucap.rc"

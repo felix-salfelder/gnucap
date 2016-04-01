@@ -78,7 +78,6 @@ private: // override vitrual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_PULSE(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
 
-//  void		precalc_first(const CARD_LIST*);
   void		precalc_last(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
   TIME_PAIR	tr_review(COMPONENT*)const;

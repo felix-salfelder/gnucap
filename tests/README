@@ -1,3 +1,34 @@
+Automated testing and tests
+==================================
+
+tests are listed in TESTS (see Makefile.am). the extensions are .gc and .ckt.
+for a test t type
+$ make $t.out
+to generate the output under test. this command essentially runs gnucap $t.gc,
+or gnucap -b %t.ckt, respectively.
+
+for t=$file.gc or $file.ckt type
+$ make $file.log
+to run the particular test. this will compare the contents of the .out file
+against a .ref file, the out file will be delted on success. a .ref file is
+like an .out file, but it may contain "~" characters to mask numerical noise.
+there's more advanced filtering happening in a few cases, c.f. Makefile.am.
+
+adding tests is done by prepring a .gc (or .ckt) file, the respective .ref
+file, and registering to GC_TESTS (or CKT_TESTS) in Makefile.am.
+
+tests listed in XFAIL_TESTS (additionally) are expected to fail. these
+correspond do known bugs. some tests are skipped, depending on the
+configuaration. this is done by passing SKIP as first argument to the test
+driver, it will return 77 in this case, which will be interpreted accordingly
+by the test suite.
+
+$ make check
+will run all tests. pass -jN to run N threads in parallel
+
+upstream testing (not in use here)
+==================================
+
 Here are circuits used for regressions.  Some of these will also run
 on Spice and can be used for comparison.  Most are designed to test
 partcular features in hopes of clearly identifying the defective

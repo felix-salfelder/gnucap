@@ -1,0 +1,50 @@
+V: already installed, replacing
+stashing as V:0
+vsource: already installed, replacing
+stashing as vsource:0
+>>>>>.model NMOS NMOS Level = 49 Tox = 8.e-09 Vth0 = 0.3999 
+>>>>>.model PMOS PMOS Level= 49 version =3.23 Tox= 8.0e-09 Vth0= -0.42 
+>>>>>.SUBCKT op nout ninp ninn vdd gnd 
+>>>>>.options incmode=no 
+>>>>>.print tran v(nodes) 
+>>>>>.print dc v(nodes) 
+>>>>>.sock nobinout 
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.125      1.125      1.65       1.1752     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.125      1.125      1.65       1.1752     3.3       
+ 0.         1.125      1.125      1.65       1.0752     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.125      1.125      1.65       1.0752     3.3       
+ 0.         1.1        1.1        1.65       1.1502     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.1        1.1        1.65       1.1502     3.3       
+ 0.         1.1        1.1        1.65       1.0502     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.1        1.1        1.65       1.0502     3.3       
+ 0.         1.15       1.15       1.65       1.2002     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.15       1.15       1.65       1.2002     3.3       
+ 0.         1.15       1.15       1.65       1.1002     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.15       1.15       1.65       1.1002     3.3       
+ 0.         1.125      1.125      1.65       1.2252     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.125      1.125      1.65       1.2252     3.3       
+ 0.         1.125      1.125      1.65       1.0252     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.125      1.125      1.65       1.0252     3.3       
+ 0.         1.1        1.1        1.65       1.2002     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.1        1.1        1.65       1.2002     3.3       
+ 0.         1.1        1.1        1.65       1.0002     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.1        1.1        1.65       1.0002     3.3       
+ 0.         1.15       1.15       1.65       1.2502     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.15       1.15       1.65       1.2502     3.3       
+ 0.         1.15       1.15       1.65       1.0502     3.3       
+#           v(nin)     v(ninp)    v(nmid)    v(nout)    v(vdd)    
+ 0.         1.15       1.15       1.65       1.0502     3.3       

@@ -1,5 +1,4 @@
-/*$Id: d_cs.cc,v 1.5 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
- * vim:ts=2:sw=2:et:
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -73,15 +72,19 @@ private: // override virtual
 void DEV_CS::precalc_last()
 {
   trace0("DEV_CS::precalc_last()");
-  ELEMENT::precalc_last();
+  //ELEMENT::precalc_last();	//BUG// skip
+  COMPONENT::precalc_last();
   set_constant(!has_tr_eval());
   set_converged(!has_tr_eval());
+  set_constant(false);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CS::tr_begin()
 {
   ELEMENT::tr_begin();
-  _y1.f0 = _y[0].f0 = 0.; // override
+  _y[0].x  = 0.;
+  _y[0].f1 = value();
+  _y1.f0 = _y[0].f0 = 0.;	//BUG// override
   _m0.x  = 0.;
   _m0.c0 = _y[0].f1;
   _m0.c1 = 0.;

@@ -86,6 +86,7 @@ order_t	OPT::order = oAUTO;
 smode_t	OPT::mode = moMIXED;
 int	OPT::transits = 2;
 bool	OPT::dupcheck = false;
+bool	OPT::prequeue = getenv("GNUCAP_PREQ");
 bool	OPT::bypass = true;
 bool	OPT::incmode = true;
 bool	OPT::lcbypass = true;

@@ -1,4 +1,4 @@
-/*$Id: bm_pwl.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -47,9 +47,7 @@ private: // override virtual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_PWL(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
 
-  void		precalc_first(const CARD_LIST*);
   void		precalc_last(const CARD_LIST*);
-
   void		tr_eval(ELEMENT*)const;
   TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "pwl";}
@@ -104,10 +102,11 @@ void EVAL_BM_PWL::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)con
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_PWL::precalc_first(const CARD_LIST* Scope)
+void EVAL_BM_PWL::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  EVAL_BM_ACTION_BASE::precalc_first(Scope);
+  EVAL_BM_ACTION_BASE::precalc_last(Scope);
+
   _delta.e_val(_default_delta, Scope);
   _smooth.e_val(_default_smooth, Scope);
 
@@ -116,12 +115,6 @@ void EVAL_BM_PWL::precalc_first(const CARD_LIST* Scope)
     p->first.e_val(0, Scope);
     p->second.e_val(0, Scope);
   }
-}
-/*--------------------------------------------------------------------------*/
-void EVAL_BM_PWL::precalc_last(const CARD_LIST* Scope)
-{
-  assert(Scope);
-  EVAL_BM_ACTION_BASE::precalc_last(Scope);
 
   double last = -BIGBIG;
   for (std::vector<std::pair<PARAMETER<double>,PARAMETER<double> > >::iterator
