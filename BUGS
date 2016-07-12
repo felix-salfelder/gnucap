@@ -5,9 +5,9 @@
 - switch appears to switch too fast, need positive transition interval length (?)
 - extra nodes in sckt instanciations trigger assertion.
 - discontinuity propagation is too slow for huge circuits
-- build without gsl broken (again?!)
 - build without lapack-dev?!
 - segfaults if first dc does not comverge (vdcstack bug)
+- ageing and prequeueing does not work
 
 ## incomplete stuff in -uf (see XFAIL_TESTS)
 - print <sim> v 1 2 3 (and similar syntax) is broken

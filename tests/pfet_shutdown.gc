@@ -1,3 +1,4 @@
+options nopreq
 spice
 * p type inv amp w/bti
 .options TEMP=25
