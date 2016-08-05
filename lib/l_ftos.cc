@@ -46,7 +46,6 @@
 const int POOLSIZE = 100;
 const int MAXLENGTH = 40;
 static double ftos_floor = 1e-99;
-using namespace std;
 /*--------------------------------------------------------------------------*/
 std::string to_string(std::string s)
 {
@@ -81,13 +80,13 @@ string to_string(long int n)
   return s;
 }
 /*--------------------------------------------------------------------------*/
-string to_string(vector<double> n)
+string to_string(std::vector<double> n)
 {
   string buf("");
   // FIXME: remove one ,
   if (n.size()==0){return "( )";}
 
-  vector<double>::iterator i=n.begin();
+  std::vector<double>::iterator i=n.begin();
   buf += string("(") + ftos((double)*i, 0, 7, 0);
   ++i;
 
