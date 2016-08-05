@@ -24,7 +24,6 @@
 ##  02110-1301, USA.
 
 
-
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 # These source files can be omitted, and supplied as plugins.
@@ -35,6 +34,8 @@ d_mos4.model d_mos5.model d_mos6.model d_mos7.model d_mos8.model \
 d_mos123.model d_mos_base.model d_mos.model \
 d_bjt.model d_diode.model 
 #d_rcd.model d_bti.model 
+
+BUILT_SOURCES = ${MODELS:%.model=%.h}
 
 # device models hand coded in C++
 D_SRCS = \
