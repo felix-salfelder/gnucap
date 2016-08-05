@@ -1564,7 +1564,8 @@ void DEV_BUILT_IN_RCD::tr_stress_last() // "tt_review?".
         assert(!a->tr_lo);
         assert(!a->tr_hi);
   }
-  assert( a->tr_lo <= a->tr_hi );
+  trace2("", a->tr_lo, a->tr_hi );
+  // assert( a->tr_lo <= a->tr_hi );
   if(_tr_fill>1){
     error(bTRACE, "at %f: something wrong with _tr_fill in %s\n", _sim->_Time0, long_label().c_str());
     _tr_fill = 1;

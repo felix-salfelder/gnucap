@@ -31,7 +31,8 @@ libgnucap_uf_la_CPPFLAGS = $(AM_CPPFLAGS) \
                            -I$(top_builddir)/include -I$(top_srcdir)/include \
                            -I$(top_builddir)/src -I$(top_srcdir)/src \
                            -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
-libgnucap_uf_la_LDFLAGS = $(AM_LDFLAGS) -Wl,--enable-new-dtags -Wl,-rpath -Wl,${pkglibdir}
+libgnucap_uf_la_LDFLAGS = $(AM_LDFLAGS) -Wl,--enable-new-dtags -Wl,-rpath -Wl,${pkglibdir} \
+								  -version-info 0:0:0
 libgnucap_uf_la_SOURCES = \
 globals.cc \
 m_expression_dump.cc m_expression_in.cc m_expression_reduce.cc \
