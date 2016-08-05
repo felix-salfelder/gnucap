@@ -4,9 +4,7 @@
 
 ACLOCAL_AMFLAGS=-I m4
 
-dist_bin_SCRIPTS = gnucap-conf gnucap.mk
 doc_DATA = COPYING
-CLEANFILES = gnucap-conf gnucap.mk
 
 if MODULES
   MODULES_DIR = modules
@@ -22,6 +20,7 @@ DIST_SUBDIRS = $(SUBDIRS) doc
 SUBDIRS = \
     include \
     lib \
+    main \
     $(DOC_DIR) \
     examples \
     $(MODELGEN) \
