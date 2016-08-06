@@ -438,13 +438,14 @@ done
 #	src/Makefile
 #	])
 
-AC_CONFIG_FILES([gnucap-conf], [chmod +x gnucap-conf])
-AC_CONFIG_FILES([gnucap.mk], [chmod +x gnucap.mk])
+AC_CONFIG_FILES([main/gnucap-conf], [chmod +x main/gnucap-conf])
+AC_CONFIG_FILES([main/gnucap.mk], [chmod +x main/gnucap.mk])
 AC_CONFIG_FILES([src/gnucap], [chmod +x src/gnucap])
 
 AC_OUTPUT([
 	Makefile
 	lib/Makefile
+	main/Makefile
 	modelgen/Makefile
 	plugins/Makefile
 	include/Makefile

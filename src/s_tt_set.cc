@@ -48,7 +48,7 @@ void TTT::options(CS& Cmd)
 					(ONE_OF
 					 || Set(Cmd, "n{one}",     &_agemode, amNONE)
 					 || Set(Cmd, "o{nce}",     &_agemode, amONCE)
-					 || Set(Cmd, "b{nce}",     &_agemode, amBYPASS)
+					 || Set(Cmd, "b{ypass}",   &_agemode, amBYPASS)
 					 || Set(Cmd, "a{lways}",   &_agemode, amALWAYS)
 					)
 				)
