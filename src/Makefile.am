@@ -35,7 +35,7 @@ d_mos123.model d_mos_base.model d_mos.model \
 d_bjt.model d_diode.model 
 #d_rcd.model d_bti.model 
 
-BUILT_SOURCES = ${MODELS:%.model=%.h}
+BUILT_SOURCES = ${MODELS:%.model=%.h} ${MODELS:%.model=%.cc}
 
 # device models hand coded in C++
 D_SRCS = \
@@ -148,7 +148,7 @@ GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 noinst_SCRIPTS = gnucap
 bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
-gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1} ${MODELSRCS}
+gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1} ${MODELS}
 
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
 gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
