@@ -353,7 +353,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
     cmd.warn(bDANGER, here1, e.message());
   }
   if (ii < unsigned(minnodes)) {
-    cmd.warn(bDANGER, "need " + to_string(minnodes-int(ii)) +" more nodes");
+    cmd.warn(bDANGER, "need " + ::to_string(minnodes-int(ii)) +" more nodes");
   }else{
   }
   if (paren != 0) {

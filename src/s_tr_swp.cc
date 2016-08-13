@@ -587,7 +587,7 @@ bool TRANSIENT::next()
     set_step_cause(scSMALL);
     //check_consistency2();
     throw Exception("tried everything, still doesn't work, giving up at %s step %i",
-        to_string(_time1).c_str(), iteration_number());
+        ::to_string(_time1).c_str(), iteration_number());
     //}else if (newtime <= _sim->_time0 - _sim->_dtmin) {
   }else if (newtime < _sim->_time0) {
     /* Reject the most recent step. */

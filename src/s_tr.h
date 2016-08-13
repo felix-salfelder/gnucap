@@ -161,7 +161,7 @@ inline T& operator<<( T& o, const TRANSIENT::STEP_CAUSE &c)
 {
 	if(c > TRANSIENT::scLAST){
 		// FIXME: sometimes multiple causes sum up...
-		return o << to_string(int(c));
+		return o << ::to_string(int(c));
 	}
 	return o << TRANSIENT::STEP_CAUSE_label[c];
 }

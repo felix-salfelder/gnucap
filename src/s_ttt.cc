@@ -1417,7 +1417,7 @@ void TTT::tt_alarm(ALARM a, OMSTREAM* out)
 			s << (*p)->label() << '=' << (*p)->value() << '\n';
 			switch (a) {
 				case aREDIR:
-					cerr << s;
+					cerr << s.str();
 					break;
 				case aABORT:
 					abort = true;
@@ -1574,9 +1574,9 @@ void TTT::print_results_tt(double x)
 /*--------------------------------------------------------------------------*/
 string TTT::status()const
 {
-	return "twotime timesteps: accepted=" + to_string(steps_accepted())
-		+ ", rejected=" + to_string(steps_rejected())
-		+ ", total=" + to_string(steps_total()) + "\n";
+	return "twotime timesteps: accepted=" + ::to_string(steps_accepted())
+		+ ", rejected=" + ::to_string(steps_rejected())
+		+ ", total=" + ::to_string(steps_total()) + "\n";
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::store: store data in preparation for post processing

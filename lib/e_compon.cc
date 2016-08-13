@@ -896,7 +896,7 @@ const MODEL_CARD* COMPONENT::find_model(const std::string& modelname)const
 	  bin_count = 0;
 	  for (;;) {
 	    // loop over binned models
-	    std::string extended_name = modelname + '.' + to_string(++bin_count);
+	    std::string extended_name = modelname + '.' + ::to_string(++bin_count);
 	    try {
 	      c = Scope->find_in_my_scope(extended_name);
 	    }catch (Exception_Cant_Find& e2) {

@@ -78,7 +78,7 @@ public:
   std::string name()const
   {
     if(_n_ports){
-      return "poly(" + to_string(_n_ports-1) + ")";
+      return "poly(" + ::to_string(_n_ports-1) + ")";
     }else{
       return "poly";
     }
@@ -232,9 +232,9 @@ protected: // override virtual
     }else if(n==1){
       return "n";
     }else if(n%2){
-      return "cn" + to_string(n/2-1);
+      return "cn" + ::to_string(n/2-1);
     }else{
-      return "cp" + to_string(n/2-1);
+      return "cp" + ::to_string(n/2-1);
     }
   }
 public:
@@ -415,6 +415,7 @@ DEV_CPOLY_G::DEV_CPOLY_G()
 {
 }
 /*--------------------------------------------------------------------------*/
+#if 0 // not used.
 DEV_CPOLY_G::DEV_CPOLY_G(COMMON_COMPONENT* c)
   :ELEMENT(),
    _values(NULL),
@@ -425,6 +426,7 @@ DEV_CPOLY_G::DEV_CPOLY_G(COMMON_COMPONENT* c)
 { untested();
   attach_common(c);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_G::~DEV_CPOLY_G()
 {

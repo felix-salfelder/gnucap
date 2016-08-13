@@ -146,7 +146,7 @@ void EVAL_BM_FIT::precalc_last(const CARD_LIST* Scope)
   for (std::vector<std::pair<PARAMETER<double>,PARAMETER<double> > >::
 	 iterator p = _table.begin();  p != _table.end();  ++p) {
     if (last > p->first) {untested();
-      throw Exception_Precalc("FIT table is out of order: (" + to_string(last)
+      throw Exception_Precalc("FIT table is out of order: (" + ::to_string(last)
       			      + ", " + string(p->first) + ")\n");
     }else{
     }

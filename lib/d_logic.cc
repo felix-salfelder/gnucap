@@ -85,7 +85,7 @@ void DEV_LOGIC::expand()
   }else{
   }
 
-  std::string subckt_name(c->modelname()+c->name()+to_string(c->incount));
+  std::string subckt_name(c->modelname()+c->name()+::to_string(c->incount));
   try {
     const CARD* model = find_looking_out(subckt_name);
     

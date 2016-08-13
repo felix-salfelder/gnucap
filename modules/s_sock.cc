@@ -360,13 +360,13 @@ void SOCK::sweep()
 string SOCK::status()const
 {
   // incomplete();
-  return "sock: tr rejected=" + to_string(tr_steps_rejected_) + "\n";
+  return "sock: tr rejected=" + ::to_string(tr_steps_rejected_) + "\n";
 }
 /*--------------------------------------------------------------------------*/
-void SOCK::sweep_recursive(int )
-{
-  assert(false);
-}
+// void SOCK::sweep_recursive(int )
+// {
+//   assert(false);
+// }
 /*--------------------------------------------------------------------------*/
 // fetch names from circuit recursively. fill into local vector.
 void SOCK::fillnames( const CARD_LIST* scope){

@@ -1581,9 +1581,9 @@ void EV_BASE::quantize(gsl_vector_complex_view z0, gsl_vector_complex_const_view
 string EV_BASE::status()const
 {
 	return string("state space: charts=")
-		+ to_string(SSP_TREE::num_charts())
-		+ ", states=" + to_string(SSP_TREE::num_states())
-		+ ", samples=" + to_string(SSP_TREE::num_spls()) + "\n";
+		+ ::to_string(SSP_TREE::num_charts())
+		+ ", states=" + ::to_string(SSP_TREE::num_states())
+		+ ", samples=" + ::to_string(SSP_TREE::num_spls()) + "\n";
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
