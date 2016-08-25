@@ -35,6 +35,8 @@ d_mos123.model d_mos_base.model d_mos.model \
 d_bjt.model d_diode.model 
 #d_rcd.model d_bti.model 
 
+.model.cc:
+
 BUILT_SOURCES = ${MODELS:%.model=%.h} ${MODELS:%.model=%.cc}
 
 # device models hand coded in C++
