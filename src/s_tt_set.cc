@@ -136,7 +136,7 @@ void TTT::setup(CS& Cmd)
 	_Tstep.e_val(NOT_INPUT, _scope);
 	_tstart.e_val(NOT_INPUT, _scope);
 	_tstop.e_val(NOT_INPUT, _scope);
-	_tstep.e_val(NOT_INPUT, _scope);
+	_tstrobe.e_val(NOT_INPUT, _scope);
 
 	_new = false;
 	_cont = true;
@@ -193,10 +193,10 @@ void TTT::setup(CS& Cmd)
 
 
 			if( arg3 < arg4 ) {
-				_tstep  = arg3;
+				_tstrobe  = arg3;
 				_tstop  = arg4;
 			} else {
-				_tstep  = arg4;
+				_tstrobe  = arg4;
 				_tstop  = arg3;
 			}
 
@@ -234,10 +234,10 @@ void TTT::setup(CS& Cmd)
 				}
 				_Tstop = arg2;
 				if( arg3 < arg4 ) {
-					_tstep = arg3;
+					_tstrobe = arg3;
 					_tstop = arg4;
 				} else {
-					_tstep = arg4;
+					_tstrobe = arg4;
 					_tstop = arg3;
 				}
 			} else { untested();
@@ -268,7 +268,7 @@ void TTT::setup(CS& Cmd)
 			arg3.e_val(0.,_scope);
 
 			_Tstop = arg1;
-			_tstep = arg2;
+			_tstrobe = arg2;
 			_tstop = arg3;
 
 			if( arg1 < arg2 ) { untested();
@@ -276,16 +276,16 @@ void TTT::setup(CS& Cmd)
 				_Tstart = arg1;
 				_Tstop = arg2;
 				_tstop = arg3;
-				_tstep = _tstop; incomplete(); // bug, take from last if exists
+				_tstrobe = _tstop; incomplete(); // bug, take from last if exists
 			} else if ( arg2 < arg3 ) {
 				// 3 args: TTstop tstep tstop   (TTstart=0 or previous)
 				_Tstart = _sim->_last_Time;
-				_tstep = arg2;
+				_tstrobe = arg2;
 				_tstop = arg3;
 			} else {
 				// 3 args: TTstop tstop tstep   (TTstart=0 or previous)
 				_Tstart = _sim->_last_Time;
-				_tstep = arg3;
+				_tstrobe = arg3;
 				_tstop = arg2;
 			}
 
@@ -294,13 +294,13 @@ void TTT::setup(CS& Cmd)
 				_stepmode = tts_LIN;
 			} else {
 			}
-			assert((double)_tstep!=0 || !_tstop);
+			assert((double)_tstrobe!=0 || !_tstop);
 			if (!_tstop) {
 			} else {
 			}
 
 			_cont_tt = false;
-			trace6("TTT::setup ", _tstep, _tstop, _Tstep, _Tstop, _sim->last_time(), _sim->last_Time());
+			trace6("TTT::setup ", _tstrobe, _tstop, _Tstep, _Tstop, _sim->last_time(), _sim->last_Time());
 
 			if(_sim->last_time() && !_sim->last_Time()){
 				// a transient has been run, but no tt yet
@@ -319,7 +319,7 @@ void TTT::setup(CS& Cmd)
 			_sim->tr_reset();
 			if ((double)_Tstart == 0){
 				trace0("TTT::setup latching tr times");
-				_tstep = arg1;
+				_tstrobe = arg1;
 				_tstop = arg2;
 				_Tstop = 0;
 
@@ -339,7 +339,7 @@ void TTT::setup(CS& Cmd)
 
 			_cont_tt = true;
 			_cont = true;
-			trace4("TTT::setup 2 args ", _tstep, _tstop , _Tstep , _Tstop);
+			trace4("TTT::setup 2 args ", _tstrobe, _tstop , _Tstep , _Tstop);
 
 		} else if (arg1.has_hard_value() ) {
 			trace1("TTT::setup same tr, new Tend", _sim->_last_Time);
@@ -381,7 +381,7 @@ void TTT::setup(CS& Cmd)
 		if(_sim->_last_Time==0){
 			trace1("TTT::setup no args at beginning", _cont_tt);
 			_Tstop=0;
-			_tstep=0;
+			_tstrobe=0;
 			_tstop=0;
 
 		}
@@ -391,15 +391,15 @@ void TTT::setup(CS& Cmd)
 		}
 	}
 
-	if (_tstep>_tstop){
-		error(bWARNING, "_tstep > _tstop. really?\n");
+	if (_tstrobe>_tstop){
+		error(bWARNING, "_tstrobe > _tstop. really?\n");
 	}
 
 	options(Cmd);
 
 	_tstart.e_val(0., _scope);
 	_tstop.e_val(NOT_INPUT, _scope);
-	_tstep.e_val(NOT_INPUT, _scope);
+	_tstrobe.e_val(NOT_INPUT, _scope);
 	_Tstop.e_val(NOT_INPUT, _scope);
 	_Tstep.e_val(NOT_INPUT, _scope);
 
@@ -408,9 +408,9 @@ void TTT::setup(CS& Cmd)
 	_Time1 = _Tstart;
 
 
-	if (!_tstep.has_good_value()) {
+	if (!_tstrobe.has_good_value()) {
 		throw Exception("transient: Time step is required");
-	}else if (_tstep==0. && _tstop ) {
+	}else if (_tstrobe==0. && _tstop ) {
 		untested();
 		throw Exception("Time step == 0 while tend");
 	}else{
@@ -419,9 +419,9 @@ void TTT::setup(CS& Cmd)
 //		if (_dtmax_in.has_hard_value()) {
 //			_dtmax = _dtmax_in;
 //		}else if (_skip_in.has_hard_value()) {
-//			_dtmax = _tstep / double(_skip_in);
+//			_dtmax = _tstrobe / double(_skip_in);
 //		}else{
-//			_dtmax = std::min(_dtmax_in, _tstep);
+//			_dtmax = std::min(_dtmax_in, _tstrobe);
 //		}
 
 	_dTmin= _tstop;
@@ -455,7 +455,7 @@ void TTT::setup(CS& Cmd)
 
 	_tstart.e_val(0., _scope);
 	_tstop.e_val(NOT_INPUT, _scope);
-	_tstep.e_val(NOT_INPUT, _scope);
+	_tstrobe.e_val(NOT_INPUT, _scope);
 
 	if  (_cont_tt){
 		_cont = false;
@@ -472,9 +472,9 @@ void TTT::setup(CS& Cmd)
 	// }
 	_sim->_freq = ((_tstop > _tstart) ? (1 / (_tstop - _tstart)) : (0.));
 
-	if (!_tstep.has_good_value()) {
+	if (!_tstrobe.has_good_value()) {
 		throw Exception("transient: time step is required");
-	}else if (_tstep==0. && _tstop ) { itested();
+	}else if (_tstrobe==0. && _tstop ) { itested();
 		throw Exception("time step == 0 and tstop");
 	}else{
 	}
@@ -482,9 +482,9 @@ void TTT::setup(CS& Cmd)
 	if (_dtmax_in.has_hard_value()) {
 		_dtmax = _dtmax_in;
 	}else if (_skip_in.has_hard_value()) {
-		_dtmax = _tstep / double(_skip_in);
+		_dtmax = _tstrobe / double(_skip_in);
 	}else{
-		_dtmax = std::min(_dtmax_in, _tstep);
+		_dtmax = std::min(_dtmax_in, _tstrobe);
 	}
 
 	if (_dtmin_in.has_hard_value()) {
@@ -498,9 +498,9 @@ void TTT::setup(CS& Cmd)
 
 	assert(_stepmode);
 
-	steps_total_out_ = (uint_t) (1 + ceil( ( (_tstop - _tstart ) / _tstep ) ));
+	steps_total_out_ = (uint_t) (1 + ceil( ( (_tstop - _tstart ) / _tstrobe ) ));
 	trace7( "TTT::setup done ",  _sim->_Time0, _Tstart, _Tstep ,_stepmode, _cont, _cont_tt, _Tstop );
-	trace7( "TTT::setup done ",  steps_total_out_ , (double)_tstep , _tstop ,_tstart, _cont, _cont_tt, (double)_Tstop );
+	trace7( "TTT::setup done ",  steps_total_out_ , (double)_tstrobe , _tstop ,_tstart, _cont, _cont_tt, (double)_Tstop );
 	allocate();
 }
 /*--------------------------------------------------------------------------*/
@@ -510,7 +510,7 @@ void TTT::setup_tw(CS& Cmd)
 
 	_tstart.e_val(NOT_INPUT, _scope);
 	_tstop.e_val(NOT_INPUT, _scope);
-	_tstep.e_val(NOT_INPUT, _scope);
+	_tstrobe.e_val(NOT_INPUT, _scope);
 	_Tstop.e_val(NOT_INPUT, _scope);
 	_Tstep.e_val(NOT_INPUT, _scope);
 
@@ -566,19 +566,19 @@ void TTT::setup_tw(CS& Cmd)
 			_sim->_last_Time = .0; // ?
 			_sim->tr_reset();
 
-			_tstep  = arg1;
+			_tstrobe  = arg1;
 			_tstop  = arg2;
 
 			_Tstart = arg3;
 			_Tstep  = arg4;
 			_Tstop  = arg5;
-			assert((double)_tstep!=0 || !_tstop);
+			assert((double)_tstrobe!=0 || !_tstop);
 			if (!_tstop) { untested(); }
 
 			if(double( _Tstart) == 0) 
 				_cont_tt = false;
 
-			trace4("TTT::setup_tw ", _tstep, _tstop , _Tstep , _Tstop);
+			trace4("TTT::setup_tw ", _tstrobe, _tstop , _Tstep , _Tstop);
 
 		} else if (arg3.has_hard_value()) {	    // 4 args: tt tt TT [TTstep]
 			trace0("TTT::setup_tw have 3");
@@ -590,12 +590,12 @@ void TTT::setup_tw(CS& Cmd)
 			arg3.e_val(0.,_scope);
 			_sim->_last_Time = .0;
 
-			_tstep  = arg1;
+			_tstrobe  = arg1;
 			_tstop  = arg2;
 
-			if ( _tstep>_tstop ) {
-				double x=_tstep;
-				_tstep=_tstop;
+			if ( _tstrobe>_tstop ) {
+				double x=_tstrobe;
+				_tstrobe=_tstop;
 				_tstop=x;
 			} else {
 			}
@@ -609,13 +609,13 @@ void TTT::setup_tw(CS& Cmd)
 				_stepmode = tts_MUL;
 			}
 			_Tstart = 0; //HACK?
-			assert((double)_tstep!=0 || !_tstop);
+			assert((double)_tstrobe!=0 || !_tstop);
 			if (!_tstop) { untested();
 			} else {
 			}
 
 			_cont_tt = false;
-			trace6("TTT::setup_tw ", _tstep, _tstop, _Tstep, _Tstop, _sim->last_time(), _sim->last_Time());
+			trace6("TTT::setup_tw ", _tstrobe, _tstop, _Tstep, _Tstop, _sim->last_time(), _sim->last_Time());
 
 			if(_sim->last_time() && !_sim->last_Time()){
 				// a transient has been run, but no tt yet
@@ -633,7 +633,7 @@ void TTT::setup_tw(CS& Cmd)
 			_sim->tr_reset();
 			if ((double)_Tstart == 0){
 				trace0("TTT::setup_tw latching tr times");
-				_tstep = arg1;
+				_tstrobe = arg1;
 				_tstop = arg2;
 				_Tstop = 0;
 
@@ -653,7 +653,7 @@ void TTT::setup_tw(CS& Cmd)
 
 			_cont_tt = true;
 			_cont = true; untested();
-			trace4("TTT::setup_tw 2 args ", _tstep, _tstop , _Tstep , _Tstop);
+			trace4("TTT::setup_tw 2 args ", _tstrobe, _tstop , _Tstep , _Tstop);
 
 		} else if (arg1.has_hard_value() ) {
 			trace1("TTT::setup_tw same tr, new Tend", _sim->_last_Time);
@@ -693,21 +693,21 @@ void TTT::setup_tw(CS& Cmd)
 		if(_sim->_last_Time==0){
 			trace1("TTT::setup_tw no args at beginning", _cont_tt);
 			_Tstop=0;
-			_tstep=0;
+			_tstrobe=0;
 			_tstop=0;
 
 		}
 	}
 
-	if (_tstep>_tstop){
-		error(bWARNING, "_tstep > _tstop. really?\n");
+	if (_tstrobe>_tstop){
+		error(bWARNING, "_tstrobe > _tstop. really?\n");
 	}
 
 	options(Cmd);
 
 	_tstart.e_val(0., _scope);
 	_tstop.e_val(NOT_INPUT, _scope);
-	_tstep.e_val(NOT_INPUT, _scope);
+	_tstrobe.e_val(NOT_INPUT, _scope);
 	_Tstop.e_val(NOT_INPUT, _scope);
 	_Tstep.e_val(NOT_INPUT, _scope);
 
@@ -716,9 +716,9 @@ void TTT::setup_tw(CS& Cmd)
 	_Time1 = _Tstart;
 
 
-	if (!_tstep.has_good_value()) {
+	if (!_tstrobe.has_good_value()) {
 		throw Exception("transient: Time step is required");
-	}else if (_tstep==0. && _tstop ) {
+	}else if (_tstrobe==0. && _tstop ) {
 		untested();
 		throw Exception("Time step == 0 while tend");
 	}else{
@@ -727,9 +727,9 @@ void TTT::setup_tw(CS& Cmd)
 //		if (_dtmax_in.has_hard_value()) {
 //			_dtmax = _dtmax_in;
 //		}else if (_skip_in.has_hard_value()) {
-//			_dtmax = _tstep / double(_skip_in);
+//			_dtmax = _tstrobe / double(_skip_in);
 //		}else{
-//			_dtmax = std::min(_dtmax_in, _tstep);
+//			_dtmax = std::min(_dtmax_in, _tstrobe);
 //		}
 
 	_dTmin= _tstop * .5;
@@ -760,7 +760,7 @@ void TTT::setup_tw(CS& Cmd)
 
 	_tstart.e_val(0., _scope);
 	_tstop.e_val(NOT_INPUT, _scope);
-	_tstep.e_val(NOT_INPUT, _scope);
+	_tstrobe.e_val(NOT_INPUT, _scope);
 
 	if  (_cont_tt){
 		_cont = false;
@@ -777,9 +777,9 @@ void TTT::setup_tw(CS& Cmd)
 	// }
 	_sim->_freq = ((_tstop > _tstart) ? (1 / (_tstop - _tstart)) : (0.));
 
-	if (!_tstep.has_good_value()) {
+	if (!_tstrobe.has_good_value()) {
 		throw Exception("transient: time step is required");
-	}else if (_tstep==0. && _tstop ) { itested();
+	}else if (_tstrobe==0. && _tstop ) { itested();
 		throw Exception("time step == 0 and tstop");
 	}else{
 	}
@@ -787,9 +787,9 @@ void TTT::setup_tw(CS& Cmd)
 	if (_dtmax_in.has_hard_value()) {
 		_dtmax = _dtmax_in;
 	}else if (_skip_in.has_hard_value()) {
-		_dtmax = _tstep / double(_skip_in);
+		_dtmax = _tstrobe / double(_skip_in);
 	}else{
-		_dtmax = std::min(_dtmax_in, _tstep);
+		_dtmax = std::min(_dtmax_in, _tstrobe);
 	}
 
 	if (_dtmin_in.has_hard_value()) {
@@ -801,9 +801,9 @@ void TTT::setup_tw(CS& Cmd)
 		_sim->_dtmin = std::max(double(_dtmin_in), _dtmax/_dtratio_in);
 	}
 
-	steps_total_out_ = (uint_t) (1 + ceil( ( (_tstop - _tstart ) / _tstep ) ));
-	trace7( "TTT::setup_tw done ",  steps_total_out_ , _tstep , _Tstep ,_stepmode, _cont, _cont_tt, _Tstop );
-	trace7( "TTT::setup_tw done ",  steps_total_out_ , (double)_tstep , _tstop ,_tstart, _cont, _cont_tt, (double)_Tstop );
+	steps_total_out_ = (uint_t) (1 + ceil( ( (_tstop - _tstart ) / _tstrobe ) ));
+	trace7( "TTT::setup_tw done ",  steps_total_out_ , _tstrobe , _Tstep ,_stepmode, _cont, _cont_tt, _Tstop );
+	trace7( "TTT::setup_tw done ",  steps_total_out_ , (double)_tstrobe , _tstop ,_tstart, _cont, _cont_tt, (double)_Tstop );
 	allocate();
 }
 	/*--------------------------------------------------------------------------*/

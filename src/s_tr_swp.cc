@@ -193,7 +193,7 @@ void TRANSIENT::sweep()
     }
   }
 
-  assert(_tstep >=OPT::dtmin ); // == wont work because of CAUSE
+  assert(_tstrobe >=OPT::dtmin ); // == wont work because of CAUSE
                                 // we do only increase _time_by_user_request if
                                 // CAUSE == user.
                                 // the second step is always caused by initial guess...
@@ -222,7 +222,7 @@ void TRANSIENT::sweep()
 	++(_sim->_stepno);
         trace1("TRANSIENT::sweep delivered req", _time_by_user_request);
         if (_time_by_user_request<_tstop){
-          _time_by_user_request += _tstep;	/* advance user time */
+          _time_by_user_request += _tstrobe;	/* advance user time */
           // _time_by_user_request = min(_time_by_user_request, (double)_tstop+_sim->_dtmin);
         } else {
           _time_by_user_request += _tstrobe;	/* advance user time */
@@ -312,7 +312,7 @@ void TRANSIENT::first()
   while (!_sim->_eq.empty()) {untested();
     _sim->_eq.pop();
   }
-  _stepno = 0;
+  _sim->_stepno = 0;
 
   //_time_by_user_request = _sim->_time0 + _tstrobe;	/* set next user step */
   //set_step_cause(scUSER);

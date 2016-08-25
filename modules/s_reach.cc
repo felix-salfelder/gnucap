@@ -677,7 +677,7 @@ void REACH::tran_step(double dt)
 	_sim->_dtmin = dt/10.;
 	_dtmax = dt/2.;
 	_tstop = dt;
-	_tstep = dt;
+	_tstrobe = dt;
 	_sim->_freezetime = true;
 	TRANSIENT::sweep();
 	_sim->_freezetime = false;

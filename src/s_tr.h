@@ -76,7 +76,7 @@ public:
     _accepted(false),
 	 _print_only(false)
   {
-	  trace4( "TRANSIENT()",  steps_total_out_, _tstep , _tstop, _tstart );
+	  trace4( "TRANSIENT()",  steps_total_out_, _tstrobe , _tstop, _tstart );
   }
   ~TRANSIENT() {}
 public:

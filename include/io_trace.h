@@ -42,6 +42,24 @@
 #undef unreachable
 #undef incomplete
 /*--------------------------------------------------------------------------*/
+
+#ifndef hashpointer_
+# define hashpointer_
+#include <stdint.h> // intptr_t
+
+class hp{
+	intptr_t p;
+	public:
+	hp(const void* x){
+		p = (intptr_t)x %30011;
+	}
+	operator int(){
+		return static_cast<int>(p);
+	}
+};
+
+#endif
+/*--------------------------------------------------------------------------*/
 #ifdef DO_TRACE
 
 #define trace_line() (std::cerr << "@@#\n@#@:" \

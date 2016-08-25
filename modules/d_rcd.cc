@@ -2009,7 +2009,7 @@ long double MODEL_BUILT_IN_RCD::__uin_iter(long double& s, double E_old, long do
   assert (E<1.000001);
 
   if (E>1) { untested();
-    untested0("COMMON_BUILT_IN_RCD::__uin_iter aligned E");
+    trace0("COMMON_BUILT_IN_RCD::__uin_iter aligned E");
     E = 1;
   }
   double h = BASE_SUBCKT::_sim->last_time();

@@ -23,7 +23,7 @@
 
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")
 libgnucap_includedir = $(includedir_transformed)
-libgnucap_include_HEADERS = patchlev.h m_mvpoly.h
+libgnucap_include_HEADERS = patchlev.h m_mvpoly.h io_trace.h
 
 EXTRA_DIST = patchlev.h.in
 BUILT_SOURCES = patchlev.h
