@@ -1,7 +1,14 @@
 #!/bin/bash
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+includedir="@includedir@"
+libdir="@libdir@"
+pkglibdir="@pkglibdir@"
+LIBS="@LIBS@"
+CXX="@CXX@"
+CXXFLAGS="@CXXFLAGS@"
+datarootdir="@datarootdir@"
 transform=`echo '@program_transform_name@' | sed -e 's/\\$\\$/$/'`
 
 case $1 in
@@ -34,10 +41,12 @@ case $1 in
 		;;
 	*)
 	echo $0 --cppflags
-	echo $0 --cxx
 	echo $0 --cxxflags
-	echo $0 --data
-	echo $0 --exec-prefix
+	echo $0 --cxx
 	echo $0 --ldflags
+	echo $0 --pkglibdir
 	echo $0 --libdir
+	echo $0 --libs
+	echo $0 --exec-prefix
+	echo $0 --data
 esac

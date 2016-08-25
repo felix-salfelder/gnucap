@@ -164,9 +164,9 @@ inline T asserted_cast(S s){
 #undef max
 #undef INTERFACE
   #ifdef MAKE_DLL
-    #define INTERFACE __declspec(dllimport)
-  #else
     #define INTERFACE __declspec(dllexport)
+  #else
+    #define INTERFACE 
   #endif
 
 inline void* dlopen(const char* f, int)

@@ -1,4 +1,4 @@
-/*$Id: globals.h,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+/*                               -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -26,7 +26,7 @@
 #include "patchlev.h"
 #endif
 
-extern const char*  lib_version();
+extern INTERFACE const char*  lib_version();
 
 extern "C" {
 const char* interface_name();
