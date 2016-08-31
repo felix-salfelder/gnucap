@@ -28,7 +28,7 @@
 #include "md.h"
 #include <vector>
 /*--------------------------------------------------------------------------*/
-char* getcmd(const char*,char*,int);
+INTERFACE char* getcmd(const char*,char*,int);
 /*--------------------------------------------------------------------------*/
 enum AP_MOD{
   mNONE,	/* nothing special */

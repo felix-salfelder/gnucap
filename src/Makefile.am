@@ -35,7 +35,9 @@ d_mos123.model d_mos_base.model d_mos.model \
 d_bjt.model d_diode.model 
 #d_rcd.model d_bti.model 
 
-BUILT_SOURCES = ${MODELS:%.model=%.h}
+.model.cc:
+
+BUILT_SOURCES = ${MODELS:%.model=%.h} ${MODELS:%.model=%.cc}
 
 # device models hand coded in C++
 D_SRCS = \
@@ -94,7 +96,7 @@ l_compar.h l_dispatcher.h l_denoise.h \
 l_lib.h l_stlextra.h l_timer.h \
 m_cpoly.h m_divdiff.h m_interp.h m_matrix.h m_spline.h m_wave.h \
 m_base.h m_expression.h m_phase.h \
-io_.h io_error.h io_trace.h io_matrix.h io_misc.h \
+io_.h io_error.h io_matrix.h io_misc.h \
 u_cardst.h u_function.h u_lang.h u_limit.h u_nodemap.h u_opt.h u_parameter.h \
 u_prblst.h u_probe.h u_sim_data.h u_sdp.h u_status.h u_time_pair.h u_xprobe.h \
 s__.h s_tr.h e_adp.h s_tt.h\
@@ -148,7 +150,7 @@ GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 noinst_SCRIPTS = gnucap
 bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
-gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1} ${MODELSRCS}
+gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1} ${MODELS}
 
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
 gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"

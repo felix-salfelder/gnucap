@@ -33,8 +33,7 @@
  */
 #include "l_lib.h"
 /*--------------------------------------------------------------------------*/
-std::string findfile(const std::string& filename, const std::string& path,
-		     int mode)
+INTERFACE std::string findfile(const std::string& filename, const std::string& path, int mode)
 {
 #ifdef CHECK_LOCAL_FIRST
   if (OS::access_ok(filename, mode)) { untested();

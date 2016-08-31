@@ -502,7 +502,7 @@
  5.E-6      480.4E-33  480.4E-33  34.09E-36  34.09E-36 
 ttr 
 #TTime      hci(MN1.HCI) hci(MN2.HCI) dvth(MN1.HCI) dvth(MN1)  v(nomax)   use_hci(MP1) use_hci(MN1) hidden(0)  age(0)    
- 0.         0.         0.         0.         0.        -Inf        1.         1.         1.         0.        
+ 0.         0.         0.         0.         0.        -Inf        1.         1.         0.         0.        
  5.E-6      47.95E-36  47.95E-36  2.0336E-9  2.0336E-9  2.6328     1.         1.         1.         0.        
  15.E-6     143.3E-36  143.3E-36  2.824E-9   2.824E-9   2.6327     1.         1.         1.         0.        
 Gnucap   System status

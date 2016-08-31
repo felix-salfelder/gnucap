@@ -182,7 +182,7 @@ void REACH::SWEEP::do_it(int Nest, double dt, double bak)
 	}
 
 	trace2("resetting iv", Nest, bak);
-	_parent._zap_bm[Nest]->set_param_by_name("iv", to_string(bak));
+	_parent._zap_bm[Nest]->set_param_by_name("iv", ::to_string(bak));
 }
 /*--------------------------------------------------------------------------*/
 // TODO: breadth-first search...?
@@ -471,8 +471,8 @@ void REACH::sweep_recursive(int Nest)
 	for(unsigned i=0; i < _n_inputs; ++i) { untested();
 		inputvals[i+1] = _zap[i]->value();
 		trace2("setup pulse input", _zap[i]->long_label(), _zap[i]->value());
-		_zap_bm[i]->set_param_by_name("iv", to_string(inputvals[i+1]));
-		_zap_bm[i]->set_param_by_name("pv", to_string(inputvals[i+1]));
+		_zap_bm[i]->set_param_by_name("iv", ::to_string(inputvals[i+1]));
+		_zap_bm[i]->set_param_by_name("pv", ::to_string(inputvals[i+1]));
 		_zap[i]->precalc_first();
 		_zap[i]->precalc_last();
 		_zap[i]->tr_begin();
@@ -570,8 +570,8 @@ double REACH::SWEEP::first(const SSP_SPL& s, index_t* swp, int Nest)
 	trace3("REACH::first, pulse", ch.id(), swp[Nest], _last);
 	trace2("REACH::first, pulse", min_index, max_index);
 
-	_parent._zap_bm[Nest]->set_param_by_name("iv", to_string(from));
-	_parent._zap_bm[Nest]->set_param_by_name("pv", to_string(to));
+	_parent._zap_bm[Nest]->set_param_by_name("iv", ::to_string(from));
+	_parent._zap_bm[Nest]->set_param_by_name("pv", ::to_string(to));
 
 	*(_parent._sweepval[Nest]) = to; // needed by inputsens scaling
 
@@ -588,7 +588,7 @@ bool REACH::SWEEP::next(const SSP_CHART& c, index_t* swp, int Nest) const
 	double q = double(swp[Nest]);
 	assert(c.grid(Nest));
 	double to = q*p;
-	_parent._zap_bm[Nest]->set_param_by_name("pv", to_string(to));
+	_parent._zap_bm[Nest]->set_param_by_name("pv", ::to_string(to));
 	*(_parent._sweepval[Nest]) = to; // BUG? used by inputsens scaling
 
 	trace5("EV_BASE::next", Nest, swp[Nest], p, to, _last);
@@ -662,7 +662,7 @@ void REACH::tran_step(double dt)
 	for(unsigned i=0; i < _n_inputs; ++i) {
 		assert(_zap[i]);
 		assert(_zap_bm[i]);
-		_zap_bm[i]->set_param_by_name("rise", to_string(dt));
+		_zap_bm[i]->set_param_by_name("rise", ::to_string(dt));
 		_zap[i]->precalc_last();
 		_zap[i]->tr_begin(); // hmmm?
 	}
@@ -677,7 +677,7 @@ void REACH::tran_step(double dt)
 	_sim->_dtmin = dt/10.;
 	_dtmax = dt/2.;
 	_tstop = dt;
-	_tstep = dt;
+	_tstrobe = dt;
 	_sim->_freezetime = true;
 	TRANSIENT::sweep();
 	_sim->_freezetime = false;

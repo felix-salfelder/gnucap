@@ -680,10 +680,10 @@ void COMMON_BUILT_IN_RCD::precalc_last(const CARD_LIST* par_scope)
   trace1("COMMON_BUILT_IN_RCD::precalc_last done", m->v2());
 
   if (cc->_Re1 < 0) { untested(); // turnt
-    throw Exception_Precalc("nonnegative Re1: " + to_string(cc->_Re1) + "\n");
+    throw Exception_Precalc("nonnegative Re1: " + ::to_string(cc->_Re1) + "\n");
   }
   if (cc->_Rc1 > 0) { untested(); // turnt
-    throw Exception_Precalc("nonpositive Rc1: " + to_string(cc->_Rc1) + "\n");
+    throw Exception_Precalc("nonpositive Rc1: " + ::to_string(cc->_Rc1) + "\n");
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -2009,7 +2009,7 @@ long double MODEL_BUILT_IN_RCD::__uin_iter(long double& s, double E_old, long do
   assert (E<1.000001);
 
   if (E>1) { untested();
-    untested0("COMMON_BUILT_IN_RCD::__uin_iter aligned E");
+    trace0("COMMON_BUILT_IN_RCD::__uin_iter aligned E");
     E = 1;
   }
   double h = BASE_SUBCKT::_sim->last_time();
@@ -2231,7 +2231,7 @@ TIME_PAIR DEV_BUILT_IN_RCD::tt_review()
     return TIME_PAIR();
   } else if (delta) {
     error(bNOERROR, "tt step contr" + long_label()
-        + " old " + to_string(_Ccgfill->tr1()) + " new " + to_string(_Ccgfill->tr()) + '\n');
+        + " old " + ::to_string(_Ccgfill->tr1()) + " new " + ::to_string(_Ccgfill->tr()) + '\n');
     double timestep = _sim->_dT0 * tol / delta;
     _ttgain = timestep/_sim->_dT0;
     _ttfuture = tt_review_check_and_convert(timestep);

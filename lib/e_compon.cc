@@ -306,15 +306,13 @@ void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::tt_commit(ELEMENT*x)const
-{
-  untested0( x->short_label().c_str()); 
+{ untested();
   assert(_model);
   _model->do_tt_commit(x);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::tr_eval(ELEMENT*x)const
-{
-  untested0( x->short_label().c_str()); // bug?
+{ untested();
   assert(_model);
 
   //printf("typeid(_model): %s", typeid(_model).name());
@@ -896,7 +894,7 @@ const MODEL_CARD* COMPONENT::find_model(const std::string& modelname)const
 	  bin_count = 0;
 	  for (;;) {
 	    // loop over binned models
-	    std::string extended_name = modelname + '.' + to_string(++bin_count);
+	    std::string extended_name = modelname + '.' + ::to_string(++bin_count);
 	    try {
 	      c = Scope->find_in_my_scope(extended_name);
 	    }catch (Exception_Cant_Find& e2) {

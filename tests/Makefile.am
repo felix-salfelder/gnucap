@@ -987,7 +987,8 @@ EXTRA_DIST = gnucap_run.sh \
 
 .PHONY: check
 
-AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
+AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include \
+              -I$(top_builddir)/src -I$(top_srcdir)/src
 AM_DEFAULT_SOURCE_EXT = .cc
 AM_LDFLAGS = -module -avoid-version -rpath /dev/null
 check_LTLIBRARIES = bogus.la bogus1.la bogus2.la bogus3.la bogus4.la

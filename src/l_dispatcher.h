@@ -49,7 +49,7 @@ public:
 	 ii != _map->end();
 	 ++ii) {
       if(ii->second){
-	cerr << ii->second->long_label() << "\n";
+	std::cerr << ii->second->long_label() << "\n";
 	unreachable();
       }
     }

@@ -182,7 +182,7 @@ void TRANSIENT::sweep()
     if (printnow) {
       _sim->keep_voltages();
       outdata(_sim->_time0);
-      if( _sim->_mode  == s_TTT && OPT::behave ){
+      if( _sim->_mode  == s_TTT && OPT::behave ){ untested();
         CARD_LIST::card_list.do_forall( &CARD::tr_save_amps, _sim->_stepno );
         CKT_BASE::tt_behaviour_del += CKT_BASE::tr_behaviour_del;
         CKT_BASE::tt_behaviour_rel += CKT_BASE::tr_behaviour_rel;
@@ -190,10 +190,11 @@ void TRANSIENT::sweep()
       CKT_BASE::tr_behaviour_del = 0;
       CKT_BASE::tr_behaviour_rel = 0;
     }else{ untested();
+      ++::status.hidden_steps;
     }
   }
 
-  assert(_tstep >=OPT::dtmin ); // == wont work because of CAUSE
+  assert(_tstrobe >=OPT::dtmin ); // == wont work because of CAUSE
                                 // we do only increase _time_by_user_request if
                                 // CAUSE == user.
                                 // the second step is always caused by initial guess...
@@ -222,10 +223,10 @@ void TRANSIENT::sweep()
 	++(_sim->_stepno);
         trace1("TRANSIENT::sweep delivered req", _time_by_user_request);
         if (_time_by_user_request<_tstop){
-          _time_by_user_request += _tstep;	/* advance user time */
+          _time_by_user_request += _tstrobe;	/* advance user time */
           // _time_by_user_request = min(_time_by_user_request, (double)_tstop+_sim->_dtmin);
         } else {
-          _time_by_user_request += _tstep;	/* advance user time */
+          _time_by_user_request += _tstrobe;	/* advance user time */
         }
       }else{
       }
@@ -236,9 +237,11 @@ void TRANSIENT::sweep()
       assert(_time1 < _time_by_user_request);
     }
     {
-      bool printnow = (_trace >= tREJECTED)
-             || (_accepted && ((_trace >= tALLTIME) 
-             || (step_cause() == scUSER && _sim->_time0+_sim->_dtmin > _tstart)));
+      bool printnow =
+	(_trace >= tREJECTED)
+	|| (_accepted && (_trace >= tALLTIME
+			  || step_cause() == scUSER
+			  || (!_tstrobe.has_hard_value() && _sim->_time0+_sim->_dtmin > _tstart)));
       if (printnow) {
         _sim->keep_voltages();
         trace2("TRANSIENT::sweep" ,_sim->last_time(), (double)_tstop);
@@ -248,6 +251,7 @@ void TRANSIENT::sweep()
         CKT_BASE::tr_behaviour_del = 0;
         CKT_BASE::tr_behaviour_rel = 0;
       }else{
+	++::status.hidden_steps;
       }
     }
 
@@ -305,14 +309,25 @@ void TRANSIENT::first()
   assert(_sim->_time0 == _time1);
   assert(_sim->_time0 <= _tstart);
   ::status.review.start();
-  _time_by_user_request = _sim->_time0 + _tstep;	/* set next user step */
-  //_eq.Clear();				/* empty the queue */
+
+  //_eq.Clear();					/* empty the queue */
   while (!_sim->_eq.empty()) {untested();
     _sim->_eq.pop();
   }
   _sim->_stepno = 0;
-  set_step_cause(scUSER);
-  ::status.hidden_steps = 1;
+
+  //_time_by_user_request = _sim->_time0 + _tstrobe;	/* set next user step */
+  //set_step_cause(scUSER);
+
+  if (_sim->_time0 < _tstart) {			// skip until _tstart
+    set_step_cause(scINITIAL);				// suppressed 
+    _time_by_user_request = _tstart;			// set first strobe
+  }else{					// no skip
+    set_step_cause(scUSER);				// strobe here
+    _time_by_user_request = _sim->_time0 + _tstrobe;	// set next strobe
+  }
+
+  ::status.hidden_steps = 0;
   ::status.review.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -586,9 +601,7 @@ bool TRANSIENT::next()
     assert(newtime <= _time_by_user_request);
     set_step_cause(scSMALL);
     //check_consistency2();
-    throw Exception("tried everything, still doesn't work, giving up at %s step %i",
-        to_string(_time1).c_str(), iteration_number());
-    //}else if (newtime <= _sim->_time0 - _sim->_dtmin) {
+    throw Exception("tried everything, still doesn't work, giving up");
   }else if (newtime < _sim->_time0) {
     /* Reject the most recent step. */
     /* We have faith that it will work with a smaller time step. */
@@ -668,7 +681,7 @@ bool TRANSIENT::next()
   }
   assert(_sim->_time0 <= _time_by_user_request);
 
-  ++::status.hidden_steps;
+  check_consistency2();
   ++steps_total_;
   ::status.review.stop();
   bool ret= _sim->_time0 <= _tstop; // throw away last step if it helps.  + _sim->_dtmin;

@@ -390,7 +390,7 @@ void TTT::sweep()
 
 	if(_no_act) { untested();
 		_out << "ttt " << string(_Tstart) << " " << string(_Tstop) << " " << string(_Tstep)
-		     << " tran " << string(_tstop) << " " << string(_tstep) << "\n";
+		     << " tran " << string(_tstop) << " " << string(_tstrobe) << "\n";
 		_out << "stepmode " << _stepmode << "\n";
 		return;
 	}else{
@@ -459,7 +459,7 @@ void TTT::sweep()
 		trace2("",_Time1,_Tstart);
 		trace3("TTT::sweep first done", _sim->_Time0, _Time1, _Tstart);
 		assert (_Time1 == _Tstart);
-	}else if(_tstop==0. && _tstep==0. && (!_cont_tt)) { untested();
+	}else if(_tstop==0. && _tstrobe==0. && (!_cont_tt)) { untested();
 		if (_new) {untested();
 			print_results_tt(_sim->_Time0);
 		}
@@ -655,7 +655,7 @@ void TTT::sweep_tr() // tr sweep wrapper.
 
 	try {
 		_cont = true;
-		trace4("TTT::sweep calling sweep", _sim->_time0, _sim->last_time(), _tstep, _sim->_phase);
+		trace4("TTT::sweep calling sweep", _sim->_time0, _sim->last_time(), _tstrobe, _sim->_phase);
 		_inside_tt = true;
 		assert(_sim->_mode == s_TTT);
 		TRANSIENT::sweep();
@@ -1417,7 +1417,7 @@ void TTT::tt_alarm(ALARM a, OMSTREAM* out)
 			s << (*p)->label() << '=' << (*p)->value() << '\n';
 			switch (a) {
 				case aREDIR:
-					cerr << s;
+					cerr << s.str();
 					break;
 				case aABORT:
 					abort = true;
@@ -1504,7 +1504,7 @@ void TTT::print_stored_results_tt(double x)
 {
 
 	if ( printlist().size() ==0) { untested();
-		untested0( "no ttprint" );
+		trace0("no ttprint");
 		return;
 	} else {
 	}
@@ -1574,9 +1574,9 @@ void TTT::print_results_tt(double x)
 /*--------------------------------------------------------------------------*/
 string TTT::status()const
 {
-	return "twotime timesteps: accepted=" + to_string(steps_accepted())
-		+ ", rejected=" + to_string(steps_rejected())
-		+ ", total=" + to_string(steps_total()) + "\n";
+	return "twotime timesteps: accepted=" + ::to_string(steps_accepted())
+		+ ", rejected=" + ::to_string(steps_rejected())
+		+ ", total=" + ::to_string(steps_total()) + "\n";
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::store: store data in preparation for post processing

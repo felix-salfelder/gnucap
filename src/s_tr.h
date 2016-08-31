@@ -76,7 +76,7 @@ public:
     _accepted(false),
 	 _print_only(false)
   {
-	  trace4( "TRANSIENT()",  steps_total_out_, _tstep , _tstop, _tstart );
+	  trace4( "TRANSIENT()",  steps_total_out_, _tstrobe , _tstop, _tstart );
   }
   ~TRANSIENT() {}
 public:
@@ -110,7 +110,7 @@ private:
 protected:
   PARAMETER<double> _tstart;	// sweep start time
   PARAMETER<double> _tstop;	// sweep stop time
-  PARAMETER<double> _tstep;	// printed step size
+  PARAMETER<double> _tstrobe;	// printed step size
   PARAMETER<double> _dtratio_in;// ratio of max/min dt
   PARAMETER<double> _dtmin_in;	// min internal step size
   PARAMETER<double> _dtmax_in;	// max internal step size (user)
@@ -161,7 +161,7 @@ inline T& operator<<( T& o, const TRANSIENT::STEP_CAUSE &c)
 {
 	if(c > TRANSIENT::scLAST){
 		// FIXME: sometimes multiple causes sum up...
-		return o << to_string(int(c));
+		return o << ::to_string(int(c));
 	}
 	return o << TRANSIENT::STEP_CAUSE_label[c];
 }
