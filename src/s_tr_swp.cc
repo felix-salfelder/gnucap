@@ -182,7 +182,7 @@ void TRANSIENT::sweep()
     if (printnow) {
       _sim->keep_voltages();
       outdata(_sim->_time0);
-      if( _sim->_mode  == s_TTT && OPT::behave ){
+      if( _sim->_mode  == s_TTT && OPT::behave ){ untested();
         CARD_LIST::card_list.do_forall( &CARD::tr_save_amps, _sim->_stepno );
         CKT_BASE::tt_behaviour_del += CKT_BASE::tr_behaviour_del;
         CKT_BASE::tt_behaviour_rel += CKT_BASE::tr_behaviour_rel;
@@ -190,6 +190,7 @@ void TRANSIENT::sweep()
       CKT_BASE::tr_behaviour_del = 0;
       CKT_BASE::tr_behaviour_rel = 0;
     }else{ untested();
+      ++::status.hidden_steps;
     }
   }
 
@@ -250,6 +251,7 @@ void TRANSIENT::sweep()
         CKT_BASE::tr_behaviour_del = 0;
         CKT_BASE::tr_behaviour_rel = 0;
       }else{
+	++::status.hidden_steps;
       }
     }
 
@@ -325,7 +327,7 @@ void TRANSIENT::first()
     _time_by_user_request = _sim->_time0 + _tstrobe;	// set next strobe
   }
 
-  ++::status.hidden_steps;
+  ::status.hidden_steps = 0;
   ::status.review.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -679,7 +681,7 @@ bool TRANSIENT::next()
   }
   assert(_sim->_time0 <= _time_by_user_request);
 
-  ++::status.hidden_steps;
+  check_consistency2();
   ++steps_total_;
   ::status.review.stop();
   bool ret= _sim->_time0 <= _tstop; // throw away last step if it helps.  + _sim->_dtmin;
