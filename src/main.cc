@@ -1,4 +1,4 @@
-/*$Id: main.cc 2015/01/21 al $ -*- C++ -*-
+/*$Id: main.cc 2016/09/11 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *

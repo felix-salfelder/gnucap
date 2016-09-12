@@ -1,8 +1,4 @@
-<<<<<<< HEAD:src/spice-wrapper.cc
 /*                                   -*- C++ -*-
-=======
-/* $Id: spice-wrapper.cc 2016/03/29 al $ -*- C++ -*-
->>>>>>> precalc_last-2:include/spice-wrapper.cc
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -1075,7 +1071,7 @@ void DEV_SPICE::precalc_last()
 
     assert(ok == OK);
     assert(num_states_garbage == _num_states);
-    //trace3("precalc", maxEqNum_stash, ckt()->CKTmaxEqNum, (maxEqNum_stash == ckt()->CKTmaxEqNum));
+    trace3("precalc", _maxEqNum, ckt()->CKTmaxEqNum, (_maxEqNum == ckt()->CKTmaxEqNum));
     assert(_maxEqNum == ckt()->CKTmaxEqNum);
     notstd::copy_n(node_stash, matrix_nodes(), node); // put back real nodes
     // hopefully, the matrix pointers are the same as last time!

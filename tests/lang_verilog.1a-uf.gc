@@ -1,0 +1,21 @@
+spice
+* a comment
+.verilog
+// testing spice bm access through wrapper
+
+load bm_wrapper.cc
+options debug
+
+vsource_sin #(.amplitude(1),.samples(12)) mysin(1 0);
+
+spice
+v1 0 2 sin freq=1 amplitude=1
+.verilog
+list
+
+spice
+.print tran v(nodes)
+.tran 0 1 .05 trace=n
+
+.status notime
+.end
