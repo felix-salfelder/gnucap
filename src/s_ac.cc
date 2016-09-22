@@ -88,10 +88,10 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();	break;
     case rPIPE:		untested();
-    case rBATCH:		itested();
-    case rINTERACTIVE:	itested();
-    case rSCRIPT:		sweep();	break;
-    case rPRESET:		/*nothing*/	break;
+    case rBATCH:
+    case rINTERACTIVE:
+    case rSCRIPT:	sweep();	break;
+    case rPRESET:	/*nothing*/	break;
     }
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
