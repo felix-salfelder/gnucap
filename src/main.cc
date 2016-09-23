@@ -77,7 +77,8 @@ void read_startup_files(void)
     } catch(Exception e){
       error(bDANGER, "%s\n",e.message().c_str());
     }
-  }else{
+  }else{ untested();
+    CMD::command(std::string("load " DEFAULT_PLUGINS), &CARD_LIST::card_list);
   }
   if (!startup_recursive()) {
     trace1("read_startup_files, no cwd", name);

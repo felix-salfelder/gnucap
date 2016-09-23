@@ -39,23 +39,6 @@ d_bjt.model d_diode.model
 
 BUILT_SOURCES = ${MODELS:%.model=%.h} ${MODELS:%.model=%.cc}
 
-# device models hand coded in C++
-D_SRCS = \
-d_admit.cc d_cap.cc d_cccs.cc d_ccvs.cc d_coil.cc \
-d_meas.cc \
-d_meter.cc \
-d_ttcap.cc \
-d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
-d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
-d_branchvs.cc
-
-# matrix_example_LDADD = libgnucap.la
-
-# behavioral modeling functions
-BM_SRCS = \
-bm_complex.cc bm_exp.cc bm_fit.cc bm_generator.cc \
-bm_model.cc bm_poly.cc bm_posy.cc bm_pulse.cc bm_pwl.cc bm_sffm.cc \
-bm_sin.cc bm_tanh.cc bmm_table.cc bmm_semi.cc
 
 # utility commands, usually one file per command
 # some have multiple commands in a file
@@ -75,19 +58,11 @@ s_tr.cc s_tr_set.cc s_tr_swp.cc
 LANG_SRCS = \
 lang_spice.cc lang_spectre.cc lang_verilog.cc
 
-# parameter functions
-FUNC_SRCS = \
-func_core.cc measure_eval.cc \
-measure_max.cc measure_min.cc measure_slewrate.cc measure_cross.cc \
-measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 #------------------------------------------------------------------------
 RAW_SRCS = \
-$(BM_SRCS) \
-$(D_SRCS) \
 $(C_SRCS) \
 $(S_SRCS) \
-$(LANG_SRCS) \
-$(FUNC_SRCS)
+$(LANG_SRCS)
 
 #------------------------------------------------------------------------
 RAW_HDRS = \
@@ -225,3 +200,6 @@ EXTRA_DIST+= \
  e_ivl_compile.h \
  extlib.cc \
  pointers.h
+
+
+AM_DEFAULT_SOURCE_EXT = .cc

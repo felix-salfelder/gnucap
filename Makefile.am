@@ -26,6 +26,7 @@ SUBDIRS = \
     $(MODELGEN) \
     src \
     $(MODULES_DIR) \
+    apps \
     plugins \
     tests
 
