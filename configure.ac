@@ -450,6 +450,7 @@ AC_OUTPUT([
 	plugins/Makefile
 	include/Makefile
 	src/Makefile
+	apps/Makefile
 	tests/Makefile
 	examples/Makefile])
 

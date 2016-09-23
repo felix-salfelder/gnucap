@@ -82,12 +82,9 @@ measure_max.cc measure_min.cc measure_slewrate.cc measure_cross.cc \
 measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 #------------------------------------------------------------------------
 RAW_SRCS = \
-$(BM_SRCS) \
-$(D_SRCS) \
 $(C_SRCS) \
 $(S_SRCS) \
-$(LANG_SRCS) \
-$(FUNC_SRCS)
+$(LANG_SRCS)
 
 #------------------------------------------------------------------------
 RAW_HDRS = \
@@ -225,3 +222,16 @@ EXTRA_DIST+= \
  e_ivl_compile.h \
  extlib.cc \
  pointers.h
+
+
+# apps
+plugindir = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
+plugin_LTLIBRARIES = gnucap-default-plugins.la
+
+gnucap_default_plugins_la_LDFLAGS = -shared -module -avoid-version
+gnucap_default_plugins_la_SOURCES = $(BM_SRCS) $(D_SRCS) $(FUNC_SRCS) patchlev.cc
+gnucap_default_plugins_la_CPPFLAGS = \
+	-I$(top_builddir)/include -I$(top_srcdir)/include \
+	-I$(top_builddir)/src -I$(top_srcdir)/src
+
+AM_DEFAULT_SOURCE_EXT = .cc
