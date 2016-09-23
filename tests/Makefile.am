@@ -95,6 +95,7 @@ CKT_TESTS = \
     bm_pulse.1.ckt \
     bm_pulse.2.ckt \
     bm_pulse.3.ckt \
+    bm_pulse.4.ckt \
     bm_pwl.1.ckt \
     bm_pwl.2.ckt \
     bm_pwl.3.ckt \
@@ -597,7 +598,6 @@ GC_TESTS = \
     ac_lp.gc \
     ac_noise.gc \
     alter.gc \
-    bm_pulse.4.gc \
     bm_pulse.5.gc \
     bm_pulse.6.gc \
     bm_pulse.7.gc \

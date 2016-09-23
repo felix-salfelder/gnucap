@@ -106,7 +106,7 @@
  * "s" will let you change the value of zero,
  *   but you will find out about it later.
  */
-//testing=script 2008.09.19
+//testing=script 2016.09.14
 #ifndef M_MATRIX_H
 #define M_MATRIX_H
 /*--------------------------------------------------------------------------*/
@@ -186,12 +186,12 @@ public:
   unsigned	size()const		{return _size;}
   double 	density();
   inline T*    rmul(T* b, const T* x)const; // returns A*x
-  T 	d(unsigned r, unsigned  )const	{return *(_diaptr[r]);}
-  T     s(unsigned r, unsigned c)const; 
+  T 	d(unsigned r, unsigned  )const;
+  T     s(unsigned r, unsigned c)const;
   needed_t n(unsigned row, unsigned col)const;
 private:
-  T 	u(unsigned r, unsigned c)const	{ return _colptr[c][r];}
-  T 	l(unsigned r, unsigned c)const	{ return *(_rowptr[r]-c);}
+  T 	u(unsigned r, unsigned c)const;
+  T 	l(unsigned r, unsigned c)const;
   T&	d(unsigned r, unsigned c);
   T&	u(unsigned r, unsigned c);
   T&	l(unsigned r, unsigned c);
@@ -482,12 +482,26 @@ double BSMATRIX<T>::density()
   }
 }
 /*--------------------------------------------------------------------------*/
-/* d: fast matrix entry access, lvalue
+/* d: fast matrix entry access
  * It is known that the entry is valid and on the diagonal
  */
 template <class T>
+T BSMATRIX<T>::d(unsigned r, unsigned c) const
+{
+  USE(c);
+  assert(_diaptr);
+  assert(r == c);
+  assert(0 <= r);
+  assert(r <= _size);
+
+  return *(_diaptr[r]);
+}
+/*--------------------------------------------------------------------------*/
+/* d: as above, but lvalue */
+template <class T>
 T& BSMATRIX<T>::d(unsigned r, unsigned c)
 {
+  USE(c);
   assert(_diaptr);
   assert(r == c); USE(c);
   assert(r);
@@ -499,6 +513,21 @@ T& BSMATRIX<T>::d(unsigned r, unsigned c)
 /* u: fast matrix entry access
  * It is known that the entry is valid and in the upper triangle (or diagonal)
  */
+template <class T>
+T BSMATRIX<T>::u(unsigned r, unsigned c) const
+{
+  assert(_colptr);
+  assert(_lownode);
+  assert(0 < r);
+  assert(r <= c);
+  assert(c <= _size);
+  assert(1 <= _lownode[c]);
+  assert(_lownode[c] <= r);
+
+  return _colptr[c][r];
+}
+/*--------------------------------------------------------------------------*/
+/* u: as above, but lvalue */
 template <class T>
 T& BSMATRIX<T>::u(unsigned r, unsigned c)
 {
@@ -516,6 +545,21 @@ T& BSMATRIX<T>::u(unsigned r, unsigned c)
 /* l: fast matrix entry access
  * It is known that the entry is valid and in the lower triangle not diagonal
  */
+template <class T>
+T BSMATRIX<T>::l(unsigned r, unsigned c) const
+{
+  assert(_rowptr);
+  assert(_lownode);
+  assert(0 < c);
+  assert(c <= r);
+  assert(r <= _size);
+  assert(1 <= _lownode[r]);
+  assert(_lownode[r] <= c);
+
+  return *(_rowptr[r]-c);
+}
+/*--------------------------------------------------------------------------*/
+/* l: as above, but lvalue */
 template <class T>
 T& BSMATRIX<T>::l(unsigned r, unsigned c)
 {
@@ -544,10 +588,10 @@ T& BSMATRIX<T>::m(unsigned r, unsigned c)
   }
 }
 /*--------------------------------------------------------------------------*/
-/* s: general matrix entry access.
+/* s: general matrix entry access (read-only)
  * It is known that the location is strictly in bounds,
  *   but it is not known whether the location actually exists.
- * If access is attempted to a non-allocated location, 
+ * If access is attempted to a non-allocated location,
  *   it returns a reference to a shared zero variable.
  *   Writing to this zero is not prohibited,
  *   but will corrupt the matrix in a known and testable way.
@@ -558,7 +602,7 @@ T& BSMATRIX<T>::m(unsigned r, unsigned c)
  */
 template <class T>
 T BSMATRIX<T>::s(unsigned row, unsigned col)const
-{
+{untested();
   assert(_lownode);
   // assert(0 <= col);
   assert(col <= size());
@@ -566,17 +610,17 @@ T BSMATRIX<T>::s(unsigned row, unsigned col)const
   assert(row <= size());
   assert(_zero == 0.);
 
-  if (col == row) {
-    return d(row,col);
-  }else if (col > row) {	/* above the diagonal */
-    if (row == 0) {
+  if (col == row) {untested();
+    return d(row, col);
+  }else if (col > row) {untested();    /* above the diagonal */
+    if (row == 0) {untested();
       return _trash;
     }else if (row < _lownode[col]) {
       return _zero;
-    }else{
-      return (u(row,col));
+    }else{untested();
+      return u(row, col);
     }
-  }else{			/* below the diagonal */
+  }else{untested();                    /* below the diagonal */
     assert(col < row);
     if (col == 0) {
       return _trash;
@@ -654,21 +698,21 @@ T& BSMATRIX<T>::s(unsigned row, unsigned col)
       return _trash;
     }else if (col < _lownode[row]) {
       return _zero;
-    }else{
-      return (l(row,col));
+    }else{untested();
+      return l(row, col);
     }
   }
   unreachable();
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::load_point(uint_t i, uint_t j, T value)
-{
-  if (i > 0 && j > 0) {
+void BSMATRIX<T>::load_point(unsigned i, unsigned j, T value)
+{untested();
+  if (i > 0 && j > 0) {untested();
     set_changed(j);
     set_changed(i);
     m(i,j) += value;
-  }else{
+  }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -953,20 +997,22 @@ void BSMATRIX<double>::sink_reverse(unsigned* nm);
  */
 template <class T>
 void BSMATRIX<T>::fbsubt(T* v) const
-{
+{untested();
   assert(_lownode);
   assert(v);
 
-  for (unsigned ii = 1; ii <= size(); ++ii) {	// forward substitution
-    for (unsigned jj = _lownode[ii]; jj < ii; ++jj) {
+  // forward substitution
+  for (unsigned ii = 1; ii <= size(); ++ii) {untested();
+    for (unsigned jj = _lownode[ii]; jj < ii; ++jj) {untested();
       v[ii] -= u(jj,ii) * v [jj];
     }
   }
 
-  for (unsigned jj = size(); jj > 1; --jj) {		// back substitution
-	v[jj] /= d(jj,jj);
-    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {
-      v[ii] -= l(jj,ii) * v[jj];			
+  // back substitution
+  for (unsigned jj = size(); jj > 1; --jj) {untested();
+    v[jj] /= d(jj,jj);
+    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {untested();
+      v[ii] -= l(jj,ii) * v[jj];
     }
   }
   v[1]/=d(1,1);
@@ -990,7 +1036,6 @@ void BSMATRIX<T>::fbsub(std::complex<T>* v)const
     v[i].imag(part[i]);
   }
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 

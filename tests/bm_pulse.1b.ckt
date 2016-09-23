@@ -1,0 +1,18 @@
+spice
+* 'switch capacitor filter.  Use tr 0 50u .1u.  Gen freq 100k
+
+.options reltol=5e-4
+
+Vin   1  0  generator( 1. )
+C1   1  2  1.p
+Y1   2  3  pulse iv=20u pv=0 width=500n period=1u rise=1e-14 fall=1e-14
+Y2   3  0  pulse iv=0 pv=20u width=500n period=1u rise=1e-14 fall=1e-14
+C2   3  0  1.p ic=0.
+.gen freq=100k
+.print tran v(nodes)
++ hidden(0) ord(c*) hidden(0)
++ disc(nodes)
++ ev(Y*)
+.tran 0 5u .1u trace=n > bm_pulse_1a.out echo
+.status notime
+.end
