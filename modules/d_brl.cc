@@ -29,7 +29,8 @@ namespace {
 class DEV_BRANCH_L : public INDUCTANCE::DEV_INDUCTANCE { //
 public:
   DEV_BRANCH_L() :DEV_INDUCTANCE() { _c_model = true; }
-  DEV_BRANCH_L(const DEV_BRANCH_L&p) :DEV_INDUCTANCE(p) { _c_model = true; }
+  DEV_BRANCH_L(const DEV_BRANCH_L&p)
+     : DEV_INDUCTANCE(p) { _c_model = true; }
   CARD*	   clone()const		{return new DEV_BRANCH_L(*this);}
 };
 /*--------------------------------------------------------------------------*/
