@@ -395,6 +395,7 @@ CKT_TESTS = \
     d_subckt.error1.ckt \
     d_subckt.error2.ckt \
     d_subckt.error3.ckt \
+    d_subckt.error3b.ckt \
     d_subckt.error4.ckt \
     d_switch.c0.ckt \
     d_switch.c1a.ckt \

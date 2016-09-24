@@ -1,4 +1,4 @@
-/*$Id: c_delete.cc,v 1.2 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
+/*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -27,7 +27,8 @@
 // element will reappear next time an elaboration occurs, which is 
 // usually before anything else.
 
-#include "d_subckt.h"
+#include "globals.h"
+#include "e_cardlist.h"
 #include "c_comand.h"
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -61,7 +62,7 @@ private:
       if (i == Scope->end()) {
 	// can't find "container" (probably .subckt) - no match
 	return false;
-      }else if (!dynamic_cast<BASE_SUBCKT*>(*i)) {
+      }else if ((**i).is_device()) {
 	// found a match, but it isn't a container (subckt)
 	return false;
       }else{

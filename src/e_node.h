@@ -325,14 +325,9 @@ public: // matrix
 class ADP_NODE;
 class INTERFACE node_t {
 private:
-  static bool node_is_valid( uint_t i) {
-   // if (!NODE::_sim->_nm){
-   //   untested();
-  //  } else
-    if (i == (uint_t) INVALID_NODE) {untested();
-      itested();
-    }else if ( i > NODE::_sim->_total_nodes) {
-      trace2("node_t::node_is_valid", i, NODE::_sim->_total_nodes  );
+  static bool node_is_valid(unsigned i) {
+    if (i == INVALID_NODE) {
+    }else if (i > NODE::_sim->_total_nodes) {
       unreachable();
     }else{
     }
