@@ -1,4 +1,5 @@
 load d_brl.so
+options preq
 options debug
 
 spice

@@ -4,7 +4,6 @@ spice
 .param vdd 1.7
 .options numdgt=5
 .param stress=1
-.param pw=.000001
 .param pp=0
 .param pw=.1
 V1 nin 0 pulse iv=0 pv=stress width=pw delay=0 period=pp
