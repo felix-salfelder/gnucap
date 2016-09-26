@@ -26,7 +26,10 @@ plugindir = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
 plugin_LTLIBRARIES = gnucap-default-plugins.la
 
 gnucap_default_plugins_la_LDFLAGS = -shared -module -avoid-version
-gnucap_default_plugins_la_SOURCES = $(BM_SRCS) $(D_SRCS) $(FUNC_SRCS) patchlev.cc
+gnucap_default_plugins_la_SOURCES = \
+	$(BM_SRCS) $(D_SRCS) $(FUNC_SRCS) \
+	patchlev.cc \
+	signon.cc
 gnucap_default_plugins_la_CPPFLAGS = \
 	-I$(top_builddir)/include -I$(top_srcdir)/include \
 	-I$(top_builddir)/src -I$(top_srcdir)/src
