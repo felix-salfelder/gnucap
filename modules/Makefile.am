@@ -56,6 +56,10 @@ c_wave_la_SOURCES = c_wave.cc
 c_wave_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 c_wave_la_CXXFLAGS = -std=c++11 $(AM_CXXFLAGS)
 #------------------------------------------------------------------------
+plugin_LTLIBRARIES += c_make_attach.la
+c_make_attach_la_SOURCES = c_make_attach.cc
+c_make_attach_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
+#------------------------------------------------------------------------
 plugin_LTLIBRARIES += c_debug.la
 c_debug_la_LDFLAGS = -module -avoid-version
 c_debug_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
