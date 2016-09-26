@@ -883,6 +883,8 @@ trcurve2.ckt.out: POSTDIFF+= '35·s/7\.08E-21/0.······/'
 trcurve2.ckt.out: POSTDIFF+= '35·s/13\.28E-21/0.·······/'
 trcurve2.ckt.out: POSTDIFF+= 's/[0-9]....E-30/0.·······/g'
 
+bm_pulse.5.gc.out: POSTDIFF+= 's/[0-9]\....E-18/0.·······/g'
+
 # negative zeroes? nice, but should not be machine dependent
 bm_sffm.%.out: POSTDIFF+= 's/-0\.000\>/·0.000/g'
 
