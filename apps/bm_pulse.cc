@@ -1,4 +1,4 @@
-/*                                 -*- C++ -*-
+/*$Id: bm_pulse.cc,v 1.3 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,7 +21,7 @@
  *------------------------------------------------------------------
  * SPICE compatible PULSE
  */
-#include "globals.h"
+//testing=script 2005.10.06
 #include "e_elemnt.h"
 #include "u_lang.h"
 #include "bm.h"
@@ -190,9 +190,6 @@ bool EVAL_BM_PULSE::operator==(const COMMON_COMPONENT& x)const
     && _area == p->_area
     && _phase == p->_phase
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {untested();
-  }else{
-  }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
@@ -313,37 +310,41 @@ void EVAL_BM_PULSE::precalc_last(const CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_PULSE::tr_eval(ELEMENT* d)const
 {
-  double ev = 0; // effective value
-
-  double raw_time = d->_sim->_time0;
-
-  if (raw_time <= _delay) {			/* init val	*/
-    ev = _iv;
-  }else{
-    double reltime;
-    if (0 < _period  &&  _period < BIGBIG) {
-      reltime = fmod(raw_time - _delay, _period);
+  double eps = d->_sim->_dtmin * .01;
+  double time = d->_sim->_time0;
+  if (0 < _period && _period < BIGBIG) {
+    //time = fmod(time,_period);
+    if (time > _delay) {
+      time = fmod(time - _delay, _period) + _delay;
     }else{
-      reltime = raw_time - _delay;
     }
-
-    if (reltime < _rise) {				/* rising 	*/
-      double interp = reltime / _rise;
-      ev = _iv + interp * (_pv - _iv);
-    }else if (reltime <= _rise + _width) {		/* pulse val 	*/
-      ev = _pv;
-      if (_rise==0.) {
-	d->_discont |= disFIRST;
-      }
-    }else if (reltime <  _rise + _width + _fall) {	/* falling 	*/
-      double interp = (reltime - (_rise+_width)) / _fall;
-      ev = _pv + interp * (_iv - _pv);
-    }else{						/* past pulse	*/
-      ev = _iv;
-      if (_fall==0.) {
-	d->_discont |= disFIRST;
-      }
+  }else{
+  }
+  double ev = 0; // effective value
+  if (time >= eps + _delay+_rise+_width+_fall) {
+    /* past pulse	*/
+    ev = _iv;
+    if (_fall==0.) {
+      d->_discont |= disFIRST;
     }
+  }else if (time >= eps + _delay+_rise+_width) {
+    /* falling 	*/
+    double interp = (time - (_delay+_rise+_width)) / _fall;
+	 assert(_pv_in != NOT_INPUT);
+    ev = _pv + interp * (_iv - _pv);
+  }else if (time >= eps + _delay + _rise) {
+    /* pulse val 	*/
+	 assert(_pv != NOT_INPUT);
+    ev = _pv;
+    if (_rise==0.) {
+      d->_discont |= disFIRST;
+    }
+  }else if (time >= eps + _delay) {
+    /* rising 	*/
+    double interp = (time - _delay) / _rise;
+    ev = _iv + interp * (_pv - _iv);
+  }else{					/* init val	*/
+    ev = _iv;
   }
   trace2("EVAL_BM_PULSE::tr_eval", ev, d->long_label());
   assert(is_number(ev));
@@ -359,46 +360,43 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
   double time = d->_sim->_time0;
   double eps = d->_sim->_dtmin * .01;
   time += eps; // hack to avoid duplicate events from numerical noise
-  double raw_time = d->_sim->_time0 + d->_sim->_dtmin * .01;
-				    // hack to avoid duplicate events from numerical noise
+  double raw_time = time;
+
+  if (0 < _period && _period < BIGBIG) {
+    if (time > _delay) {
+      time = fmod(time - _delay, _period) + _delay;
+    }else{
+    }
+  }else{
+  }
   double time_offset = raw_time - time;
 
-  if (raw_time <= _delay) {
-    d->_time_by.min_event(_delay);
-  }else{
-    double reltime;
-    if (0 < _period && _period < BIGBIG) {
-      reltime = fmod(raw_time - _delay, _period);
-    }else{
-      reltime = raw_time - _delay;
+  if (time >= _delay+_rise+_width+_fall) {		/* past pulse	*/
+    d->_time_by.min_event(_delay + _period + time_offset);
+    if (d->_sim->_time0 < _delay + _rise + _width + _fall + eps + time_offset) {
+      e->_discont |= disSECOND;
+      d->q_accept();
     }
-    double time_offset = raw_time - reltime;
-    
-    if (reltime < _rise) {				/* rising 	*/
-      d->_time_by.min_event(_rise + time_offset);
-      if (d->_sim->_time0 < _delay + eps + time_offset) {
-	e->_discont |= disSECOND;
-	d->q_accept();
-      }
-    }else if (reltime < _rise + _width) {		/* pulse val 	*/
-      d->_time_by.min_event(_rise + _width + time_offset);
-      if (d->_sim->_time0 < _delay + _rise + eps + time_offset) {
-	e->_discont |= disSECOND;
-	d->q_accept();
-      }
-    }else if (reltime < _rise + _width + _fall) {	/* falling 	*/
-      d->_time_by.min_event(_rise + _width + _fall + time_offset);
-      if (d->_sim->_time0 < _delay + _rise + _width + eps + time_offset) {
-	e->_discont |= disSECOND;
-	d->q_accept();
-      }
-    }else{						/* past pulse	*/
-      d->_time_by.min_event(_period + time_offset);
-      if (d->_sim->_time0 < _delay + _rise + _width + _fall + eps + time_offset) {
-	e->_discont |= disSECOND;
-	d->q_accept();
-      }
+  }else if (time >= _delay+_rise+_width) {		/* falling 	*/
+    if (d->_sim->_time0 < _delay + _rise + _width + eps + time_offset) {
+      e->_discont |= disSECOND;
+      d->q_accept();
     }
+    d->_time_by.min_event(_delay + _rise + _width + _fall + time_offset);
+  }else if (time >= _delay + _rise) {			/* pulse val 	*/
+    if (d->_sim->_time0 < _delay + _rise + eps + time_offset) {
+      e->_discont |= disSECOND;
+      d->q_accept();
+    }
+    d->_time_by.min_event(_delay + _rise + _width + time_offset);
+  }else if (time >= _delay) {				/* rising 	*/
+    if (d->_sim->_time0 < _delay + eps + time_offset) {
+      e->_discont |= disSECOND;
+      d->q_accept();
+    }
+    d->_time_by.min_event(_delay + _rise + time_offset);
+  }else{						/* init val	*/
+    d->_time_by.min_event(_delay + time_offset);
   }
 
   return d->_time_by;
