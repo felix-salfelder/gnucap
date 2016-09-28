@@ -142,6 +142,7 @@ class hp{
 
 #endif // __cplusplus
 
+#define USE(x) (void)x
 #else
 #define USE(x) (1)?(void)(0):(void)(x)
 #define trace_line()
