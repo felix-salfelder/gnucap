@@ -315,6 +315,9 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd) const
   if ((cmd >> "//")) {
     assert(here == 0); // BUG. why not "\t//"?
     type = "dev_comment";
+  }else if (cmd.skip1('`')) { untested();
+    cmd >> type;
+    type = '`' + type;
   }else if (cmd.skip1('.')) {
     cmd.check(bWARNING, "bogus input. trying to ignore leading dot...");
     here += 1;
