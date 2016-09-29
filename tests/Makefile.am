@@ -425,6 +425,7 @@ CKT_TESTS = \
     d_tcap.2.ckt \
     d_tcap.3.ckt \
     d_tcap.4.ckt \
+    d_tcap.5.ckt \
     d_trln.ac.ckt \
     d_trln.tr.100.im.ckt \
     d_trln.tr.100.nim.ckt \
@@ -516,6 +517,7 @@ CKT_TESTS = \
     param.9.ckt \
     parse.1.ckt \
     sl.ckt \
+    s_tr.1.ckt \
     trcurve2.ckt \
     trcurve.ckt \
     trcurves.ckt
@@ -697,6 +699,12 @@ GC_TESTS = \
     s_sock.2.gc \
     s_sock.3.gc \
     s_sock.4.gc \
+    s_tr.2.gc \
+    s_tr.3.gc \
+    s_tr.4.gc \
+    s_tr.5.gc \
+    s_tr.6.gc \
+    s_tr.7.gc \
     s_tr.cont.gc \
     s_tr.lrc.gc \
     s_ttt.1.gc \

@@ -38,7 +38,12 @@ void TRANSIENT::setup(CS& Cmd)
   _tstop.e_val(NOT_INPUT, _scope);
   _tstrobe.e_val(NOT_INPUT, _scope);
 
-  _cont=false;
+  _cont = false; // hmmm
+  if (_sim->is_first_expand()) {
+    _sim->_last_time = 0;
+  }else{
+  }
+
   if (Cmd.match1("'\"({") || Cmd.is_pfloat()) {
     trace1("TRANSIENT::setup parsing args", printlist().size());
     PARAMETER<double> arg1, arg2, arg3;

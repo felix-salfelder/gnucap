@@ -1,4 +1,4 @@
-/*$Id: s_tr_swp.cc 2015/01/28 al $ -*- C++ -*-
+/*$Id: s_tr_swp.cc 2016/09/20 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -182,14 +182,7 @@ void TRANSIENT::sweep()
     if (printnow) {
       _sim->keep_voltages();
       outdata(_sim->_time0);
-      if( _sim->_mode  == s_TTT && OPT::behave ){ untested();
-        CARD_LIST::card_list.do_forall( &CARD::tr_save_amps, _sim->_stepno );
-        CKT_BASE::tt_behaviour_del += CKT_BASE::tr_behaviour_del;
-        CKT_BASE::tt_behaviour_rel += CKT_BASE::tr_behaviour_rel;
-      }
-      CKT_BASE::tr_behaviour_del = 0;
-      CKT_BASE::tr_behaviour_rel = 0;
-    }else{ untested();
+    }else{
       ++::status.hidden_steps;
     }
   }
@@ -307,7 +300,7 @@ void TRANSIENT::first()
 {
   /* usually, _sim->_time0, time1 == 0, from setup */
   assert(_sim->_time0 == _time1);
-  assert(_sim->_time0 <= _tstart);
+  // assert(_sim->_time0 <= _tstart); // oops?
   ::status.review.start();
 
   //_eq.Clear();					/* empty the queue */
@@ -398,7 +391,8 @@ bool TRANSIENT::next()
     //    fprintf(stderr,".");
     //    _trace=tDEBUG;
   }else{
-    // _trace=tNONE;
+  }
+  {
     double reftime;
     if (_accepted) {
       reftime = _sim->_time0;
@@ -410,18 +404,23 @@ bool TRANSIENT::next()
     trace3("TRANSIENT::next ", _time1, _sim->_time0, reftime);
     trace2("TRANSIENT::next ", _time_by_user_request, _sim->_dtmin);
 
-    newtime = _time_by_user_request;
-    new_dt = newtime - reftime;
-    if (new_dt < _sim->_dtmin) {
-      // last step handler?
-      new_dt = _sim->_dtmin;
-      newtime = reftime + _sim->_dtmin;
+    if (_time_by_user_request < newtime) {
+      newtime = _time_by_user_request;
+      new_dt = newtime - reftime;
+      if (new_dt < _sim->_dtmin) { untested();
+	// last step handler?
+	new_dt = _sim->_dtmin;
+	newtime = reftime + _sim->_dtmin;
+      }else{untested();
+      }
+      new_control = scUSER;
+    }else{
     }
-    new_control = scUSER;
     double fixed_time = newtime;
     double almost_fixed_time = newtime;
     trace2("TRANSIENT::next", _time_by_user_request, newtime);
     check_consistency();
+
     
     // event queue, events that absolutely will happen
     // exact time.  NOT ok to move or omit, even by _sim->_dtmin
