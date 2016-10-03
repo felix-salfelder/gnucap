@@ -261,7 +261,7 @@ void AC::sweep()
   do {
     _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
     solve();
-    outdata(_sim->_freq);
+    outdata(_sim->_freq, ofPRINT | ofSTORE);
     if (_dump_matrix){
       _out << _sim->_acx << "\n";
       //for(unsigned i=0; i++<_sim->_total_nodes;){

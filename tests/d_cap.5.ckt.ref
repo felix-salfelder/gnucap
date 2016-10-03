@@ -4,6 +4,7 @@ r1 ( 1 2 )  0.01
 c2 ( 2 0 )  1.
 #Time       v(1)       v(2)      
  0.         0.         0.        
+<<<<<<< HEAD:tests/d_cap.5.ckt.ref
  0.001      0.99999    0.0906~   
  0.002      0.99999    0.1772~   
  0.003      0.99999    0.255~    
@@ -22,6 +23,26 @@ c2 ( 2 0 )  1.
  0.04       1.         0.9827~   
  0.05       1.         0.99424   
  0.06       1.         0.99808   
+=======
+ 0.001      0.99999    0.090644  
+ 0.002      0.99999    0.17725   
+ 0.003      0.99999    0.2556    
+ 0.004      0.99999    0.3265    
+ 0.005      0.99999    0.39064   
+ 0.006      0.99999    0.44867   
+ 0.007      1.         0.50118   
+ 0.008      1.         0.54869   
+ 0.009      1.         0.59167   
+ 0.01       1.         0.63056   
+#Time       v(1)       v(2)      
+ 0.         0.         0.        
+ 0.01       1.         0.63154   
+ 0.02       1.         0.86572   
+ 0.03       1.         0.95166   
+ 0.04       1.         0.9826    
+ 0.05       1.         0.9942    
+ 0.06       1.         0.99807   
+>>>>>>> unstable:tests/==out/d_cap.5.ckt.out
  0.07       1.         0.99936   
  0.08       1.         0.99979   
  0.09       1.         0.99993   
@@ -51,7 +72,12 @@ c2 ( 2 0 )  1.
  9.         1.         1.        
  10.        1.         1.        
 Gnucap   System status
+<<<<<<< HEAD:tests/d_cap.5.ckt.ref
 iterations: op=0, dc=0, tran=95, fourier=0, total=420
 transient timesteps: accepted=101, rejected=5, total=106
+=======
+iterations: op=0, dc=0, tran=140, fourier=0, total=636
+transient timesteps: accepted=135, rejected=25, total=160
+>>>>>>> unstable:tests/==out/d_cap.5.ckt.out
 nodes: user=2, subckt=0, model=0, total=2
 dctran density=100.0%, ac density=100.0%

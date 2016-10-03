@@ -234,7 +234,12 @@ v(6)  -4.               -2.               0.                2.               4.
  0.001  |                 .                .        *        .                |
         +-----------------+----------------+-----------------+----------------+
 Gnucap   System status
+<<<<<<< HEAD:tests/opamp-vf.2.ckt.ref
 iterations: op=23, dc=348, tran=~~~, fourier=0, total=1~~~
 transient timesteps: accepted=1~~, rejected=0, total=1~~
+=======
+iterations: op=23, dc=348, tran=1008, fourier=0, total=1582
+transient timesteps: accepted=160, rejected=7, total=167
+>>>>>>> unstable:tests/==out/opamp-vf.2.ckt.out
 nodes: user=8, subckt=0, model=16, total=24
 dctran density=47.9%, ac density=47.9%

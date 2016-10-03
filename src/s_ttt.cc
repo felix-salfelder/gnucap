@@ -1327,7 +1327,7 @@ void TTT::print_foot_tr()
 /*--------------------------------------------------------------------------*/
 // override TRANSIENT::outdata
 // save things during TR.
-void TTT::outdata(double time0)
+void TTT::outdata(double time0, int x)
 {
 	assert(TRANSIENT::step_cause());
 	assert(is_number(time0));

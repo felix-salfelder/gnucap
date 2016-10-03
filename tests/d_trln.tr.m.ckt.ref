@@ -43,7 +43,12 @@ R4l ( 42 0 )  50.
  95.n       1.         0.5        0.5        0.5        0.5        0.5        0.5        0.51852    0.44444   
  100.n      1.         0.5        0.5        0.5        0.5        0.5        0.5        0.51852    0.44444   
 Gnucap   System status
+<<<<<<< HEAD:tests/d_trln.tr.m.ckt.ref
 iterations: op=0, dc=0, tran=63, fourier=0, total=87
 transient timesteps: accepted=24, rejected=0, total=24
+=======
+iterations: op=0, dc=0, tran=59, fourier=0, total=81
+transient timesteps: accepted=22, rejected=0, total=22
+>>>>>>> unstable:tests/==out/d_trln.tr.m.ckt.out
 nodes: user=9, subckt=0, model=0, total=9
 dctran density=28.4%, ac density=38.3%

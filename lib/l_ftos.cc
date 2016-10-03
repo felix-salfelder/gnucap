@@ -1,5 +1,4 @@
-/*$Id: l_ftos.cc,v 1.3 2010-08-16 12:23:30 felix Exp $ -*- C++ -*-
- * vim:ts=8:sw=2:et:
+/*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -111,18 +110,18 @@ std::string to_string(std::list<double> n)
 /*--------------------------------------------------------------------------*/
 std::string to_string(double n)
 {
-  return ftos((double)n, 0, 7, 0);
+  return ftos((double)n, 0, 15, 0);
 }
 /*--------------------------------------------------------------------------*/
 std::string to_string(long double n)
 {
-  return ftos((double)n, 0, 7, 0);
+  return ftos((double)n, 0, 15, 0);
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
 std::string to_string(T n)
 {
-  return ftos((double)n, 0, 7, 0);
+  return ftos((double)n, 0, 15, 0);
 }
 /*--------------------------------------------------------------------------*/
 char* ftos(double num, int fieldwidth, int len, int fmt)

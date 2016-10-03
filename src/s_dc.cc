@@ -496,9 +496,9 @@ void DCOP::sweep_recursive(int Nest)
 	extra_steps = 0;
 	fixzero(_sweepval[Nest], _step[Nest]); // hack
 	if (_converged){
-	  outdata(*_sweepval[Nest]);
+	  outdata(*_sweepval[Nest], ofPRINT | ofSTORE);
 	} else {
-	  outdata(- *_sweepval[Nest]);
+	  outdata(- *_sweepval[Nest], ofPRINT | ofSTORE);
 	}
 	::status.hidden_steps = 0;
       }else{
@@ -508,13 +508,14 @@ void DCOP::sweep_recursive(int Nest)
 	trace1("didnt converge in first", Nest);
 	return;
       }
-      // ::status.accept.start();
-      // _sim->set_limit();
-      // CARD_LIST::card_list.tr_accept();
-      // ::status.accept.stop();
-      // _sim->_has_op = _sim->_mode;
-      // _sim->keep_voltages();
-      // outdata(*_sweepval[Nest]); ??
+#if 0
+      ::status.accept.start();
+      _sim->set_limit();
+      CARD_LIST::card_list.tr_accept();
+      ::status.accept.stop();
+      _sim->_has_op = _sim->_mode;
+      outdata(*_sweepval[Nest], ofPRINT | ofSTORE | ofKEEP);
+#endif
       itl = OPT::DCXFER;
 
     }

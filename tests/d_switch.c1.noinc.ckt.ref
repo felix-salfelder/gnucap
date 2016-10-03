@@ -39,9 +39,18 @@ Vprobe ( 8 0 )  DC  0.
 #Time       v(W1)      v(W2)      v(W3)      ev(W1)     ev(W2)     ev(W3)     i(Vsig)    i(Rprobe)  i(Vprobe)  timef(W1)  timef(W2)  timef(W3)  in(W1)     in(W2)     in(W3)     control(0)
  0.         1.         1.         1.         1.E+12     1.E+12     1.E+12     0.         0.         0.         Inf        Inf        Inf        0.         0.         0.         1.        
  0.01       1.         1.         1.         1.E+12     1.E+12     1.E+12    -10.u       10.u       10.u       2.         2.         2.         0.         0.         0.         9.        
+<<<<<<< HEAD:tests/d_switch.c1.noinc.ckt.ref
  1.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      2.         2.         2.         10.u       10.u      -10.u       1.        
  1.99       1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.00199    0.00199    0.00199    2.         2.         2.         0.001      0.001     -0.001      6.        
  2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         2.         0.00199    0.00199   -0.00199    1.        
+=======
+ 0.02       1.         1.         1.         1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       2.         2.         2.         10.u       10.u      -10.u       6.        
+ 1.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      2.         2.         2.         20.u       20.u      -20.u       1.        
+ 2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         2.         0.001      0.001     -0.001      1.        
+ 2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         Inf        0.002      0.002     -0.002      7.        
+ 2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         2.         0.002      0.002     -0.002      17.       
+ 2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         2.2749     0.002      0.002     -0.002      7.        
+>>>>>>> unstable:tests/==out/d_switch.c1.noinc.ckt.out
  2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         Inf        0.002      0.002     -0.002      7.        
  2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         Inf        0.002      0.002     -0.002      17.       
  2.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      2.         2.         Inf        0.002      0.002     -0.002      7.        
@@ -110,7 +119,12 @@ Rprobe ( 7 8 )  1.K
 Vprobe ( 8 0 )  DC  0.
 .model sss csw ( it=0. ih=.002 ion=NA( 0.002) ioff=NA(-0.002) ron=1.K roff=1.E+12 tnom=NA( 27.))
 Gnucap   System status
+<<<<<<< HEAD:tests/d_switch.c1.noinc.ckt.ref
 iterations: op=0, dc=84, tran=191, fourier=0, total=342
 transient timesteps: accepted=57, rejected=8, total=65
+=======
+iterations: op=0, dc=84, tran=195, fourier=0, total=348
+transient timesteps: accepted=58, rejected=9, total=67
+>>>>>>> unstable:tests/==out/d_switch.c1.noinc.ckt.out
 nodes: user=8, subckt=0, model=0, total=8
 dctran density=25.0%, ac density=25.0%

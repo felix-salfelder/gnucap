@@ -107,7 +107,7 @@ class TTT : public TRANSIENT {
     double _dT_by_adp;
     double _dTmin;
     double _dTmax;
-    void   outdata(double);
+    void   outdata(double, int);
     void   print_results(double); // stupid?
     void   print_results_tr(double);
     void   print_results_tt(double);

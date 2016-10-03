@@ -1,4 +1,4 @@
-/*$Id: s_tr_swp.cc 2016/09/20 al $ -*- C++ -*-
+/*$Id: s_tr_swp.cc 2016/09/22 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -179,12 +179,13 @@ void TRANSIENT::sweep()
 
   {
     bool printnow = (_sim->_time0 == _tstart || _trace >= tALLTIME);
+    int outflags = ofNONE;
     if (printnow) {
-      _sim->keep_voltages();
-      outdata(_sim->_time0);
+      outflags = ofPRINT | ofSTORE | ofKEEP;
     }else{
-      ++::status.hidden_steps;
+      outflags = ofSTORE;
     }
+    outdata(_sim->_time0, outflags);
   }
 
   assert(_tstrobe >=OPT::dtmin ); // == wont work because of CAUSE
@@ -235,21 +236,19 @@ void TRANSIENT::sweep()
 	|| (_accepted && (_trace >= tALLTIME
 			  || step_cause() == scUSER
 			  || (!_tstrobe.has_hard_value() && _sim->_time0+_sim->_dtmin > _tstart)));
+      int outflags = ofNONE;
       if (printnow) {
-        _sim->keep_voltages();
-        trace2("TRANSIENT::sweep" ,_sim->last_time(), (double)_tstop);
-        assert(_sim->last_time() < _tstop+_sim->_dtmin || _sim->_freezetime);
-
-        outdata(_sim->_time0);
-        CKT_BASE::tr_behaviour_del = 0;
-        CKT_BASE::tr_behaviour_rel = 0;
-      }else{
-	++::status.hidden_steps;
+	outflags = ofPRINT | ofSTORE | ofKEEP;
+      }else if (_accepted) {untested();
+	// ++::status.hidden_steps;
+	outflags = ofSTORE;
+      }else{untested();
       }
+      outdata(_sim->_time0, outflags);
     }
-
-    if (!_converged && OPT::quitconvfail) { untested();
-      outdata(_sim->_time0);
+    
+    if (!_converged && OPT::quitconvfail) {untested();
+      outdata(_sim->_time0, ofPRINT);
       throw Exception("convergence failure, giving up");
     }else{
     }
@@ -549,7 +548,7 @@ bool TRANSIENT::next()
 	// Try to choose one that we will keep for a while.
 	// Choose new_dt to be in integer fraction of target_dt.
 	assert(reftime == _sim->_time0); // moving forward
-	assert(reftime > _time1);
+	//assert(reftime > _time1); // _time1==_time0 on restart, ok
 	double target_dt = fixed_time - reftime;
 	assert(target_dt >= new_dt);
 	double steps = 1 + floor((target_dt - _sim->_dtmin) / new_dt);
@@ -776,7 +775,7 @@ bool TRANSIENT::review()
   }else{
   }
 
-  if (time_by._error_estimate < _time1 + 2*_sim->_dtmin) {
+  if (time_by._error_estimate < _time1 + 2*_sim->_dtmin) {itested();
     _time_by_error_estimate = _time1 + 2*_sim->_dtmin;
   }else{
     _time_by_error_estimate = time_by._error_estimate;

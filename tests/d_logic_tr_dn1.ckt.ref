@@ -4,6 +4,11 @@
 #Time       v(1)       l(1)       v(2)       l(2)       iter(0)    control(0)
  0.         2.5        1.41       5.         3.         3.         1.        
  500.n      2.5079     1.41       5.         3.         3.         9.        
+<<<<<<< HEAD:tests/d_logic_tr_dn1.ckt.ref
+=======
+ 1.u        2.5157     1.41       5.         3.         3.         6.        
+ 10.8u      2.6695     1.41       5.         3.         3.         6.        
+>>>>>>> unstable:tests/==out/d_logic_tr_db1.ckt.out
  50.u       3.2725     1.41       5.         3.         3.         1.        
  99.5u      3.9631     3.31       5.         2.         3.         6.        
  99.6u      3.9644     3.31       0.         0.         3.         2.        
@@ -227,7 +232,11 @@
  0.00995    1.7275     1.31       5.         3.         3.         1.        
  0.01       2.5        1.41       5.         3.         3.         1.        
 Gnucap   System status
+<<<<<<< HEAD:tests/d_logic_tr_dn1.ckt.ref
 iterations: op=4, dc=0, tran=672, fourier=0, total=900
+=======
+iterations: op=3, dc=0, tran=672, fourier=0, total=899
+>>>>>>> unstable:tests/==out/d_logic_tr_db1.ckt.out
 transient timesteps: accepted=224, rejected=0, total=224
 nodes: user=3, subckt=0, model=0, total=3
 dctran density=100.0%, ac density=100.0%

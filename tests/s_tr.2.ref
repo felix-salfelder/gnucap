@@ -18,6 +18,10 @@
 #Time       v(1)      
  0.         0.        
  0.001      1.        
+<<<<<<< HEAD:tests/s_tr.2.ref
+=======
+ 0.002      1.        
+>>>>>>> unstable:tests/==out/s_tr.2.gc.out
  0.1        1.        
  0.2        1.        
  0.3        1.        
