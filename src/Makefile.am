@@ -39,23 +39,6 @@ d_bjt.model d_diode.model
 
 BUILT_SOURCES = ${MODELS:%.model=%.h} ${MODELS:%.model=%.cc}
 
-# device models hand coded in C++
-D_SRCS = \
-d_admit.cc d_cap.cc d_cccs.cc d_ccvs.cc d_coil.cc \
-d_meas.cc \
-d_meter.cc \
-d_ttcap.cc \
-d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc \
-d_trln.cc d_vcg.cc d_vcr.cc d_vcvs.cc d_vs.cc  \
-d_branchvs.cc
-
-# matrix_example_LDADD = libgnucap.la
-
-# behavioral modeling functions
-BM_SRCS = \
-bm_complex.cc bm_exp.cc bm_fit.cc bm_generator.cc \
-bm_model.cc bm_poly.cc bm_posy.cc bm_pulse.cc bm_pwl.cc bm_sffm.cc \
-bm_sin.cc bm_tanh.cc bmm_table.cc bmm_semi.cc
 
 # utility commands, usually one file per command
 # some have multiple commands in a file
@@ -75,19 +58,11 @@ s_tr.cc s_tr_set.cc s_tr_swp.cc
 LANG_SRCS = \
 lang_spice.cc lang_spectre.cc lang_verilog.cc
 
-# parameter functions
-FUNC_SRCS = \
-func_core.cc measure_eval.cc \
-measure_max.cc measure_min.cc measure_slewrate.cc measure_cross.cc \
-measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 #------------------------------------------------------------------------
 RAW_SRCS = \
-$(BM_SRCS) \
-$(D_SRCS) \
 $(C_SRCS) \
 $(S_SRCS) \
-$(LANG_SRCS) \
-$(FUNC_SRCS)
+$(LANG_SRCS)
 
 #------------------------------------------------------------------------
 RAW_HDRS = \
@@ -97,13 +72,11 @@ l_lib.h l_stlextra.h l_timer.h \
 m_cpoly.h m_divdiff.h m_interp.h m_matrix.h m_spline.h m_wave.h \
 m_base.h m_expression.h m_phase.h \
 io_.h io_error.h io_matrix.h io_misc.h \
-u_cardst.h u_function.h u_lang.h u_limit.h u_nodemap.h u_opt.h u_parameter.h \
 u_prblst.h u_probe.h u_sim_data.h u_sdp.h u_status.h u_time_pair.h u_xprobe.h \
 s__.h s_tr.h e_adp.h s_tt.h\
 e_base.h e_card.h e_node.h e_aux.h e_model.h e_compon.h e_subckt.h \
 e_adplist.h \
 e_elemnt.h e_ccsrc.h e_storag.h e_cardlist.h \
-d_coment.h d_dot.h d_logic.h d_subckt.h \
 bm.h \
 c_comand.h globals.h extlib.h d_cap.h m_matrix_extra.h \
 u_sock.h s_ddc.h u_atlas.h
@@ -227,3 +200,6 @@ EXTRA_DIST+= \
  e_ivl_compile.h \
  extlib.cc \
  pointers.h
+
+
+AM_DEFAULT_SOURCE_EXT = .cc

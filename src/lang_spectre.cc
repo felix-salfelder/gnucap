@@ -1,4 +1,4 @@
-/*$Id: lang_spectre.cc 2015/01/27 al $ -*- C++ -*-
+/*$Id: lang_spectre.cc 2016/09/17  $ -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -24,7 +24,7 @@
 #include "c_comand.h"
 #include "d_dot.h"
 #include "d_coment.h"
-#include "d_subckt.h"
+#include "e_subckt.h"
 #include "e_model.h"
 #include "u_lang.h"
 /*--------------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*);
   DEV_DOT*	parse_command(CS&, DEV_DOT*);
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*);
-  BASE_SUBCKT* parse_module(CS&, BASE_SUBCKT*);
+  BASE_SUBCKT*	parse_module(CS&, BASE_SUBCKT*);
   COMPONENT*	parse_instance(CS&, COMPONENT*);
   std::string	find_type_in_string(CS&) const;
 
@@ -460,13 +460,12 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "model", &p1);
 class CMD_SUBCKT : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
-    const CARD* s = device_dispatcher["subckt"];
-    assert(s); // for now
-    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(s->clone());
+    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("subckt"));
     assert(new_module);
     assert(!new_module->owner());
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());
+    assert(!new_module->is_device());
     lang_spectre.parse_module(cmd, new_module);
     Scope->push_back(new_module);
   }

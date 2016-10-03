@@ -316,8 +316,8 @@ inline void ELEMENT::ac_load_source()
   }else{
   }
   if (_n[OUT1].m_() != 0) {
-    _n[OUT1].iac() -= mfactor() * _acg;
-  }else{itested();
+    _n[OUT1]->iac() -= mfactor() * _acg;
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

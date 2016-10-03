@@ -92,10 +92,7 @@ PROBE& PROBE::operator=(const PROBE& p)
   _hi   = p._hi;
   if (_brh) {
     _brh->inc_probes();
-    trace1( ("++probe (=): " + _what +
-          " " + _brh->long_label()  ).c_str() , _brh->probes());
-  }else{
-    untested();
+  }else{ untested();
   }
   return *this;
 }

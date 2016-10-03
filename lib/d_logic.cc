@@ -1,4 +1,4 @@
-/*                               -*- C++ -*-
+/*                              -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,7 +25,8 @@
  * model:   .model mname LOGIC <args>
  */
 //testing=script,sparse 2006.07.17
-#include "d_subckt.h"
+#include "globals.h"
+#include "e_subckt.h"
 #include "u_xprobe.h"
 #include "d_logic.h"
 /*--------------------------------------------------------------------------*/

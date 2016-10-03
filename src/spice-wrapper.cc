@@ -1,8 +1,4 @@
-<<<<<<< HEAD:src/spice-wrapper.cc
-/*                                   -*- C++ -*-
-=======
-/* $Id: spice-wrapper.cc 2016/03/29 al $ -*- C++ -*-
->>>>>>> precalc_last-2:include/spice-wrapper.cc
+/*                                    -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -65,7 +61,7 @@ extern "C" {
 // gnucap includes
 //#include "globals.h"
 #include "u_xprobe.h"
-#include "d_subckt.h"
+#include "e_paramlist.h"
 #include "e_storag.h"
 #include "e_model.h"
 /*--------------------------------------------------------------------------*/
@@ -95,7 +91,7 @@ enum {uGROUND=1, uFLOAT=2, uDISALLOW=3};
 const uint_t MATRIX_NODES = (MAX_NET_NODES + INTERNAL_NODES);
 class DEV_SPICE;
 class MODEL_SPICE;
-static COMMON_SUBCKT Default_Params(CC_STATIC);
+static COMMON_PARAMLIST Default_Params(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 /* function mapping: see devdefs.h
  * DEVparam	DEV_SPICE::parse_spice
@@ -845,7 +841,7 @@ void DEV_SPICE::set_param_by_name(std::string Name, std::string Value)
   }else{
   }
   COMPONENT::set_param_by_name(Name, Value);
-  COMMON_SUBCKT* c = dynamic_cast<COMMON_SUBCKT*>(mutable_common());
+  COMMON_PARAMLIST* c = dynamic_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
   Set_param_by_name(Name, to_string(c->_params[Name].e_val(1,scope())));
 }
@@ -1020,7 +1016,7 @@ void DEV_SPICE::precalc_last()
   init_ckt();
 
   // push down parameters into spice data
-  COMMON_SUBCKT* c = dynamic_cast<COMMON_SUBCKT*>(mutable_common());
+  COMMON_PARAMLIST* c = dynamic_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
   for (PARAM_LIST::iterator i = c->_params.begin(); i != c->_params.end(); ++i) {
     if (i->second.has_hard_value()) {
@@ -1075,7 +1071,7 @@ void DEV_SPICE::precalc_last()
 
     assert(ok == OK);
     assert(num_states_garbage == _num_states);
-    //trace3("precalc", maxEqNum_stash, ckt()->CKTmaxEqNum, (maxEqNum_stash == ckt()->CKTmaxEqNum));
+    trace3("precalc", _maxEqNum, ckt()->CKTmaxEqNum, (_maxEqNum == ckt()->CKTmaxEqNum));
     assert(_maxEqNum == ckt()->CKTmaxEqNum);
     notstd::copy_n(node_stash, matrix_nodes(), node); // put back real nodes
     // hopefully, the matrix pointers are the same as last time!

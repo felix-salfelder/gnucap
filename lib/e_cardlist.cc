@@ -1,4 +1,4 @@
-/*                             -*- C++ -*-
+/*                                 -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -801,7 +801,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
 
   // scan the list, map the nodes
   for (CARD_LIST::iterator ci = begin(); ci != end(); ++ci) {
-    if ((**ci).is_device()) {
+    if ((**ci).is_device()) { untested();
       const CARD* c = *ci;
       trace2("CARD_LIST::map_subckt_nodes subdevice node ", c->long_label(), here->long_label());
       for (uint_t ii = 0;  ii < (**ci).net_nodes();  ++ii) {
@@ -832,8 +832,19 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
           throw Exception(here->long_label() + ": need more nodes");
         }
         assert(c->n_(ii).e_() != INVALID_NODE);
+#if 0
+      for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+	// for each connection node in card
+	try{
+	  (**ci).n_(ii).map_subckt_node(map, owner);
+	}catch(...){
+	  delete[] map;
+	  throw;
+	}
       }
-    }else{
+#endif
+      }
+    }else{ untested();
       assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }

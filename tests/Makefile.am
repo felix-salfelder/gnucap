@@ -95,6 +95,7 @@ CKT_TESTS = \
     bm_pulse.1.ckt \
     bm_pulse.2.ckt \
     bm_pulse.3.ckt \
+    bm_pulse.4.ckt \
     bm_pwl.1.ckt \
     bm_pwl.2.ckt \
     bm_pwl.3.ckt \
@@ -394,6 +395,7 @@ CKT_TESTS = \
     d_subckt.error1.ckt \
     d_subckt.error2.ckt \
     d_subckt.error3.ckt \
+    d_subckt.error3b.ckt \
     d_subckt.error4.ckt \
     d_switch.c0.ckt \
     d_switch.c1a.ckt \
@@ -423,6 +425,7 @@ CKT_TESTS = \
     d_tcap.2.ckt \
     d_tcap.3.ckt \
     d_tcap.4.ckt \
+    d_tcap.5.ckt \
     d_trln.ac.ckt \
     d_trln.tr.100.im.ckt \
     d_trln.tr.100.nim.ckt \
@@ -514,6 +517,7 @@ CKT_TESTS = \
     param.9.ckt \
     parse.1.ckt \
     sl.ckt \
+    s_tr.1.ckt \
     trcurve2.ckt \
     trcurve.ckt \
     trcurves.ckt
@@ -597,7 +601,6 @@ GC_TESTS = \
     ac_lp.gc \
     ac_noise.gc \
     alter.gc \
-    bm_pulse.4.gc \
     bm_pulse.5.gc \
     bm_pulse.6.gc \
     bm_pulse.7.gc \
@@ -696,6 +699,12 @@ GC_TESTS = \
     s_sock.2.gc \
     s_sock.3.gc \
     s_sock.4.gc \
+    s_tr.2.gc \
+    s_tr.3.gc \
+    s_tr.4.gc \
+    s_tr.5.gc \
+    s_tr.6.gc \
+    s_tr.7.gc \
     s_tr.cont.gc \
     s_tr.lrc.gc \
     s_ttt.1.gc \
@@ -882,6 +891,8 @@ trcurve2.ckt.out: POSTDIFF+= '29·s/630\.3E-24/0.·······/'
 trcurve2.ckt.out: POSTDIFF+= '35·s/7\.08E-21/0.······/'
 trcurve2.ckt.out: POSTDIFF+= '35·s/13\.28E-21/0.·······/'
 trcurve2.ckt.out: POSTDIFF+= 's/[0-9]....E-30/0.·······/g'
+
+bm_pulse.5.gc.out: POSTDIFF+= 's/[0-9]\....E-18/0.·······/g'
 
 # negative zeroes? nice, but should not be machine dependent
 bm_sffm.%.out: POSTDIFF+= 's/-0\.000\>/·0.000/g'

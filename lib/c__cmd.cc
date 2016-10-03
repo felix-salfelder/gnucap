@@ -1,5 +1,4 @@
-/*$Id: c__cmd.cc,v 1.7 2009-12-13 17:55:01 felix Exp $ -*- C++ -*-
- * vim:ts=8:sw=2:et:
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -54,8 +53,8 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
   // Map possible short names to full ones.
   // If this if/else block is removed, the only loss is the short names.
   // Although it looks like it can be used to make aliases, don't.
-  if (cmd.umatch("'|*|#|//|\""))	{            s = "xxxxcomment";}
-  else if (cmd.umatch("b{uild} "))      {            s = "build";}
+  if (cmd.umatch("'|*|#|//|\""))	{	     s = "xxxxcomment";}
+  else if (cmd.umatch("b{uild} "))      {itested();  s = "build";}
   else if (cmd.umatch("del{ete} "))     {            s = "delete";}
   else if (cmd.umatch("fo{urier} "))    {            s = "fourier";}
   else if (cmd.umatch("gen{erator} "))  {	     s = "generator";}

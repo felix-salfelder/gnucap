@@ -1,4 +1,4 @@
-/*                                     -*- C++ -*-
+/*                                      -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -19,10 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include "globals.h"
 #include "c_comand.h"
 #include "d_dot.h"
 #include "d_coment.h"
-#include "d_subckt.h"
+#include "e_subckt.h"
 #include "e_model.h"
 #include "u_lang.h"
 /*--------------------------------------------------------------------------*/
@@ -239,7 +240,6 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
  *  "endparamset"
  */
 //BUG// no paramset_item_declaration, falls back to spice mode
-//BUG// must be on single line
 
 MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
 {
@@ -249,13 +249,18 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
   parse_label(cmd, x);
   parse_type(cmd, x);
   cmd >> ';';
-  trace0("LANG_VERILOG::parse_paramset, have ;");
-  cmd.eat_lines();
-  parse_args_paramset(cmd, x);
-  cmd.eat_lines();
-  cmd >> "endparamset ";
-  cmd.check(bWARNING, "what's this?");
-  trace0("done.");
+
+  for (;;) {
+    parse_args_paramset(cmd, x);
+    if (cmd >> "endparamset ") {
+      break;
+    }else if (!cmd.more()) {
+      cmd.get_line("verilog-paramset>");
+    }else{untested();
+      cmd.check(bWARNING, "what's this?");
+      break;
+    }
+  }
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -310,6 +315,9 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd) const
   if ((cmd >> "//")) {
     assert(here == 0); // BUG. why not "\t//"?
     type = "dev_comment";
+  }else if (cmd.skip1('`')) { untested();
+    cmd >> type;
+    type = '`' + type;
   }else if (cmd.skip1('.')) {
     cmd.check(bWARNING, "bogus input. trying to ignore leading dot...");
     here += 1;
@@ -501,9 +509,7 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);
 class CMD_MODULE : public CMD { //
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
-    CARD const* sckt = device_dispatcher["subckt"];
-    assert(sckt);
-    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(sckt->clone());
+    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("subckt"));
     assert(new_module);
     assert(!new_module->owner());
     assert(new_module->subckt());

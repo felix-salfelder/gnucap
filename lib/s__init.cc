@@ -51,7 +51,7 @@ void SIM::command_base(CS& cmd)
     case rPIPE:         untested();
     case rBATCH:
     case rINTERACTIVE:
-    case rSCRIPT:	trace0("SIM::command_base calling sweep");	sweep(); break;
+    case rSCRIPT:	sweep();	break;
     case rPRESET:	/*nothing*/	break;
     }
   }catch (Exception& e) {
@@ -70,7 +70,7 @@ SIM::~SIM()
 {
   if (_sim) {
     _sim->uninit();
-  }else { untested();
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

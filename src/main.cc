@@ -1,4 +1,4 @@
-/*$Id: main.cc 2015/01/21 al $ -*- C++ -*-
+/*$Id: main.cc 2016/09/11 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -77,7 +77,8 @@ void read_startup_files(void)
     } catch(Exception e){
       error(bDANGER, "%s\n",e.message().c_str());
     }
-  }else{
+  }else{ untested();
+    CMD::command(std::string("load " DEFAULT_PLUGINS), &CARD_LIST::card_list);
   }
   if (!startup_recursive()) {
     trace1("read_startup_files, no cwd", name);
