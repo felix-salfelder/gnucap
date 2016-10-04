@@ -102,11 +102,11 @@ Rp noutp nddp 10k
 * + v(nodes)
 * + vth(m*)
 *>.print dc v(nodes)
-*>.tr 0 40n 40n basic trace=a > test_np_tr.out echo
+*>.tr 0 40n 40n basic trace=n > test_np_tr.out echo
 .echo >> test_np_tr.out
-*>.tr 0 40n 1n basic trace=a >> test_np_tr.out echo
+*>.tr 0 40n 1n basic trace=n >> test_np_tr.out echo
 .echo >> test_np_tr.out
-*>.tr 0 40n .1n basic trace=a >> test_np_tr.out echo
+*>.tr 0 40n .1n basic trace=n >> test_np_tr.out echo
 
 **>.dc vsu 0 2 .1 basic
 *>.end

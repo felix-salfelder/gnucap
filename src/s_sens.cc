@@ -287,7 +287,7 @@ void SENS::sweep()
   do {
     solve();
     _out.form(format, (*_output_iter).label.c_str() );
-    outdata(0);
+    outdata(0, ofPRINT);
   } while (next_output());
 }
 /*--------------------------------------------------------------------------*/

@@ -52,7 +52,7 @@ v(1)  -5.               -2.5              0.                2.5              5.
  24.    |*                .                .                 .                |
  24.5   |         *       .                .                 .                |
  25.    |                 .     *          .                 .                |
- 25.5   |                 .                .     *           .                |
+ 25.5   |                 .                .      *          .                |
  26.    |                 .                .                 .   *            |
  26.5   |                 .                .                 .             *  |
  27.    |                 .                .                 .                *
@@ -68,7 +68,7 @@ v(1)  -5.               -2.5              0.                2.5              5.
  32.    |                 .                .            *    .                |
  32.5   |                 .                .                 .        *       |
  33.    |                 .                .                 .               *|
- 33.5   |                 .                .                 .              * |
+ 33.5   |                 .                .                 .               *|
  34.    |                 .                .                 .      *         |
  34.5   |                 .                .         *       .                |
  35.    |                 .         *      .                 .                |
@@ -91,7 +91,7 @@ v(1)  -5.               -2.5              0.                2.5              5.
  43.5   |          *      .                .                 .                |
  44.    |                 .       *        .                 .                |
  44.5   |                 .                .       *         .                |
- 45.    |                 .                .                 .    *           |
+ 45.    |                 .                .                 .     *          |
  45.5   |                 .                .                 .              * |
  46.    |                 .                .                 .                *
  46.5   |                 .                .                 .         *      |
@@ -204,12 +204,7 @@ v(1)  -5.               -2.5              0.                2.5              5.
  100.   |   *             .                .                 .                |
         +-----------------+----------------+-----------------+----------------+
 Gnucap   System status
-<<<<<<< HEAD:tests/oscillator.1.ckt.ref
 iterations: op=0, dc=0, tran=12~~, fourier=0, total=16~~
 transient timesteps: accepted=4~~, rejected=~, total=41~
-=======
-iterations: op=0, dc=0, tran=1233, fourier=0, total=1644
-transient timesteps: accepted=409, rejected=2, total=411
->>>>>>> unstable:tests/==out/oscillator.1.ckt.out
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

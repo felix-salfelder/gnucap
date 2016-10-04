@@ -120,19 +120,19 @@ void SIM::outdata(double x, int outflags)
   trace1("SIM::outdata ", x);
 
   ::status.output.start();
-  if (outflags & ofKEEP) {
+  if (outflags & ofKEEP) { untested();
     _sim->keep_voltages();
-  }else{
+  }else{ untested();
   }
-  if (outflags & ofPRINT) {
+  if (outflags & ofPRINT) { untested();
     plottr(x, plotlist());
     print_results(x);
     _sim->reset_iteration_counter(iPRINTSTEP);
     ::status.hidden_steps = 0;
-  }else{
+  }else{ untested();
     ++::status.hidden_steps;
   }
-  if (outflags & ofSTORE) {
+  if (outflags & ofSTORE) { untested();
     alarm();
     store_results(x);
   }else{

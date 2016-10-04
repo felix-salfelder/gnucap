@@ -128,7 +128,7 @@ void REACH::SWEEP::do_it(int Nest, double dt, double bak)
 	trace7("transition", _spl.id(), Nest, Nest, _parent._zap_bm[Nest]->param_name(10), _parent._zap_bm[Nest]->param_value(10), swp[Nest], dt);
 
 	if(_parent.EV_BASE::_trace >= tVERBOSE){
-		_parent.EV_BASE::outdata(-double(_spl.id()));
+		_parent.EV_BASE::outdata(-double(_spl.id()), ofPRINT);
 	}
 
 	_parent.tran_step(dt);
@@ -137,7 +137,7 @@ void REACH::SWEEP::do_it(int Nest, double dt, double bak)
 	memcpy(v0save, _sim->_v0+1, n*sizeof(double));
 
 	if(_parent.EV_BASE::_trace >= tITERATION){
-		_parent.EV_BASE::outdata(1./0.);
+		_parent.EV_BASE::outdata(1./0., ofPRINT);
 	}
 
 	trace1("presolver", v0__);
@@ -157,7 +157,7 @@ void REACH::SWEEP::do_it(int Nest, double dt, double bak)
 	if (spl.is_new()) { itested();
 		//				_parent.EV_BASE::_out << double(spl.id()) << double(depth) << double(chart->id());
 		_parent.EV_BASE::_out << chart->id();
-		_parent.EV_BASE::outdata(double(spl.id()));
+		_parent.EV_BASE::outdata(double(spl.id()), ofPRINT);
 	}
 
 	_parent.EV_BASE::_out << _spl.chart().id() << "," << _spl.id() << " -> " << chart->id() << "," << spl.id();
@@ -487,7 +487,7 @@ void REACH::sweep_recursive(int Nest)
 	_sim->_uic = false;
 
 	if(EV_BASE::_trace >= tVERBOSE){
-		EV_BASE::outdata(1./0.);
+		EV_BASE::outdata(1./0., ofPRINT);
 	}
 
 	SSP_CHART* chart = NULL;
@@ -525,7 +525,7 @@ void REACH::sweep_recursive(int Nest)
 
 	if (spl.is_new()){
 		EV_BASE::_out << chart->id();
-		EV_BASE::outdata(spl.id());
+		EV_BASE::outdata(spl.id(), ofPRINT);
 	}
 
 	if (!_depth){ untested();

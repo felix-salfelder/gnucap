@@ -62,11 +62,12 @@ void TRANSIENT::sweep()
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
  
-  if ( _print_only ) {
+  if ( _print_only ) { untested();
+    // better to be achieved with a singleton time interval...?
     _sim->_phase = p_RESTORE;
     _sim->restore_voltages();
     CARD_LIST::card_list.tr_restore();
-      outdata(_sim->_time0);
+      outdata(_sim->_time0, ofPRINT);
       return;
 
   } else if (_inside_tt && _cont_dc) {

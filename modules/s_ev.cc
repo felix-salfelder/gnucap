@@ -1295,7 +1295,7 @@ void EV::sweep_recursive(int Nest)
 
 			if (spl.is_new()){
 				EV_BASE::_out << chart->id();
-				outdata(spl.id());
+				outdata(spl.id(), ofPRINT);
 			}
 
 			// here??

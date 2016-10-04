@@ -577,7 +577,7 @@ void DDC_BASE::sweep_recursive(int Nest)
       }
 
       //_sim->set_command(s_DC);
-      outdata(*_sweepval[Nest]);
+      outdata(*_sweepval[Nest], ofPRINT);
       //_sim->set_command(s_DDC);
 
       // here??

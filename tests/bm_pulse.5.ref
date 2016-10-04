@@ -19,15 +19,15 @@ V4 ( 4 0 ) pulse iv= 0. pv= 1. delay=NA( 0.) rise= 100.u fall= 100.u width= 500.
  550.u      0.         0.5        0.50015    0.50507    0.5        1.        
  600.u      0.        -1.5682f    1.         0.0050696  1.         1.        
  650.u      0.        -13.87E-18  1.        -16.91E-18  1.         0.5       
- 700.u      0.        -13.87E-18  1.        -16.91E-18  1.        -1.5643f   
- 750.u      0.        -13.87E-18  1.        -16.91E-18  0.5       -10.02E-18 
- 800.u      0.         0.         1.         0.        -2.2192f    0.        
- 850.u      0.         0.         1.         0.         0.         0.        
- 900.u      0.         0.         1.         0.         0.         0.        
- 950.u      0.         0.         1.         0.         0.         0.        
- 0.001      0.         0.         0.99985    0.         0.         0.        
+ 700.u      0.        -13.87E-18  1.        -16.91E-18  1.        -1.5~f     
+ 750.u      0.         0.         1.         0.         0.5        0.        
+ 800.u      0.         0.         1.         0.        -2.2555f    0.        
+ 850.u      0.         0.         1.         0.        -35.1E-18   0.        
+ 900.u      0.         0.         1.         0.        -35.1E-18   0.        
+ 950.u      0.         0.         1.         0.        -35.1E-18   0.        
+ 0.001      0.         0.         0.99985    0.        -35.1E-18   0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=136, fourier=0, total=182
-transient timesteps: accepted=43, rejected=3, total=46
+iterations: op=0, dc=0, tran=217, fourier=0, total=290
+transient timesteps: accepted=60, rejected=13, total=73
 nodes: user=6, subckt=0, model=0, total=6
 dctran density=16.7%, ac density=16.7%

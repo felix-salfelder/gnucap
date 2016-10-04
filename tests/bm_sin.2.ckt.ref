@@ -1,19 +1,25 @@
 ' sin test 
 #Time       v(1)       next(V1)   event(V1) 
  0.         0.         2.5n       0.        
- 200.p      0.12533    2.7n       0.        
- 2.675n     0.99396    5.15n      0.        
- 5.15n     -0.094108   7.625n     0.        
- 7.625n    -0.99692    10.1n      0.        
- 10.1n      0.062791   12.263n    0.        
- 12.575n    0.99889    14.701n    0.        
- 15.05n    -0.031411   17.521n    0.        
- 17.525n   -0.99988    19.58n     0.        
- 18.762n   -0.70153    21.118n    0.        
- 20.n       0.         21.826n    0.        
+ 2.p        0.0012566  57.704p    0.        
+ 15.926p    0.010007   30.853p    0.        
+ 29.852p    0.018756   551.27p    0.        
+ 541.91p    0.33395    1.2467n    0.        
+ 1.054n     0.61487    2.0319n    0.        
+ 2.0013n    0.9513     3.3314n    0.        
+ 2.9486n    0.96054    4.6159n    0.        
+ 4.4987n    0.3098     6.745n     0.        
+ 6.0488n   -0.61232    7.6212n    0.        
+ 7.599n    -0.99807    9.4172n    0.        
+ 9.1491n   -0.50953    11.649n    0.        
+ 11.319n    0.7372     13.111n    0.        
+ 13.489n    0.81289    15.44n     0.        
+ 15.66n    -0.4027     17.839n    0.        
+ 17.83n    -0.9786     19.786n    0.        
+ 20.n       0.         22.5n      0.        
 V1 ( 1 0 ) sin offset= 0. amplitude= 1. frequency= 100.Meg delay= 0. damping= 0.
 Gnucap   System status
-iterations: op=0, dc=0, tran=~~, fourier=0, total=~~
-transient timesteps: accepted=~~, rejected=0, total=~~
+iterations: op=0, dc=0, tran=56, fourier=0, total=75
+transient timesteps: accepted=17, rejected=2, total=19
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

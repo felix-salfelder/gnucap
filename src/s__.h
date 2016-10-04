@@ -91,9 +91,6 @@ protected:
 	 const PROBELIST& printlist()const;
 	 const PROBELIST& storelist()const;
   virtual void	outdata(double, int);
-  void	outdata(double x) {incomplete();
-    outdata(x, ofPRINT | ofSTORE);
-  }
   virtual void	head(double,double,const std::string&);
   virtual void	print_results(double);
   virtual void	alarm();
