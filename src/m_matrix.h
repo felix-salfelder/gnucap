@@ -602,7 +602,7 @@ T& BSMATRIX<T>::m(unsigned r, unsigned c)
  */
 template <class T>
 T BSMATRIX<T>::s(unsigned row, unsigned col)const
-{untested();
+{itested();
   assert(_lownode);
   // assert(0 <= col);
   assert(col <= size());
@@ -612,7 +612,7 @@ T BSMATRIX<T>::s(unsigned row, unsigned col)const
 
   if (col == row) {untested();
     return d(row, col);
-  }else if (col > row) {untested();    /* above the diagonal */
+  }else if (col > row) {itested();    /* above the diagonal */
     if (row == 0) {untested();
       return _trash;
     }else if (row < _lownode[col]) {
