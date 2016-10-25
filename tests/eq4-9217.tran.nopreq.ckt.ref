@@ -247,7 +247,7 @@ function ----- last -- total
     review    ~~.~~    ~~.~~
     accept     0.~~     0.~~
     output     0.~~     0.~~
-  overhead     0.~~     0.~~
+  overhead     ~.~~     ~.~~
       aux1     0.00     0.00
       aux2     0.00     0.00
       aux3     0.00     0.00
@@ -278,7 +278,7 @@ function ----- last -- total
     review    ~~.~~    ~~.~~
     accept     0.~~     0.~~
     output     0.~~     0.~~
-  overhead     0.~~     0.~~
+  overhead     ~.~~     ~.~~
       aux1     0.00     0.00
       aux2     0.00     0.00
       aux3     0.00     0.00
