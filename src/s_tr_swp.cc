@@ -411,7 +411,7 @@ bool TRANSIENT::next()
 	// last step handler?
 	new_dt = _sim->_dtmin;
 	newtime = reftime + _sim->_dtmin;
-      }else{untested();
+      }else{itested();
       }
       new_control = scUSER;
     }else{
