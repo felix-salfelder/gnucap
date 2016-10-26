@@ -549,7 +549,11 @@ bool TRANSIENT::next()
 	// Try to choose one that we will keep for a while.
 	// Choose new_dt to be in integer fraction of target_dt.
 	assert(reftime == _sim->_time0); // moving forward
-	assert(reftime > _time1);
+	if(reftime <= _time1){ unreachable();
+	  // this is a weird bug.
+	  // FIX LATER
+	}else{
+	}
 	double target_dt = fixed_time - reftime;
 	assert(target_dt >= new_dt);
 	double steps = 1 + floor((target_dt - _sim->_dtmin) / new_dt);
