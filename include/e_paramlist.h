@@ -36,7 +36,7 @@ public:
 	   ~COMMON_PARAMLIST()		{--_count;}
   bool operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new COMMON_PARAMLIST(*this);}
-  std::string	name()const		{untested();return "";}
+  std::string	name()const		{itested();return "";}
   static int	count()			{untested();return _count;}
 
   void set_param_by_name(std::string Name, std::string Value) {_params.set(Name, Value);}

@@ -108,7 +108,7 @@ static void parse_args_paramset(CS& cmd, MODEL_CARD* x)
     try{
       cmd >> name >> '=' >> value >> ';';
       x->set_param_by_name(name, value);
-    }catch (Exception_No_Match&) {untested();
+    }catch (Exception_No_Match&) {itested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
     cmd.eat_lines();

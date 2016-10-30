@@ -407,7 +407,7 @@ bool TRANSIENT::next()
     if (_time_by_user_request < newtime) {
       newtime = _time_by_user_request;
       new_dt = newtime - reftime;
-      if (new_dt < _sim->_dtmin) { untested();
+      if (new_dt < _sim->_dtmin) { itested();
 	// last step handler?
 	new_dt = _sim->_dtmin;
 	newtime = reftime + _sim->_dtmin;
@@ -821,7 +821,7 @@ void TRANSIENT::accept()
       _sim->_acceptq.back()->tr_accept();
       _sim->_acceptq.pop_back();
     }
-  }else{untested();
+  }else{itested();
     _sim->_acceptq.clear();
     CARD_LIST::card_list.tr_accept();
   }
