@@ -64,6 +64,8 @@ extern "C" {
 #include "e_paramlist.h"
 #include "e_storag.h"
 #include "e_model.h"
+#include "d_subckt.h"
+
 /*--------------------------------------------------------------------------*/
 // customization -- must be last
 #include "wrapper.h"
@@ -601,8 +603,9 @@ void MODEL_SPICE::set_param_by_name(std::string Name, std::string Value)
   }else{
   }
   _params.set(Name, Value);
-  Set_param_by_name(Name, to_string(_params[Name].e_val(1,scope())));
+  Set_param_by_name(Name, ::to_string(_params[Name].e_val(1,scope())));
 }
+
 /*--------------------------------------------------------------------------*/
 void MODEL_SPICE::precalc_first()
 {
@@ -614,7 +617,7 @@ void MODEL_SPICE::precalc_first()
   for (PARAM_LIST::iterator i = _params.begin(); i != _params.end(); ++i) {
     if (i->second.has_hard_value()) {
       try {
-	Set_param_by_name(i->first, to_string(i->second.e_val(1,scope())));
+		Set_param_by_name(i->first, ::to_string(i->second.e_val(1,scope())));
       }catch (Exception_No_Match&) {
 	error(bTRACE, long_label() + ": bad parameter: " + i->first + ", ignoring\n");
       }
@@ -843,7 +846,7 @@ void DEV_SPICE::set_param_by_name(std::string Name, std::string Value)
   COMPONENT::set_param_by_name(Name, Value);
   COMMON_PARAMLIST* c = dynamic_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
-  Set_param_by_name(Name, to_string(c->_params[Name].e_val(1,scope())));
+  Set_param_by_name(Name, ::to_string(c->_params[Name].e_val(1,scope())));
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SPICE::Set_param_by_index(int i, std::string& new_value, int offset)
@@ -1021,7 +1024,7 @@ void DEV_SPICE::precalc_last()
   for (PARAM_LIST::iterator i = c->_params.begin(); i != c->_params.end(); ++i) {
     if (i->second.has_hard_value()) {
       try {
-	Set_param_by_name(i->first, to_string(i->second.e_val(1,scope())));
+		Set_param_by_name(i->first, ::to_string(i->second.e_val(1,scope())));
       }catch (Exception_No_Match&) {
 	error(bTRACE, long_label() + ": bad parameter: " + i->first + ", ignoring\n");
       }
@@ -1332,7 +1335,7 @@ void DEV_SPICE::tr_load()
 	  int njj = nj-OFFSET;
 	  trace2("", jj, nj);
 	  trace2("", _matrix[nii][njj].real(), _matrix[nii][njj].imag());
-	  tr_load_point(_n[ii], _n[jj], &(_matrix[nii][njj].real()), &(_matrix[nii][njj].imag()));
+	  tr_load_point(_n[ii], _n[jj], &reinterpret_cast<double(&)[2]>(_matrix[nii][njj])[0] , &reinterpret_cast<double(&)[2]>(_matrix[nii][njj])[1]);
 	}else{
 	  trace2("skip", jj, nj);
 	}
@@ -1348,7 +1351,7 @@ void DEV_SPICE::tr_unload()
 
   for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {untested();
     for (uint_t jj = 0; jj < matrix_nodes(); ++jj) {untested();
-      _matrix[ii][jj].real() = 0;
+      _matrix[ii][jj].real(0);
     }
   }
   _sim->mark_inc_mode_bad();
@@ -1898,8 +1901,8 @@ static struct COMPLEX_TEST {
   COMPLEX_TEST() {
     COMPLEX x;
     COMPLEX* px = &x;
-    double* prx = &x.real();
-    double* pix = &x.imag();
+    double* prx = &reinterpret_cast<double(&)[2]>(x)[0];
+    double* pix = &reinterpret_cast<double(&)[2]>(x)[1];
     assert(reinterpret_cast<void*>(prx) == reinterpret_cast<void*>(px));
     assert(reinterpret_cast<void*>(pix-1) == reinterpret_cast<void*>(px));
   }

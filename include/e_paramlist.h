@@ -22,8 +22,9 @@
  * data structures for subcircuits
  */
 //testing=script 2016.09.16
-#ifndef D_SUBCKT_H
-#define D_SUBCKT_H
+// changed to obious. Why was D_SUBCKT_H here?
+#ifndef E_PARAMLIST_H
+#define E_PARAMLIST_H
 #include "e_compon.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
