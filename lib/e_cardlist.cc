@@ -801,7 +801,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
 
   // scan the list, map the nodes
   for (CARD_LIST::iterator ci = begin(); ci != end(); ++ci) {
-    if ((**ci).is_device()) { untested();
+    if ((**ci).is_device()) { itested();
       const CARD* c = *ci;
       trace2("CARD_LIST::map_subckt_nodes subdevice node ", c->long_label(), here->long_label());
       for (uint_t ii = 0;  ii < (**ci).net_nodes();  ++ii) {
@@ -844,7 +844,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
       }
 #endif
       }
-    }else{ untested();
+    }else{ itested();
       assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }

@@ -22,8 +22,9 @@
  * data structures for subcircuits
  */
 //testing=script 2016.09.16
-#ifndef D_SUBCKT_H
-#define D_SUBCKT_H
+// changed to obious. Why was D_SUBCKT_H here?
+#ifndef E_PARAMLIST_H
+#define E_PARAMLIST_H
 #include "e_compon.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -36,7 +37,7 @@ public:
 	   ~COMMON_PARAMLIST()		{--_count;}
   bool operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new COMMON_PARAMLIST(*this);}
-  std::string	name()const		{untested();return "";}
+  std::string	name()const		{itested();return "";}
   static int	count()			{untested();return _count;}
 
   void set_param_by_name(std::string Name, std::string Value) {_params.set(Name, Value);}

@@ -632,7 +632,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
   int error_deriv;
   if (order() >= OPT::_keep_time_steps - 2) {
     error_deriv = OPT::_keep_time_steps - 1;
-  }else if (order() < 0) {untested();
+  }else if (order() < 0) {itested();
     error_deriv = 1;
   }else{
     error_deriv = order()+1;

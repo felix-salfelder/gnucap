@@ -77,7 +77,7 @@ void read_startup_files(void)
     } catch(Exception e){
       error(bDANGER, "%s\n",e.message().c_str());
     }
-  }else{ untested();
+  }else{ itested();
     CMD::command(std::string("load " DEFAULT_PLUGINS), &CARD_LIST::card_list);
   }
   if (!startup_recursive()) {
