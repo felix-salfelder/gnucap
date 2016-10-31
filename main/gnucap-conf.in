@@ -29,9 +29,12 @@ case $1 in
 		echo -n @includedir@/
 		echo gnucap | sed -e "$transform"
 		;;
-	"--libdir")
+	"--pkglibdir")
 		echo -n @libdir@/
 		echo gnucap | sed -e "$transform"
+		;;
+	"--libdir")
+		echo -n @libdir@
 		;;
 	"--data")
 		echo @datarootdir@

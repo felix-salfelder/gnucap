@@ -602,7 +602,7 @@ T& BSMATRIX<T>::m(unsigned r, unsigned c)
  */
 template <class T>
 T BSMATRIX<T>::s(unsigned row, unsigned col)const
-{untested();
+{itested();
   assert(_lownode);
   // assert(0 <= col);
   assert(col <= size());
@@ -610,17 +610,17 @@ T BSMATRIX<T>::s(unsigned row, unsigned col)const
   assert(row <= size());
   assert(_zero == 0.);
 
-  if (col == row) {untested();
+  if (col == row) {itested();
     return d(row, col);
-  }else if (col > row) {untested();    /* above the diagonal */
+  }else if (col > row) {itested();    /* above the diagonal */
     if (row == 0) {untested();
       return _trash;
     }else if (row < _lownode[col]) {
       return _zero;
-    }else{untested();
+    }else{itested();
       return u(row, col);
     }
-  }else{untested();                    /* below the diagonal */
+  }else{itested();                    /* below the diagonal */
     assert(col < row);
     if (col == 0) {
       return _trash;
@@ -707,12 +707,12 @@ T& BSMATRIX<T>::s(unsigned row, unsigned col)
 /*--------------------------------------------------------------------------*/
 template <class T>
 void BSMATRIX<T>::load_point(unsigned i, unsigned j, T value)
-{untested();
-  if (i > 0 && j > 0) {untested();
+{itested();
+  if (i > 0 && j > 0) {itested();
     set_changed(j);
     set_changed(i);
     m(i,j) += value;
-  }else{untested();
+  }else{itested();
   }
 }
 /*--------------------------------------------------------------------------*/
