@@ -768,19 +768,33 @@ void SOCK::verakons()
   _sim->set_inc_mode_no();
 
   // vera wants just cap stamps
-  for (unsigned i = 0; i < _caplist.size(); i++) { itested();
-    CARD* c = prechecked_cast<CARD*>(_caplist[i]);
-    assert(c);
-    trace1("verakons, loading cap", c->long_label());
-    _sim->_damp = 1.; // need raw stamps
-    c->tr_load();
+  if (converged) {
+	for (unsigned i = 0; i < _caplist.size(); i++) { itested();
+	  CARD* c = prechecked_cast<CARD*>(_caplist[i]);
+	  assert(c);
+	  trace1("verakons, loading cap", c->long_label());
+	  _sim->_damp = 1.; // need raw stamps
+	  c->tr_load(); // this can be done only when converged
+	  // because after converged in solve() the steps
+	  // clear_arrays() finish_building_evalq() _sim->count_iterations(iTOTAL)
+	  // evaluate_models() 
+	  // are performed. If solve or solve with homotopy
+	  // fails, it will not increment the iTOTAL counter and
+	  // we will get a double tr_load_source if this is executed.
+	  //
+	  // normal function mode: 
+	  //   final step of solve() will call evaluate models() which
+	  //   calculates with do_tr the values of the caps and
+	  //   the tr_load() here will stamp the values in the matrix.  
+	}
   }
-
+	
   for( unsigned i = 0; i < _caplist.size(); i++) {
-    /// oops. maybe the next command is tran?!
-    // (this is a hack!!)
-    _caplist[i]->set_constant(false);
+	/// oops. maybe the next command is tran?!
+	// (this is a hack!!)
+	_caplist[i]->set_constant(false);
   }
+	
 }
 /*--------------------------------------------------------------------------*/
 #undef rescale
