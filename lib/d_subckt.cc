@@ -110,7 +110,7 @@ public: // override virtual
   CARD*		clone()const		{return new DEV_SUBCKT_PROTO(*this);}
   bool		is_device()const	{return false;}
   bool		makes_own_scope()const  {return true;}
-  CARD_LIST*	   scope()		{untested();return subckt();}
+  CARD_LIST*	   scope()		{itested();return subckt();}
   const CARD_LIST* scope()const		{return subckt();}
 private: // no-ops for prototype
   void precalc_first(){}
@@ -129,7 +129,7 @@ private: // no-ops for prototype
   void do_ac(){}
   void ac_load(){}
   bool do_tr(){ return true;}
-  bool tr_needs_eval()const{untested(); return false;}
+  bool tr_needs_eval()const{itested(); return false;}
   void tr_queue_eval(){}
   std::string port_name(unsigned)const {return "";}
 public:
@@ -142,13 +142,13 @@ DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "X|subckt", &pp);
 /*--------------------------------------------------------------------------*/
 DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO& p)
   :DEV_SUBCKT(p)
-{ untested();
+{ itested();
   new_subckt();
 }
 /*--------------------------------------------------------------------------*/
 DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO()
   :DEV_SUBCKT()
-{ untested();
+{ itested();
   new_subckt();
 }
 /*--------------------------------------------------------------------------*/
@@ -286,7 +286,7 @@ void DEV_SUBCKT::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_SUBCKT::tr_probe_num(const std::string& x)const
-{untested();
+{itested();
   if (Umatch(x, "p ")) {untested();
     double power = 0.;
     assert(subckt());
@@ -317,7 +317,7 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "m1 ")) {
     return _n[1].m_();
 #endif
-  }else{untested();
+  }else{itested();
     return COMPONENT::tr_probe_num(x);
   }
   /*NOTREACHED*/

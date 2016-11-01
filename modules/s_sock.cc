@@ -508,7 +508,7 @@ void SOCK::main_loop()
         status = transtep(arg[0], dt);
         transtep_reply(status);
         break;
-      case 103: untested();
+      case 103: itested();
         set_param();
         break;
       case 104: itested();
@@ -870,7 +870,7 @@ void SOCK::ev_iter()
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::set_param()
-{ untested();
+{ itested();
   string tmp[2];
   stream >> tmp[0];
   stream >> tmp[1];

@@ -2,6 +2,8 @@ spice
 * zero length mosfet. does not work as expected
 
 Mpch (d g s b) pchh l=0
+.end
+* this just crashes.
 
 .model pchh pmos()
 

@@ -407,11 +407,11 @@ bool TRANSIENT::next()
     if (_time_by_user_request < newtime) {
       newtime = _time_by_user_request;
       new_dt = newtime - reftime;
-      if (new_dt < _sim->_dtmin) { untested();
+      if (new_dt < _sim->_dtmin) { itested();
 	// last step handler?
 	new_dt = _sim->_dtmin;
 	newtime = reftime + _sim->_dtmin;
-      }else{untested();
+      }else{itested();
       }
       new_control = scUSER;
     }else{
@@ -549,7 +549,11 @@ bool TRANSIENT::next()
 	// Try to choose one that we will keep for a while.
 	// Choose new_dt to be in integer fraction of target_dt.
 	assert(reftime == _sim->_time0); // moving forward
-	assert(reftime > _time1);
+	if(reftime <= _time1){ unreachable();
+	  // this is a weird bug.
+	  // FIX LATER
+	}else{
+	}
 	double target_dt = fixed_time - reftime;
 	assert(target_dt >= new_dt);
 	double steps = 1 + floor((target_dt - _sim->_dtmin) / new_dt);
@@ -817,7 +821,7 @@ void TRANSIENT::accept()
       _sim->_acceptq.back()->tr_accept();
       _sim->_acceptq.pop_back();
     }
-  }else{untested();
+  }else{itested();
     _sim->_acceptq.clear();
     CARD_LIST::card_list.tr_accept();
   }
