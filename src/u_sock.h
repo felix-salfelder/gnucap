@@ -401,7 +401,7 @@ inline Socket::Socket(SOCKET_TYPE type, short unsigned port ) : fd(0),
     fd = socket(AF_INET, SOCK_STREAM, 0);
   }else if(type == UDP) { untested();
     fd = socket(AF_INET, SOCK_DGRAM, 0);
-  }els if(type == UNIX) { untested();
+  }else if(type == UNIX) { untested();
     fd = socket(AF_UNIX, SOCK_DGRAM, 0);
   }else{
     unreachable();

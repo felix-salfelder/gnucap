@@ -163,8 +163,6 @@ double	SOCK::temp_c_in = 0.;
 void SOCK::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   trace0("SOCK::do_it");
-  IO::error.detach(stdout);
-  IO::error.attach(stderr);
   _scope = Scope;
   _sim->_time0 = 0.;
   //_sim->set_command_ddc();
@@ -250,11 +248,14 @@ void SOCK::setup(CS& Cmd)
   _sim->_freq = 0;
 
   // not implemented. need to queue sources properly (CARDLIST::q_hack..?)
-  if(OPT::prequeue) { // incomplete();
-    error(bDANGER, "prequeueing is experimental, this might not work\n");
-    OPT::prequeue=false;
+  if(OPT::prequeue) { incomplete();
+    error(bDANGER, "prequeueing is incomplete, disabling\n");
+    OPT::prequeue = false;
   }else{
   }
+
+  IO::error.detach(stdout);
+  IO::error.attach(stderr);
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::options(CS& Cmd, int Nest)
@@ -336,24 +337,30 @@ void SOCK::sweep()
 
     trace0("SOCK::do_it waiting");
     stream = sock->listen();
-  } else {
+  }else{ untested();
     fflush( stdout );
     fflush( stdin );
     trace0("SOCK::sweep simple i/o");
-    socket=0;
+    socket = NULL;
     trace1("bufsize Stdin ", _bufsize);
-    if (!_binout) {
-      int  devnull=open("/dev/null",O_WRONLY);
+    if (!_binout){ untested();
+      int devnull=open("/dev/null", O_WRONLY);
       trace2("Socket stream for dev null" ,devnull, STDIN_FILENO);
       stream = SocketStream( devnull, STDIN_FILENO, _bufsize);
-    } else {
+    }else{ untested();
       stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
     }
     stream << "gnucap sock ready";
   }
 
   main_loop();
+
   delete socket;
+
+  _out << "\n"; // (good idea?)
+
+  IO::error.detach(stderr);
+  IO::error.attach(stdout); // BUG. does not seem to work?!
   return;
 }
 /*--------------------------------------------------------------------------*/
@@ -483,9 +490,8 @@ void SOCK::main_loop()
     double dt;
     unsigned status;
     switch (opcode) {
-      case '\0': // 0
+      case '\0': untested();
         return;
-        break;
       case '3': // 51
         if(init_done) throw Exception("init twice??");
         verainit(arg[0], arg[1], arg[2]);
