@@ -32,3 +32,14 @@
  0.0011554  1.5        1.4986     1.4973    
  0.0011554  1.5        1.4986     1.4973    
  0.0015321  1.5        1.4999     1.4998    
+
+>>>>>.echo goodbye 
+goodbye 
+>>>>>.status notime 
+Gnucap   System status
+iterations: op=0, dc=6, tran=51, fourier=0, total=68
+sock: tr rejected=0
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=1, total=4
+dctran density=75.0%, ac density=75.0%
+

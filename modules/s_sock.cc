@@ -54,7 +54,7 @@ typedef union {
 } di_union_t;
 
 /*--------------------------------------------------------------------------*/
-class SOCK : public DDC_BASE {
+class SOCK : public DDC_BASE { //
 public:
   explicit SOCK();
   ~SOCK();
@@ -154,7 +154,6 @@ private: //vera stuff.
   double *matrixg, *matrixc,*vectorq;
 
   static const int printlevel=0;
-
 };
 /*--------------------------------------------------------------------------*/
 unsigned SOCK::tr_steps_rejected_ = 0;
@@ -163,8 +162,6 @@ double	SOCK::temp_c_in = 0.;
 void SOCK::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   trace0("SOCK::do_it");
-  IO::error.detach(stdout);
-  IO::error.attach(stderr);
   _scope = Scope;
   _sim->_time0 = 0.;
   //_sim->set_command_ddc();
@@ -250,11 +247,14 @@ void SOCK::setup(CS& Cmd)
   _sim->_freq = 0;
 
   // not implemented. need to queue sources properly (CARDLIST::q_hack..?)
-  if(OPT::prequeue) { // incomplete();
-    error(bDANGER, "prequeueing is experimental, this might not work\n");
-    OPT::prequeue=false;
+  if(OPT::prequeue) { incomplete();
+    error(bDANGER, "prequeueing is incomplete, disabling\n");
+    OPT::prequeue = false;
   }else{
   }
+
+  IO::error.detach(stdout);
+  IO::error.attach(stderr);
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::options(CS& Cmd, int Nest)
@@ -336,24 +336,30 @@ void SOCK::sweep()
 
     trace0("SOCK::do_it waiting");
     stream = sock->listen();
-  } else {
+  }else{ untested();
     fflush( stdout );
     fflush( stdin );
     trace0("SOCK::sweep simple i/o");
-    socket=0;
+    socket = NULL;
     trace1("bufsize Stdin ", _bufsize);
-    if (!_binout) {
-      int  devnull=open("/dev/null",O_WRONLY);
+    if (!_binout){ untested();
+      int devnull=open("/dev/null", O_WRONLY);
       trace2("Socket stream for dev null" ,devnull, STDIN_FILENO);
       stream = SocketStream( devnull, STDIN_FILENO, _bufsize);
-    } else {
+    }else{ untested();
       stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
     }
     stream << "gnucap sock ready";
   }
 
   main_loop();
+
   delete socket;
+
+  _out << "\n"; // (good idea?)
+
+  IO::error.detach(stderr);
+  IO::error.attach(stdout); // BUG. does not seem to work?!
   return;
 }
 /*--------------------------------------------------------------------------*/
@@ -415,13 +421,11 @@ void SOCK::findcaps( CARD_LIST* scope){
 static SOCK p2;
 static DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "sock", &p2);
 /*--------------------------------------------------------------------------*/
+DISPATCHER<CKT_BASE>::INSTALL* _status=NULL;
 static void register_status()
 {
-  static bool done;
-
-  if(!done) {
-    new DISPATCHER<CKT_BASE>::INSTALL(&status_dispatcher, "sock", &p2);
-    done = true;
+  if(!_status){
+    _status = new DISPATCHER<CKT_BASE>::INSTALL(&status_dispatcher, "sock", &p2);
   }else{ untested();
   }
 }
@@ -483,9 +487,8 @@ void SOCK::main_loop()
     double dt;
     unsigned status;
     switch (opcode) {
-      case '\0': // 0
+      case '\0': untested();
         return;
-        break;
       case '3': // 51
         if(init_done) throw Exception("init twice??");
         verainit(arg[0], arg[1], arg[2]);
@@ -734,17 +737,16 @@ void SOCK::verakons()
     //    solve_with_homotopy(itl,_trace);
     // homotopy is to much effort calling
     // procedures must catch problems with convergence.
-  }catch( Exception e) {
-    ::error(bDANGER, "hot failed\n");
+  }catch(Exception e) { untested();
+    ::error(bDANGER, "solve failed in verakons\n");
     throw e;
   }
-  if (!converged) {
+  if(!converged){
     ::error(bWARNING, "s_sock::verakons: solve did not converge\n");
     converged = solve_with_homotopy(itl,_trace);
-    if (!converged) {
-      ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
-      _error = 1;
-    }
+  }
+  if(!converged){
+    _error = 1;
   }
   ::status.accept.start();
   assert(_sim->_uic);
@@ -762,19 +764,31 @@ void SOCK::verakons()
   _sim->set_inc_mode_no();
 
   // vera wants just cap stamps
-  for (unsigned i = 0; i < _caplist.size(); i++) { itested();
-    CARD* c = prechecked_cast<CARD*>(_caplist[i]);
-    assert(c);
-    trace1("verakons, loading cap", c->long_label());
-    _sim->_damp = 1.; // need raw stamps
-    c->tr_load();
+  if(converged) { untested();
+    //   final step of solve() will call evaluate models() which
+    //   calculates with do_tr the values of the caps and
+    //   the tr_load() here will stamp the values in the matrix.  
+    for (unsigned i = 0; i < _caplist.size(); i++) { itested();
+      CARD* c = prechecked_cast<CARD*>(_caplist[i]);
+      assert(c);
+      trace1("verakons, loading cap", c->long_label());
+      _sim->_damp = 1.; // need raw stamps
+      c->tr_load(); // this can be done only when converged
+    }
+  }else{untested();
+    ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
+    // avoid double loads. in case of _error
+	  // If solve or solve with homotopy did not converge,
+	  // it will not increment the iTOTAL counter and
+	  // we would get a double tr_load_source if this is executed.
   }
-
+	
   for( unsigned i = 0; i < _caplist.size(); i++) {
-    /// oops. maybe the next command is tran?!
-    // (this is a hack!!)
-    _caplist[i]->set_constant(false);
+	/// oops. maybe the next command is tran?!
+	// (this is a hack!!)
+	_caplist[i]->set_constant(false);
   }
+	
 }
 /*--------------------------------------------------------------------------*/
 #undef rescale
@@ -1289,6 +1303,10 @@ void SOCK::cap_reset(void)
 SOCK::~SOCK()
 {
   trace0("SOCK::~SOCK()");
+  if(_status){untested();
+    delete(_status);
+  }else{untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
