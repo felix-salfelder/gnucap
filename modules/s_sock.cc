@@ -54,7 +54,7 @@ typedef union {
 } di_union_t;
 
 /*--------------------------------------------------------------------------*/
-class SOCK : public DDC_BASE {
+class SOCK : public DDC_BASE { //
 public:
   explicit SOCK();
   ~SOCK();
@@ -154,7 +154,6 @@ private: //vera stuff.
   double *matrixg, *matrixc,*vectorq;
 
   static const int printlevel=0;
-
 };
 /*--------------------------------------------------------------------------*/
 unsigned SOCK::tr_steps_rejected_ = 0;
@@ -422,13 +421,11 @@ void SOCK::findcaps( CARD_LIST* scope){
 static SOCK p2;
 static DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "sock", &p2);
 /*--------------------------------------------------------------------------*/
+DISPATCHER<CKT_BASE>::INSTALL* _status=NULL;
 static void register_status()
 {
-  static bool done;
-
-  if(!done) {
-    new DISPATCHER<CKT_BASE>::INSTALL(&status_dispatcher, "sock", &p2);
-    done = true;
+  if(!_status){
+    _status = new DISPATCHER<CKT_BASE>::INSTALL(&status_dispatcher, "sock", &p2);
   }else{ untested();
   }
 }
@@ -1306,6 +1303,10 @@ void SOCK::cap_reset(void)
 SOCK::~SOCK()
 {
   trace0("SOCK::~SOCK()");
+  if(_status){untested();
+    delete(_status);
+  }else{untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
