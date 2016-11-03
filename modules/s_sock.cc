@@ -740,17 +740,16 @@ void SOCK::verakons()
     //    solve_with_homotopy(itl,_trace);
     // homotopy is to much effort calling
     // procedures must catch problems with convergence.
-  }catch( Exception e) {
-    ::error(bDANGER, "hot failed\n");
+  }catch(Exception e) { untested();
+    ::error(bDANGER, "solve failed in verakons\n");
     throw e;
   }
-  if (!converged) {
+  if(!converged){
     ::error(bWARNING, "s_sock::verakons: solve did not converge\n");
     converged = solve_with_homotopy(itl,_trace);
-    if (!converged) {
-      ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
-      _error = 1;
-    }
+  }
+  if(!converged){
+    _error = 1;
   }
   ::status.accept.start();
   assert(_sim->_uic);
@@ -768,25 +767,23 @@ void SOCK::verakons()
   _sim->set_inc_mode_no();
 
   // vera wants just cap stamps
-  if (converged) {
-	for (unsigned i = 0; i < _caplist.size(); i++) { itested();
-	  CARD* c = prechecked_cast<CARD*>(_caplist[i]);
-	  assert(c);
-	  trace1("verakons, loading cap", c->long_label());
-	  _sim->_damp = 1.; // need raw stamps
-	  c->tr_load(); // this can be done only when converged
-	  // because after converged in solve() the steps
-	  // clear_arrays() finish_building_evalq() _sim->count_iterations(iTOTAL)
-	  // evaluate_models() 
-	  // are performed. If solve or solve with homotopy
-	  // fails, it will not increment the iTOTAL counter and
-	  // we will get a double tr_load_source if this is executed.
-	  //
-	  // normal function mode: 
-	  //   final step of solve() will call evaluate models() which
-	  //   calculates with do_tr the values of the caps and
-	  //   the tr_load() here will stamp the values in the matrix.  
-	}
+  if(converged) { untested();
+    //   final step of solve() will call evaluate models() which
+    //   calculates with do_tr the values of the caps and
+    //   the tr_load() here will stamp the values in the matrix.  
+    for (unsigned i = 0; i < _caplist.size(); i++) { itested();
+      CARD* c = prechecked_cast<CARD*>(_caplist[i]);
+      assert(c);
+      trace1("verakons, loading cap", c->long_label());
+      _sim->_damp = 1.; // need raw stamps
+      c->tr_load(); // this can be done only when converged
+    }
+  }else{untested();
+    ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
+    // avoid double loads. in case of _error
+	  // If solve or solve with homotopy did not converge,
+	  // it will not increment the iTOTAL counter and
+	  // we would get a double tr_load_source if this is executed.
   }
 	
   for( unsigned i = 0; i < _caplist.size(); i++) {
