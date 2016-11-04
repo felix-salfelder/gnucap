@@ -217,7 +217,7 @@ void TTT::tt_begin()
 	trace0("TTT::tt_begin");
 	_sim->_stepno = 0;
 	_sim->_tt_uic = false;
-	CARD_LIST::card_list.do_forall( &CARD::tt_begin );
+	CARD_LIST::card_list.tt_begin();
 	// advance_time() // must be done, as tt1 is used in do_tt...
 	CARD_LIST::card_list.do_tt();
 }
