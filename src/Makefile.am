@@ -67,18 +67,15 @@ $(LANG_SRCS)
 #------------------------------------------------------------------------
 RAW_HDRS = \
 startup.h md.h ap.h mode.h constant.h declare.h \
-l_compar.h l_dispatcher.h l_denoise.h \
-l_lib.h l_stlextra.h l_timer.h \
 m_cpoly.h m_divdiff.h m_interp.h m_matrix.h m_spline.h m_wave.h \
 m_base.h m_expression.h m_phase.h \
 io_.h io_error.h io_matrix.h io_misc.h \
 u_prblst.h u_probe.h u_sim_data.h u_sdp.h u_status.h u_time_pair.h u_xprobe.h \
 s__.h s_tr.h e_adp.h s_tt.h\
-e_base.h e_card.h e_node.h e_aux.h e_model.h e_compon.h e_subckt.h \
+m_matrix_extra.h \
 e_adplist.h \
-e_elemnt.h e_ccsrc.h e_storag.h e_cardlist.h \
-bm.h \
-c_comand.h globals.h extlib.h d_cap.h m_matrix_extra.h \
+d_cap.h \
+extlib.h \
 u_sock.h s_ddc.h u_atlas.h
 
 noinst_HEADERS = d_coil.h
