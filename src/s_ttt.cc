@@ -232,7 +232,7 @@ void TTT::tt_cont()
 	trace0("TTT::cont");
 	_sim->_stepno = 0;
 	_sim->_tt_uic = true;
-	CARD_LIST::card_list.do_forall( &CARD::tt_begin );
+	CARD_LIST::card_list.tt_begin();
 	CARD_LIST::card_list.do_tt();
 }
 /*--------------------------------------------------------------*/
@@ -241,7 +241,7 @@ void TTT::do_initial_dc()
 	trace3("TTT::do_initial_dc", _sim->_Time0, _cont, _cont_dc);
 	// set adp_nodes to initial values
 	_sim->set_inc_mode_bad();
-	CARD_LIST::card_list.do_forall( &CARD::tr_begin );
+	CARD_LIST::card_list.tr_begin();
 	_sim->_phase = p_INIT_DC;
 	bool _converged = solve_with_homotopy(OPT::DCBIAS,TRANSIENT::_trace);
 	assert(_converged); USE(_converged); // incomplete(); (why?)
