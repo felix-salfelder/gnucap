@@ -69,7 +69,7 @@ DEFINE_EXCEPTION(SocketException, Exception);
  * @brief the SocketStream handles the actual data
  *        writing and reading from the socket.
  */
-class SocketStream : public iostream {
+class SocketStream : public iostream { //
 
     int _fd_w;
     int _fd_r;
@@ -92,13 +92,13 @@ class SocketStream : public iostream {
       _tcur=0;
     }
 
-    SocketStream(int fd_w, int fd_r, unsigned bs=BUFSIZE) : 
+    SocketStream(int fd_w, int fd_r, unsigned bs=BUFSIZE) :
       iostream(),
       _fd_w(fd_w),
       _fd_r(fd_r),
       _bufsize(bs),
       copied(false)
-    { 
+    {
       trace3("SocketStream(...)",fd_w,fd_r,_bufsize);
       assert(_bufsize);
       _rbuf = (char*)malloc((_bufsize)*sizeof(char));
@@ -108,7 +108,7 @@ class SocketStream : public iostream {
     }
 
     void operator=(const SocketStream& obj)
-      {
+    {
       _fd_w = obj._fd_w;
       _fd_r = obj._fd_r;
       obj.copied = true;
@@ -255,14 +255,18 @@ SocketStream& SocketStream::pad(const unsigned i){
 
 
 
-SocketStream::~SocketStream() {
+SocketStream::~SocketStream()
+{
   if (!copied){
     trace1("SocketStream::~SocketStream closing", _fd_w);
-    if(_fd_w != _fd_r)
+    if(_fd_w != _fd_r){untested();
       close(_fd_w);
+    }else{untested();
+    }
     close(_fd_r);
     free(_rbuf);
     free(_tbuf);
+  }else{untested();
   }
 }
 
@@ -297,7 +301,8 @@ inline SocketStream& SocketStream::operator<<(const char data) {
   return *this;
 }
 
-inline SocketStream& SocketStream::operator<<(const char* data) {
+inline SocketStream& SocketStream::operator<<(const char* data)
+{
   size_t len=strlen(data);
 
   for(unsigned i=0; i<len; i++){
@@ -309,7 +314,7 @@ inline SocketStream& SocketStream::operator<<(const char* data) {
 
 void SocketStream::flush() {
   ssize_t n = ::write(_fd_w, _tbuf, _tcur);
-  if(n < 0) {
+  if(n < 0){ untested();
     trace5("flush failed", n,_tcur,_tbuf,_fd_w,errno);
     throw SocketException("flush: Could not write to socket ");
   }
@@ -323,8 +328,10 @@ inline void SocketStream::read()
   assert(_tbuf);
   _rcur = 0;
   ssize_t n = ::read(_fd_r, _rbuf, _bufsize);
-  if(n < 0)
+  if(n < 0){untested();
     throw SocketException("SocketStream: Could not read from socket");
+  }else{untested();
+  }
   chunksize = static_cast<unsigned>(n);
 }
 
@@ -332,8 +339,11 @@ inline const string SocketStream::get(unsigned len)
 {
   trace1("::get", len);
   ssize_t n = ::read(_fd_r, _rbuf, len);
-  if(n < 0)
+  if(n < 0){ untested();
     throw SocketException("Could not read from socket");
+  }else{
+    untested();
+  }
   return _rbuf;
 }
 
@@ -383,21 +393,28 @@ inline SocketStream &SocketStream::operator>>(std::string& s) {
 }
 
 inline Socket::Socket(SOCKET_TYPE type, short unsigned port ) : fd(0),
-  port(port), type(type), _stream(0) {
+  port(port), type(type), _stream(0)
+{
   bzero((char*) &addr, sizeof(addr));
 
-  if(type == TCP)
+  if(type == TCP){ untested();
     fd = socket(AF_INET, SOCK_STREAM, 0);
-  else if(type == UDP)
+  }else if(type == UDP) { untested();
     fd = socket(AF_INET, SOCK_DGRAM, 0);
-  else if(type == UNIX)
+  }else if(type == UNIX) { untested();
     fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+  }else{
+    unreachable();
+  }
 
-  if(fd < 0)
+  if(fd < 0){untested();
     throw SocketException("Could not create socket");
+  }else{untested();
+  }
 }
 
-inline Socket::~Socket() {
+inline Socket::~Socket()
+{ untested();
   delete _stream;
   // hmmm no fd because SocketStream does the job
 }
@@ -430,12 +447,16 @@ inline ServerSocket::ServerSocket(SOCKET_TYPE type, uint16_t port, short
 }
 #pragma GCC diagnostic warning "-Wconversion"
 
-inline ServerSocket::~ServerSocket() {
-  if(_stream != NULL)
+inline ServerSocket::~ServerSocket()
+{ untested();
+  if(_stream != NULL) {untested();
     delete _stream;
+  }else{untested();
+  }
 }
 
-inline SocketStream ServerSocket::listen() {
+inline SocketStream ServerSocket::listen()
+{
   struct sockaddr_in client_addr;
   size_t client_addr_len = sizeof(client_addr);
 
@@ -444,8 +465,10 @@ inline SocketStream ServerSocket::listen() {
 
   int client_fd = accept(fd, (struct sockaddr*) &client_addr, (socklen_t*)
       &client_addr_len);
-  if(client_fd < 0)
+  if(client_fd < 0){ untested();
     throw SocketException("Error during accaptance of remote client");
+  }else{
+  }
   return SocketStream(client_fd, client_fd);
 }
 
@@ -462,8 +485,8 @@ inline ClientSocket::ClientSocket(SOCKET_TYPE type, string port, const
   hints.ai_protocol = 0;          /* Any protocol */
 
   if(type == TCP) {
-    hints.ai_family = AF_INET;   
-    hints.ai_socktype = SOCK_STREAM; 
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
   }    else if(type == UDP) {
     assert(false); // cleanup;
   }    else if(type == UNIX){
@@ -505,7 +528,7 @@ inline ClientSocket::ClientSocket(SOCKET_TYPE type, string port, const
     throw SocketException("Could not connect to " + host + ":" + to_string(port) );
   }
 
-  _stream = new SocketStream(fd,fd,bufsize);
+  _stream = new SocketStream(fd, fd, bufsize);
 }
 #pragma GCC diagnostic warning "-Wconversion"
 

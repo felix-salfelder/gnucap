@@ -703,7 +703,7 @@ DEV_BUILT_IN_MOS::~DEV_BUILT_IN_MOS()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_BUILT_IN_MOS::expand()
-{
+{ untested();
   BASE_SUBCKT::expand(); // COMPON::expand()
   assert(_n);
   assert(common());
@@ -715,9 +715,9 @@ void DEV_BUILT_IN_MOS::expand()
   assert(c->sdp());
   const SDP_BUILT_IN_MOS_BASE* s = prechecked_cast<const SDP_BUILT_IN_MOS_BASE*>(c->sdp());
   assert(s);
-  if (!subckt()) {
+  if (!subckt()) { untested();
     new_subckt(scope()->params());
-  }else{
+  }else{ untested();
   }
 
   if (_sim->is_first_expand()) {

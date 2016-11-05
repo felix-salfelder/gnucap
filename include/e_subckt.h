@@ -94,11 +94,25 @@ public:
   void	  ac_load()	{assert(subckt()); subckt()->ac_load();}
   void	  do_sens()	{assert(subckt()); subckt()->do_sens();}
 
-  virtual void	tt_begin() { assert(subckt()); subckt()->tt_begin();}
+  virtual void	tt_begin() {
+#ifndef NDEBUG
+	   if(!subckt()){ // BUG!
+	     std::cerr << "no sckt?! " << is_device() << long_label() << "\n";
+	   }
+#endif
+    assert(subckt()); subckt()->tt_begin();
+  }
   virtual void	tt_regress() { assert(subckt()); subckt()->tt_regress();}
   virtual void	tt_advance() { assert(subckt()); subckt()->tt_advance();}
   virtual void	tt_accept()
-         { assert(subckt()); subckt()->do_forall( &CARD::tt_accept );}
+         {
+#ifndef NDEBUG
+	   if(!subckt()){ // BUG!
+	     std::cerr << "no sckt?! " << long_label();
+	   }
+#endif
+	   assert(subckt()); subckt()->do_forall( &CARD::tt_accept );
+	 }
   TIME_PAIR tt_review()	{
     assert(subckt());
     _time_by = subckt()->tt_review();

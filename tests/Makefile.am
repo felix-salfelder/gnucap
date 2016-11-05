@@ -705,6 +705,7 @@ GC_TESTS = \
     s_sock.2.gc \
     s_sock.3.gc \
     s_sock.4.gc \
+    s_sock.load.gc \
     s_tr.2.gc \
     s_tr.3.gc \
     s_tr.4.gc \
