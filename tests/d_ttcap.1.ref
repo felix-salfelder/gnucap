@@ -49,8 +49,8 @@
  0.99748    97.293E-6  11.        3.         0.070~     3.        -973.4E-12 -97.34E-15  ??         100.      
  1.         94.867E-6  1.         3.         0.0032~    3.        -949.1E-12 -94.91E-15  ??         100.      
 Gnucap   System status
-iterations: op=0, dc=3, tran=108, fourier=0, total=5701
-transient timesteps: accepted=1888, rejected=0, total=1888
+iterations: op=0, dc=3, tran=112, fourier=0, total=4590
+transient timesteps: accepted=1516, rejected=1, total=1517
 twotime timesteps: accepted=71, rejected=0, total=124
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
@@ -190,8 +190,8 @@ dctran density=100.0%, ac density=100.0%
  0.98       115.89E-6  1.         3.         0.060785   3.        -1.1595E-9 -115.9E-15  ??         100.      
  1.         94.87E-6   1.         3.         0.026002   3.        -949.2E-12 -94.92E-15  ??         100.      
 Gnucap   System status
-iterations: op=0, dc=3, tran=108, fourier=0, total=11477
-transient timesteps: accepted=3823, rejected=0, total=3823
+iterations: op=0, dc=3, tran=112, fourier=0, total=9205
+transient timesteps: accepted=3064, rejected=1, total=3065
 twotime timesteps: accepted=129, rejected=0, total=253
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
@@ -1201,8 +1201,8 @@ dctran density=100.0%, ac density=100.0%
  0.0998     0.7~       1.         3.         130.E-6    3.        -7.~E-6    -774.5E-12  ??         100.      
  0.1        0.7~       1.         3.         260.E-6    3.        -7.~E-6    -772.9E-12  ??         1.5E+3    
 Gnucap   System status
-iterations: op=0, dc=3, tran=108, fourier=0, total=324167
-transient timesteps: accepted=108718, rejected=0, total=108718
+iterations: op=0, dc=3, tran=112, fourier=0, total=312904
+transient timesteps: accepted=104962, rejected=1, total=104963
 twotime timesteps: accepted=999, rejected=0, total=1252
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
