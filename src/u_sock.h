@@ -259,14 +259,14 @@ SocketStream::~SocketStream()
 {
   if (!copied){
     trace1("SocketStream::~SocketStream closing", _fd_w);
-    if(_fd_w != _fd_r){untested();
+    if(_fd_w != _fd_r){
       close(_fd_w);
-    }else{untested();
+    }else{
     }
     close(_fd_r);
     free(_rbuf);
     free(_tbuf);
-  }else{untested();
+  }else{
   }
 }
 
@@ -330,7 +330,7 @@ inline void SocketStream::read()
   ssize_t n = ::read(_fd_r, _rbuf, _bufsize);
   if(n < 0){untested();
     throw SocketException("SocketStream: Could not read from socket");
-  }else{untested();
+  }else{
   }
   chunksize = static_cast<unsigned>(n);
 }

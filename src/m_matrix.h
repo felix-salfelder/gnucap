@@ -698,7 +698,7 @@ T& BSMATRIX<T>::s(unsigned row, unsigned col)
       return _trash;
     }else if (col < _lownode[row]) {
       return _zero;
-    }else{untested();
+    }else{
       return l(row, col);
     }
   }
@@ -997,21 +997,21 @@ void BSMATRIX<double>::sink_reverse(unsigned* nm);
  */
 template <class T>
 void BSMATRIX<T>::fbsubt(T* v) const
-{untested();
+{
   assert(_lownode);
   assert(v);
 
   // forward substitution
-  for (unsigned ii = 1; ii <= size(); ++ii) {untested();
-    for (unsigned jj = _lownode[ii]; jj < ii; ++jj) {untested();
+  for (unsigned ii = 1; ii <= size(); ++ii) {
+    for (unsigned jj = _lownode[ii]; jj < ii; ++jj) {
       v[ii] -= u(jj,ii) * v [jj];
     }
   }
 
   // back substitution
-  for (unsigned jj = size(); jj > 1; --jj) {untested();
+  for (unsigned jj = size(); jj > 1; --jj) {
     v[jj] /= d(jj,jj);
-    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {untested();
+    for (unsigned ii = _lownode[jj]; ii < jj; ++ii) {
       v[ii] -= l(jj,ii) * v[jj];
     }
   }

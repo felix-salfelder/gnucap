@@ -336,17 +336,17 @@ void SOCK::sweep()
 
     trace0("SOCK::do_it waiting");
     stream = sock->listen();
-  }else{ untested();
+  }else{
     fflush( stdout );
     fflush( stdin );
     trace0("SOCK::sweep simple i/o");
     socket = NULL;
     trace1("bufsize Stdin ", _bufsize);
-    if (!_binout){ untested();
+    if (!_binout){
       int devnull=open("/dev/null", O_WRONLY);
       trace2("Socket stream for dev null" ,devnull, STDIN_FILENO);
       stream = SocketStream( devnull, STDIN_FILENO, _bufsize);
-    }else{ untested();
+    }else{
       stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
     }
     stream << "gnucap sock ready";
@@ -487,7 +487,7 @@ void SOCK::main_loop()
     double dt;
     unsigned status;
     switch (opcode) {
-      case '\0': untested();
+      case '\0':
         return;
       case '3': // 51
         if(init_done) throw Exception("init twice??");
@@ -764,7 +764,7 @@ void SOCK::verakons()
   _sim->set_inc_mode_no();
 
   // vera wants just cap stamps
-  if(converged) { untested();
+  if(converged) {
     //   final step of solve() will call evaluate models() which
     //   calculates with do_tr the values of the caps and
     //   the tr_load() here will stamp the values in the matrix.  
@@ -1303,9 +1303,9 @@ void SOCK::cap_reset(void)
 SOCK::~SOCK()
 {
   trace0("SOCK::~SOCK()");
-  if(_status){untested();
+  if(_status){
     delete(_status);
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

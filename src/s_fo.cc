@@ -129,7 +129,7 @@ void FOURIER::store_results(double X)
       _fdata[ii][_sim->_stepno] = (*p)->value();
       ++ii;
     }
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

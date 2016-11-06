@@ -256,7 +256,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
       break;
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
-    }else{untested();
+    }else{
       cmd.check(bWARNING, "what's this?");
       break;
     }
