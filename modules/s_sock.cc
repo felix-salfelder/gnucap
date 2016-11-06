@@ -699,7 +699,7 @@ void SOCK::verakons()
     //    trace2("SOCK::kons start ", i,  _sim->_v0[i] );
   }
   if (printlist().size()) {
-    outdata(0.);
+    outdata(0., ofPRINT);
   }
   _sim->keep_voltages(); // v0->vdc
 
@@ -755,7 +755,7 @@ void SOCK::verakons()
 
   //  assert(_sim->_mode==s_SOCK);
   if (printlist().size()) {
-    outdata(_sim->_time0);
+    outdata(_sim->_time0, ofPRINT);
   }
   _sim->_mode = s_SOCK; // for now.
 
@@ -971,7 +971,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
   _sim->set_command_tran();
 
   if (printlist().size()) {
-    outdata(reftime);
+    outdata(reftime, ofPRINT);
   }
 
   _sim->_phase = p_TRAN;
@@ -1020,7 +1020,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
       ::status.accept.stop();
     }
     if (printlist().size()) {
-      outdata(_sim->_time0);
+      outdata(_sim->_time0, ofPRINT);
     }
     if(i>1){
       _sim->_time0 += _sim->_dt0;
