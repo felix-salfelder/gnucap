@@ -109,21 +109,34 @@ void SIM::expect_results(double t){
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::out: output the data, "keep" for ac reference
+ * x = the x coordinate
+ * print = selected points, "print" to screen, files, etc.
+ * store = all points, for internal postprocessing, measure
+ * keep = after the command is done, dcop for ac
  */
-void SIM::outdata(double x)
+void SIM::outdata(double x, int outflags)
 {
 
   trace1("SIM::outdata ", x);
 
-  expect_results(x);
   ::status.output.start();
-  plottr(x, plotlist());
-  print_results(x);
-  
-  alarm();
-  store_results(x);
-  _sim->reset_iteration_counter(iPRINTSTEP);
-  ::status.hidden_steps = 0;
+  if (outflags & ofKEEP) { untested();
+    _sim->keep_voltages();
+  }else{ untested();
+  }
+  if (outflags & ofPRINT) { untested();
+    plottr(x, plotlist());
+    print_results(x);
+    _sim->reset_iteration_counter(iPRINTSTEP);
+    ::status.hidden_steps = 0;
+  }else{ untested();
+    ++::status.hidden_steps;
+  }
+  if (outflags & ofSTORE) { untested();
+    alarm();
+    store_results(x);
+  }else{
+  }
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
