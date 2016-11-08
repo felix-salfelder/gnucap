@@ -240,10 +240,10 @@ void TRANSIENT::sweep()
       int outflags = ofNONE;
       if (printnow) {
 	outflags = ofPRINT | ofSTORE | ofKEEP;
-      }else if (_accepted) {untested();
+      }else if (_accepted) {
 	// ++::status.hidden_steps;
 	outflags = ofSTORE;
-      }else{untested();
+      }else{
       }
       outdata(_sim->_time0, outflags);
     }

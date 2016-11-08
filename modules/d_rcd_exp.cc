@@ -34,7 +34,6 @@ class MODEL_BUILT_IN_RCD_EXP : public MODEL_BUILT_IN_RCD_SYM { //
     std::string dev_type()const ;
     void      set_dev_type(const std::string& nt )
     {
-      assert(&nt);
      trace0(("MODEL_BUILT_IN_RCD_EXP::set_dev_type() " + nt).c_str()); 
     };
     CARD* clone()const {return new MODEL_BUILT_IN_RCD_EXP(*this);}

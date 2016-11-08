@@ -27,7 +27,6 @@ class MODEL_BUILT_IN_RCD_SYM : public MODEL_BUILT_IN_RCD {
 
     void      set_dev_type(const std::string& nt )
     {
-      assert(&nt);
      trace0(("MODEL_BUILT_IN_RCD_SYM::set_dev_type() " + nt).c_str()); 
     };
     virtual CARD* clone()const {return new MODEL_BUILT_IN_RCD_SYM(*this);}

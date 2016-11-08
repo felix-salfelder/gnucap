@@ -661,19 +661,9 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
       c[i] = q[i].f0;
     }
     assert(error_deriv < OPT::_keep_time_steps);
-#if 0
     // better use divdiff.
     // better, only compute up to error_div
-    if (error_deriv && 0. == _time[error_deriv-1]) {
-      // vile hack, probably not a good idea
-      _time[error_deriv] = -_time[error_deriv-2];
-      derivatives(c, OPT::_keep_time_steps, _time);
-      _time[error_deriv] = 0;
-    } else 
-#endif
-    {
-      derivatives(c, OPT::_keep_time_steps, _time);
-    }
+    derivatives(c, OPT::_keep_time_steps, _time);
     // now c[i] is i'th derivative
     
     assert(OPT::_keep_time_steps >= 5);
@@ -687,7 +677,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
       timestep = NEVER;
     }else{
       double chargetol = std::max(OPT::chgtol,
-				  OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
+	OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
       double tol = OPT::trtol * chargetol;
       double denom = error_factor() * std::abs(c[error_deriv]);
       assert(tol > 0.);
@@ -718,8 +708,8 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
 
     if (timestep < _dt * OPT::trreject) {
       if (_time[order()] == 0) {
-	error(bTRACE, "initial step rejected:" + long_label() + '\n');
-	error(bTRACE, "new=%g  old=%g  required=%g\n",
+	error(bWARNING, "initial step rejected:" + long_label() + '\n');
+	error(bWARNING, "new=%g  old=%g  required=%g\n",
 	      timestep, _dt, _dt * OPT::trreject);
       }else{
 	error(bTRACE, "step rejected:" + long_label() + '\n');

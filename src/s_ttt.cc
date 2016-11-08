@@ -1328,7 +1328,7 @@ void TTT::print_foot_tr()
 // override TRANSIENT::outdata
 // save things during TR.
 void TTT::outdata(double time0, int x)
-{ untested();
+{
 	assert(TRANSIENT::step_cause());
 	assert(is_number(time0));
 	_sim->_mode = s_TTT;
@@ -1339,19 +1339,19 @@ void TTT::outdata(double time0, int x)
 	_sim->_mode=s_TRAN;
 	if ( _trace>=tDEBUG && ( x & ofPRINT ) ) { untested();
 		TRANSIENT::print_results(time0);
-	}else{ untested();
+	}else{
 	}
 
 	_sim->set_command_tran();
-	if(printlist().size()==0){ untested();
-	}else if (_sim->tt_iteration_number()==0) { untested();
+	if(printlist().size()==0){
+	}else if (_sim->tt_iteration_number()==0) {
 		// will always accept 1st
-		if( x & ofPRINT ){ untested();
+		if( x & ofPRINT ){
 			TRANSIENT::_out << (double)_sim->_Time0;
 			TRANSIENT::print_results(time0);
-		}else{untested();
+		}else{
 		}
-	} else { untested();
+	} else {
 		// store_results(time0);
 		if (TRANSIENT::_trace >= tDEBUG){ untested();
 			TRANSIENT::_out << "*" << (double)_sim->_Time0;
@@ -1362,11 +1362,11 @@ void TTT::outdata(double time0, int x)
 
 	_sim->_mode=s_TRAN;
 	// FIXME (only > 0)?
-	if( x & ofPRINT ){ untested();
+	if( x & ofPRINT ){
 		TRANSIENT::store_results(time0);
-	}else{ untested();
+	}else{
 	}
-	if( x & ofKEEP ){ untested();
+	if( x & ofKEEP ){
 		_sim->keep_voltages();
 	}
 
