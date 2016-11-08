@@ -630,7 +630,6 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
 double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
 {
   double timestep;
-  trace2("ELEMENT::tr_review_trunc_error", _time[0], order());
   // if (_time[0] <= _sim->_time0)
   if (_sim->analysis_is_tran_restore()) { untested();
     timestep = NEVER;
@@ -638,10 +637,10 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
     // DC, I know nothing
     timestep = NEVER;
   }else{
-    int error_deriv; // which derivative to use for error estimate
+    int error_deriv;
     if (order() >= OPT::_keep_time_steps - 2) {
       error_deriv = OPT::_keep_time_steps - 1;
-    }else if (order() < 0) {untested();
+    }else if (order() < 0) {itested();
       error_deriv = 1;
     }else{
       error_deriv = order()+1;
@@ -649,6 +648,13 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
     while (_time[error_deriv-1] <= 0.) {
       // not enough info to use that derivative, use a lower order derivative
       --error_deriv;
+    }
+    trace2("ELEMENT::tr_review_trunc_error", _time[0], error_deriv);
+    if (error_deriv - 1 - OPT::initsc < 0 || _time[error_deriv - 1 - OPT::initsc] <= 0 ) {
+      incomplete();
+    // first few steps, I still know nothing
+    // repeat whatever step was used the first time
+      return _dt;
     }
     assert(error_deriv > 0);
     assert(error_deriv < OPT::_keep_time_steps);
@@ -677,7 +683,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
       timestep = NEVER;
     }else{
       double chargetol = std::max(OPT::chgtol,
-	OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
+				  OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
       double tol = OPT::trtol * chargetol;
       double denom = error_factor() * std::abs(c[error_deriv]);
       assert(tol > 0.);

@@ -20,6 +20,7 @@
  *------------------------------------------------------------------
  * a remote control socket. used by verification tools
  */
+#define ADD_VERSION // signon?
 #include "globals.h"
 #include "u_status.h"
 #include <unistd.h>

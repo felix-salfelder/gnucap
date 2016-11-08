@@ -506,8 +506,8 @@ ttr
  5.E-6      47.95E-36  47.95E-36  2.0336E-9  2.0336E-9  2.6328     1.         1.         1.         0.        
  15.E-6     143.3E-36  143.3E-36  2.8241E-9  2.8241E-9  2.6331     1.         1.         1.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=11986, fourier=0, total=21692
-transient timesteps: accepted=4671, rejected=360, total=5030
+iterations: op=0, dc=0, tran=11986, fourier=0, total=21628
+transient timesteps: accepted=4660, rejected=359, total=5018
 twotime timesteps: accepted=2, rejected=0, total=2
 nodes: user=3, subckt=0, model=0, total=3
 dctran density=100.0%, ac density=100.0%
@@ -521,8 +521,8 @@ dctran density=100.0%, ac density=100.0%
  20.E-6     190.1E-36  190.1E-36  3.0742E-9  3.0742E-9  2.6327     1.         1.         1.         0.        
  25.E-6     236.9E-36  236.9E-36  3.2842E-9  3.2842E-9  2.6327     1.         1.         1.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=11986, fourier=0, total=27355
-transient timesteps: accepted=5686, rejected=411, total=6095
+iterations: op=0, dc=0, tran=11986, fourier=0, total=27307
+transient timesteps: accepted=5677, rejected=407, total=6082
 twotime timesteps: accepted=2, rejected=0, total=4
 nodes: user=3, subckt=0, model=0, total=3
 dctran density=100.0%, ac density=100.0%
@@ -534,8 +534,8 @@ extime -0.000005?! 0.000000 last_time 0.000005 last_Time 0.000025
  15.E-6     190.1E-36  190.1E-36  3.0743E-9  3.0743E-9  2.6327     1.         1.         1.         0.        
  25.E-6     284.8E-36  284.8E-36  3.4706E-9  3.4706E-9  2.6328     1.         1.         1.         0.        
 Gnucap   System status
-iterations: op=0, dc=0, tran=11986, fourier=0, total=33087
-transient timesteps: accepted=6713, rejected=460, total=7170
+iterations: op=0, dc=0, tran=11986, fourier=0, total=32986
+transient timesteps: accepted=6694, rejected=455, total=7146
 twotime timesteps: accepted=2, rejected=0, total=6
 nodes: user=3, subckt=0, model=0, total=3
 dctran density=100.0%, ac density=100.0%
