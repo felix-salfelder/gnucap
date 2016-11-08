@@ -1,3 +1,4 @@
+load s_ddc.so
 spice
 * a coil with branch
 

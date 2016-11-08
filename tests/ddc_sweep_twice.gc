@@ -1,3 +1,4 @@
+load s_ddc.so
 spice
 * RC-Glied (aufladen mit uic)
 

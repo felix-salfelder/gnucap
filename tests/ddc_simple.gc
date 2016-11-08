@@ -1,3 +1,4 @@
+load s_ddc.so
 options nopreq
 spice
 * RC-Glied
