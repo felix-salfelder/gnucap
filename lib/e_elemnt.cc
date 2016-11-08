@@ -677,7 +677,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
       timestep = NEVER;
     }else{
       double chargetol = std::max(OPT::chgtol,
-				OPT::reltol * std::max((double)std::abs(q[0].f0), (double) std::abs(q[1].f0)));
+	OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
       double tol = OPT::trtol * chargetol;
       double denom = error_factor() * std::abs(c[error_deriv]);
       assert(tol > 0.);
@@ -708,8 +708,8 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
 
     if (timestep < _dt * OPT::trreject) {
       if (_time[order()] == 0) {
-	error(bTRACE, "initial step rejected:" + long_label() + '\n');
-	error(bTRACE, "new=%g  old=%g  required=%g\n",
+	error(bWARNING, "initial step rejected:" + long_label() + '\n');
+	error(bWARNING, "new=%g  old=%g  required=%g\n",
 	      timestep, _dt, _dt * OPT::trreject);
       }else{
 	error(bTRACE, "step rejected:" + long_label() + '\n');
