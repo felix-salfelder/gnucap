@@ -64,7 +64,6 @@ private: // override virtual
   XPROBE sens_probe_ext(const std::string& x)const;
 
   std::string port_name(uint_t i)const {
-    assert(i >= 0);
     assert(i < 2);
     static std::string names[] = {"p", "n"};
     return names[i];

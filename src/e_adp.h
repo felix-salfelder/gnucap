@@ -56,7 +56,6 @@ class ADP_NODE: public NODE_BASE { //
       assert(m_() != INVALID_NODE);
       assert(m_() < _sim->_adp_nodes);
       assert (_sim->_tr1);
-      assert(this);
       return _sim->_tr1[m_()];
     }
     hp_float_t tr2()const	{

@@ -247,7 +247,7 @@ void DEV_SUBCKT::expand()
   subckt()->params()->set_try_again(&(c->_params));
   assert(scope());
 
-  trace1("DEV_SUBCKT::expand sckt expand ...", *(subckt()->params()));
+  // trace1("DEV_SUBCKT::expand sckt expand ...", *(subckt()->params()));
   subckt()->expand();
 //  subckt()->set_(model);
   trace1("",model->subckt());
@@ -264,7 +264,7 @@ void DEV_SUBCKT::precalc_first()
     COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
     assert(c);
     subckt()->attach_params(&(c->_params), scope());
-    trace2("DEV_SUBCKT::precalc_first", long_label(), _params);
+    // trace2("DEV_SUBCKT::precalc_first", long_label(), _params);
     subckt()->precalc_first();
   }else{
   }

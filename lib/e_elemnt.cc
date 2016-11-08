@@ -664,14 +664,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
 
     // better use divdiff.
     // better, only compute up to error_div
-    if (error_deriv && 0. == _time[error_deriv-1]) {
-      // vile hack, probably not a good idea
-      _time[error_deriv] = -_time[error_deriv-2];
-      derivatives(c, OPT::_keep_time_steps, _time);
-      _time[error_deriv] = 0;
-    } else {
-      derivatives(c, OPT::_keep_time_steps, _time);
-    }
+    derivatives(c, OPT::_keep_time_steps, _time);
     // now c[i] is i'th derivative
     
     assert(OPT::_keep_time_steps >= 5);
