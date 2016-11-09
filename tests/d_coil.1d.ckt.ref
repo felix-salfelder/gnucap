@@ -148,12 +148,7 @@ r3a ( 8 9 ) Rsource
 x3 ( 9 0 12 0 ) trans2e k12=K12 l1=L1 l2=L2
 r3b ( 12 0 ) Rload
 Gnucap   System status
-<<<<<<< HEAD:tests/d_coil.1d.ckt.ref
 iterations: op=0, dc=0, tran=426, fourier=0, total=579
 transient timesteps: accepted=139, rejected=5, total=144
-=======
-iterations: op=0, dc=0, tran=378, fourier=0, total=515
-transient timesteps: accepted=125, rejected=3, total=128
->>>>>>> unstable:tests/==out/d_coil.1d.ckt.out
 nodes: user=9, subckt=2, model=3, total=14
 dctran density=48.0%, ac density=48.0%

@@ -304,12 +304,7 @@ R5l ( 52 0 )  100.
  595.n      1.         0.33333    0.33333    1.         0.99999    8.1191u    10.u       0.2        0.2        0.5        0.5       
  600.n      1.         0.33333    0.33333    1.         0.99999    8.1191u    10.u       0.2        0.2        0.5        0.5       
 Gnucap   System status
-<<<<<<< HEAD:tests/d_trln.tr.100.im.ckt.ref
 iterations: op=0, dc=0, tran=304, fourier=0, total=1074
 transient timesteps: accepted=278, rejected=0, total=278
-=======
-iterations: op=0, dc=0, tran=304, fourier=0, total=1050
-transient timesteps: accepted=270, rejected=0, total=270
->>>>>>> unstable:tests/==out/d_trln.tr.100.im.ckt.out
 nodes: user=11, subckt=0, model=0, total=11
 dctran density=24.0%, ac density=32.2%

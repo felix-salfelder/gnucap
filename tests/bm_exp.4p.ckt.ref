@@ -41,15 +41,9 @@ parameter p has no value
 #Time       v(1)       next(v1)   event(v1)  control(0)
  0.         0.         0.         1.n        1.        
  1.n        0.         6.n        10.n       9.        
-<<<<<<< HEAD:tests/bm_exp.4p.ckt.ref
  5.95n      0.62842    10.9n      10.n       6.        
  10.n       0.8347     14.05n     20.n       7.        
  14.05n     0.37132    18.1n      20.n       6.        
-=======
- 5.95n      0.62842    10.399n    10.n       6.        
- 10.n       0.8347     15.n       20.n       7.        
- 14.05n     0.37132    18.802n    20.n       6.        
->>>>>>> unstable:tests/==out/bm_exp.4p.ckt.out
  18.1n      0.16519    21.383n    20.n       6.        
  20.n       0.11296    23.229n    21.n       7.        
  21.n       0.092488   26.n       30.n       7.        

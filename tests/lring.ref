@@ -40,7 +40,7 @@ dctran density=100.0%, ac density=100.0%
  0.04       10.4       10.        0.         0.1       -0.4        2.        
  0.05       10.5       10.        0.         0.1       -0.5        2.        
  0.1        11.        10.        0.         0.        -1.         2.        
- 1.         1.        -47.~p      0.         0.        -1.         4.        
+ 1.         1.        -47.~       0.         0.        -1.         4.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=32, fourier=0, total=190
 transient timesteps: accepted=30, rejected=8, total=38
@@ -84,9 +84,9 @@ euleronly
  0.         0.         0.         0.         0.1        0.        -1.        
  0.01       10.1       10.        0.         0.1       -0.1        1.        
  0.012~     10.1~      10.        2.         0.1       -0.12~      1.        
- 0.01~      10.1~      10.        0.         0.1       -0.1~       1.        
+ 0.01~      10.137     10.        0.         0.1       -0.13698    1.        
  0.1        11.        10.        0.         0.        -1.         1.        
- 1.         1.         22.22~p    0.         0.        -1.         1.        
+ 1.         1.         22.225p    0.         0.        -1.         1.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=32, fourier=0, total=366
 transient timesteps: accepted=55, rejected=17, total=72
@@ -99,7 +99,7 @@ initsc 1
  0.012~     10.12~     10.        2.         0.1       -0.12~      1.        
  0.01~      10.1~      10.        0.         0.1       -0.1~       1.        
  0.1        11.        10.        0.         0.        -1.         1.        
- 1.         1.         22.22~p    0.         0.        -1.         1.        
+ 1.         1.         22.225p    0.         0.        -1.         1.        
 Gnucap   System status
 iterations: op=0, dc=0, tran=32, fourier=0, total=406
 transient timesteps: accepted=61, rejected=19, total=80

@@ -26,8 +26,8 @@
 
  5.            4.            1.5K          1.           
 Gnucap   System status
-iterations: op=0, dc=0, tran=0, fourier=0, total=294
-transient timesteps: accepted=65, rejected=12, total=76
+iterations: op=0, dc=0, tran=0, fourier=0, total=102
+transient timesteps: accepted=29, rejected=0, total=28
 twotime timesteps: accepted=4, rejected=0, total=4
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
@@ -59,8 +59,8 @@ dctran density=100.0%, ac density=100.0%
 
  5.            4.            1.5K          1.           
 Gnucap   System status
-iterations: op=0, dc=0, tran=0, fourier=0, total=588
-transient timesteps: accepted=130, rejected=24, total=152
+iterations: op=0, dc=0, tran=0, fourier=0, total=204
+transient timesteps: accepted=58, rejected=0, total=56
 twotime timesteps: accepted=4, rejected=0, total=8
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
@@ -434,8 +434,8 @@ dctran density=100.0%, ac density=100.0%
 
  10.           9.            1.5K          1.           
 Gnucap   System status
-iterations: op=0, dc=0, tran=0, fourier=0, total=4905
-transient timesteps: accepted=1079, rejected=201, total=1273
+iterations: op=0, dc=0, tran=0, fourier=0, total=1689
+transient timesteps: accepted=476, rejected=0, total=469
 twotime timesteps: accepted=7, rejected=0, total=67
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%
@@ -575,8 +575,8 @@ dctran density=100.0%, ac density=100.0%
 
  10.           9.            1.5K          1.           
 Gnucap   System status
-iterations: op=0, dc=0, tran=0, fourier=0, total=6444
-transient timesteps: accepted=1418, rejected=264, total=1672
+iterations: op=0, dc=0, tran=0, fourier=0, total=2220
+transient timesteps: accepted=626, rejected=0, total=616
 twotime timesteps: accepted=7, rejected=0, total=88
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

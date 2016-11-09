@@ -46,13 +46,6 @@ Vprobe ( 8 0 )  DC  0.
 -2.         1.         1.         1.         0.01       100.p      1.E+12     1.E+12     1.E+12    -10.u       10.u       10.u       2.        
  0.01       1.         1.         1.         0.01       100.p      1.E+12     1.E+12     1.E+12    -10.u       10.u       10.u       3.        
  0.         1.         1.         1.         0.01       100.p      1.E+12     1.E+12     1.E+12    -10.u       10.u       10.u       0.        
-<<<<<<< HEAD:tests/d_switch.c1a.ckt.ref
-=======
--1.         1.         1.         1.         0.02       200.p      1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       1.        
--2.         1.         1.         1.         0.02       200.p      1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       2.        
- 0.02       1.         1.         1.         0.02       200.p      1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       3.        
- 0.         1.         1.         1.         0.02       200.p      1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       0.        
->>>>>>> unstable:tests/==out/d_switch.c1a.ckt.out
 -1.         1.         1.         1.         1.         10.n       1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      1.        
 -2.         1.         1.         1.         1.         10.n       1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      2.        
  1.         1.         1.         1.         1.         10.n       1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      3.        
@@ -247,12 +240,7 @@ Rprobe ( 7 8 )  1.K
 Vprobe ( 8 0 )  DC  0.
 .model sss csw ( it=0. ih=.002 ion=NA( 0.002) ioff=NA(-0.002) ron=1.K roff=1.E+12 tnom=NA( 27.))
 Gnucap   System status
-<<<<<<< HEAD:tests/d_switch.c1a.ckt.ref
 iterations: op=0, dc=76, tran=134, fourier=0, total=265
 transient timesteps: accepted=45, rejected=8, total=53
-=======
-iterations: op=0, dc=66, tran=138, fourier=0, total=261
-transient timesteps: accepted=46, rejected=9, total=55
->>>>>>> unstable:tests/==out/d_switch.c1a.ckt.out
 nodes: user=8, subckt=0, model=0, total=8
 dctran density=25.0%, ac density=25.0%
