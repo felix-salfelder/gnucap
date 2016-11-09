@@ -287,7 +287,7 @@ inline int CKT_BASE::iteration_number()const
 }
 /*--------------------------------------------------------------------------*/
 inline unsigned CKT_BASE::tt_iteration_number()const
-{ untested();
+{
   // accepted steps...
   return _sim->_tt_iter;
 }

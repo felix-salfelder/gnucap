@@ -35,11 +35,11 @@
 /*--------------------------------------------------------------------------*/
 // TODO: move to l_istring.h (or something like that)
 struct Ichar{
-  Ichar() {untested();}
-  Ichar(char c) : _c(c) {untested();}
+  Ichar() {}
+  Ichar(char c) : _c(c) {}
   // Ichar(const Ichar& c) : _c(c._c) {untested();}
   bool operator==(char o) const
-  { untested();
+  {
     if(OPT::case_insensitive){
       return tolower(_c)==tolower(o);
     }else{
@@ -47,7 +47,7 @@ struct Ichar{
     }
   }
   bool operator==(Ichar o) const
-  { untested();
+  {
     if(OPT::case_insensitive){
       return tolower(_c)==tolower(o);
     }else{
@@ -55,12 +55,12 @@ struct Ichar{
     }
   }
   bool operator<(const Ichar& o) const
-  { untested();
+  {
     return((!OPT::case_insensitive && tolower(_c)==tolower(o._c))
       ? _c<o._c : tolower(_c)<tolower(o._c));
   }
   operator char const&() const{untested(); return _c;}
-  operator char&(){untested(); return _c;}
+  operator char&(){return _c;}
   char _c;
 };
 /*--------------------------------------------------------------------------*/
@@ -103,16 +103,16 @@ class IString : public std::basic_string<Ichar> { //
 private:
   typedef std::basic_string<Ichar> base;
 public:
-  IString() { untested(); }
-  IString(const IString& s) : base(s) { untested(); }
-  IString(const base& s) : base(s) { untested(); }
+  IString() {}
+  IString(const IString& s) : base(s) {}
+  IString(const base& s) : base(s) {}
   IString(const Ichar* s) : base(s) { untested(); }
 public: // construct from conventional types
-  IString(const char* s) : base((const Ichar*)s) { untested(); }
-  IString(const std::string& s) : base((Ichar const*)s.c_str()) { untested(); }
+  IString(const char* s) : base((const Ichar*)s) {}
+  IString(const std::string& s) : base((Ichar const*)s.c_str()) {}
 public: // views
   operator const std::string&() const
-  { untested();
+  {
     return reinterpret_cast<std::string const&>(*this); 
   }
 };
@@ -128,12 +128,12 @@ inline bool operator!=(const IString& s, char c)
 }
 /*--------------------------------------------------------------------------*/
 inline bool operator==(const IString& s, const char* c)
-{ untested();
+{
   return s == IString(c);
 }
 /*--------------------------------------------------------------------------*/
 inline bool operator!=(const IString& s, const char* c)
-{ untested();
+{
   return !(s==c);
 }
 /*--------------------------------------------------------------------------*/
@@ -143,7 +143,7 @@ inline std::string operator+(IString s, char x)
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(IString s, const char x[])
-{ untested();
+{
   return std::string((char const*) s.c_str()) + x;
 }
 /*--------------------------------------------------------------------------*/
@@ -153,7 +153,7 @@ inline std::string operator+(char x, IString s)
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(const char* x, IString s)
-{ untested();
+{
   return x + std::string((char const*) s.c_str());
 }
 /*--------------------------------------------------------------------------*/
@@ -169,14 +169,14 @@ inline std::string operator+(std::string x, IString s)
 /*--------------------------------------------------------------------------*/
 template<class S>
 inline S& operator<< (S& o, const IString& s)
-{untested();
+{
   o << (char const*)s.c_str();
   return o;
 }
 /*--------------------------------------------------------------------------*/
 template<class MAP, class key>
 typename MAP::const_iterator find_in_map(MAP const&d, key k)
-{ untested();
+{
   // TODO: report close misses and ambiguous matches
   return d.find(k);
 }
