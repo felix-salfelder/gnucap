@@ -1,0 +1,6 @@
+name   ...
+have 3 nodes. model: 0 sckt: 0 adp 0
+
+1        1 matrix_number 3, user_number 1 nm[t]  vdc  0.
+2        2 matrix_number 2, user_number 2 nm[t]  vdc  0.
+3        3 matrix_number 1, user_number 3 nm[t]  vdc  0.

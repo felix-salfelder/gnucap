@@ -617,6 +617,7 @@ GC_TESTS = \
     bm_pulse.periodic.gc \
     c_attach.1.gc \
     c_attach.2.gc \
+    c_debug.1.gc \
     c_echo.1.gc \
     c_for.1.gc \
     c_for.2.gc \
