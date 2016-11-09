@@ -306,11 +306,11 @@ TIME_PAIR ELEMENT::tr_review()
 {
   trace2("ELEMENT::tr_review", long_label(), order());
   COMPONENT::tr_review();
-  if (order() > 0 && _y[0].f0 != LINEAR) {
+  if (order() > 0 && _y[0].f0 != LINEAR) { untested();
     double timestep = tr_review_trunc_error(_y);
     double newtime = tr_review_check_and_convert(timestep);
     _time_by.min_error_estimate(newtime);
-  }else{
+  }else{ untested();
   }
 
   return _time_by;
@@ -631,9 +631,9 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
 {
   double timestep;
   // if (_time[0] <= _sim->_time0)
-  if (_sim->analysis_is_tran_restore()) {
+  if (_sim->analysis_is_tran_restore()) { untested();
     timestep = NEVER;
-  }else if (_time[0] == 0.) {
+  }else if (_time[0] <= 0.) { untested();
     // DC, I know nothing
     timestep = NEVER;
   }else{
@@ -656,13 +656,17 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
     // repeat whatever step was used the first time
       return _dt;
     }
-
+    assert(error_deriv > 0);
+    assert(error_deriv < OPT::_keep_time_steps);
+    for (int i=error_deriv; i>0; --i) {
+      assert(_time[i] < _time[i-1]);
+    }
+    
     double c[OPT::_keep_time_steps];
     for (int i=0; i<OPT::_keep_time_steps; ++i) {
       c[i] = q[i].f0;
     }
     assert(error_deriv < OPT::_keep_time_steps);
-
     // better use divdiff.
     // better, only compute up to error_div
     derivatives(c, OPT::_keep_time_steps, _time);
@@ -675,6 +679,7 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
     trace5("deriv", c[0], c[1], c[2], c[3], c[4]);
     
     if (c[error_deriv] == 0) {
+      // avoid divide by zero
       timestep = NEVER;
     }else{
       double chargetol = std::max(OPT::chgtol,
@@ -709,8 +714,8 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
 
     if (timestep < _dt * OPT::trreject) {
       if (_time[order()] == 0) {
-	error(bTRACE, "initial step rejected:" + long_label() + '\n');
-	error(bTRACE, "new=%g  old=%g  required=%g\n",
+	error(bWARNING, "initial step rejected:" + long_label() + '\n');
+	error(bWARNING, "new=%g  old=%g  required=%g\n",
 	      timestep, _dt, _dt * OPT::trreject);
       }else{
 	error(bTRACE, "step rejected:" + long_label() + '\n');

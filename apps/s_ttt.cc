@@ -362,7 +362,7 @@ void TTT::power_down(double until)
 static void register_status();
 /*--------------------------------------------------------------------------*/
 void TTT::sweep()
-{
+{ untested();
 	register_status();
 	assert( _sim->_mode == s_TTT );
 	assert( _sim->_Time0 >= 0 );
@@ -398,20 +398,20 @@ void TTT::sweep()
 
 	_sim->force_tt_order(0); //hack
 
-	if (_new) {
+	if (_new) { untested();
 		trace2("TTT::sweep tt_begin", _Tstart, _sim->_phase);
 		_sim->_last_Time = _Tstart;
 		tt_begin();
 		// CARD_LIST::card_list.do_tt(); BUG: not idempotent (?!)
 		set_step_cause(scUSER);
 		assert(_sim->_mode == s_TTT);
-	}else{
+	}else{ untested();
 		tt_cont();
 	}
 
 	// bug: _new not correctly processed (?)
 
-	if (_power_down) {
+	if (_power_down) { untested();
 		if (_new) {untested();
 			print_results_tt(_sim->_Time0);
 		}
@@ -504,7 +504,7 @@ void TTT::sweep()
 	assert (_Time1 == _Tstart);
 	assert( _sim->_mode  == s_TTT );
 
-	while (next()) {
+	while (next()) { untested();
 		assert(step_cause());
 		assert( _sim->_mode  == s_TTT );
 		trace8( "TTT::sweep loop start ", _sim->_Time0, _Time1, _sim->_dT0,
@@ -602,16 +602,16 @@ void TTT::sweep()
 			// 	_Time_by_user_request = _Tstop - _tstop;
 			// }else{
 			// }
-		} else if(_trace >= tALLTIME) {
+		} else if(_trace >= tALLTIME) { untested();
 			assert(step_cause());
 			outdata_tt(_sim->_Time0);
-		} else {
+		} else { untested();
 			trace1("TTT::sweep not printing", _sim->_Time0);
 			TTT::store_results( _sim->_Time0 + _tstop );
 		}
 
-		if (!_accepted_tt) {
-		} else {
+		if (!_accepted_tt) { untested();
+		} else { untested();
 			_Time_by_user_request = min(_Time_by_user_request, _Tstop-_sim->last_time());
 
 			_sim->_last_Time = _sim->_Time0 + _sim->last_time();
@@ -969,7 +969,7 @@ bool TTT::next()
 {
 	if(_Time_by_user_request > _Tstop){ untested();
 		return false;
-	}else{
+	}else{ untested();
 	}
 	assert( _sim->_mode  == s_TTT );
 	double new_dT;
@@ -986,7 +986,7 @@ bool TTT::next()
 	if (_sim->_dT0 == 0.) { unreachable();
 		// first transient. is this reachable?
 		new_dT = 0;
-	}else if (_Time1 == _sim->_Time0) {
+	}else if (_Time1 == _sim->_Time0) { untested();
 		// second step...
 		new_dT = _sim->last_time();
 		new_control = scINITIAL;
@@ -1378,7 +1378,7 @@ void TTT::outdata(double time0, int x)
 }
 /*--------------------------------------------------------------------------*/
 void TTT::outdata_b4(double time)
-{
+{ untested();
 	assert( _sim->_mode  == s_TTT );
 	::status.output.start();
 	print_results_tt(time);
@@ -1387,7 +1387,7 @@ void TTT::outdata_b4(double time)
 /*--------------------------------------------------------------------------*/
 // print at end of timeframe. "now" is begin of timeframe...
 void TTT::outdata_tt(double now)
-{
+{ untested();
 	assert(step_cause());
 	assert(_sim->_mode==s_TTT);
 	if ( 0 && _accepted_tt && _sim->_dT0 && !is_almost (_sim->_dT0 + _sim->_last_Time, now + _sim->last_time() )) { untested();
@@ -1535,7 +1535,7 @@ void TTT::print_stored_results_tt(double x)
 // store things at begin of timeframe, so it may be printed
 // after/if the step is accepted.
 void TTT::store_results_tt(double x)
-{
+{ untested();
 	trace0("TTT::store_results_tt()");
 	if ( printlist().size() ==0) {
 		return;
@@ -1594,7 +1594,7 @@ string TTT::status()const
  * use storelist as index for waves
  */
 void TTT::store_results(double time)
-{
+{ untested();
 	trace3("TTT::store_results()", tt_iteration_number(), iteration_number(), time );
 	assert(_sim->_mode==s_TTT);
 	int ii = 0;

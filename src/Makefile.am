@@ -48,12 +48,6 @@ c_measure.cc c_modify.cc c_param.cc c_prbcmd.cc c_status.cc \
 c_sweep.cc c_sim.cc c_system.cc c_for.cc c_printf.cc \
 c_help.cc
 
-# simulation commands, usually multiple files for one command
-S_SRCS = \
-s_ac.cc s_dc.cc s_fo.cc s_sens.cc \
-s_ddc.cc s_ttt.cc s_tt_set.cc \
-s_tr.cc s_tr_set.cc s_tr_swp.cc
-
 # netlist languages
 LANG_SRCS = \
 lang_spice.cc lang_spectre.cc lang_verilog.cc

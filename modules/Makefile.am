@@ -37,9 +37,12 @@ plugin_LTLIBRARIES += d_branchvs.la
 d_branchvs_la_SOURCES = d_branchvs.cc
 d_branchvs_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
 #------------------------------------------------------------------------
+plugin_LTLIBRARIES += s_ddc.la
+s_ddc_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
+#------------------------------------------------------------------------
 plugin_LTLIBRARIES += s_sock.la
-s_sock_la_SOURCES = s_sock.cc
-s_sock_la_CPPFLAGS = -DADD_VERSION $(AM_CPPFLAGS)
+s_sock_la_SOURCES = s_ddc.cc s_sock.cc
+s_sock_la_CPPFLAGS = $(AM_CPPFLAGS)
 #------------------------------------------------------------------------
 if USE_GSL
 SEVLA = s_ev.la

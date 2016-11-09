@@ -25,9 +25,17 @@ measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 plugindir = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
 plugin_LTLIBRARIES = gnucap-default-plugins.la
 
+# simulation commands, usually multiple files for one command
+S_SRCS = \
+	s_ac.cc s_dc.cc s_fo.cc s_sens.cc \
+	s_tr.cc s_tr_set.cc s_tr_swp.cc \
+	s_ttt.cc s_tt_set.cc
+
+
 gnucap_default_plugins_la_LDFLAGS = -shared -module -avoid-version
 gnucap_default_plugins_la_SOURCES = \
 	$(BM_SRCS) $(D_SRCS) $(FUNC_SRCS) \
+	$(S_SRCS) \
 	patchlev.cc \
 	signon.cc
 gnucap_default_plugins_la_CPPFLAGS = \
