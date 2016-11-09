@@ -306,11 +306,11 @@ TIME_PAIR ELEMENT::tr_review()
 {
   trace2("ELEMENT::tr_review", long_label(), order());
   COMPONENT::tr_review();
-  if (order() > 0 && _y[0].f0 != LINEAR) { untested();
+  if (order() > 0 && _y[0].f0 != LINEAR) {
     double timestep = tr_review_trunc_error(_y);
     double newtime = tr_review_check_and_convert(timestep);
     _time_by.min_error_estimate(newtime);
-  }else{ untested();
+  }else{
   }
 
   return _time_by;
@@ -631,9 +631,9 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
 {
   double timestep;
   // if (_time[0] <= _sim->_time0)
-  if (_sim->analysis_is_tran_restore()) { untested();
+  if (_sim->analysis_is_tran_restore()) {
     timestep = NEVER;
-  }else if (_time[0] <= 0.) { untested();
+  }else if (_time[0] <= 0.) {
     // DC, I know nothing
     timestep = NEVER;
   }else{

@@ -225,7 +225,7 @@ double SIM_DATA::v0dist_min(double *what)const
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::keep_voltages(bool push)
-{ untested();
+{
   trace2("SIM_DATA::keep_voltages", push, _freezetime);
   assert(_vdcstack.size());
   if(push) {
@@ -235,7 +235,7 @@ void SIM_DATA::keep_voltages(bool push)
   }else{
   }
   double* vdc = _vdcstack.top();
-  if (!_freezetime){ untested();
+  if (!_freezetime){
     for (unsigned ii = 1;  ii <= _total_nodes;  ++ii) {
       vdc[ii] = _v0[ii];
     }
