@@ -306,7 +306,7 @@ TIME_PAIR ELEMENT::tr_review()
 {
   trace2("ELEMENT::tr_review", long_label(), order());
   COMPONENT::tr_review();
-  if (order() >= 0 && _y[0].f0 != LINEAR) { untested();
+  if (order() > 0 && _y[0].f0 != LINEAR) { untested();
     double timestep = tr_review_trunc_error(_y);
     double newtime = tr_review_check_and_convert(timestep);
     _time_by.min_error_estimate(newtime);
