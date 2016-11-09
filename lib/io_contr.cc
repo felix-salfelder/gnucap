@@ -126,12 +126,12 @@ OMSTREAM* OMSTREAM::outset(CS& cmd)
       (*out).attach(fn);
     }else if (cmd.umatch("\\|")) {
       // open a pipe
-      std::string command;
+      IString command;
       cmd >> command;
       if (to_pipe) { itested();
         pclose(to_pipe);
       }
-      to_pipe = popen(command.c_str(), "w");
+      to_pipe = popen((char*)command.c_str(), "w");
       assert(to_pipe);
 
       IO::stream[static_cast<int>(fileno(to_pipe))] = to_pipe;

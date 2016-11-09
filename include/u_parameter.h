@@ -26,10 +26,10 @@
 #ifndef U_PARAMETER_H
 #define U_PARAMETER_H
 #define PARAM_LIST PARAM_LIST_MAP
-#include "md.h"
-#include "globals.h"
-#include "m_expression.h"
+#include "l_istring.h"
 #include "u_opt.h"
+#include "io_.h"
+#include "m_expression.h"
 #include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
 class LANGUAGE;
@@ -363,9 +363,9 @@ class PARAM_LIST_COPY;
 // base class for param lists
 class PARAM_LIST_BASE {
 public:
-  typedef std::map<const std::string, PARAMETER<double> >::const_iterator
+  typedef std::map< IString, PARAMETER<double> >::const_iterator
 		const_iterator;
-  typedef std::map<const std::string, PARAMETER<double> >::iterator
+  typedef std::map< IString, PARAMETER<double> >::iterator
 		iterator;
 protected:
   PARAM_LIST_BASE(): _try_again(NULL) {}

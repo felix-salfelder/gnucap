@@ -84,7 +84,7 @@ const CARD* LANGUAGE::find_card(string name, CARD_LIST* Scope, bool nondevice) {
   return *i;
 }
 /*--------------------------------------------------------------------------*/
-const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
+const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
 {
   trace1("LANGUAGE::find_proto", Name);
   const CARD* p = NULL;

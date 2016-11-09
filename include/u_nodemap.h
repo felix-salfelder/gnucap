@@ -25,6 +25,7 @@
 #ifndef U_NODEMAP_H
 #define U_NODEMAP_H
 #include "md.h"
+#include "l_istring.h"
 /*--------------------------------------------------------------------------*/
 class NODE_BASE;
 class COMPONENT;
@@ -34,7 +35,8 @@ class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
 private:
-  std::map<const std::string, NODE_BASE*> _node_map;
+  std::map<IString, NODE*> _node_map;
+  explicit  NODE_MAP(const NODE_MAP&);
   unsigned ckt;
   unsigned adp;
 
@@ -49,8 +51,8 @@ public:
   ADP_NODE*     new_adp_node(string, const COMPONENT* p);
   ADP_NODE*     new_adp_node(string, const CARD_LIST* p=0);
 
-  typedef std::map<const std::string, NODE_BASE*>::iterator iterator;
-  typedef std::map<const std::string, NODE_BASE*>::const_iterator const_iterator;
+  typedef std::map<IString, NODE*>::iterator iterator;
+  typedef std::map<IString, NODE*>::const_iterator const_iterator;
 
   const_iterator begin()const		{return _node_map.begin();}
   const_iterator end()const		{return _node_map.end();}
