@@ -33,7 +33,7 @@
 #include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
 class LANGUAGE;
-class PARAM_LIST; //unnnec?
+class PARAM_LIST_MAP; //unnnec?
 //class MODEL_BUILT_IN_RCD;
 //class MODEL_BUILT_IN_BTI;
 /*--------------------------------------------------------------------------*/
@@ -371,8 +371,8 @@ protected:
   PARAM_LIST_BASE(): _try_again(NULL) {}
   PARAM_LIST_BASE* _try_again; // if you don't find it, also look here
 protected:
-  virtual std::map<const std::string, PARAMETER<double> >& pl() const = 0;
-  virtual std::map<const std::string, PARAMETER<double> >& pl() = 0;
+  virtual std::map<IString, PARAMETER<double> >& pl() const = 0;
+  virtual std::map<IString, PARAMETER<double> >& pl() = 0;
 public:
   virtual PARAM_LIST_BASE* try_again()const {return _try_again;}
   virtual bool operator==(const PARAM_LIST_BASE& )const {return 0;}
@@ -399,11 +399,11 @@ public:
 // actual map
 class PARAM_LIST_MAP : public PARAM_LIST_BASE {
 private:
-  mutable std::map<const std::string, PARAMETER<double> > _pl;
+  mutable std::map<IString, PARAMETER<double> > _pl;
 protected:
-  std::map<const std::string, PARAMETER<double> >& pl() {return _pl;}
+  std::map<IString, PARAMETER<double> >& pl() {return _pl;}
 public:
-  std::map<const std::string, PARAMETER<double> >& pl() const {return _pl;}
+  std::map<IString, PARAMETER<double> >& pl() const {return _pl;}
   explicit PARAM_LIST() : PARAM_LIST_BASE() {}
   explicit PARAM_LIST(const PARAM_LIST& p)
 				:_pl(p._pl){ _try_again=(p._try_again);};
@@ -443,14 +443,14 @@ public:
   _parent(x._parent){}
   PARAM_LIST_COPY( const PARAM_LIST* x );
   ~PARAM_LIST_COPY() {}
-  virtual std::map<const std::string, PARAMETER<double> >& pl() const
+  virtual std::map<IString, PARAMETER<double> >& pl() const
   {
     assert(_parent);
     return _parent->pl();
   }
   PARAM_LIST_COPY& operator=(const PARAM_LIST* c) {_parent=c; return *this;}
 protected:
-  virtual std::map<const std::string, PARAMETER<double> >& pl()
+  virtual std::map<IString, PARAMETER<double> >& pl()
   {
     assert(_parent);
     return _parent->pl();

@@ -108,8 +108,8 @@ public:
   IString(const base& s) : base(s) { untested(); }
   IString(const Ichar* s) : base(s) { untested(); }
 public: // construct from conventional types
-  IString(const char* s) : base((Ichar*)s) { untested(); }
-  IString(const std::string& s) : base((Ichar*)s.c_str()) { untested(); }
+  IString(const char* s) : base((const Ichar*)s) { untested(); }
+  IString(const std::string& s) : base((Ichar const*)s.c_str()) { untested(); }
 public: // views
   operator const std::string&() const
   { untested();
@@ -139,38 +139,38 @@ inline bool operator!=(const IString& s, const char* c)
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(IString s, char x)
 { untested();
-  return std::string((char*) s.c_str()) + x;
+  return std::string((char const*) s.c_str()) + x;
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(IString s, const char x[])
 { untested();
-  return std::string((char*) s.c_str()) + x;
+  return std::string((char const*) s.c_str()) + x;
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(char x, IString s)
 { untested();
-  return x + std::string((char*) s.c_str());
+  return x + std::string((char const*) s.c_str());
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(const char* x, IString s)
 { untested();
-  return x + std::string((char*) s.c_str());
+  return x + std::string((char const*) s.c_str());
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(IString s, std::string x)
 { untested();
-  return std::string((char*) s.c_str()) + x;
+  return std::string((char const*) s.c_str()) + x;
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(std::string x, IString s)
 { untested();
-  return x + std::string((char*) s.c_str());
+  return x + std::string((char const*) s.c_str());
 }
 /*--------------------------------------------------------------------------*/
 template<class S>
 inline S& operator<< (S& o, const IString& s)
 {untested();
-  o << s.c_str();
+  o << (char const*)s.c_str();
   return o;
 }
 /*--------------------------------------------------------------------------*/
@@ -179,6 +179,12 @@ typename MAP::const_iterator find_in_map(MAP const&d, key k)
 { untested();
   // TODO: report close misses and ambiguous matches
   return d.find(k);
+}
+/*--------------------------------------------------------------------------*/
+template<>
+inline OMSTREAM& OMSTREAM::operator<< <>(const IString& s)
+{untested();
+  return (operator<<((const char*)s.c_str()));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

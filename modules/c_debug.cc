@@ -74,7 +74,7 @@ void volts_load( fstream *in, CARD_LIST* )
     } else {
       //*in >> skipws >> inss;
       inss = (char) in->get();
-      trace1((" garbage ->" + inss + "<- ").c_str(), (int)inss[0]);
+      trace2(" garbage ->", inss, (int)inss[0]);
     }
   }
 }

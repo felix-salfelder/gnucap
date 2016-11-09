@@ -35,12 +35,10 @@ class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
 private:
-  std::map<IString, NODE*> _node_map;
+  std::map<IString, NODE_BASE*> _node_map;
   explicit  NODE_MAP(const NODE_MAP&);
   unsigned ckt;
   unsigned adp;
-
-  explicit  NODE_MAP(const NODE_MAP&);
 public:
   //  NODE_MAP( const NODE_MAP& p) : _node_map(p._node_map) {}
   explicit  NODE_MAP();
@@ -51,8 +49,8 @@ public:
   ADP_NODE*     new_adp_node(string, const COMPONENT* p);
   ADP_NODE*     new_adp_node(string, const CARD_LIST* p=0);
 
-  typedef std::map<IString, NODE*>::iterator iterator;
-  typedef std::map<IString, NODE*>::const_iterator const_iterator;
+  typedef std::map<IString, NODE_BASE*>::iterator iterator;
+  typedef std::map<IString, NODE_BASE*>::const_iterator const_iterator;
 
   const_iterator begin()const		{return _node_map.begin();}
   const_iterator end()const		{return _node_map.end();}

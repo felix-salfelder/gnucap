@@ -25,7 +25,7 @@
 #include "c_comand.h"
 #include "u_lang.h"
 #include "l_compar.h"
-#include "ap.h"
+#include "u_sim_data.h" // not in upstream!
 /*--------------------------------------------------------------------------*/
 void OPT::command(CS& cmd)
 {
@@ -219,7 +219,7 @@ bool OPT::set_values(CS& cmd)
   }while (cmd.more() && changed);
 
   if (big_change) {
-    CKT_BASE::_sim->uninit();
+    CKT_BASE::_sim->uninit(); // not in upstream!
     //BUG// not sure if this is really working
     //regressions do go both ways, but not sure if it actually
     //makes the topology changes expected

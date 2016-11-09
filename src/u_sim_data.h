@@ -28,10 +28,13 @@
 #include "l_compar.h"
 #include "u_opt.h"
 #include "m_matrix.h"
-#include "e_cardlist.h"
+// #include "e_cardlist.h"
+#include "e_base.h"
 #include <stack>
 /*--------------------------------------------------------------------------*/
 #include "io_error.h"
+/*--------------------------------------------------------------------------*/
+class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 template<class T>
 class MYSTACK : public std::stack<T>
@@ -170,9 +173,9 @@ public:
   void order_forward();
   void order_sink_forward();
   void order_auto();
-  void order_tree_bf(const CARD_LIST* scope=&CARD_LIST::card_list);
-  void order_tree_df(const CARD_LIST* scope=&CARD_LIST::card_list);
-  void order_comp(const CARD_LIST* scope=&CARD_LIST::card_list);
+  void order_tree_bf(const CARD_LIST* scope=NULL);
+  void order_tree_df(const CARD_LIST* scope=NULL);
+  void order_comp(const CARD_LIST* scope=NULL);
 
   //int init_node_count( const CARD_LIST* l=&CARD_LIST::card_list); 
   unsigned init_node_count(unsigned user, unsigned sub, unsigned mod, unsigned adp) {
@@ -277,6 +280,17 @@ public: // expect (dead code...)
   void expect(CS* x){ assert (!_expect_file); _expect_file = x; }
   CS* expect_file()const { return _expect_file; }
 };
+/*--------------------------------------------------------------------------*/
+inline int CKT_BASE::iteration_number()const
+{ untested();
+  return _sim->_iter[iSTEP];
+}
+/*--------------------------------------------------------------------------*/
+inline unsigned CKT_BASE::tt_iteration_number()const
+{ untested();
+  // accepted steps...
+  return _sim->_tt_iter;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

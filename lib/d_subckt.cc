@@ -34,6 +34,7 @@
 //testing=script 2016.09.16
 #include "e_node.h"
 #include "globals.h"
+#include "u_parameter.h"
 #include "e_paramlist.h"
 #include "e_subckt.h"
 /*--------------------------------------------------------------------------*/

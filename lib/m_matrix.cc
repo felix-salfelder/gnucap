@@ -20,7 +20,7 @@
  * 02110-1301, USA.
  */
 
-#include "m_matrix.h"
+#include "u_sim_data.h"
 #include "e_base.h"
 
 template<>

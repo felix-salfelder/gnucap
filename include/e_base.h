@@ -24,7 +24,7 @@
 #ifndef E_BASE_H
 #define E_BASE_H
 #include "md.h"
-#include "u_sim_data.h"
+// #include "u_sim_data.h"
 /*--------------------------------------------------------------------------*/
 // external
 class XPROBE;
@@ -32,7 +32,7 @@ class WAVE;
 class OMSTREAM;
 class PROBE_LISTS;
 typedef std::map<std::string, WAVE> WAVE_LIST;
-// class SIM_DATA;
+class SIM_DATA;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
 private:
@@ -88,8 +88,8 @@ public:
   virtual void   tr_stress_last() {}
   virtual double tt_probe_num(const std::string&)const;
 
-  int iteration_number()const   {return _sim->_iter[iSTEP];}
-  unsigned tt_iteration_number()const   {return _sim->_tt_iter;} // accepted steps
+  int iteration_number()const;
+  unsigned tt_iteration_number()const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

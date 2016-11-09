@@ -25,12 +25,14 @@
 //testing=script 2006.07.17
 #ifndef IO_H
 #define IO_H
+// #include "l_istring.h"
 #include "l_lib.h"
 #include <complex>
 using std::stringstream;
 #define BROKEN_IO
 /*--------------------------------------------------------------------------*/
 class CS;
+class IString;
 const unsigned MAXHANDLE = (unsigned)(CHAR_BIT*sizeof(int)-1);
 /*--------------------------------------------------------------------------*/
 class INTERFACE OMSTREAM {
@@ -153,10 +155,15 @@ template<>
 inline OMSTREAM& OMSTREAM::operator<< <>(unsigned x)	{return form("%u", x);}
 template<>
 inline OMSTREAM& OMSTREAM::operator<< <>(const std::string& s) {untested(); return (operator<<(s.c_str()));}
+// template<>
+// inline OMSTREAM& OMSTREAM::operator<< <>(const IString& s); // in istring.h
+
 
 // last resort, make sure to override this carefully
 template<class T>
-inline OMSTREAM& OMSTREAM::operator<< (T t){
+inline OMSTREAM& OMSTREAM::operator<< (T t)
+{
+  incomplete();
 	stringstream a;
 	a << t;
 	return *this << a.str().c_str();

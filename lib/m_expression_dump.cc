@@ -63,7 +63,7 @@ void Expression::_dump(S& out)const
 	  unreachable();
 	}
       }
-      Token* t = new Token_PARLIST(IString((Ichar*)tmp.c_str()));
+      Token* t = new Token_PARLIST(IString((Ichar const*)tmp.c_str()));
       locals.push_back(t);
       stack.push_back(t);
     }else if (dynamic_cast<const Token_CONSTANT*>(*i)|| dynamic_cast<const Token_SYMBOL*>(*i)) {

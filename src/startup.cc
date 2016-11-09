@@ -7,6 +7,8 @@
 
 #include "io_trace.h"
 #include "c_comand.h"
+#include "io_.h"
+#include "e_cardlist.h"
 
 using std::string;
 

@@ -387,6 +387,10 @@ void SIM_DATA::order_auto()
 // component wise node sort. depth-first
 void SIM_DATA::order_comp( const CARD_LIST* scope )
 {
+  if(scope==NULL){ untested();
+    scope=&CARD_LIST::card_list;
+  }else{ untested();
+  }
   static unsigned c;
   static bool* d;
   unsigned t = CKT_BASE::_sim->_total_nodes;
@@ -443,6 +447,11 @@ void SIM_DATA::order_comp( const CARD_LIST* scope )
 // based on NODE_MAP
 void SIM_DATA::order_tree_bf( const CARD_LIST* scope)
 {
+  if(scope==NULL){ untested();
+    scope=&CARD_LIST::card_list;
+  }else{ untested();
+  }
+
   static unsigned c;
   static bool* d;
   unsigned t = CKT_BASE::_sim->_total_nodes;
@@ -489,6 +498,11 @@ void SIM_DATA::order_tree_bf( const CARD_LIST* scope)
 // depth-first tree
 void SIM_DATA::order_tree_df( const CARD_LIST* scope)
 { untested();
+  if(scope==NULL){ untested();
+    scope=&CARD_LIST::card_list;
+  }else{ untested();
+  }
+
   static unsigned c;
   static bool* d;
   unsigned t = CKT_BASE::_sim->_total_nodes;

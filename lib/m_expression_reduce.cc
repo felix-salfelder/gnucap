@@ -27,6 +27,7 @@
 //testing=script,sparse 2009.08.12
 #include "u_function.h"
 #include "u_parameter.h"
+#include "globals.h"
 /*--------------------------------------------------------------------------*/
 Token* Token_BINOP::op(const Token* T1, const Token* T2)const
 {

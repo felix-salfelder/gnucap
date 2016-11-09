@@ -29,6 +29,7 @@
 /*--------------------------------------------------------------------------*/
 // this file
 class CARD;
+#define PARAM_LIST PARAM_LIST_MAP
 /*--------------------------------------------------------------------------*/
 // external
 class node_t;
@@ -125,7 +126,7 @@ public: // owner, scope
 public: // subckt
   CARD_LIST*	     subckt()		{return _subckt;}
   const CARD_LIST*   subckt()const	{return _subckt;}
-  void	  new_subckt(PARAM_LIST_MAP* p=NULL);
+  void	  new_subckt(PARAM_LIST* p=NULL);
   void	  new_subckt(const CARD* model, PARAM_LIST* p);
   void	  renew_subckt(const CARD* model, PARAM_LIST* p);
   void    new_subckt(const CARD* model, CARD* Owner, const CARD_LIST* Scope, PARAM_LIST* p){

@@ -25,6 +25,7 @@
 #define E_NODE_H
 #include "u_sim_data.h"
 #include "e_base.h"
+class NODE;
 #if __cplusplus < 201103L
 # include <list>
 typedef std::set<NODE*> prop_list;
@@ -139,7 +140,7 @@ class NODE_BASE : public CKT_BASE {
     NODE_BASE&	set_user_number(uint_t n){_user_number = n; return *this;}
     virtual uint_t user_number()const	{return INVALID_NODE;}
 
-    static NODE_BASE* lookup_node(const string, const CARD_LIST* s=&CARD_LIST::card_list);
+    static NODE_BASE* lookup_node(const string, const CARD_LIST* s=NULL);
   public: // virtuals
     virtual double	tr_probe_num(const std::string&)const;
     virtual double	tt_probe_num(const std::string&)const;

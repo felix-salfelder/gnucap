@@ -26,6 +26,7 @@
 #define S_TR_H
 #include "u_parameter.h"
 #include "s__.h"
+#include "u_sim_data.h"
 /*--------------------------------------------------------------------------*/
 class TRANSIENT : public SIM {
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 

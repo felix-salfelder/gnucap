@@ -22,6 +22,7 @@
  * ac analysis top
  */
 //testing=script 2008.08.06
+#include "globals.h"
 #include "u_sim_data.h"
 #include "u_status.h"
 #include "u_parameter.h"

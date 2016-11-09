@@ -37,7 +37,7 @@ class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LANGUAGE : public CKT_BASE {
 public:
-  const CARD* find_proto(const IString&, const CARD*);
+  static const CARD* find_proto(const IString&, const CARD*);
 public:
   void new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope);
 
