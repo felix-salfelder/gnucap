@@ -26,6 +26,7 @@ libgnucap_includedir = $(includedir_transformed)
 libgnucap_include_HEADERS = \
 l_compar.h l_dispatcher.h l_denoise.h \
 l_lib.h l_stlextra.h l_timer.h \
+l_istring.h \
 	patchlev.h m_mvpoly.h io_trace.h \
 	d_coment.h d_dot.h d_logic.h d_subckt.h \
 	e_paramlist.h \
