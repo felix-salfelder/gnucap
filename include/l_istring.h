@@ -112,7 +112,7 @@ inline std::string operator+(IString s, const char* x)
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(char x, IString s)
-{ untested();
+{
   return x + std::string(s);
 }
 /*--------------------------------------------------------------------------*/
@@ -122,12 +122,12 @@ inline std::string operator+(const char* x, IString s)
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(IString s, std::string x)
-{ untested();
+{
   return std::string(s) + x;
 }
 /*--------------------------------------------------------------------------*/
 inline std::string operator+(std::string x, IString s)
-{ untested();
+{
   return x + std::string(s);
 }
 /*--------------------------------------------------------------------------*/
@@ -138,7 +138,7 @@ inline std::ostream& operator<< (std::ostream& o, IString s)
 }
 /*--------------------------------------------------------------------------*/
 inline OMSTREAM& operator<< (OMSTREAM& o, IString s)
-{untested();
+{
   o << std::string(s);
   return o;
 }

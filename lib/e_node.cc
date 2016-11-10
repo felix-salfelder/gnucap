@@ -852,7 +852,7 @@ NODE_BASE* NODE_BASE::lookup_node(string nodelabel, const CARD_LIST* scope)
 {
   if(scope==NULL){untested();
     scope = &CARD_LIST::card_list;
-  }else{untested();
+  }else{
   }
   trace1("NODE_BASE::lookup_node", nodelabel);
   std::string::size_type dotplace = nodelabel.find_first_of(".");
