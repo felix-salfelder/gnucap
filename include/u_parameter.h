@@ -48,8 +48,8 @@ namespace PARM{
 #define HAVE_PARA_VEC
 class PARA_BASE {
 protected:
-  std::string _s;
-
+  IString _s;
+  
 public:
   PARA_BASE( ): _s(){}
   PARA_BASE(const PARA_BASE& p): _s(p._s) {}
@@ -60,7 +60,7 @@ public:
   virtual bool	has_good_value()const = 0;
 
   virtual void	parse(CS& cmd) = 0;
-  virtual void	operator=(const std::string& s) = 0;
+  virtual void	operator=(const IString& s) = 0;
 
   void	print(OMSTREAM& o)const		{o << string(*this);}
   void	print(ostream& o)const		{o << string(*this);}
@@ -92,8 +92,14 @@ public:
   T	e_val(const T& def, const CARD_LIST* scope, bool try_=false)const;
   void	parse(CS& cmd);
 
-  std::string debugstring()const {
-    return(_s + " -> " + to_string(_v));
+  std::string string()const {
+    if (_s == "#") {
+      return to_string(_v);
+    }else if (_s == "") {
+      return "NA(" + to_string(_v) + ")";
+    }else{
+      return _s.to_string();
+    }
   }
   virtual std::string string( )const {return *this;}
   operator std::string()const;
@@ -104,9 +110,15 @@ public:
   void	operator=(const T& v)		{_v = v; _s = "#";}
   //void	operator=(const std::string& s)	{untested();_s = s;}
 
-  void	operator=(const std::string& s) {
-    if (strchr("'\"{", s[0])) {
-      CS cmd(CS::_STRING, s);
+  void	operator=(const char* s)	{ untested();
+    operator=(IString(s));
+  }
+  void	operator=(const std::string& s)	{ untested();
+    operator=(IString(s));
+  }
+  void	operator=(const IString& s)	{ untested();
+    if (strchr("'\"{", s[0].to_char())) {
+      CS cmd(CS::_STRING, s.to_string());
       _s = cmd.ctos("", "'\"{", "'\"}");
     }else if (s == "NA") {
       _s = "";
@@ -415,7 +427,7 @@ public:
   size_t size()const {return _pl.size();}
   bool	 is_empty()const {return _pl.empty();}
   bool	 is_printable(int)const;
-  std::string name(int)const;
+  IString name(int)const;
   std::string value(int)const;
 
   void	eval_copy(PARAM_LIST&, const CARD_LIST*);
@@ -428,8 +440,8 @@ public:
 
 //  const PARAMETER<std::string>& operator[](std::string i)const {return string_lookup(i);}
 
-  void set(std::string, const std::string&);
-  void set(std::string, const double);
+  void set(IString, const IString&);
+  void set(IString, const double);
 
 public:
   // return a lined up copy of *this
@@ -485,7 +497,7 @@ inline string PARAMETER<string>::lookup_solve(const std::string& def,
 template <>
 inline bool PARAMETER<bool>::lookup_solve(const bool&, const CARD_LIST*, bool)const
 {
-  CS cmd(CS::_STRING, _s);
+  CS cmd(CS::_STRING, _s.to_string());
   return cmd.ctob();
 }
 /*--------------------------------------------------------------------------*/
@@ -494,7 +506,7 @@ template <class T>
 inline T PARAMETER<T>::lookup_solve(const T& def, const CARD_LIST* scope, bool try_)const
 {
   trace1("PARAMETER<T>::lookup_solve", def);
-  CS cmd(CS::_STRING, _s);
+  CS cmd(CS::_STRING, _s.to_string());
   Expression e(cmd);
   Expression reduced(e, scope);
   T v = T(reduced.eval());
@@ -560,7 +572,7 @@ T PARAMETER<T>::e_val(const T& def, const CARD_LIST* scope, bool try_)const
   assert(scope);
 
   static int recursion=0;
-  static const std::string* first_name = NULL;
+  static const IString* first_name = NULL;
   if (recursion == 0) {
     first_name = &_s;
   }else{

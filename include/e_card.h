@@ -52,10 +52,10 @@ public:
   uint_t 	_net_nodes;	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
 public:   				// traversal functions
-  CARD* find_in_my_scope(const std::string& name);
-  const CARD* find_in_my_scope(const std::string& name)const;
-  const CARD* find_in_parent_scope(const std::string& name)const;
-  const CARD* find_looking_out(const std::string& name)const;
+  CARD* find_in_my_scope(const IString& name);
+  const CARD* find_in_my_scope(const IString& name)const;
+  const CARD* find_in_parent_scope(const IString& name)const;
+  const CARD* find_looking_out(const IString& name)const;
   //--------------------------------------------------------------------
 protected: // create and destroy.
   explicit CARD();

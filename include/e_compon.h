@@ -321,7 +321,7 @@ public: // parameters
 			      uint_t node_count, const node_t nodes[]);
   void	set_value(const PARAMETER<double>& v)	{_value = v;}
   void	set_value(double v)			{_value = v;}
-  void  set_value(const std::string& v)		{_value = v;}
+  void  set_value(const IString& v)		{untested(); _value = v;}
   void	set_value(double v, COMMON_COMPONENT* c);
   const PARAMETER<double>& value()const		{return _value;}
   //--------------------------------------------------------------------

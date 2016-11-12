@@ -131,8 +131,10 @@ CKT_NODE::CKT_NODE(const CKT_NODE& p)
   unreachable();
 }
 /*--------------------------------------------------------------------------*/
-NODE_BASE::NODE_BASE(const std::string& s, unsigned n, const CARD_LIST* p)
-  :CKT_BASE(s),
+/* usual initializing constructor : name and index
+ */
+NODE_BASE::NODE_BASE(const IString& s, unsigned n, const CARD_LIST* p)
+  :CKT_BASE(s.to_string()),
    _owner(0),
    _scope(p),
    _next(this),

@@ -167,7 +167,7 @@ private: // inhibited
   explicit NODE(const NODE& p);
 public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
-  explicit NODE(const std::string& s, unsigned n, const CARD_LIST* p=0);
+  explicit NODE(const IString& s, int n, const CARD_LIST* p=0);
   ~NODE() {}
 public: // raw data access (rvalues)
   uint_t	user_number()const	{return _user_number;}
@@ -383,7 +383,7 @@ public:
   const ADP_NODE* a_()const; // HACK?
   ADP_NODE* a_(); // HACK?
   
-  const std::string  short_label()const {return ((n_()) ? (n_()->short_label()) : "?????");}
+  const IString short_label()const {return ((n_()) ? (n_()->short_label()) : "?????");}
   void	set_to_ground(CARD*);
   void  collapse(CARD* d, node_t to);
   void	new_node(const std::string&, const CARD*);

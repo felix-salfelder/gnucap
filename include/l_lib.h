@@ -26,18 +26,20 @@
 #define HAVE_GETENV_DEFAULTS
 // #include "u_parameter.h"
 /*--------------------------------------------------------------------------*/
+class IString;
+/*--------------------------------------------------------------------------*/
 	  char*		trim(char*);
-INTERFACE bool		Umatch(const std::string&, const std::string&);
-INTERFACE bool		wmatch(const std::string& s1,const std::string& s2);
+INTERFACE bool		Umatch(const IString&, const std::string&);
+INTERFACE bool		wmatch(const IString& s1, const IString& s2);
 
 //template doesnt work?
 INTERFACE std::string to_string(std::string);
-INTERFACE std::string to_string(int);
 INTERFACE std::string to_string(unsigned long int);
 INTERFACE std::string to_string(long int);
-INTERFACE std::string to_string(unsigned);
-INTERFACE std::string to_string(double);
 INTERFACE std::string to_string(long double);
+INTERFACE std::string	to_string(unsigned);
+INTERFACE std::string	to_string(int);
+INTERFACE std::string	to_string(double);
 
 //FIXME: template?
 INTERFACE std::string to_string(std::vector<double>);

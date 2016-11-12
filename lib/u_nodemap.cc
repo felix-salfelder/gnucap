@@ -91,7 +91,7 @@ NODE_BASE* NODE_MAP::operator[](unsigned x)const {
 /* return a pointer to a node given a string
  * returns NULL pointer if no match
  */
-NODE_BASE* NODE_MAP::operator[](std::string s)
+NODE_BASE* NODE_MAP::operator[](IString s)
 {
   const_iterator i = find_in_map(_node_map, s);
   if (i != _node_map.end()) {
@@ -104,7 +104,7 @@ NODE_BASE* NODE_MAP::operator[](std::string s)
 /* return a pointer to a node given a string
  * creates a new one if it isn't already there.
  */
-CKT_NODE* NODE_MAP::new_node(std::string s_in, const CARD_LIST* scope)
+CKT_NODE* NODE_MAP::new_node(IString s_in, const CARD_LIST* scope)
 {
   std::string::size_type dotplace = s_in.find_last_of(".");
   string s = s_in;

@@ -31,7 +31,7 @@
 #include "mode.h"
 
 /*--------------------------------------------------------------------------*/
-PROBE::PROBE(const std::string& what,const CKT_BASE *brh)
+PROBE::PROBE(const IString& what, const CKT_BASE *brh)
   :CKT_BASE(),
    _what(what),
    _override_label(""),
@@ -120,7 +120,7 @@ void PROBE::detach()
  * (suitable for printing)
  * It has nothing to do with whether it was selected or not
  */
-const std::string PROBE::label(void)const
+const IString PROBE::label()const
 {
   if (_brh) {
 

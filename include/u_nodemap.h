@@ -43,11 +43,11 @@ public:
   //  NODE_MAP( const NODE_MAP& p) : _node_map(p._node_map) {}
   explicit  NODE_MAP();
 	   ~NODE_MAP();
-  NODE_BASE*     operator[](std::string);
+  NODE_BASE*     operator[](IString);
   NODE_BASE*     operator[](unsigned) const;
-  CKT_NODE*     new_node(string,const CARD_LIST* p=0);
-  ADP_NODE*     new_adp_node(string, const COMPONENT* p);
-  ADP_NODE*     new_adp_node(string, const CARD_LIST* p=0);
+  CKT_NODE*     new_node(IString, const CARD_LIST* p=0);
+  ADP_NODE*     new_adp_node(IString, const COMPONENT* p);
+  ADP_NODE*     new_adp_node(IString, const CARD_LIST* p=0);
 
   typedef std::map<IString, NODE_BASE*>::iterator iterator;
   typedef std::map<IString, NODE_BASE*>::const_iterator const_iterator;
