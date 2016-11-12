@@ -51,15 +51,7 @@ struct Ichar{
     if(OPT::case_insensitive){
       return tolower(_c)==tolower(o._c);
     }else{
-      return char(o) == _c;
-    }
-  }
-  bool operator!=(Ichar o) const
-  {
-    if(OPT::case_insensitive){ untested();
-      return tolower(_c)!=tolower(o);
-    }else{ untested();
-      return char(o) != _c;
+      return char(o._c) == _c;
     }
   }
   bool operator!=(Ichar o) const { untested();
@@ -75,6 +67,9 @@ struct Ichar{
   }
   bool operator!() const{ untested();
     return !_c;
+  }
+  operator bool() const{ untested();
+    return _c;
   }
   char const& to_char() const{untested(); return _c;}
 private:
@@ -113,6 +108,9 @@ public: // more conventional type bridge
   }
   size_type find_first_of(char const* x) const { untested();
     return base::find_first_of((Ichar const*)x);
+  }
+  size_type find_last_of(char const* x) const { untested();
+    return base::find_last_of((Ichar const*)x);
   }
   std::string const& to_string() const
   { untested();

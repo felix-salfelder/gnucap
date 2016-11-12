@@ -25,8 +25,8 @@
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
-//#include "e_model.h"
-//#include "d_subckt.h"
+#include "e_model.h" // BUG (frozen)
+#include "d_subckt.h" // BUG (frozen)
 #include "io_misc.h"
 #include "l_istring.h"
 /*--------------------------------------------------------------------------*/
@@ -78,13 +78,13 @@ CARD::~CARD()
 	delete _subckt;
 }
 /*--------------------------------------------------------------------------*/
-const std::string CARD::long_label()const
+std::string CARD::long_label()const
 {
-  IString buffer(short_label());
+  std::string buffer(short_label());
   for (const CARD* brh = owner();  brh;  brh = brh->owner()) {
     buffer = brh->short_label() + '.' + buffer;
   }
-  return buffer.to_string();
+  return buffer;
 }
 /*--------------------------------------------------------------------------*/
 /* connects_to: does this part connect to this node?

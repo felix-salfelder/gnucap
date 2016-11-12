@@ -61,7 +61,7 @@ private:
   PARAMETER<double> _duty;
   PARAMETER<double> _area;
   PARAMETER<double> _phase;
-  static map<string, PARA_BASE EVAL_BM_PULSE::*> _param_dict;
+  static std::map<string, PARA_BASE EVAL_BM_PULSE::*> _param_dict;
 
   explicit	EVAL_BM_PULSE(const EVAL_BM_PULSE& p);
 public:
@@ -285,7 +285,7 @@ void EVAL_BM_PULSE::precalc_last(const CARD_LIST* Scope)
     _rise = _rise_in * min(1., min(cofactor, factor));
 
     if (eff*_period < (_rise+_fall)/2.) {
-      _width = 0;
+      _width = 0.;
     }else if ((1-eff)*_period < (_rise+_fall)/2.) {
       _width = _period - (_rise+_fall);
     }else{
@@ -437,7 +437,7 @@ bool EVAL_BM_PULSE::parse_params_obsolete_callback(CS& cmd)
     ;
 }
 /*--------------------------------------------------------------------------*/
-map<string, PARA_BASE EVAL_BM_PULSE::*> EVAL_BM_PULSE::_param_dict =
+std::map<string, PARA_BASE EVAL_BM_PULSE::*> EVAL_BM_PULSE::_param_dict =
   boost::assign::map_list_of
     ("iv",    (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_iv_in)
     ("U1",    (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_iv_in)

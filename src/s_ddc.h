@@ -39,7 +39,7 @@ protected:
   std::string _para_name[DCNEST];
   PARAMETER<double>* _param[DCNEST];
 
-  vector<STORAGE*> _uic_caplist;
+  std::vector<STORAGE*> _uic_caplist;
   void set_uic_caps_constant(bool x=true);
 
   CARDSTASH _stash[DCNEST];	/* store std values of elements being swept */

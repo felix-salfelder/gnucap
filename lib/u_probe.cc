@@ -51,7 +51,7 @@ PROBE::PROBE(const IString& what, const CKT_BASE *brh)
 /*--------------------------------------------------------------------------*/
 bool PROBE::operator==(const CKT_BASE& brh)const
 {
-  string objlabel = (object())?object()->long_label():"NULL";
+  IString objlabel = (object())?object()->long_label():"NULL";
   trace3("PROBE::operator==(const CKT_BASE& brh)",objlabel, brh.long_label(), (object() == &brh) );
   return (object() == &brh); 
 }
@@ -224,6 +224,7 @@ double PROBE::probe_node(void)const
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0 // never worked
 MATH_PROBE::~MATH_PROBE(){
   trace1("MATH_PROBE::~MATH_PROBE", label());
 
@@ -250,6 +251,7 @@ void MATH_PROBE::push(PROBE* p)
   newp->set_next(arg());
   set_arg(newp);
 }
+#endif
 //void PROBE::push(PROBE* p)
 //{
 //  assert(false);
@@ -262,6 +264,7 @@ void MATH_PROBE::push(PROBE* p)
 //}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0 // this never worked.
 MATH_PROBE::MATH_PROBE(const MATH_PROBE& p) : PROBE(p) {  _type = p._type ; _next=p._next; }
 /*--------------------------------------------------------------------------*/
 const string typelabel(const unsigned a){
@@ -304,6 +307,7 @@ const string  MATH_PROBE::label()const{
     trace1("MATH_PROBE::label done", s.str());
   return s.str();
 }
+#endif
 /*--------------------------------------------------------------------------*/
 char typetochar(MATH_OP _type ){
   switch(_type){
@@ -325,6 +329,7 @@ char typetochar(MATH_OP _type ){
 
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void MATH_PROBE::set_arg( PROBE* p){
   trace1("MATH_PROBE::set_arg()", p->label());
   _arg=p;
@@ -366,6 +371,7 @@ double MATH_PROBE::value(void)const
       return NOT_VALID;
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 MEAS_PROBE::MEAS_PROBE(const MEAS_PROBE& p) : 
@@ -442,7 +448,7 @@ MEAS_PROBE& MEAS_PROBE::operator=(const MEAS_PROBE& p)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-const std::string MEAS_PROBE::label(void)const
+const IString MEAS_PROBE::label(void)const
 {
   assert(_f);
   return _f->label()+"("+probe_name+")";
@@ -469,6 +475,7 @@ void MEAS_PROBE::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0
 MATH_PROBE& MATH_PROBE::operator=(const MATH_PROBE& p)
 {
   trace0("MATH_PROBE::operator=");
@@ -476,6 +483,7 @@ MATH_PROBE& MATH_PROBE::operator=(const MATH_PROBE& p)
   _type = p._type;
   return *this;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 EVAL_PROBE::EVAL_PROBE(const EVAL_PROBE& p) :
   PROBE(p),
@@ -496,7 +504,7 @@ double EVAL_PROBE::value(void)const
   assert(_scope);
   trace1("EVAL_PROBE::value()", _what);
 
-  CS cmd(CS::_STRING, _cmd);
+  CS cmd(CS::_STRING, _cmd.to_string());
 
   Expression e(cmd);
   cmd.check(bDANGER, "syntax error");
@@ -505,8 +513,8 @@ double EVAL_PROBE::value(void)const
   return r.eval();
 }
 /*--------------------------------------------------------------------------*/
-EVAL_PROBE::EVAL_PROBE(const std::string& cmd, const CARD_LIST* scope)
-{
+EVAL_PROBE::EVAL_PROBE(const IString& cmd, const CARD_LIST* scope)
+{ untested();
   _what = cmd;
   _cmd = cmd;
   assert(scope);

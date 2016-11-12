@@ -450,7 +450,7 @@ bool COMMON_BUILT_IN_DIODE::operator==(const COMMON_COMPONENT& x)const
     && COMMON_COMPONENT::operator==(x));
 }
 /*--------------------------------------------------------------------------*/
-map<string, PARA_BASE COMMON_BUILT_IN_DIODE::*> COMMON_BUILT_IN_DIODE::param_dict
+std::map<std::string, PARA_BASE COMMON_BUILT_IN_DIODE::*> COMMON_BUILT_IN_DIODE::param_dict
   = boost::assign::map_list_of
 ("Area", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::area))
 ("Perim", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::perim))
@@ -461,7 +461,8 @@ map<string, PARA_BASE COMMON_BUILT_IN_DIODE::*> COMMON_BUILT_IN_DIODE::param_dic
 ("Cjo", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::cj_raw))
 ("CJSW", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::cjsw_raw))
 ("GParallel", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::gparallel_raw))
-;map<string, PARA_BASE COMMON_BUILT_IN_DIODE::*> COMMON_BUILT_IN_DIODE::param_dict_low
+;
+std::map<std::string, PARA_BASE COMMON_BUILT_IN_DIODE::*> COMMON_BUILT_IN_DIODE::param_dict_low
   = boost::assign::map_list_of
 ("area", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::area))
 ("perim", (PARA_BASE COMMON_BUILT_IN_DIODE::*)  (&COMMON_BUILT_IN_DIODE::perim))

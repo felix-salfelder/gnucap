@@ -23,8 +23,8 @@ class COMPONENT;
 class ADP_NODE: public NODE_BASE { //
    private:
      friend class NODE_MAP;
-    explicit ADP_NODE( string name, const COMPONENT* owner );// don't use
-    explicit ADP_NODE( string name, const CARD_LIST* scope );// new one
+    explicit ADP_NODE(IString name, const COMPONENT* owner );// don't use
+    explicit ADP_NODE(IString name, const CARD_LIST* scope );// new one
   public:
     ~ADP_NODE( );
     ADP_NODE( const ADP_NODE& );
@@ -36,7 +36,7 @@ class ADP_NODE: public NODE_BASE { //
     void init( const COMPONENT* , std::string name_in2 );//
 
   public:
-    std::string label() const  {return long_label();}
+    IString label() const  {return long_label();}
     uint_t order() const;
 
     uint_t m_()const {

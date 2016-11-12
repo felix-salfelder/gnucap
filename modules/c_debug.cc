@@ -240,6 +240,7 @@ public:
   void do_it(CS& cmd, CARD_LIST* )
   {
     OMSTREAM _out = IO::mstdout;
+    USE(cmd);
 
     for(DISPATCHER<CARD*>::const_iterator i=model_dispatcher.begin();
         i!=model_dispatcher.end(); ++i)

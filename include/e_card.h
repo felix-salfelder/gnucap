@@ -148,7 +148,7 @@ public:	// type
 public:	// label -- in CKT_BASE
   // non-virtual void set_label(const std::string& s) //BASE
   // non-virtual const std::string& short_label()const //BASE
-  /*virtual*/ const std::string long_label()const; // no further override
+  /*virtual*/ std::string long_label()const; // no further override
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
   node_t& n_(unsigned i)const;

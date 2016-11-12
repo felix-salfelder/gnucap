@@ -155,10 +155,7 @@ void SIM::head(double start, double stop, const std::string& col1)
   unsigned ii = 0;
   for (PROBELIST::const_iterator
 	 p=storelist().begin();  p!=storelist().end();  ++p) {
-    string l = (*p)->label();
-    if (OPT::case_insensitive) {
-      notstd::to_upper(&l);
-    }
+    IString l = (*p)->label();
     WAVE* newwave = &(_sim->_waves[_sim->_label][l]);
 
     // UGLY: linear.

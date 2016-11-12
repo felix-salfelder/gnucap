@@ -347,6 +347,7 @@ char *getcmd(const char *prompt, char *buffer, int buflen)
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 static std::string getlines(FILE *fileptr)
 {
   assert(fileptr);
@@ -391,6 +392,7 @@ static std::string getlines(FILE *fileptr)
   }
   return s;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:et:

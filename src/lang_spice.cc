@@ -1009,7 +1009,7 @@ void LANG_SPICE_BASE::print_label(OMSTREAM& o, const COMPONENT* x)
   assert(x);
   if(x->print_type_in_spice()){
   }else if(!x->id_letter()){
-  }else if(x->id_letter()!=toupper(x->short_label().c_str()[0])){
+  }else if(x->id_letter()!=toupper(x->short_label()[0])){
     o << x->id_letter();
   }else{
   }

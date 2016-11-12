@@ -165,7 +165,11 @@ NODE::NODE(const NODE* p)
 /*--------------------------------------------------------------------------*/
 /* usual initializing constructor : name and index
  */
-CKT_NODE::CKT_NODE(const string& s, unsigned n, const CARD_LIST*p) : NODE_BASE(s,n,p) { }
+CKT_NODE::CKT_NODE(const IString& s, unsigned n, const CARD_LIST*p)
+  : NODE_BASE(s,n,p)
+{ untested();
+
+}
 /*--------------------------------------------------------------------------*/
 node_t::node_t()
   :_nnn(0),
@@ -299,9 +303,9 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
   }
 }
 /*--------------------------------------------------------------------------*/
-const std::string NODE_BASE::long_label()const
+std::string NODE_BASE::long_label()const
 {
-  string ret(short_label());
+  std::string ret(short_label());
   if (_scope){
     if( _scope->owner()){
       return (_scope->owner()->long_label() + "." + ret);

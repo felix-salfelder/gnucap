@@ -56,7 +56,10 @@ public:
           trace1("have dollar", file_name);
           PARAMETER<string> a(file_name.c_str()+1);
           a.e_val("", Scope);
-          if(!(a=="")) file_name=a;
+          if(!(a=="")){ untested();
+	    file_name = a.value();
+	  }else{ untested();
+	  }
         }
       }else{ untested();
         trace1("no dollar", file_name);

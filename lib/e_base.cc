@@ -66,7 +66,7 @@ CKT_BASE::~CKT_BASE()
   }
 }
 /*--------------------------------------------------------------------------*/
-const std::string CKT_BASE::long_label()const
+std::string CKT_BASE::long_label()const
 {
   trace0("CKT_BASE::long_label");
   //incomplete();
@@ -172,21 +172,17 @@ double CKT_BASE::ac_probe_num(const IString& what)const
   }					/* don't have all parts */
 }
 /*--------------------------------------------------------------------------*/
-/*static*/ WAVE_LIST& CKT_BASE::create_waves(const std::string& coll_name)
+/*static*/ WAVE_LIST& CKT_BASE::create_waves(const IString& coll_name)
 {
   assert(_sim);
   _sim->_label = coll_name;
   return _sim->_waves[coll_name];
 }
 /*--------------------------------------------------------------------------*/
-/*static*/ WAVE_LIST* CKT_BASE::find_waves(const std::string& coll_name)
+/*static*/ WAVE_LIST* CKT_BASE::find_waves(const IString& coll_name)
 {
-  std::map<std::string,WAVE_LIST>::iterator i;
-  string n = coll_name;
-  if (0 && OPT::case_insensitive) { untested();
-    notstd::to_upper(&n);
-  }else{
-  }
+  std::map<IString, WAVE_LIST>::iterator i;
+  IString n = coll_name;
   i = _sim->_waves.find(n);
   if(i!=_sim->_waves.end()){
     return &i->second;
@@ -195,39 +191,31 @@ double CKT_BASE::ac_probe_num(const IString& what)const
   }
 }
 /*--------------------------------------------------------------------------*/
-/*static*/ WAVE& CKT_BASE::create_wave(const std::string& wave_name, std::string coll_name)
+/*static*/ WAVE& CKT_BASE::create_wave(const IString& wave_name, IString coll_name)
 {
   assert(_sim);
   if(coll_name==""){untested();
     coll_name = _sim->_label;
   }else{
   }
-  std::string n = wave_name;
-  if (OPT::case_insensitive) {
-    notstd::to_upper(&n);
-  }else{ untested();
-  }
+  IString n = wave_name;
   return _sim->_waves[coll_name][n];
 }
 /*--------------------------------------------------------------------------*/
 /*static*/ WAVE* CKT_BASE::find_wave(const IString& probe_name)
 {
   trace2("find_wave", probe_name, _sim->_label);
-  std::map<std::string,WAVE>* w = &_sim->_waves[_sim->_label];
-  std::map<std::string,WAVE>::iterator i;
-  string n = probe_name;
-  if (OPT::case_insensitive) {
-    notstd::to_upper(&n);
-  }else{ untested();
-  }
+  std::map<IString, WAVE>* w = &_sim->_waves[_sim->_label];
+  std::map<IString, WAVE>::iterator i;
+  IString n = probe_name;
   i = w->find(n);
   if(i!=_sim->_waves[_sim->_label].end()){
     return &i->second;
   }else{
   }
-  std::string prefix;
-  std::string suffix;
-  CS cmd(CS::_STRING, probe_name);
+  IString prefix;
+  IString suffix;
+  CS cmd(CS::_STRING, probe_name.to_string());
   prefix = cmd.ctos(":");
 
   if(_sim->_waves.find(prefix) == _sim->_waves.end()) {
@@ -237,10 +225,6 @@ double CKT_BASE::ac_probe_num(const IString& what)const
 
   cmd >> ":";
   suffix = cmd.ctos("");
-  if (OPT::case_insensitive) {
-    notstd::to_upper(&suffix);
-  }else{untested();
-  }
   trace0(("\"" + prefix + "\":\"" + suffix + "\"").c_str());
   i = _sim->_waves[prefix].find(suffix);
   if(i!=_sim->_waves[prefix].end()){
@@ -249,8 +233,6 @@ double CKT_BASE::ac_probe_num(const IString& what)const
 
   return NULL;
 }
-/*--------------------------------------------------------------------------*/
-bool CKT_BASE::operator!=(const std::string& n)const {return strcasecmp(_label.c_str(),n.c_str())!=0;}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

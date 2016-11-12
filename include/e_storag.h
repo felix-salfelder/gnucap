@@ -61,7 +61,7 @@ private:
     const int o[] = {0, 1, 1, 2, 1, 1};
     int ord = o[_method_a+1];
     assert(ord < OPT::_keep_time_steps);
-    return min(ord,ELEMENT::order());
+    return std::min(ord, ELEMENT::order());
   }
   double   error_factor()const {
     const double f[]={1./2., 1./2., 1./12., 1./6., 1./2.};

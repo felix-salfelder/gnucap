@@ -38,7 +38,7 @@ private:
   PARAMETER<double> _min;
   PARAMETER<double> _max;
   PARAMETER<bool>   _abs;
-  static map<string, PARA_BASE EVAL_BM_POLY::*> param_dict;
+  static std::map<string, PARA_BASE EVAL_BM_POLY::*> param_dict;
   std::vector<PARAMETER<double> > _c;
   PARAMETER<unsigned> _degree;
   explicit	EVAL_BM_POLY(const EVAL_BM_POLY& p);
@@ -182,7 +182,7 @@ bool EVAL_BM_POLY::parse_numlist(CS& cmd)
   return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
-map<string, PARA_BASE EVAL_BM_POLY::*> EVAL_BM_POLY::param_dict = 
+std::map<string, PARA_BASE EVAL_BM_POLY::*> EVAL_BM_POLY::param_dict = 
   boost::assign::map_list_of
     ("min",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_min)
     ("max",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_max)

@@ -56,7 +56,7 @@ class EV_BASE : public SIM { // public DDC_BASE?
 		std::string _para_name[DCNEST];
 		PARAMETER<double>* _param[DCNEST];
 
-		vector<STORAGE*> _uic_caplist;
+		std::vector<STORAGE*> _uic_caplist;
 		void set_uic_caps_constant(bool x=true);
 
 		CARDSTASH _stash[DCNEST];	/* store std values of elements being swept */
@@ -96,11 +96,11 @@ class EV_BASE : public SIM { // public DDC_BASE?
 			string label;
 			CKT_BASE* brh[2];
 		};
-		vector<output_t> _output;
-		vector<output_t>::iterator _output_iter;
+		std::vector<output_t> _output;
+		std::vector<output_t>::iterator _output_iter;
 
 	protected: //sim_data?
-		static void set_sens(vector<output_t>::iterator _output_iter);
+		static void set_sens(std::vector<output_t>::iterator _output_iter);
 		static void clear_sens();
 
 	protected: // cleanup later
@@ -130,7 +130,7 @@ inline void EV_BASE::clear_sens()
 	}
 }
 /*--------------------------------------------------------------------------*/
-inline void EV_BASE::set_sens(vector<output_t>::iterator _output_iter)
+inline void EV_BASE::set_sens(std::vector<output_t>::iterator _output_iter)
 {
   CKT_NODE* np = dynamic_cast<CKT_NODE*>((*_output_iter).brh[0]);
   assert(np);

@@ -122,7 +122,7 @@ public:
       }
       return ((arg) ? (time) : (m));
     }else{
-      throw Exception_No_Match(probe_name);
+      throw Exception_No_Match(probe_name.to_string());
     }
   }
 } p2;

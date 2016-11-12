@@ -31,14 +31,14 @@ class XPROBE;
 class WAVE;
 class OMSTREAM;
 class PROBE_LISTS;
-typedef std::map<std::string, WAVE> WAVE_LIST;
+typedef std::map<IString, WAVE> WAVE_LIST;
 class SIM_DATA;
 class IString;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
 private:
   mutable int	_probes;		/* number of probes set */
-  IString	_label;
+  std::string	_label;
 public:
   static SIM_DATA* _sim;
   static PROBE_LISTS* _probe_lists;
@@ -68,9 +68,9 @@ public: // probes
 	  int	      probes()const	{return _probes;}
   static  double      probe(const CKT_BASE*,const IString&);
 public: // waves
-  static  WAVE_LIST&    create_waves(const std::string& coll_name);
-  static  WAVE_LIST*    find_waves(const std::string& coll_name);
-  static  WAVE&         create_wave(const std::string& wave_name, std::string coll_name="");
+  static  WAVE_LIST&    create_waves(const IString& coll_name);
+  static  WAVE_LIST*    find_waves(const IString& coll_name);
+  static  WAVE&         create_wave(const IString& wave_name, IString coll_name="");
   static  WAVE*	      find_wave(const IString& probe_name);
   //--------------------------------------------------------------------
 virtual void sens_load(const std::string&) {} // nodes and cards.
@@ -78,10 +78,10 @@ virtual void sens_load(const std::string&) {} // nodes and cards.
   //--------------------------------------------------------------------
 public: // label
   bool operator!=(const IString& n)const {untested();
-    return _label != n;
+    return IString(_label) != n;
   }
-  virtual const std::string long_label()const;
-  const IString& short_label()const {return _label;}
+  virtual std::string long_label()const;
+  const std::string& short_label()const {return _label;}
   void	set_label(const std::string& s) {_label = s;}
 public:
   static double tr_behaviour_del;

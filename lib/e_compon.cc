@@ -686,7 +686,7 @@ void COMPONENT::map_nodes()
     assert(_n[ii].m_() <= _sim->_total_nodes || _n[ii].m_() == INVALID_NODE || _n[ii].is_adp() );
     unsigned user_number = (_n[ii].n_())? _n[ii].n_()->user_number(): 0; USE(user_number);
     unsigned matrix_number = (_n[ii].n_())? _n[ii].n_()->matrix_number(): 0;
-    string node_label = (_n[ii].n_())? _n[ii].n_()->long_label(): "";
+    IString node_label = (_n[ii].n_())? _n[ii].n_()->long_label(): "";
     // matrix_number not initialized yet.
     USE(user_number); USE(matrix_number);
     trace5("COMPONENT::map_nodes done", long_label(), ii, _n[ii].t_(), _n[ii].m_(), _n[ii].is_adp() );

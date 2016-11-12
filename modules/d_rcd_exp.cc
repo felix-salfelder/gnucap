@@ -247,7 +247,7 @@ void MODEL_BUILT_IN_RCD_EXP::do_precalc_last(COMMON_COMPONENT* ccc, const CARD_L
   assert(cc);
   //const MODEL_BUILT_IN_RCD_EXP* m=this;
 
-  cc->Uref=0;
+  cc->Uref = 0.;
 
   trace5("MODEL_BUILT_IN_RCD_EXP::do_precalc_last", cc->Uref,
       c->Recommon1,

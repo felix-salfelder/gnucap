@@ -321,13 +321,13 @@ void TTT::setup(CS& Cmd)
 				trace0("TTT::setup latching tr times");
 				_tstrobe = arg1;
 				_tstop = arg2;
-				_Tstop = 0;
+				_Tstop = 0.;
 
 			}else{
 				trace1("TTT::setup ran already", (double)_Tstart );
 				if((double)arg1==0){
 					_Tstop  = arg2; 
-					_Tstart =0;
+					_Tstart = 0.;
 				}else if(arg1<arg2){
 					_Tstop  = arg2; 
 					_Tstep = arg1;
@@ -380,9 +380,9 @@ void TTT::setup(CS& Cmd)
 
 		if(_sim->_last_Time==0){
 			trace1("TTT::setup no args at beginning", _cont_tt);
-			_Tstop=0;
-			_tstrobe=0;
-			_tstop=0;
+			_Tstop = 0.;
+			_tstrobe = 0.;
+			_tstop = 0.;
 
 		}
 		if (!_stepmode){
@@ -608,7 +608,7 @@ void TTT::setup_tw(CS& Cmd)
 				_Tstep = OPT::ttstepgrow;
 				_stepmode = tts_MUL;
 			}
-			_Tstart = 0; //HACK?
+			_Tstart = 0.; //HACK?
 			assert((double)_tstrobe!=0 || !_tstop);
 			if (!_tstop) { untested();
 			} else {
@@ -629,24 +629,24 @@ void TTT::setup_tw(CS& Cmd)
 		} else if (arg2.has_hard_value() ) {
 			trace0("TTT::setup_tw have 2");
 			_Tstart = _sim->_last_Time;
-			_sim->_time0 = 0;
+			_sim->_time0 = 0.;
 			_sim->tr_reset();
 			if ((double)_Tstart == 0){
 				trace0("TTT::setup_tw latching tr times");
 				_tstrobe = arg1;
 				_tstop = arg2;
-				_Tstop = 0;
+				_Tstop = 0.;
 
 			}else{
 				trace1("TTT::setup_tw ran already", (double)_Tstart );
 				if((double)arg1==0){
-					_Tstop  = arg2; 
-					_Tstart =0;
+					_Tstop  = arg2;
+					_Tstart = 0.;
 				}else if(arg1<arg2){
-					_Tstop  = arg2; 
+					_Tstop = arg2;
 					_Tstep = arg1;
 				}else{
-					_Tstop  = arg1; 
+					_Tstop = arg1;
 					_Tstep = arg2;
 				}
 			}
@@ -690,12 +690,12 @@ void TTT::setup_tw(CS& Cmd)
 		_Tstart = _sim->_last_Time;
 		_Tstop  = _sim->_last_Time + oldrange;
 
-		if(_sim->_last_Time==0){
+		if(_sim->_last_Time==0){ untested();
 			trace1("TTT::setup_tw no args at beginning", _cont_tt);
-			_Tstop=0;
-			_tstrobe=0;
-			_tstop=0;
-
+			_Tstop = 0.;
+			_tstrobe = 0.;
+			_tstop = 0.;
+		}else{untested();
 		}
 	}
 
