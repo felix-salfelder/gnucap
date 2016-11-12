@@ -28,29 +28,7 @@
 #------------------------------------------------------------------------
 # These source files can be omitted, and supplied as plugins.
 # device models defined in high level .model files
-MODELS = \
-d_mos1.model d_mos2.model d_mos3.model \
-d_mos4.model d_mos5.model d_mos6.model d_mos7.model d_mos8.model \
-d_mos123.model d_mos_base.model d_mos.model \
-d_bjt.model d_diode.model 
-#d_rcd.model d_bti.model 
 
-.model.cc:
-
-BUILT_SOURCES = ${MODELS:%.model=%.h} ${MODELS:%.model=%.cc}
-
-
-# utility commands, usually one file per command
-# some have multiple commands in a file
-C_SRCS = \
-c_clear.cc c_comand.cc c_delete.cc c_exp.cc c_list.cc c_save.cc \
-c_measure.cc c_modify.cc c_param.cc c_prbcmd.cc c_status.cc \
-c_sweep.cc c_sim.cc c_system.cc c_for.cc c_printf.cc \
-c_help.cc
-
-# netlist languages
-LANG_SRCS = \
-lang_spice.cc lang_spectre.cc lang_verilog.cc
 
 #------------------------------------------------------------------------
 RAW_SRCS = \
@@ -96,16 +74,11 @@ m_matrix_example_CPPFLAGS = $(AM_CPPFLAGS)
 SRCS1= 
 SRCS2= ${RAW_SRCS} 
 
-# make all of the model object files depend on all of the model sources
-# this is a bit overkill, but for example the bjt model makes use of the
-# diode model and we want to be sure and capture that dependency
-#
-${MODELOBJS}: ${MODELSRCS}
 
 ## Include the .model files in the distfile as well as the rest of the
 ## non-generated sources
 
-EXTRA_DIST= ${MODELS} ${SRCS1} ${SRCS2} \
+EXTRA_DIST = ${SRCS1} ${SRCS2} \
 test_readline.cc spice-wrapper.cc \
 Makefile.am
 
@@ -114,7 +87,7 @@ GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 noinst_SCRIPTS = gnucap
 bin_PROGRAMS = gnucap.real
 transform=s&\.real$$&&;$(program_transform_name)
-gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1} ${MODELS}
+gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1}
 
 gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
 gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
@@ -135,24 +108,8 @@ libgnucap_include_HEADERS = ${RAW_HDRS} spice-wrapper.cc
 gnucap_includedir = $(pkgincludedir)
 
 
-### Clean out the modelgen generated files
-CLEANFILES = ${MODELSRCS}
-
-## Suffix rules for modelgen.
-##
-
-SUFFIXES= .model
-MODELGEN= @MODELGEN@
-
-MAKEDEPEND = gcc -M $(CPPFLAGS) -o $*.d $<
-
-%.cc : %.model %.h ${MODELGEN}${EXEEXT}
-	${MODELGEN} -cc $<
 
 # #############################################
-
-%.h : %.model ${MODELGEN}${EXEEXT}
-	${MODELGEN} -h $<
 
 $(D_IVL_O): CPPFLAGS+= IVL_CPPFLAGS
 
