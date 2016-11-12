@@ -618,6 +618,7 @@ GC_TESTS = \
     c_attach.1.gc \
     c_attach.2.gc \
     c_debug.1.gc \
+    c_debug.2.gc \
     c_echo.1.gc \
     c_for.1.gc \
     c_for.2.gc \
@@ -979,6 +980,7 @@ EXTRA_DIST = gnucap_run.sh \
              $(UF_TESTS) $(UF_TESTS:%.gc=%.ref) \
              c_attach.1.gc \
              bm_wrapper.cc \
+             disp_test.cc \
              bm_generator.doc bm_pulse.doc bm_pwl.doc bm_sin.doc d_cap.doc d_diode.doc \
              d_.doc d_subckt.doc u_.doc \
              d_coil.5.spice \
@@ -1010,12 +1012,16 @@ AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include \
               -I$(top_builddir)/src -I$(top_srcdir)/src
 AM_DEFAULT_SOURCE_EXT = .cc
 AM_LDFLAGS = -module -avoid-version -rpath /dev/null
-check_LTLIBRARIES = bogus.la bogus1.la bogus2.la bogus3.la bogus4.la
+check_LTLIBRARIES = \
+	disp_test.la \
+	bogus.la bogus1.la bogus2.la bogus3.la bogus4.la
 
 # $(CUSTOM_TESTS:%.sh=%.log): %.log: %.out
 	
 c_attach.1.out: empty.cc bogus.so d_vs.cc loadtestdir loadtestdirro attachclean
 c_attach.2.out c_attach.2.log: bogus.so bogus1.so bogus2.so bogus3.so bogus4.so
+
+c_debug.2.gc.out: disp_test.so
 
 attachclean:
 	rm -f d_vs.so load*/*.so empty.so
@@ -1035,7 +1041,11 @@ empty.cc:
 d_vs.cc: | $(top_srcdir)/src/d_vs.cc
 	$(LN_S) $| .
 
-bogus.so bogus1.so bogus2.so bogus3.so bogus4.so: %.so: %.la
+check_SO = \
+	disp_test.so \
+	bogus.so bogus1.so bogus2.so bogus3.so bogus4.so
+
+$(check_SO): %.so: %.la
 	[ -f $@ ] || $(LN_S) .libs/$@ .
 
 .PHONY: c_attach.1.out attachclean soclean

@@ -1,0 +1,37 @@
+paramset GG NmosTEST;
+            ^ ? paramset: no match
+endparamset
+^ ? endparamset: no match
+c
+cap
+csw
+d
+endparamset
+logic
+Nmos8
+NmosTEST
+nmos
+nmos1
+nmos2
+nmos3
+nmos4
+nmos5
+nmos6
+nmos7
+npn
+npn1
+pmos
+pmos1
+pmos2
+pmos3
+pmos4
+pmos5
+pmos6
+pmos7
+Pmos8
+pnp
+pnp1
+r
+res
+sw
+table

@@ -1,0 +1,10 @@
+load c_debug.so
+load force ./disp_test.so
+
+verilog
+
+paramset GG NmosTEST;
+endparamset
+
+listmodels
+end
