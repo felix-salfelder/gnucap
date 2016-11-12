@@ -7,12 +7,12 @@ tran storelist
         dvth(MP1.BTI) dvth(MP1.BTI)
 wavelist 
 tran (6)
-DVTH(MP1) (0),
-DVTH(MP1.BTI) (0),
-ISCALE(MP1.BTI) (0),
-MAX(MYM) (0),
-STRESS(MP1.BTI) (0),
-TAU(MP1.BTI.RCD0) (0)
+dvth(MP1) (0),
+dvth(MP1.BTI) (0),
+iscale(MP1.BTI) (0),
+max(mym) (0),
+stress(MP1.BTI) (0),
+tau(MP1.BTI.RCD0) (0)
 .wave dump "dvth(MP1.BTI)" 
            ^ ? what's this?
         dvth(MP1) dvth(MP1.BTI) tau(MP1.BTI.RCD0) stress(MP1.BTI) max(mym) dvth(MP1.BTI) iscale(MP1.BTI)
@@ -32,7 +32,7 @@ cowardly refusing to register twice: dvth(MP1.BTI) at index 1
  100.E-6    29.886E-9  32.106E-9  1.3196E+3  0.50003    0.0045763  32.106E-9 -1.        
 posttran 
  (0), *tran (1)
-DVTH(MP1.BTI) (12)
+dvth(MP1.BTI) (12)
  0.         0.        
  1.u        100.35p   
  2.u        201.29p   

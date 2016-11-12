@@ -10,8 +10,8 @@ n6       n6 matrix_number 6, user_number 6 nm[t]  vdc  0.
 n7       n7 matrix_number 5, user_number 7 nm[t]  vdc  0.
 n8       n8 matrix_number 4, user_number 8 nm[t]  vdc  0.
 n9       n9 matrix_number 3, user_number 9 nm[t]  vdc  0.
-na       na matrix_number 2, user_number 10 nm[t]  vdc  0.
-nb       nb matrix_number 1, user_number 11 nm[t]  vdc  0.
+nA       nA matrix_number 2, user_number 10 nm[t]  vdc  0.
+nB       nB matrix_number 1, user_number 11 nm[t]  vdc  0.
 forward 
 **...*......
 ***.........
