@@ -481,7 +481,7 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 /*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD { //
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {
+  { untested();
     // already got "paramset"
     std::string my_name, base_name;
     cmd >> my_name;
@@ -490,13 +490,13 @@ class CMD_PARAMSET : public CMD { //
 
     //const MODEL_CARD* p = model_dispatcher[base_name];
     const CARD* p = lang_verilog.find_proto(base_name, NULL);
-    if (p) {
+    if (p) { untested();
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(p->clone());
-      if (new_card) {
+      if (new_card) { untested();
 	assert(!new_card->owner());
 	lang_verilog.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
-      }else{
+      }else{ untested();
 	cmd.warn(bDANGER, here, "paramset: base has incorrect type");
       }
     }else{ untested();

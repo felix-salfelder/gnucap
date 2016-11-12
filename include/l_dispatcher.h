@@ -63,8 +63,9 @@ public:
 
   const_iterator begin()const		{assert(_map); return _map->begin();}
   const_iterator end()const		{assert(_map); return _map->end();}
+  size_t size()const		{assert(_map); return _map->size();}
 
-  CKT_BASE* operator[](IString s) {
+  CKT_BASE* operator[](IString s) { untested();
     assert(_map);
     CKT_BASE* rv = (*_map)[s];
     return rv;
@@ -81,7 +82,8 @@ public:
       _map = new std::map<IString, CKT_BASE*>;
     }else{
     }
-    trace1("DISPATCHER ", s);
+    size_t cnt = _map->size();
+    trace1("DISPATCHER::install ", s);
     // loop over all keys, separated by '|'
     for (IString::size_type			// bss: begin sub-string
 	 bss = 0, ess = s.find('|', bss);	// ess: end sub-string
@@ -103,9 +105,11 @@ public:
 	(*_map)[save_name] = (*_map)[name];	
 	error(bWARNING, "stashing as " + save_name + "\n");
       }else{
+	++cnt;
 	// it's new, just put it in
       }
       (*_map)[name] = p;
+      assert(cnt = _map->size());
     }
   }
   
@@ -163,13 +167,13 @@ public:
     }
   }
 
-  TT* operator[](IString s) {
+  TT* operator[](IString s) { untested();
     assert(_map);
     CKT_BASE* rv = (*_map)[s];
     return prechecked_cast<TT*>(rv);
   }
 
-  TT* operator[](CS& cmd) {
+  TT* operator[](CS& cmd) { untested();
     unsigned here = cmd.cursor();
     IString s;
     cmd >> s;
@@ -203,7 +207,7 @@ public:
       _d(d),
       _p(p)
     {
-      trace1("INSTALL ", _name);
+      trace1("INSTALL::INSTALL", _name);
       assert(_d);
       assert(p);
       _d->install(_name, p);

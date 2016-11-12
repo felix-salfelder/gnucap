@@ -50,7 +50,15 @@ struct Ichar{
     if(OPT::case_insensitive){
       return tolower(_c)==tolower(o);
     }else{
-      return o == _c;
+      return char(o) == _c;
+    }
+  }
+  bool operator!=(Ichar o) const
+  {
+    if(OPT::case_insensitive){ untested();
+      return tolower(_c)!=tolower(o);
+    }else{ untested();
+      return char(o) != _c;
     }
   }
   bool operator<(const Ichar& o) const
@@ -132,7 +140,7 @@ inline std::string operator+(std::string x, IString s)
 }
 /*--------------------------------------------------------------------------*/
 inline std::ostream& operator<< (std::ostream& o, IString s)
-{untested();
+{itested();
   o << std::string(s);
   return o;
 }
