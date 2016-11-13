@@ -291,8 +291,8 @@ int main(int argc, char * const * argv)
   //
   // FIXME: use getopt
   //
-  CMD::command("options lang=acs", &CARD_LIST::card_list);
-  assert(OPT::language);
+//  CMD::command("options lang=acs", &CARD_LIST::card_list);
+//  assert(OPT::language);
   read_startup_files();
   sign_on();
 
