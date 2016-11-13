@@ -98,13 +98,12 @@ void read_startup_files(void)
   } catch(Exception e){
     error(bDANGER, "%s\n",e.message().c_str());
   }
-  if (!OPT::language) {
-      try{
-        CMD::command(std::string("options lang=") + DEFAULT_LANGUAGE, &CARD_LIST::card_list);
-      } catch(Exception e){
-        error(bDANGER, "%s\n",e.message().c_str());
-      }
-  }else{
+  if (OPT::language) {untested();
+    OPT::case_insensitive = OPT::language->case_insensitive();
+    OPT::units            = OPT::language->units();
+  }else{untested();
+    OPT::case_insensitive = false;
+    OPT::units            = uSI;
   }
 }
 /*--------------------------------------------------------------------------*/

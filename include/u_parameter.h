@@ -65,6 +65,10 @@ public:
   void	print(OMSTREAM& o)const		{o << string();}
   void	print(ostream& o)const		{o << string();}
   virtual std::string string()const = 0;
+
+  void	operator=(const std::string& s)	{ untested();
+    operator=(IString(s));
+  }
 };
 /*--------------------------------------------------------------------------*/
 template <class T>
@@ -111,9 +115,6 @@ public:
   //void	operator=(const std::string& s)	{untested();_s = s;}
 
   void	operator=(const char* s)	{ untested();
-    operator=(IString(s));
-  }
-  void	operator=(const std::string& s)	{ untested();
     operator=(IString(s));
   }
   void	operator=(const IString& s)	{ untested();
