@@ -11,5 +11,5 @@ fi
 
 make $out
 # diff $out $ref
-./gnucap-testfilter $out < $ref | diff -up - $ref --label $ref || exit 1
+./gnucap-testfilter $out < $ref | diff -w -up - $ref --label $ref || exit 1
 rm $out
