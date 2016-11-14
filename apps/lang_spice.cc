@@ -542,10 +542,11 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
       cmd >> value;
       if(xx->print_type_in_spice()){
 	 // D1   2  0  ddd   2.
-	xx->set_param_by_name(xx->value_name(), value);
+	xx->set_param_by_name(xx->value_name(), value.to_string());
       }else if(cc){
 	cc = c->common()->clone();
-	cc->set_param_by_index(0, value, 0);
+	std::string V=value.to_string();
+	cc->set_param_by_index(0, V, 0);
 	c->attach_common(cc);
       }else{
 	x->set_param_by_name(xx->value_name(), value.to_string());
@@ -556,7 +557,8 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
       value = '{' + value + '}'; // put them back
       if(cc){ untested();
 	cc = c->common()->clone();
-	cc->set_param_by_index(0, value, 0);
+	std::string V=value.to_string();
+	cc->set_param_by_index(0, V, 0);
 	c->attach_common(cc);
       }else{
 	x->set_param_by_name(xx->value_name(), value.to_string());

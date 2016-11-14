@@ -534,7 +534,7 @@ static void putstring8(SocketStream* s, const IString x)
 {
   const Ichar* A = x.c_str();
 
-  while(*A){
+  while(*A!='\0'){
     *s << A->to_char();
     *s << A->to_char();
     *s << A->to_char();
