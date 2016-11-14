@@ -56,7 +56,7 @@ public: // override virtual, called by commands
   std::string	find_type_in_string(CS&) const;
 public: // "local?", called by own commands
   void parse_module_body(CS&, BASE_SUBCKT*, CARD_LIST*, const std::string&,
-			 EOB, const std::string&);
+			 EOB, const IString&);
 private: // local
   void parse_type(CS&, CARD*);
   void parse_args(CS&, CARD*);
@@ -185,7 +185,7 @@ static unsigned count_ports(CS& cmd, uint_t maxnodes, uint_t minnodes,
   for (;;) {
     ++i;
     //cmd.skiparg();
-    std::string node_name;
+    IString node_name;
     cmd >> node_name;
     spots.push_back(cmd.cursor());
 
@@ -509,9 +509,9 @@ void LANG_SPICE_BASE::parse_type(CS& cmd, CARD* x)
 {
   trace1("LANG_SPICE_BASE::parse_type", cmd.tail());
   assert(x);
-  std::string new_type;
+  IString new_type;
   cmd >> new_type;
-  x->set_dev_type(new_type);
+  x->set_dev_type(new_type.to_string());
   trace1("LANG_SPICE_BASE::parse_type got:", new_type);
 }
 /*--------------------------------------------------------------------------*/
@@ -537,8 +537,8 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
     trace1("LANG_SPICE_BASE::parse_args !ocp", cmd.tail());
     int paren = cmd.skip1b('(');
     if (xx && cmd.is_float()) {		// simple unnamed value
-      std::string value;
       trace1("LANG_SPICE_BASE::parse_args simple", xx->value_name());
+      IString value;
       cmd >> value;
       if(xx->print_type_in_spice()){
 	 // D1   2  0  ddd   2.
@@ -548,10 +548,10 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	cc->set_param_by_index(0, value, 0);
 	c->attach_common(cc);
       }else{
-	x->set_param_by_name(xx->value_name(), value);
+	x->set_param_by_name(xx->value_name(), value.to_string());
       }
     }else if (cmd.match1("'{")) {	// quoted unnamed value
-      std::string value;
+      IString value;
       cmd >> value; // strips off the quotes
       value = '{' + value + '}'; // put them back
       if(cc){ untested();
@@ -559,7 +559,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	cc->set_param_by_index(0, value, 0);
 	c->attach_common(cc);
       }else{
-	x->set_param_by_name(xx->value_name(), value);
+	x->set_param_by_name(xx->value_name(), value.to_string());
       }
     }else{				// only name=value pairs
        trace0("LANG_SPICE_BASE::parse_args else");
@@ -574,7 +574,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	break;
       }else{
 	trace1("name value pair?", cmd.tail());
-	std::string Name;
+	IString Name;
 	std::string value;
 	if (cmd.is_float()) {
 	}else{
@@ -601,9 +601,9 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	    }else if (value == "") {untested();
 	      cmd.warn(bDANGER, there, x->long_label() + ": " + Name + " has no value?");
 	    }else{
-	      x->set_param_by_name(Name, value);
+	      x->set_param_by_name(Name.to_string(), value);
 	    }
-	  }catch (Exception_No_Match&) {
+	  }catch (Exception_No_Match&) { untested();
 	    cmd.warn(bDANGER, there, x->long_label() + ": bad parameter " + Name + " ignored");
 	  }
 	}
@@ -723,14 +723,14 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_module_body(CS& cmd, BASE_SUBCKT* x, CARD_LIST* Scope,
-		const std::string& prompt, EOB exit_on_blank, const std::string& exit_key)
+		const std::string& prompt, EOB exit_on_blank, const IString& exit_key)
 {
   try {
     for (;;) {
       cmd.get_line(prompt);
       
       if ((exit_on_blank==EXIT_ON_BLANK && cmd.is_end()) 
-	  || cmd.umatch(exit_key)) {
+	  || cmd.umatch(exit_key.to_string())) {
 	break;
       }else{
         trace3("LANG_SPICE_BASE::parse_module_body ", cmd.fullstring(), OPT::language, head);
@@ -1038,7 +1038,7 @@ class CMD_MODEL : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
     // already got "model"
-    std::string my_name, base_name;
+    IString my_name, base_name;
     cmd >> my_name;
     unsigned here1 = cmd.cursor();    
     cmd >> base_name;
