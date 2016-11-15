@@ -9,6 +9,7 @@ build
 .brl L1 0 nl .01m ic=0.001
 R1 nosc nl .001
 .ttcap C1 nosc 0 .01m ic=1
+.
 
 list
 
