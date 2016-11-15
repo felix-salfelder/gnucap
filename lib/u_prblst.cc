@@ -334,9 +334,9 @@ PROBE* PROBELIST::push_new_probe(const IString& param, const CKT_BASE* object)
 void PROBELIST::add_all_nodes(const IString& what, const CARD_LIST* scope)
 {
   IString devname="";
-  if( scope->owner()) { untested();
+  if( scope->owner()) {
     devname = scope->owner()->long_label();
-  }else{untested();
+  }else{
   }
 
   for (NODE_MAP::const_iterator i = scope->nodes()->begin();
@@ -509,7 +509,7 @@ PROBE* PROBELIST::add_branches(const IString& device,
               IString paramn(param);
               if (param=="V?") { untested();
                 paramn="V";
-              }else{untested();
+              }else{
 	      }
 
               trace0(( "Node match " +  node->short_label()).c_str() );

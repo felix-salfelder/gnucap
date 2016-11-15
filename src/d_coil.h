@@ -220,13 +220,13 @@ void DEV_INDUCTANCE::tr_accept()
 inline void DEV_INDUCTANCE::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("DEV_INDUCTANCE::set_param_by_name", Name, Value);
-  if (Umatch(Name, value_name()) && !has_common()) { untested();
+  if (Umatch(Name, value_name()) && !has_common()) {
     set_value(Value);
   } else if (Umatch(Name, value_name())) { untested();
     ELEMENT::set_param_by_name(value_name(), value().string());
   } else if (has_common()) { untested();
     ELEMENT::set_param_by_name(Name, Value);
-  } else { untested();
+  } else {
     COMMON_COMPONENT* c = bm_dispatcher["eval_bm_value"]->clone();
     c->set_param_by_name("=", value().string());
     c->set_param_by_name(Name, Value);
@@ -237,7 +237,7 @@ inline void DEV_INDUCTANCE::set_param_by_name(std::string Name, std::string Valu
   if (const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common())) {
     USE(x);
     trace2("DEV_INDUCTANCE::set_param_by_name", long_label(), x->_ic);
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

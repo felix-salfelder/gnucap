@@ -45,7 +45,7 @@ public:
     _n_ports(0),
     _minnodes(2),
     _maxnodes(4)
-  { untested();
+  {
     // set_modelname("poly");
   }
   COMMON_G_POLY_K(const COMMON_G_POLY_K& p) :
@@ -86,18 +86,18 @@ public:
   bool has_tr_eval()const{return true;}
   bool ac_too()const {untested();return false;}
   void set_param_by_name(std::string Name, std::string Value)
-  { untested();
+  {
     trace2("", Name, Value);
-    if (Umatch(Name, "c{oeffs} ")) { untested();
+    if (Umatch(Name, "c{oeffs} ")) {
       _coeffs = Value;
       trace1("coeffs", _coeffs);
-    }else{ untested();
+    }else{
       EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
     }
   }
   std::string param_name(int i, int j)const{return j?"":param_name(i); }
   std::string param_name(int i)const
-  { untested();
+  {
     switch (COMMON_G_POLY_K::param_count() - 1 - i) {
       case 0: return "coeffs";
       default: return EVAL_BM_ACTION_BASE::param_name(i);

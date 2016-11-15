@@ -167,7 +167,7 @@ NODE::NODE(const NODE* p)
  */
 CKT_NODE::CKT_NODE(const IString& s, unsigned n, const CARD_LIST*p)
   : NODE_BASE(s,n,p)
-{ untested();
+{
 
 }
 /*--------------------------------------------------------------------------*/

@@ -249,9 +249,9 @@ void COMMON_COMPONENT::set_param_by_index(int i, std::string& value, int Offset)
 {
   IString Value(value);
   switch (i) {
-  case 0:untested();  _tnom_c = Value; break;
+  case 0:  _tnom_c = Value; break;
   case 1:untested();  _dtemp = Value; break;
-  case 2:untested();  _temp_c = Value; break;
+  case 2:  _temp_c = Value; break;
   case 3:  _mfactor = Value; break;
   default:untested();
 			 throw Exception_Too_Many(unsigned(i), 3u, Offset); break;
@@ -355,7 +355,7 @@ void COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
     return;
   }
 
-  if (has_parse_params_obsolete_callback()) {untested();
+  if (has_parse_params_obsolete_callback()) {
     std::string args(Name + "=" + Value);
     CS cmd(CS::_STRING, args); //obsolete_callback
     trace3("COMMON_COMPONENT::set_param_by_name", Name, Value, cmd.fullstring());
@@ -374,14 +374,14 @@ void COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
     _mfactor = Value;
   }else{
     //BUG// ugly linear search
-    for (int i = param_count() - 1;  i >= 0;  --i) { untested();
-      for (int j = 0;  param_name(i,j) != "";  ++j) { untested();
-	if (Umatch(Name, param_name(i,j) + ' ')) { untested();
+    for (int i = param_count() - 1;  i >= 0;  --i) {
+      for (int j = 0;  param_name(i,j) != "";  ++j) {
+	if (Umatch(Name, param_name(i,j) + ' ')) {
           cerr << typeid(this).name() << " linear search for " << Name << ": ";
           incomplete();
 	  set_param_by_index(i, Value, 0/*offset*/);
 	  return; //success
-	}else{ untested();
+	}else{
 	  //keep looking
 	}
       }
@@ -777,12 +777,12 @@ void COMPONENT::set_value(double v, COMMON_COMPONENT* c)
 void COMPONENT::set_param_by_name(std::string Name, std::string Value)
 {
   trace3("COMPONENT::set_param_by_name", Name, has_common(), long_label());
-  if (has_common()) { untested();
+  if (has_common()) {
     COMMON_COMPONENT* c = common()->clone();
     assert(c);
     c->set_param_by_name(Name, Value);
     attach_common(c);
-  }else{ untested();
+  }else{
     CARD::set_param_by_name(Name, Value);
   }
 }
@@ -798,7 +798,7 @@ void COMPONENT::set_param_by_index(int i, std::string& value, int offset)
   }else{
     switch (COMPONENT::param_count() - 1 - i) {
     case 0: _value = Value; break;
-    case 1:untested(); _mfactor = Value; break;
+    case 1: _mfactor = Value; break;
     default:untested(); CARD::set_param_by_index(i, value, offset);
     }
   }

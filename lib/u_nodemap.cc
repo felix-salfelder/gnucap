@@ -72,7 +72,7 @@ NODE_MAP::~NODE_MAP()
 // slow/stupid, but used for sckt node naming.
 // need map<unsigned, NODE_BASE*>;
 NODE_BASE* NODE_MAP::operator[](unsigned x)const
-{ untested();
+{
   USE(x);
 
   for (NODE_MAP::const_iterator ni = _node_map.begin(); ni != _node_map.end(); ++ni) {

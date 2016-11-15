@@ -378,7 +378,7 @@ string PARAMETER<string>::value()const {
 }
 /*--------------------------------------------------------------------------*/
 string PARAMETER<std::string>::string()const
-{ untested();
+{
   trace0(("PARAMETER<string>::string " + _s + " -> " + _v ).c_str());
   return _s.to_string();
 }

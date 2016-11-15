@@ -155,27 +155,27 @@ void EVAL_BM_POLY::tr_eval(ELEMENT* d)const
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_POLY::parse_numlist(CS& cmd)
-{ untested();
+{
   unsigned start = cmd.cursor();
   unsigned here = cmd.cursor();
-  for (;;) { untested();
+  for (;;) {
     unsigned old_here = here;
     PARAMETER<double> val;
     cmd >> val;
-    if (cmd.stuck(&here)) { untested();
+    if (cmd.stuck(&here)) {
       // no more, graceful finish
       break;
-    }else{ untested();
+    }else{
       if (cmd.match1('=')) { untested();
 	// got one that doesn't belong, back up
 	cmd.reset(old_here);
 	break;
-      }else{ untested();
+      }else{
 	_c.push_back(val);
       }
     }
   }
-  if (cmd.gotit(start)) { untested();
+  if (cmd.gotit(start)) {
   }else{ untested();
   }
   return cmd.gotit(start);

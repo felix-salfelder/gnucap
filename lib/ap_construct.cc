@@ -255,7 +255,7 @@ CS& CS::get_line(const std::string& prompt)
     _cnt = 0;
     _length = 0;
     throw Exception_End_Of_Input("EOF on string/whatever");
-  }else if (is_file() ) { untested();
+  }else if (is_file() ) {
     // CS must know its language.
     if(0 && OPT::language){
       // not yet.

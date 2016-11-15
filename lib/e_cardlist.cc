@@ -765,7 +765,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
         IString label = node->short_label();
         if (!node){ untested();
           label = "errornode";
-        }else{untested();
+        }else{
 	}
 
         assert(this);

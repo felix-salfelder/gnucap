@@ -77,7 +77,7 @@ virtual void sens_load(const std::string&) {} // nodes and cards.
                                               // set _sim->_sens ...
   //--------------------------------------------------------------------
 public: // label
-  bool operator!=(const IString& n)const {untested();
+  bool operator!=(const IString& n)const {
     return IString(_label) != n;
   }
   virtual std::string long_label()const;

@@ -66,7 +66,7 @@ public:
   void	print(ostream& o)const		{o << string();}
   virtual std::string string()const = 0;
 
-  void	operator=(const std::string& s)	{ untested();
+  void	operator=(const std::string& s)	{
     operator=(IString(s));
   }
 };
@@ -114,10 +114,10 @@ public:
   void	operator=(const T& v)		{_v = v; _s = "#";}
   //void	operator=(const std::string& s)	{untested();_s = s;}
 
-  void	operator=(const char* s)	{ untested();
+  void	operator=(const char* s)	{
     operator=(IString(s));
   }
-  void	operator=(const IString& s)	{ untested();
+  void	operator=(const IString& s)	{
     if (strchr("'\"{", s[0].to_char())) {
       CS cmd(CS::_STRING, s.to_string());
       _s = cmd.ctos("", "'\"{", "'\"}");
@@ -394,7 +394,7 @@ public:
   virtual bool operator==(const PARAM_LIST_BASE& )const {return 0;}
   void set_try_again(PARAM_LIST_BASE* t) {_try_again = t;}
   const PARAMETER<double>& deep_lookup(IString)const;
-  const PARAMETER<double>& operator[](IString i)const {untested();
+  const PARAMETER<double>& operator[](IString i)const {
     return deep_lookup(i);
   }
   PARAMETER<double>& find(IString); // hack?
@@ -733,16 +733,16 @@ inline std::string PARAMETER<std::string>::e_val_strange(const IString& /*def*/,
   // // cleanup needed
   if (_v=="NA"){untested();
     _v = _s.to_string();
-  }else if (_v=="NA( NA)"){ untested();
+  }else if (_v=="NA( NA)"){
     _v = _s.to_string();
-  }else{untested();
+  }else{
   }
 
   if (_v=="empty"){ untested();
     _v="";
-  }else if (_v=="none") {untested();
+  }else if (_v=="none") {
     _v="";
-  }else{untested();
+  }else{
   }
 
   trace0(("Evaluated " +_s + " to " + _v).c_str());
@@ -816,7 +816,7 @@ class PARAMETER<std::vector<PARAMETER<T> > > : public PARA_BASE{
     void	operator=(const PARAMETER<std::vector<PARAMETER<T> > >& p){ untested();
       _v = p._v; _s = p._s;
     }
-    void	operator=(const std::vector<PARAMETER<T> >& v) { untested();
+    void	operator=(const std::vector<PARAMETER<T> >& v) {
       _v = v; _s = "#";
     }
     bool operator==(const PARAMETER<std::vector<PARAMETER<double> > >& p)const;
@@ -840,14 +840,14 @@ PARAMETER<std::vector<PARAMETER<T> > >::operator std::string()const
 template <class T>
 inline std::string PARAMETER<std::vector<PARAMETER<T> > >::string()const{
   std::string ret("");
-  if (PARAMETER<std::vector<PARAMETER<T> > >::_s == "#") { untested();
+  if (PARAMETER<std::vector<PARAMETER<T> > >::_s == "#") {
     ret+= "(";
-  }else if (_s == "") { untested();
+  }else if (_s == "") {
     ret+= "NA(";
   }else{ untested();
     return _s.to_string();
   }
-  for(unsigned  i=0; i<_v.size(); i++){ untested();
+  for(unsigned  i=0; i<_v.size(); i++){
     ret+= (i)?",":"";
     ret+= _v[i].string();
   }

@@ -205,7 +205,7 @@ inline CARD_LIST::fat_iterator findbranch(const IString cmd, CARD_LIST* cl = 0)
 {
   if (cl==0){untested();
     cl = &CARD_LIST::card_list;
-  }else{untested();
+  }else{
   }
   CS c(CS::_STRING, cmd.to_string());
   return findbranch(c, CARD_LIST::fat_iterator(cl, cl->begin()));

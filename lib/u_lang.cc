@@ -85,43 +85,43 @@ const CARD* LANGUAGE::find_card(string name, CARD_LIST* Scope, bool nondevice) {
 }
 /*--------------------------------------------------------------------------*/
 const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
-{ untested();
+{
   trace2("LANGUAGE::find_proto", Name, Scope);
   const CARD* p = NULL;
-  if (Scope) { untested();
-    try { untested();
+  if (Scope) {
+    try {
       p = Scope->find_looking_out(Name);
-    }catch (Exception_Cant_Find& e) { untested();
+    }catch (Exception_Cant_Find& e) {
       assert(!p);
     }
-  }else{ untested();
+  }else{
     CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(Name);
-    if (i != CARD_LIST::card_list.end()) { untested();
+    if (i != CARD_LIST::card_list.end()) {
       p = *i;
-    }else{ untested();
+    }else{
       assert(!p);
     }
   }
   
   trace2("lookout", Name, model_dispatcher.size());
-  if (p) { untested();
+  if (p) {
     trace1("LANGUAGE::find_proto found something", prechecked_cast<const COMPONENT*>(p));
     trace1("LANGUAGE::find_proto found something", prechecked_cast<const MODEL_CARD*>(p));
     return p;
-  }else if ((command_dispatcher[Name])) { untested();
+  }else if ((command_dispatcher[Name])) {
     trace1("command_dispatcher", Name);
     return new DEV_DOT;	//BUG// memory leak
-  }else if ((p = device_dispatcher[Name])) { untested();
+  }else if ((p = device_dispatcher[Name])) {
     trace0("LANGUAGE::find_proto found device " +Name);
     return p;
-  }else if ((p = model_dispatcher[Name])) { untested();
+  }else if ((p = model_dispatcher[Name])) {
     trace0("LANGUAGE::find_proto found model " +Name);
     return p;
-  }else{ untested();
+  }else{
     assert(!p);
     IString s;
     /* */if (Umatch(Name, "b{uild} "))      {untested(); s = "build";}
-    else if (Umatch(Name, "del{ete} "))     {untested(); s = "delete";}
+    else if (Umatch(Name, "del{ete} "))     { s = "delete";}
     else if (Umatch(Name, "fo{urier} "))    {untested(); s = "fourier";}
     else if (Umatch(Name, "gen{erator} "))  {		 s = "generator";}
     else if (Umatch(Name, "inc{lude} "))    {itested();  s = "include";}
@@ -142,7 +142,7 @@ const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
     else{ /* no shortcut available */
       s = Name;
     }
-    if ((command_dispatcher[s])) { untested();
+    if ((command_dispatcher[s])) {
       trace1("command_dispatcher", Name);
       return new DEV_DOT; //BUG// we will look it up twice, //BUG// memory leak
     }else{
@@ -160,7 +160,7 @@ const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
 }
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
-{ untested();
+{
   trace4("LANGUAGE::new__instance", cmd.fullstring(), name(), hp(Scope), owner);
 
   if (cmd.is_end()) {

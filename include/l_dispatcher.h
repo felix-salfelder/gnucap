@@ -167,13 +167,13 @@ public:
     }
   }
 
-  TT* operator[](IString s) { untested();
+  TT* operator[](IString s) {
     assert(_map);
     CKT_BASE* rv = (*_map)[s];
     return prechecked_cast<TT*>(rv);
   }
 
-  TT* operator[](CS& cmd) { untested();
+  TT* operator[](CS& cmd) {
     unsigned here = cmd.cursor();
     IString s;
     cmd >> s;

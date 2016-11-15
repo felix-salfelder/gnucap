@@ -1179,7 +1179,7 @@ void SOCK::verainit_reply()
 
   assert(stream.tcur() == 24);
 
-  for (unsigned i = 0; i < n_vars; i++) { untested();
+  for (unsigned i = 0; i < n_vars; i++) {
     trace2("SOCK::verainit_reply",  i, var_namen_arr[i]);
     putstring8( &stream, var_namen_arr[i]);
     stream << '\t'; stream.pad(7);
