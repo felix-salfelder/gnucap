@@ -98,6 +98,17 @@ void read_startup_files(void)
   } catch(Exception e){
     error(bDANGER, "%s\n",e.message().c_str());
   }
+  //CMD::command("clear", &CARD_LIST::card_list);
+  if (!OPT::language) {
+    OPT::language = language_dispatcher[DEFAULT_LANGUAGE];
+    
+    for(DISPATCHER<LANGUAGE>::const_iterator
+	  i=language_dispatcher.begin(); !OPT::language && i!=language_dispatcher.end(); ++i) {untested();
+      OPT::language = prechecked_cast<LANGUAGE*>(i->second);
+    }
+  }else{untested();
+    // already have a language specified in a startup file
+  }
   if (OPT::language) {untested();
     OPT::case_insensitive = OPT::language->case_insensitive();
     OPT::units            = OPT::language->units();
