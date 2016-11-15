@@ -31,6 +31,7 @@ u_probe.h \
 	patchlev.h m_mvpoly.h io_trace.h \
 	d_coment.h d_dot.h d_logic.h d_subckt.h \
 	e_paramlist.h \
+u_prblst.h u_sim_data.h u_sdp.h u_status.h u_time_pair.h u_xprobe.h \
 e_base.h e_card.h e_node.h e_aux.h e_model.h e_compon.h e_subckt.h \
 e_elemnt.h e_ccsrc.h e_storag.h e_cardlist.h \
 bm.h \

@@ -42,7 +42,6 @@ startup.h md.h ap.h mode.h constant.h declare.h \
 m_cpoly.h m_divdiff.h m_interp.h m_matrix.h m_spline.h m_wave.h \
 m_base.h m_expression.h m_phase.h \
 io_.h io_error.h io_matrix.h io_misc.h \
-u_prblst.h u_sim_data.h u_sdp.h u_status.h u_time_pair.h u_xprobe.h \
 s__.h s_tr.h e_adp.h s_tt.h\
 m_matrix_extra.h \
 e_adplist.h \
