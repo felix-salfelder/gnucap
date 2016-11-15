@@ -24,8 +24,9 @@
 #include "u_parameter.h"
 #include "globals.h"
 #include "m_wave.h"
+#include "l_istring.h"
 /*--------------------------------------------------------------------------*/
-namespace {
+namespace { //
 
 using std::map;
 using std::string;
@@ -38,25 +39,25 @@ public:
   {
     string stash = "stash";
     if (cmd.is_end()) { untested();
-      for(auto x : _sim->_waves){
+      for(auto x : _sim->_waves){ untested();
 	IO::mstdout << x.first << endl;
       }
-    }else{
+    }else{ untested();
       string name, pname;
       WAVE* w;
       cmd >> pname;
-      if(cmd.more()){
+      if(cmd.more()){ untested();
 	w = CKT_BASE::find_wave(pname);
-	if (w){
+	if (w){ untested();
 	  cmd >> name;
 	  CKT_BASE::create_wave(name, stash) = *w;
 	}else{untested();
 	  cmd.warn(bWARNING,"no such wave " + pname);
 	}
-      }else{
+      }else{ untested();
 	const WAVE* w = CKT_BASE::find_wave(pname);
-	if(w){
-	  for(auto& pair : *w){
+	if(w){ untested();
+	  for(auto& pair : *w){ untested();
 	    IO::mstdout << pair.first << pair.second << endl;
 	  }
 	}else{incomplete();
@@ -164,7 +165,7 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "wcmp", &p1);
 class CMD_WARP : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {
+  { untested();
     string name;
     PARAMETER<double> s;
     cmd >> name;
@@ -172,7 +173,7 @@ public:
     s.e_val(1., Scope);
 
     WAVE* w1 = CKT_BASE::find_wave(name);
-    if(w1){
+    if(w1){ untested();
       w1->warp(s);
     }else{untested();
       cmd.warn(bDANGER, "no wave " + name);
@@ -181,10 +182,10 @@ public:
 } p4;
 DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "wwarp", &p4);
 /*--------------------------------------------------------------------------*/
-class CMD_SCALE : public CMD {
+class CMD_SCALE : public CMD { //
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {
+  { untested();
     string name;
     PARAMETER<double> s;
     cmd >> name;
@@ -192,7 +193,7 @@ public:
     s.e_val(1., Scope);
 
     WAVE* w1 = CKT_BASE::find_wave(name);
-    if(w1){
+    if(w1){ untested();
       *w1 *= double(s);
     }else{untested();
       cmd.warn(bDANGER, "no wave " + name);
@@ -204,23 +205,25 @@ DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "wscale", &p2);
 class CMD_WAVE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* scope)
-  {
-    string what;
+  { untested();
+    IString what;
     cmd >> what;
 
     auto w = _what.find(what);
-    if(w != _what.end()){
+    if(w != _what.end()){ untested();
+      error(bDEBUG, "wave " + what + "\n");
       auto c = w->second;
-      (this->*c)(cmd,scope);
+      (this->*c)(cmd, scope);
+      error(bDEBUG, "wave " + what + " done\n");
     }else{ untested();
       cmd.warn(bDANGER, "what's this?");
     }
   }
 private:
-  static map<string, void (CMD_WAVE::*)(CS&, CARD_LIST*)> _what;
+  static map<IString, void (CMD_WAVE::*)(CS&, CARD_LIST*)> _what;
   // umm use output plugins to do this?!
   void dumpwaves(CS& cmd, const WAVE_LIST* wl)
-  {
+  { untested();
     OMSTREAM out = IO::mstdout;
     out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
     out.outset(cmd);
@@ -233,34 +236,34 @@ private:
     sprintf(format, "%%c%%-%us", width);
     out.form(format, '#', "key");
 
-    for(const auto& x : *wl){
+    for(const auto& x : *wl){ untested();
       out.form(format, ' ', x.first.c_str());
       *ws = std::pair<const WAVE*, WAVE::const_iterator>(&x.second, x.second.begin());
       ++ws;
     }
     out << endl;
 
-    while(true){
+    while(true){ untested();
       double key = inf;
-      for( std::pair<const WAVE*, WAVE::const_iterator> x : Wit ){
+      for( std::pair<const WAVE*, WAVE::const_iterator> x : Wit ){ untested();
 	trace5("found key", *(Wit[0].second), x.first->size(), *x.first->begin(), *x.second, x.second->first);
 
-	if(x.second == x.first->end()){
-	}else if (x.second->first <= key) {
+	if(x.second == x.first->end()){ untested();
+	}else if (x.second->first <= key) { untested();
 	  key = x.second->first;
 	}else{untested();
 	}
       }
-      if(key==inf){
+      if(key==inf){ untested();
 	break;
       }
       out << key;
-      for( auto& x : Wit ){
-	if(x.second == x.first->end()){
+      for( auto& x : Wit ){ untested();
+	if(x.second == x.first->end()){ untested();
 	  out << NOT_VALID;
-	}else{
+	}else{ untested();
 	  out << x.first->v_out(key).f0; // fixme: pass iterator
-	  if(x.second->first == key) {
+	  if(x.second->first == key) { untested();
 	    ++(x.second);
 	  }else{untested();
 	  }
@@ -272,47 +275,47 @@ private:
     }
   }
   void dump(CS& cmd, CARD_LIST*)
-  {
+  { untested();
     string what;
     unsigned here=cmd.cursor();
     cmd >> what; // >> what_else >> whatnot ... FIXME dump multiple waves
     trace1("dump", what);
     const WAVE_LIST* wl = CKT_BASE::find_waves(what);
-    if (wl){
+    if (wl){ untested();
       dumpwaves(cmd, wl);
-    }else if( const WAVE* w = CKT_BASE::find_wave(what)) {
+    }else if( const WAVE* w = CKT_BASE::find_wave(what)) { untested();
       OMSTREAM out = IO::mstdout;
       out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
       out.outset(cmd);
       error(bTRACE, "dumping " + what + "\n");
-      for(auto pair : *w){
+      for(auto pair : *w){ untested();
 	out << pair.first << pair.second << endl;
       }
-    }else{
+    }else{ untested();
       cmd.reset(here);
       cmd.warn(bWARNING, "what's this?");
     }
 
   }
   void list(CS& cmd, CARD_LIST*)
-  {
+  { untested();
     string what;
     string comma;
     cmd >> what;
-    if(what!=""){
+    if(what!=""){ untested();
       WAVE_LIST* w = CKT_BASE::find_waves(what);
-      if(w){
-	for (auto i : *w){
+      if(w){ untested();
+	for (auto i : *w){ untested();
 	  IO::mstdout << comma << i.first << " (" << i.second.size() << ")";
 	  comma = ",\n";
 	}
 	IO::mstdout << endl;
       }else{incomplete();
       }
-    }else{
-      for (auto i : _sim->_waves){
+    }else{ untested();
+      for (auto i : _sim->_waves){ untested();
 	IO::mstdout << comma;
-	if(_sim->_label == i.first){
+	if(_sim->_label == i.first){ untested();
 	  IO::mstdout << "*";
 	}
 	IO::mstdout << i.first;
@@ -324,12 +327,12 @@ private:
     }
   }
   void build(CS& cmd, CARD_LIST*)
-  {
+  { untested();
     string file_name;
     string coll_name;
     CS* input = &cmd;
     bool file = false;
-    if(!cmd.match1("<")){
+    if(!cmd.match1("<")){ untested();
       cmd >> coll_name;
     }else{itested();
     }
@@ -341,7 +344,7 @@ private:
       trace1("wave", file_name);
       input = new CS(CS::_INC_FILE, file_name);
       file = true;
-    }else if(coll_name==""){
+    }else if(coll_name==""){ untested();
       cmd.warn(bDANGER, "need name");
       return;
     }
@@ -351,24 +354,20 @@ private:
     auto before_end = wp.before_begin();
 
     input->get_line("wave-head>");
-    if(input->match1('#')){
+    if(input->match1('#')){ untested();
       string name;
       *input >> name; // discard
       name = input->ctos("","","","");
-      while(*input){
-	if (OPT::case_insensitive) {
-	  notstd::to_upper(&name);
-	}else{untested();
-	}
+      while(*input){ untested();
 	wp.insert_after(before_end, &wl[name]);
 	++before_end;
 	name = input->ctos("","","","");
       }
-    }else{
+    }else{ untested();
       double key, data;
       *input >> key;
       unsigned i = 0;
-      while(*input >> data){
+      while(*input >> data){ untested();
 	trace2("push head", key, data);
 	string name = to_string(i++);
 	WAVE* w = &wl[name];
@@ -378,50 +377,58 @@ private:
       }
     }
     input->get_line("wave>");
+    error(bTRACE, ">w1> " +  input->fullstring() + " " + to_string(input->is_end()) + "\n");
 
-
-    while(!input->is_end()){
+    while(!input->is_end()){ untested();
       double key, data;
       *input >> key;
       trace2("line", key, input->fullstring());
       auto p = wp.begin();
-      while(p!=wp.end()){
-	if(*input >> data){
+      while(p!=wp.end()){ untested();
+	if(*input >> data){ untested();
 	  (*p)->push(key,data);
-	}else{
+	}else{ untested();
 	  input->skiparg();
 	}
 	assert(p!=wp.end());
 	++p;
       }
-      try{
+      try{ untested();
 	input->get_line("wave>");
-      }catch (Exception_End_Of_Input& e) { itested();
+	error(bTRACE, ">w>> " +  input->fullstring() + " " + to_string(input->is_end()) + "\n");
+      }catch (Exception_End_Of_Input& e) { untested();
 	break;
       }
+      if(cmd.umatch(". ")){ untested();
+	break;
+      }else if(cmd.is_end()){ untested();
+	break;
+      }else{untested();
+      }
     }
-    if(file){itested();
+    if(file){untested();
       delete input;
       itested();
+    }else{untested();
     }
   }
-  typedef enum {
+  typedef enum { //
     mHD,  // hausdorff
     mDHD, // discrete hausdorff
     mSUP
   } method_t;
   void cmp(CS& cmd, CARD_LIST*)
-  {
+  { untested();
     string s1, s2;
     cmd >> s1;
     const WAVE* w1 = CKT_BASE::find_wave(s1);
-    if(!w1){
+    if(!w1){ untested();
       cmd.warn(bDANGER, "no wave " + s1);
       return;
     }
     cmd >> s2;
     const WAVE* w2 = CKT_BASE::find_wave(s2);
-    if(!w2){
+    if(!w2){ untested();
       cmd.warn(bDANGER, "no wave " + s2);
       return;
     }
@@ -432,7 +439,7 @@ private:
     OMSTREAM out;
 
     unsigned here = cmd.cursor();
-    do{
+    do{ untested();
       ONE_OF
 	|| Get(cmd, "directed",	   &directed) // FIXME: does not apply in most cases...
 	|| Get(cmd, "v{erbose}",   &verbose)
@@ -450,18 +457,18 @@ private:
     double ret;
     std::pair<DPAIR, DPAIR> where;
     std::pair<DPAIR, DPAIR>* wherep = NULL;
-    if(verbose){
+    if(verbose){ untested();
       wherep = &where;
     }
 
     auto bak = where;
     double dd;
     string to = "to";
-    switch(method){
+    switch(method){ untested();
       case mHD:
 	ret = w1->dhd_linear(*w2, wherep);
 	bak = where;
-	if(!directed){
+	if(!directed){ untested();
 	  dd = w2->dhd_linear(*w1, wherep);
 	  if(dd>ret){ untested();
 	    ret = dd;
@@ -475,13 +482,13 @@ private:
       case mDHD:
 	ret = w1->dhd_discrete(*w2, wherep);
 	bak = where;
-	if(!directed){
+	if(!directed){ untested();
 	  dd = w2->dhd_discrete(*w1, wherep);
-	  if(dd>ret){
+	  if(dd>ret){ untested();
 	    ret = dd;
 	    to = "from";
 	    swap(where.first, where.second);
-	  } else{
+	  } else{ untested();
 	    where = bak;
 	  }
 	}
@@ -492,21 +499,21 @@ private:
 
     IO::mstdout << ret;
 
-    if(verbose){
+    if(verbose){ untested();
       IO::mstdout << " at " << where.first << " " << to << " " << where.second;
     }
 
     IO::mstdout << endl;
   }
   void select(CS& cmd, CARD_LIST*)
-  {
+  { untested();
     string what;
     cmd >> what;
     _sim->_label = what;
   }
 } p5;
 /*--------------------------------------------------------------------------*/
-map<string, void (CMD_WAVE::*)(CS&, CARD_LIST*)> CMD_WAVE::_what =
+map<IString, void (CMD_WAVE::*)(CS&, CARD_LIST*)> CMD_WAVE::_what =
   boost::assign::map_list_of
       ("build",  &CMD_WAVE::build)
       ("list",   &CMD_WAVE::list)
