@@ -589,10 +589,10 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	if (cmd.stuck(&here)) {untested();
 	  break;
 	}else{
-	  try{
-	    if (Name == "") {
+	  try{ untested();
+	    if (Name == "") { untested();
 	      Name = "pos"+::to_string(i);
-	      if(cc){
+	      if(cc){ untested();
 		cc = c->common()->clone();
 		cc->set_param_by_index(i, value, 0);
 		c->attach_common(cc);
@@ -602,7 +602,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	      }
 	    }else if (value == "") {untested();
 	      cmd.warn(bDANGER, there, x->long_label() + ": " + Name + " has no value?");
-	    }else{
+	    }else{ untested();
 	      x->set_param_by_name(Name.to_string(), value);
 	    }
 	  }catch (Exception_No_Match&) { untested();
@@ -822,10 +822,6 @@ std::string LANG_SPICE_BASE::find_type_in_string(CS& cmd) const
   unsigned here = cmd.cursor();
   std::string s;
   char id_letter = cmd.peek();
-  if (OPT::case_insensitive) {
-    id_letter = static_cast<char>(toupper(id_letter));
-  }else{
-  }
   switch (id_letter) {untested();
   case '\0':untested();
     s = "";
