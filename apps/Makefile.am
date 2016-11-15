@@ -44,6 +44,9 @@ S_SRCS = \
 LANG_SRCS = \
 lang_spice.cc lang_spectre.cc lang_verilog.cc
 
+## The modelgen generated files
+MODELSRCS= ${MODELS:.model=.cc} ${MODELS:.model=.h}
+
 gnucap_default_plugins_la_LDFLAGS = -shared -module -avoid-version
 gnucap_default_plugins_la_SOURCES = \
 	$(BM_SRCS) $(D_SRCS) $(FUNC_SRCS) \

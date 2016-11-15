@@ -52,9 +52,6 @@ u_sock.h s_ddc.h u_atlas.h
 
 noinst_HEADERS = d_coil.h
 #------------------------------------------------------------------------ 
-## The modelgen generated files
-MODELSRCS= ${MODELS:.model=.cc} ${MODELS:.model=.h}
-
 # extlib_o_SOURCES = extlib.h 
 #
 plugindir_transformed = ${libdir}/$(shell echo gnucap | sed -e "$(transform)")
