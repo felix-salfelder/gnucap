@@ -37,7 +37,7 @@ CS& CS::umatch(const std::string& s)
   trace1("umatchhuh", s.c_str());
   bool optional = 0;
 
-  for (;;) { untested();
+  for (;;) { itested();
     trace1("loop", *str2);
     if ((!*str2) || (*str2 == '|')) { untested();
       _ok = true;
@@ -63,13 +63,13 @@ CS& CS::umatch(const std::string& s)
 	trace1("opt", *str2);
 	++str2;
       }
-    }else{ untested();
+    }else{ itested();
       // mismatch
       const Ichar* bar = (const Ichar*) strchr((const char*) str2, '|');
       if (bar && (*(bar-1) != '\\')) { untested();
 	str2 = bar+1;
 	reset(start);
-      }else{ untested();
+      }else{ itested();
 	_ok = false;
 	break;
       }

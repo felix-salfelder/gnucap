@@ -105,7 +105,7 @@ static void parse_args_paramset(CS& cmd, MODEL_CARD* x)
   while (cmd >> '.') {
     unsigned here = cmd.cursor();
     std::string name, value;
-    try{
+    try{ untested();
       cmd >> name >> '=' >> value >> ';';
       x->set_param_by_name(name, value);
     }catch (Exception_No_Match&) {itested();

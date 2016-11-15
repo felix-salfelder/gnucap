@@ -38,7 +38,7 @@ struct Ichar{
   Ichar(const Ichar& c) : _c(c._c) {untested();}
   explicit Ichar(char c) : _c(c) {untested();}
   bool operator==(char o) const {
-    if(OPT::case_insensitive){ untested();
+    if(OPT::case_insensitive){ itested();
       return tolower(_c)==tolower(o);
     }else if(o==_c){ untested();
       return true;
@@ -49,7 +49,7 @@ struct Ichar{
  // bool operator!=(char o) const { untested();
  //   return(!operator==(o));
  // }
-  bool operator==(Ichar o) const { untested();
+  bool operator==(Ichar o) const { itested();
     if(OPT::case_insensitive){ untested();
       return tolower(_c)==tolower(o._c);
     }else{ untested();
@@ -167,6 +167,7 @@ public:
   IString(const IString& s) : base(s) { }
   IString(const base& s) : base(s) { }
 public: // these are better implicit.
+//  IString(Ichar s) : base(s) { untested(); }
   IString(const char* s) : base((const Ichar*)s) { untested(); }
   IString(const std::string& s) : base((Ichar const*)s.c_str()) { untested(); }
 public: // ops

@@ -160,7 +160,7 @@ const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
 }
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
-{
+{ untested();
   trace4("LANGUAGE::new__instance", cmd.fullstring(), name(), hp(Scope), owner);
 
   if (cmd.is_end()) {

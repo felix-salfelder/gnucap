@@ -1,8 +1,5 @@
->>>>>
 >>>>>* hmmm
 >>>>>options nocstray
->>>>>
->>>>>
 >>>>>*.include inv_amp_p.mod
 >>>>>param vdd=5
 >>>>>spice
