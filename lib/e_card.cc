@@ -78,7 +78,7 @@ CARD::~CARD()
 	delete _subckt;
 }
 /*--------------------------------------------------------------------------*/
-std::string CARD::long_label()const
+std::string const CARD::long_label()const
 {
   std::string buffer(short_label());
   for (const CARD* brh = owner();  brh;  brh = brh->owner()) {

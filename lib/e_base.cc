@@ -66,7 +66,7 @@ CKT_BASE::~CKT_BASE()
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string CKT_BASE::long_label()const
+std::string const CKT_BASE::long_label()const
 {
   trace0("CKT_BASE::long_label");
   //incomplete();

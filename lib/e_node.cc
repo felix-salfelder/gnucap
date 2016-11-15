@@ -303,7 +303,7 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string NODE_BASE::long_label()const
+std::string const NODE_BASE::long_label()const
 {
   std::string ret(short_label());
   if (_scope){

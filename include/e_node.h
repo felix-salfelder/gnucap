@@ -145,7 +145,7 @@ class NODE_BASE : public CKT_BASE {
     virtual double	tr_probe_num(const std::string&)const;
     virtual double	tt_probe_num(const std::string&)const;
     virtual XPROBE	ac_probe_ext(const std::string&)const;
-    std::string long_label()const;
+    std::string const long_label()const;
   public:
     const CARD_LIST* scope()const{return _scope;}
     void collapse(const NODE_BASE& to) const;
