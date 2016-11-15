@@ -51,7 +51,7 @@ uint_t ADP_NODE::order() const{
 //  tr_hi = -inf;
 //}
 /*----------------------------------------------------------------------------*/
-ADP_NODE::ADP_NODE( const std::string n, const CARD_LIST* c):
+ADP_NODE::ADP_NODE( const IString n, const CARD_LIST* c):
   NODE_BASE(n, unsigned(-1), c),
   dbg(0),
   tr_value(0.),
@@ -64,7 +64,7 @@ ADP_NODE::ADP_NODE( const std::string n, const CARD_LIST* c):
   trhack(0.)
 {
   trace1("ADP_NODE::ADP_NODE ", n);
-  set_label( n );
+  set_label( n.to_string() );
   set_owner( 0 );
 
   _delta_expect = 0.;

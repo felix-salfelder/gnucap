@@ -71,13 +71,14 @@ NODE_MAP::~NODE_MAP()
 //#ifdef DO_TRACE FIXME!
 // slow/stupid, but used for sckt node naming.
 // need map<unsigned, NODE_BASE*>;
-NODE_BASE* NODE_MAP::operator[](unsigned x)const {
+NODE_BASE* NODE_MAP::operator[](unsigned x)const
+{ untested();
   USE(x);
 
   for (NODE_MAP::const_iterator ni = _node_map.begin(); ni != _node_map.end(); ++ni) {
     NODE_BASE* n = (*ni).second;
     USE(n);
-    string label = (*ni).first;
+    IString label = (*ni).first;
     trace2("NODE_MAP::operator[]", x, label);
 
     CKT_NODE* c = dynamic_cast<CKT_NODE*>(n);
@@ -91,7 +92,7 @@ NODE_BASE* NODE_MAP::operator[](unsigned x)const {
 /* return a pointer to a node given a string
  * returns NULL pointer if no match
  */
-NODE_BASE* NODE_MAP::operator[](std::string s)
+NODE_BASE* NODE_MAP::operator[](IString s)
 {
   const_iterator i = find_in_map(_node_map, s);
   if (i != _node_map.end()) {
@@ -104,22 +105,18 @@ NODE_BASE* NODE_MAP::operator[](std::string s)
 /* return a pointer to a node given a string
  * creates a new one if it isn't already there.
  */
-CKT_NODE* NODE_MAP::new_node(std::string s_in, const CARD_LIST* scope)
+CKT_NODE* NODE_MAP::new_node(IString s_in, const CARD_LIST* scope)
 {
-  std::string::size_type dotplace = s_in.find_last_of(".");
-  string s = s_in;
+  IString::size_type dotplace = s_in.find_last_of(".");
+  IString s = s_in;
 
   trace1("new_node", s_in);
   // allow leading dot only (stupid)
-  if(dotplace == std::string::npos || s_in.c_str()[0]=='.'){
+  if(dotplace == std::string::npos || s_in[0]=='.'){
   }else{
     error(bWARNING,"something wrong with dotplace" + s_in + "\n");
   }
 
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&s);
-  }else{
-  }
   NODE_BASE* node = _node_map[s];
   CKT_NODE* cnode=dynamic_cast<CKT_NODE*>(node);
 
@@ -141,16 +138,12 @@ CKT_NODE* NODE_MAP::new_node(std::string s_in, const CARD_LIST* scope)
   return dynamic_cast<CKT_NODE*>(node); 
 }
 /*--------------------------------------------------------------------------*/
-ADP_NODE* NODE_MAP::new_adp_node(std::string s, const CARD_LIST* p)
+ADP_NODE* NODE_MAP::new_adp_node(IString s, const CARD_LIST* p)
 {
   std::string::size_type dotplace = s.find_last_of(".");
   assert(dotplace == std::string::npos); USE(dotplace);
 
   trace1("NODE_MAP::new_node ", s);
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&s);
-  }else{
-  }
   NODE_BASE* node = _node_map[s];
   ADP_NODE* anode = dynamic_cast<ADP_NODE*>(node);
 

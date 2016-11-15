@@ -34,7 +34,7 @@ public:
   void do_it(CS& Cmd, CARD_LIST* Scope)
   {
     trace1("CMD_MEASURE::do_it", (string(Cmd)));
-    std::string assign_to, function;
+    IString assign_to, function;
     Cmd >> assign_to >> '=' >> function >> '(';
     if (FUNCTION_BASE* f = measure_dispatcher[function]) {
       trace1("CMD_MEASURE::do_it", f->label());
@@ -56,7 +56,7 @@ public:
       pl->set(assign_to, value);
       out.outreset();
     }else{
-      throw Exception_No_Match(function);
+      throw Exception_No_Match(function.to_string());
     }
   }
 } p0;

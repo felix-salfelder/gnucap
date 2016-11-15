@@ -71,7 +71,7 @@ public:
     if (_w) {
       return to_fun_t((derivative) ? (_w->v_out(x).f1) : (_w->v_out(x).f0));
     }else{
-      throw Exception_No_Match(probe_name);
+      throw Exception_No_Match(probe_name.to_string());
     }
   }
 } p1;

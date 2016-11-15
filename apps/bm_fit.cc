@@ -42,7 +42,7 @@ private:
   PARAMETER<double> _above;
   PARAMETER<double> _delta;
   PARAMETER<int>    _smooth;
-  static map<string, PARA_BASE EVAL_BM_FIT::*> param_dict;
+  static std::map<string, PARA_BASE EVAL_BM_FIT::*> param_dict;
 
   std::vector<std::pair<PARAMETER<double>,PARAMETER<double> > > _table;
   SPLINE* _spline;
@@ -147,7 +147,7 @@ void EVAL_BM_FIT::precalc_last(const CARD_LIST* Scope)
 	 iterator p = _table.begin();  p != _table.end();  ++p) {
     if (last > p->first) {untested();
       throw Exception_Precalc("FIT table is out of order: (" + ::to_string(last)
-      			      + ", " + string(p->first) + ")\n");
+      			      + ", " + p->first.string() + ")\n");
     }else{
     }
     last = p->first;
@@ -196,7 +196,7 @@ bool EVAL_BM_FIT::parse_numlist(CS& cmd)
   return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
-map<string, PARA_BASE EVAL_BM_FIT::*> EVAL_BM_FIT::param_dict = 
+std::map<string, PARA_BASE EVAL_BM_FIT::*> EVAL_BM_FIT::param_dict = 
   boost::assign::map_list_of
     ("order", (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_order)
     ("below", (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_below)

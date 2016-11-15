@@ -135,7 +135,7 @@ void make_common_param_names(std::ofstream& out, const Device& d)
 {
   make_tag();
   out <<
-    "map<string, PARA_BASE COMMON_" << d.name() << "::*> COMMON_" << d.name() << "::param_dict\n"
+    "std::map<string, PARA_BASE COMMON_" << d.name() << "::*> COMMON_" << d.name() << "::param_dict\n"
     "  = boost::assign::map_list_of\n";
   for (Parameter_List::const_iterator
        p = d.common().override().begin();
@@ -157,7 +157,7 @@ void make_common_param_names(std::ofstream& out, const Device& d)
   }
   out << ";";
   out <<
-    "map<string, PARA_BASE COMMON_" << d.name() << "::*> COMMON_" << d.name() << "::param_dict_low\n"
+    "std::map<string, PARA_BASE COMMON_" << d.name() << "::*> COMMON_" << d.name() << "::param_dict_low\n"
     "  = boost::assign::map_list_of\n";
   for (Parameter_List::const_iterator
        p = d.common().override().begin();

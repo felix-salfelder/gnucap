@@ -389,8 +389,8 @@ void TTT::sweep()
 	}
 
 	if(_no_act) { untested();
-		_out << "ttt " << string(_Tstart) << " " << string(_Tstop) << " " << string(_Tstep)
-		     << " tran " << string(_tstop) << " " << string(_tstrobe) << "\n";
+		_out << "ttt " << _Tstart.string() << " " << _Tstop.string() << " " << _Tstep.string()
+		     << " tran " << _tstop.string() << " " << _tstrobe.string() << "\n";
 		_out << "stepmode " << _stepmode << "\n";
 		return;
 	}else{
@@ -644,7 +644,7 @@ void TTT::sweep_tr() // tr sweep wrapper.
 	_sim->_mode = s_TRAN;
 	//print_head_tr(); wrong. not b4 accept
 	trace4("TTT::sweep_tr", storelist().size() , _sim->tt_iteration_number(), ttcontrol, _tstop);
-	typedef std::map<std::string, WAVE > wavemap_t;
+	typedef std::map<IString, WAVE> wavemap_t;
 	for ( wavemap_t::iterator i = _sim->_waves["tran"].begin(); i != _sim->_waves["tran"].end(); ++i) {
 		i->second.initialize();
 	}
@@ -842,9 +842,9 @@ void TTT::probeexpand()
 		MEAS_PROBE* w = dynamic_cast<MEAS_PROBE*>(*p);
 		if (w) {
 			w->expand();
-			string probe_name = w->probe_name;
+			IString probe_name = w->probe_name;
 			trace1("TTT::probeexpand", probe_name);
-			CS* c = new CS(CS::_STRING,probe_name);
+			CS* c = new CS(CS::_STRING, probe_name.to_string());
 			measstore.add_list(*c);
 			delete c;
 		} else {
@@ -893,10 +893,7 @@ void TTT::allocate()
 	unsigned ii = 0;
 	for (PROBELIST::const_iterator
 			p=storelist().begin();  p!=storelist().end();  ++p) {
-		string l = (*p)->label();
-		if (OPT::case_insensitive) {
-			notstd::to_upper(&l);
-		}
+		IString l = (*p)->label();
 		_wavep[ii++] = &(_sim->_waves["tran"][l]);
 	}
 	_sim->set_command_tt();
@@ -1208,10 +1205,7 @@ void TTT::head_tt(double start, double stop, const std::string& col1)
 		unsigned ii = 0;
 		for (PROBELIST::const_iterator
 				p=storelist().begin();  p!=storelist().end();  ++p) {
-			string l = (*p)->label();
-			if (OPT::case_insensitive) {
-				notstd::to_upper(&l);
-			}
+			IString l = (*p)->label();
 			_wavep_tt[ii] = &(_sim->_waves[_sim->_label][l]);
 			_wavep_tt[ii++]->initialize();
 		}
@@ -1266,10 +1260,7 @@ void TTT::head(double /* start */ , double /* stop */, const std::string& )
 	unsigned ii = 0;
 	for (PROBELIST::const_iterator
 			p=storelist().begin();  p!=storelist().end();  ++p) {
-		string l = (*p)->label();
-		if (OPT::case_insensitive) {
-			notstd::to_upper(&l);
-		}
+		IString l = (*p)->label();
 		_wavep[ii] = &(_sim->_waves["tran"][l]);
 		_wavep[ii++]->initialize();
 	}
@@ -1468,7 +1459,7 @@ void TTT::print_results_tr(double Time ) // Time is begin of frame
 	if (!IO::plotout.any() && _sim->tt_iteration_number() > 0 ) {
 		// 1st step has already been printed (no need for review)
 		TRANSIENT::_out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-		std::map<std::string, WAVE>::const_iterator wi = _sim->_waves["tran"].begin();
+		std::map<IString, WAVE>::const_iterator wi = _sim->_waves["tran"].begin();
 		assert(wi!=_sim->_waves["tran"].end());
 		w = &wi->second;
 

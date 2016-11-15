@@ -25,9 +25,10 @@
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
-#include "e_model.h"
-#include "d_subckt.h"
+#include "e_model.h" // BUG (frozen)
+#include "d_subckt.h" // BUG (frozen)
 #include "io_misc.h"
+#include "l_istring.h"
 /*--------------------------------------------------------------------------*/
 const int POOLSIZE = 4;
 /*--------------------------------------------------------------------------*/
@@ -77,7 +78,7 @@ CARD::~CARD()
 	delete _subckt;
 }
 /*--------------------------------------------------------------------------*/
-const std::string CARD::long_label()const
+std::string CARD::long_label()const
 {
   std::string buffer(short_label());
   for (const CARD* brh = owner();  brh;  brh = brh->owner()) {
@@ -129,16 +130,16 @@ const CARD_LIST* CARD::scope()const
  * capable of finding me.
  * throws exception if can't find.
  */
-CARD* CARD::find_in_my_scope(const std::string& name)
+CARD* CARD::find_in_my_scope(const IString& name)
 {
-  assert(name != "");
+  assert(name.size());
   assert(scope());
 
   trace0(("CARD::find_in_my_scope, looking for " + name).c_str() );
 
   CARD_LIST::iterator i = scope()->find_(name);
   if (i == scope()->end()) {
-    throw Exception_Cant_Find(long_label(), name,
+    throw Exception_Cant_Find(long_label(), name.to_string(),
 			      ((owner()) ? owner()->long_label() : "(root)"));
   }else{
   }
@@ -150,7 +151,7 @@ CARD* CARD::find_in_my_scope(const std::string& name)
  * capable of finding me.
  * throws exception if can't find.
  */
-const CARD* CARD::find_in_my_scope(const std::string& name)const
+const CARD* CARD::find_in_my_scope(const IString& name)const
 {
   assert(name != "");
   assert(scope());
@@ -159,7 +160,7 @@ const CARD* CARD::find_in_my_scope(const std::string& name)const
 
   CARD_LIST::const_iterator i = scope()->find_(name);
   if (i == scope()->end()) {
-    throw Exception_Cant_Find(long_label(), name,
+    throw Exception_Cant_Find(long_label(), name.to_string(),
 			      ((owner()) ? owner()->long_label() : "(root)"));
   }else{
   }
@@ -172,14 +173,14 @@ const CARD* CARD::find_in_my_scope(const std::string& name)const
  * If there is no parent (I'm an original), use my scope.
  * throws exception if can't find.
  */
-const CARD* CARD::find_in_parent_scope(const std::string& name)const
+const CARD* CARD::find_in_parent_scope(const IString& name)const
 {
   assert(name != "");
   const CARD_LIST* p_scope = (scope()->parent()) ? scope()->parent() : scope();
 
   CARD_LIST::const_iterator i = p_scope->find_(name);
   if (i == p_scope->end()) {
-    throw Exception_Cant_Find(long_label(), name);
+    throw Exception_Cant_Find(long_label(), name.to_string());
   }else{
   }
   return *i;
@@ -189,7 +190,7 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
  * capable of finding me, or anything back to root.
  * throws exception if can't find.
  */
-const CARD* CARD::find_looking_out(const std::string& name)const
+const CARD* CARD::find_looking_out(const IString& name)const
 {
   try {
     return find_in_parent_scope(name);
@@ -259,6 +260,7 @@ node_t& CARD::n_(unsigned i)const
   return _n[i];
 }
 /*--------------------------------------------------------------------------*/
+// virtual. cannot use IString here.
 void CARD::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("CARD::set_param_by_name", Name, Value);

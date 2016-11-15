@@ -86,7 +86,7 @@ public:
       }
       return to_fun_t(area/(lower->first - begin->first));
     }else{
-      throw Exception_No_Match(probe_name);
+      throw Exception_No_Match(probe_name.to_string());
     }
   }
 } p4;

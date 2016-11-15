@@ -306,7 +306,7 @@ std::string MODEL_BUILT_IN_MOS1::param_value(int i)const
   case 3:  unreachable(); return "";
   case 4:  unreachable(); return "";
   case 5:  unreachable(); return "";
-  case 6:  return mos_level;
+  case 6:  return mos_level.string();
   case 7:  return kp.string();
   default: return MODEL_BUILT_IN_MOS123::param_value(i);
   }

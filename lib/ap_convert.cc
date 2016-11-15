@@ -74,7 +74,7 @@ std::string CS::ctos(const std::string& term,
 		     const std::string& end_quote,
 		     const std::string& trap)
 {
-  trace1("CS::ctos", tail());
+//  trace1("CS::ctos", tail());
   assert(begin_quote.length() == end_quote.length());
 
   skipbl();

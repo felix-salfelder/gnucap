@@ -131,8 +131,10 @@ CKT_NODE::CKT_NODE(const CKT_NODE& p)
   unreachable();
 }
 /*--------------------------------------------------------------------------*/
-NODE_BASE::NODE_BASE(const std::string& s, unsigned n, const CARD_LIST* p)
-  :CKT_BASE(s),
+/* usual initializing constructor : name and index
+ */
+NODE_BASE::NODE_BASE(const IString& s, unsigned n, const CARD_LIST* p)
+  :CKT_BASE(s.to_string()),
    _owner(0),
    _scope(p),
    _next(this),
@@ -163,7 +165,11 @@ NODE::NODE(const NODE* p)
 /*--------------------------------------------------------------------------*/
 /* usual initializing constructor : name and index
  */
-CKT_NODE::CKT_NODE(const string& s, unsigned n, const CARD_LIST*p) : NODE_BASE(s,n,p) { }
+CKT_NODE::CKT_NODE(const IString& s, unsigned n, const CARD_LIST*p)
+  : NODE_BASE(s,n,p)
+{ untested();
+
+}
 /*--------------------------------------------------------------------------*/
 node_t::node_t()
   :_nnn(0),
@@ -297,9 +303,9 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
   }
 }
 /*--------------------------------------------------------------------------*/
-const std::string NODE_BASE::long_label()const
+std::string NODE_BASE::long_label()const
 {
-  string ret(short_label());
+  std::string ret(short_label());
   if (_scope){
     if( _scope->owner()){
       return (_scope->owner()->long_label() + "." + ret);
@@ -852,7 +858,7 @@ NODE_BASE* NODE_BASE::lookup_node(string nodelabel, const CARD_LIST* scope)
 {
   if(scope==NULL){untested();
     scope = &CARD_LIST::card_list;
-  }else{untested();
+  }else{
   }
   trace1("NODE_BASE::lookup_node", nodelabel);
   std::string::size_type dotplace = nodelabel.find_first_of(".");

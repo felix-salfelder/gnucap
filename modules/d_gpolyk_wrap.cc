@@ -1,13 +1,12 @@
 #include <globals.h>
 #include <e_compon.h>
 
-namespace {
-using std::string;
+namespace { //
 
 class DEV_G_POLY_K : public COMPONENT { //
 	public:
-		string value_name() const { return "dummy"; }
-		string port_name(uint_t) const { return "dummy"; }
+		std::string value_name() const { return "dummy"; }
+		std::string port_name(uint_t) const { return "dummy"; }
 
 		CARD* clone()const
 		{

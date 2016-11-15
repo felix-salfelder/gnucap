@@ -44,7 +44,6 @@
 /*--------------------------------------------------------------------------*/
 #define userinfo( a,b,c,d,e,f )
 /*--------------------------------------------------------------------------*/
-using namespace std;
 using namespace SOME_CAP_HACK; // FIXME. (maybe use STORAGE device interface?)
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -97,8 +96,8 @@ private:
   void findcaps( CARD_LIST* scope);
   void cap_prepare();
   void cap_reset();
-  vector<string> var_namen_arr;
-  vector<COMPONENT*> _caplist; // FIXME: use cardlist
+  std::vector<IString> var_namen_arr;
+  std::vector<COMPONENT*> _caplist; // FIXME: use cardlist
   CARDSTASH* _capstash;
   uint16_t var_namen_total_size;
 
@@ -116,13 +115,13 @@ private: //vera stuff.
   void transtep_reply(unsigned, bool eol=true);
   void transtep_gc_reply(unsigned);
 
-  char* var_names_buf;
+  Ichar* var_names_buf;
 
   unsigned _verbose;
   size_t total;
   size_t n_inputs() const{return _input_names.size();}
-  vector<string> _input_names;
-  vector<ELEMENT*> _input_devs;
+  std::vector<IString> _input_names;
+  std::vector<ELEMENT*> _input_devs;
   unsigned n_vars;
   unsigned n_vars_square;
   uint16_t n_eingaenge;
@@ -384,7 +383,7 @@ void SOCK::fillnames( const CARD_LIST* scope){
     if (i->first != "0") {
       if (const NODE* a= dynamic_cast<const NODE*>(i->second)){
         stringstream s;
-        string myname(a->long_label());
+        IString myname(a->long_label());
         var_namen_arr[a->matrix_number()-1] = myname;
         var_namen_total_size = static_cast<uint16_t>( var_namen_total_size + static_cast<uint16_t>(myname.length()) + 1 );
       }
@@ -531,12 +530,19 @@ void SOCK::main_loop()
 }
 /*--------------------------------------------------------------------------*/
 // very clever way to transfer strings.
-static void putstring8(SocketStream* s, const string x)
+static void putstring8(SocketStream* s, const IString x)
 {
-  const char* A = x.c_str();
+  const Ichar* A = x.c_str();
 
-  while(*A){
-    *s<<*A<<*A<<*A<<*A<<*A<<*A<<*A<<*A;
+  while(*A!='\0'){
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
     A++;
   }
 }
@@ -591,13 +597,13 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
   assert(stream.bufsize() >= total);
 
   assert(!var_names_buf);
-  var_names_buf = (char*) malloc( n_vars * 128 * sizeof(char));
-  strcpy(var_names_buf,"");
+  var_names_buf = (Ichar*) malloc( n_vars * 128 * sizeof(char));
+  strcpy((char*)var_names_buf, "");
   for (unsigned i=0; i < n_vars; i++)
   {
     trace1("SOCK::verainit ", var_namen_arr[i]);
-    strcat(var_names_buf, var_namen_arr[i].c_str());
-    strcat(var_names_buf, "\t");
+    strcat((char*)var_names_buf, (const char*)var_namen_arr[i].c_str());
+    strcat((char*)var_names_buf, "\t");
   }
   //length = static_cast<uint16_t>( strlen(var_names_buf) );
   // userinfo(1,"vera_titan_ak","Variablennamen %s\n",var_names_buf);
@@ -1056,7 +1062,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
 
 #ifndef NDEBUG
   for (unsigned i=1; i <= n_vars; i++) {
-    if(isnan(_sim->_i[i])||isnan(_sim->_vdcstack.top()[i]) ) {
+    if(std::isnan(_sim->_i[i])||std::isnan(_sim->_vdcstack.top()[i]) ) {
       _error = 1;
       assert(!tr_converged);
     }
@@ -1173,7 +1179,7 @@ void SOCK::verainit_reply()
 
   assert(stream.tcur() == 24);
 
-  for (unsigned i = 0; i < n_vars; i++) {
+  for (unsigned i = 0; i < n_vars; i++) { untested();
     trace2("SOCK::verainit_reply",  i, var_namen_arr[i]);
     putstring8( &stream, var_namen_arr[i]);
     stream << '\t'; stream.pad(7);

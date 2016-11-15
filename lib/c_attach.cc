@@ -192,6 +192,7 @@ public:
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "attach|load", &p1);
 /*--------------------------------------------------------------------------*/
+#if 0
 // overengineered gncap-uf approach
 void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
 { untested();
@@ -237,6 +238,7 @@ void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
     throw Exception(dlerror());
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 {

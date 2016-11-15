@@ -77,20 +77,22 @@ inline bool is_unary(MATH_OP x){
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE : public CKT_BASE {
   protected:
-    std::string	_what;    
-    std::string	_override_label;    
+    IString	_what;
+    IString	_override_label;
   public:
     explicit  PROBE(): _brh(0),_next(0) {unreachable(); incomplete();}
-    explicit  PROBE(const std::string& what, const CKT_BASE *brh);
+    explicit  PROBE(const IString& what, const CKT_BASE *brh);
     PROBE(const PROBE& p);
     virtual ~PROBE();
 
     virtual double value()const;
 
-    void        set_override_label(const std::string _override) { _override_label=_override; }  // ???
+    void        set_override_label(const IString _override) { untested();
+      _override_label = _override;
+    }
 
     PROBE* arg() const {return _arg;}
-    std::string  override_label() const {return _override_label;}
+    IString  override_label() const { untested(); return _override_label;}
     virtual PROBE* clone()const { return (new PROBE(*this));}
     virtual void expand(){}
     virtual void precalc_last(){}
@@ -105,7 +107,7 @@ class INTERFACE PROBE : public CKT_BASE {
     void	    detach();
   PROBE&    operator=(const PROBE& p);
 
-  virtual const std::string label()const;
+  virtual const IString label()const;
   const CKT_BASE* object()const	 {return _brh;}
   double	  lo()const	 {return _lo;}
   double	  hi()const	 {return _hi;}
@@ -138,6 +140,7 @@ public: // compare (for STL)
 };
 
 /*--------------------------------------------------------------------------*/
+#if 0
 class MATH_PROBE : public PROBE {
   public:
     MATH_PROBE(): PROBE() {_next=0;untested(); _arg=0;};
@@ -153,30 +156,36 @@ class MATH_PROBE : public PROBE {
     unsigned _arity;
   public:
     double value()const;
-    const std::string label()const;
+    const IString label()const;
     void push( PROBE* ); 
 };
+#endif
 /*--------------------------------------------------------------------------*/
+// this should be entirely obsolete...
 class EVAL_PROBE: public PROBE {
   public:
-    EVAL_PROBE(): PROBE() {_cmd="none";untested();};
+    EVAL_PROBE(): PROBE() { unreachable();
+      _cmd="none";untested();
+    };
     EVAL_PROBE(const EVAL_PROBE& p);
-    explicit  EVAL_PROBE(const std::string& what, const CARD_LIST* scope);
+    explicit  EVAL_PROBE(const IString& what, const CARD_LIST* scope);
     virtual PROBE* clone()const { return new EVAL_PROBE(*this);}
     EVAL_PROBE&    operator=(const EVAL_PROBE& p);
   private:
     // FIXME carry expression. not _cmd and _scope
-    std::string _cmd;
+    IString _cmd;
     Expression _exp;
     const CARD_LIST* _scope;
   public:
     double value()const;
-    const std::string label()const { return _cmd; }
+    const IString label()const { return _cmd; }
 };
 /*--------------------------------------------------------------------------*/
 class MEAS_PROBE: public PROBE {
   public:
-    MEAS_PROBE(): PROBE() {_cmd="none";untested();};
+    MEAS_PROBE(): PROBE() {
+      _cmd="none";untested();
+    };
     MEAS_PROBE(const MEAS_PROBE& p);
     explicit  MEAS_PROBE(const std::string& what);
     explicit  MEAS_PROBE(const std::string& what, const CARD_LIST* scope);
@@ -188,11 +197,11 @@ class MEAS_PROBE: public PROBE {
     WAVE_FUNCTION* _f;
     WAVE* _w;
   public:
-    string probe_name;
+    IString probe_name;
     void precalc_first();
     void expand();
     double value()const;
-    const std::string label()const;
+    const IString label()const;
     void precalc_last();
 };
 /*--------------------------------------------------------------------------*/

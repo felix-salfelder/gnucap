@@ -38,7 +38,7 @@ private:
   PARAMETER<double> _min;
   PARAMETER<double> _max;
   PARAMETER<bool>   _abs;
-  static map<string, PARA_BASE EVAL_BM_POLY::*> param_dict;
+  static std::map<string, PARA_BASE EVAL_BM_POLY::*> param_dict;
   std::vector<PARAMETER<double> > _c;
   PARAMETER<unsigned> _degree;
   explicit	EVAL_BM_POLY(const EVAL_BM_POLY& p);
@@ -155,34 +155,33 @@ void EVAL_BM_POLY::tr_eval(ELEMENT* d)const
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_POLY::parse_numlist(CS& cmd)
-{
+{ untested();
   unsigned start = cmd.cursor();
   unsigned here = cmd.cursor();
-  for (;;) {
+  for (;;) { untested();
     unsigned old_here = here;
     PARAMETER<double> val;
     cmd >> val;
-    if (cmd.stuck(&here)) {
+    if (cmd.stuck(&here)) { untested();
       // no more, graceful finish
       break;
-    }else{
-      if (cmd.match1('=')) {
+    }else{ untested();
+      if (cmd.match1('=')) { untested();
 	// got one that doesn't belong, back up
 	cmd.reset(old_here);
 	break;
-      }else{
+      }else{ untested();
 	_c.push_back(val);
       }
     }
   }
-  if (cmd.gotit(start)) {
-  }else{
-    untested();
+  if (cmd.gotit(start)) { untested();
+  }else{ untested();
   }
   return cmd.gotit(start);
 }
 /*--------------------------------------------------------------------------*/
-map<string, PARA_BASE EVAL_BM_POLY::*> EVAL_BM_POLY::param_dict = 
+std::map<string, PARA_BASE EVAL_BM_POLY::*> EVAL_BM_POLY::param_dict = 
   boost::assign::map_list_of
     ("min",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_min)
     ("max",  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_max)

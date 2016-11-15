@@ -6,7 +6,7 @@ param q=1
 build
 L1 0 nosc .01m ic=0.00
 .ttcap C1 nosc 0 .01m ic=1
-
+.
 
 options ttsteporder=3
 

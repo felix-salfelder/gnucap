@@ -1109,10 +1109,10 @@ static double triangle_intersection_area(double vgseff, double vgdeff, double bt
   }else{
     // both positive...
     if((btid - vgdeff) * (btis - vgseff) > 0){
-      area = (min(btis,vgseff)+min(btid,vgdeff))*.5;
+      area = (std::min(btis, vgseff) + std::min(btid,vgdeff))*.5;
     }else{
       double t = (btis-vgseff) /  ( vgdeff - vgseff - btid + btis);
-      double big = (max(btis,vgseff) + min(btid,vgdeff))*.5;
+      double big = (std::max(btis,vgseff) + std::min(btid,vgdeff))*.5;
       double small = fabs(vgseff - btis)*t;
       area = big-small;
     }
@@ -1135,7 +1135,7 @@ static double dvth_from_area(double vgs, double vgd, double vth, double area)
     double x = (vgs-vth)/(vgs-vgd); USE(x);
     double rad = 2*area*(vgd-vgs) + (vgs-vth)*(vgs-vth); // vgs - 2*vgs*vth + vth*vth;
     assert(rad>-1e-15);
-    ret = vgs - vth - sqrt(max(0.,rad));
+    ret = vgs - vth - sqrt(std::max(0.,rad));
     trace6("dvth_from_area", area, vgs, vgd, vth, ret, rad);
     assert(2*area <= x*(vgs-vth));
     assert(ret>=-1e-15);
@@ -1151,7 +1151,7 @@ static double dvth_from_area(double vgs, double vgd, double vth, double area)
   }
 //  assert (ret < area); wrong!
   assert (ret >= -1e-15);
-  return max(ret,0.);
+  return std::max(ret, 0.);
 }
 /*--------------------------------------------------------------------------*/
 double DEV_BUILT_IN_BTI::dvths()const
@@ -1280,9 +1280,9 @@ double DEV_BUILT_IN_BTI::dvth()const
     _max = (btis + btid) *.5;
     double err = .5*(btis+btid) - ret;
     trace8("symm", Vgd, Vgs, Vth, area, btid, btis, ret, err);
-    assert(ret<=max(btis,btid)+1e-13);
-    if (ret>max(btis,btid)){
-      ret = max(btis,btid);
+    assert(ret<=std::max(btis, btid)+1e-13);
+    if (ret>std::max(btis, btid)){
+      ret = std::max(btis, btid);
     }
     return ret;
   }

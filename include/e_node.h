@@ -134,7 +134,7 @@ class NODE_BASE : public CKT_BASE {
     //int	_matrix_number;
   public:
     explicit NODE_BASE(const NODE_BASE* p);
-    explicit NODE_BASE(const std::string& s, unsigned n, const CARD_LIST* p=0);
+    explicit NODE_BASE(const IString& s, unsigned n, const CARD_LIST* p=0);
     virtual ~NODE_BASE() {}
     const NODE_BASE* user_node()const; //?
     NODE_BASE&	set_user_number(uint_t n){_user_number = n; return *this;}
@@ -145,7 +145,7 @@ class NODE_BASE : public CKT_BASE {
     virtual double	tr_probe_num(const std::string&)const;
     virtual double	tt_probe_num(const std::string&)const;
     virtual XPROBE	ac_probe_ext(const std::string&)const;
-    const std::string  long_label()const;
+    std::string long_label()const;
   public:
     const CARD_LIST* scope()const{return _scope;}
     void collapse(const NODE_BASE& to) const;
@@ -167,7 +167,7 @@ private: // inhibited
   explicit NODE(const NODE& p);
 public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
-  explicit NODE(const std::string& s, unsigned n, const CARD_LIST* p=0);
+  explicit NODE(const IString& s, unsigned n, const CARD_LIST* p=0);
   ~NODE() {}
 public: // raw data access (rvalues)
   uint_t	user_number()const	{return _user_number;}
@@ -383,7 +383,7 @@ public:
   const ADP_NODE* a_()const; // HACK?
   ADP_NODE* a_(); // HACK?
   
-  const std::string  short_label()const {return ((n_()) ? (n_()->short_label()) : "?????");}
+  const IString short_label()const {return ((n_()) ? (n_()->short_label()) : "?????");}
   void	set_to_ground(CARD*);
   void  collapse(CARD* d, node_t to);
   void	new_node(const std::string&, const CARD*);

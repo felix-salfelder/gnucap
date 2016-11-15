@@ -4,7 +4,7 @@ C1 ( nosc 0 )  10.u ic= 1.
 name   ...
 have 3 nodes. model: 1 sckt: 0 adp 0
 
-.l1.i    .l1.i matrix_number 1, user_number 3 nm[t]  vdc  0.
+.L1.i    .L1.i matrix_number 1, user_number 3 nm[t]  vdc  0.
 nl       nl matrix_number 3, user_number 1 nm[t]  vdc  0.
 nosc     nosc matrix_number 2, user_number 2 nm[t]  vdc  0.
 #           v(C1)      i(L1)     

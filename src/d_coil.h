@@ -217,18 +217,18 @@ void DEV_INDUCTANCE::tr_accept()
 }
 /*--------------------------------------------------------------------------*/
 // quick hack. dont know how to do this in general.
-inline void DEV_INDUCTANCE::set_param_by_name(string Name, string Value)
+inline void DEV_INDUCTANCE::set_param_by_name(std::string Name, std::string Value)
 {
   trace2("DEV_INDUCTANCE::set_param_by_name", Name, Value);
-  if (Umatch(Name, value_name()) && !has_common()) {
+  if (Umatch(Name, value_name()) && !has_common()) { untested();
     set_value(Value);
   } else if (Umatch(Name, value_name())) { untested();
-    ELEMENT::set_param_by_name(value_name(), value());
+    ELEMENT::set_param_by_name(value_name(), value().string());
   } else if (has_common()) { untested();
     ELEMENT::set_param_by_name(Name, Value);
-  } else {
+  } else { untested();
     COMMON_COMPONENT* c = bm_dispatcher["eval_bm_value"]->clone();
-    c->set_param_by_name("=",value());
+    c->set_param_by_name("=", value().string());
     c->set_param_by_name(Name, Value);
     assert(c);
     attach_common(c);
@@ -237,6 +237,7 @@ inline void DEV_INDUCTANCE::set_param_by_name(string Name, string Value)
   if (const EVAL_BM_ACTION_BASE* x = dynamic_cast<const EVAL_BM_ACTION_BASE*>(common())) {
     USE(x);
     trace2("DEV_INDUCTANCE::set_param_by_name", long_label(), x->_ic);
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

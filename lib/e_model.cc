@@ -62,7 +62,7 @@ MODEL_CARD::~MODEL_CARD()
 void MODEL_CARD::set_param_by_index(int i, std::string& value, int offset)
 {
   switch (MODEL_CARD::param_count() - 1 - i) {
-  case 0: _tnom_c = value; break;
+  case 0: _tnom_c = IString(value); break;
   default: CARD::set_param_by_index(i, value, offset); break;
   }
 }
@@ -84,7 +84,7 @@ std::string MODEL_CARD::param_name(int i)const
 }
 /*--------------------------------------------------------------------------*/
 void MODEL_CARD::set_param_by_name(std::string Name, std::string Value)
-{
+{ untested();
   if (Umatch (Name,"tnom")) { _tnom_c = Value; }
   else{ CARD::set_param_by_name(Name,Value);}
 }

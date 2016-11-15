@@ -29,6 +29,8 @@
 #include "ap.h"
 
 /*--------------------------------------------------------------------------*/
+class IString;
+/*--------------------------------------------------------------------------*/
 // defined here
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
@@ -95,15 +97,15 @@ public:
   // return an iterator
   iterator begin()			{return _cl.begin();}
   iterator end()			{return _cl.end();}
-  iterator find_again(const std::string& short_name, iterator);
-  iterator find_(const std::string& short_name) 
+  iterator find_again(const IString& short_name, iterator);
+  iterator find_(const IString& short_name)
 					{return find_again(short_name, begin());}
 
   // return a const_iterator
   const_iterator begin()const		{return _cl.begin();}
   const_iterator end()const		{return _cl.end();}
-  const_iterator find_again(const std::string& short_name, const_iterator)const;
-  const_iterator find_(const std::string& short_name)const
+  const_iterator find_again(const IString& short_name, const_iterator)const;
+  const_iterator find_(const IString& short_name)const
 					{return find_again(short_name, begin());}
 
   // add to it
@@ -164,7 +166,7 @@ public:
   CARD_LIST& tt_behaviour_commit();
 
   NODE_MAP*   nodes()const {assert(_nm); return _nm;}
-  NODE_BASE*       node(std::string)const;
+  NODE_BASE*       node(IString)const;
   unsigned total_nodes()const; // recursively (for now) sum up ckt node number...
   unsigned adp_nodes()const; // recursively (for now) sum up total adp number...
   PARAM_LIST* params();
@@ -191,7 +193,7 @@ public:
   static CARD_LIST card_list; // in globals.cc
 };
 /*--------------------------------------------------------------------------*/
-INTERFACE CARD_LIST::fat_iterator findbranch(CS&,CARD_LIST::fat_iterator);
+INTERFACE CARD_LIST::fat_iterator findbranch(CS&, CARD_LIST::fat_iterator);
 /*--------------------------------------------------------------------------*/
 inline CARD_LIST::fat_iterator findbranch(CS& cmd, CARD_LIST* cl)
 {
@@ -199,10 +201,13 @@ inline CARD_LIST::fat_iterator findbranch(CS& cmd, CARD_LIST* cl)
   return findbranch(cmd, CARD_LIST::fat_iterator(cl, cl->begin()));
 }
 /*--------------------------------------------------------------------------*/
-inline CARD_LIST::fat_iterator findbranch(const string cmd, CARD_LIST* cl = 0)
+inline CARD_LIST::fat_iterator findbranch(const IString cmd, CARD_LIST* cl = 0)
 {
-  if (cl==0) cl = &CARD_LIST::card_list;
-  CS c(CS::_STRING,cmd);
+  if (cl==0){untested();
+    cl = &CARD_LIST::card_list;
+  }else{untested();
+  }
+  CS c(CS::_STRING, cmd.to_string());
   return findbranch(c, CARD_LIST::fat_iterator(cl, cl->begin()));
 }
 /*--------------------------------------------------------------------------*/

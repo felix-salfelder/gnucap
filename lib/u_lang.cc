@@ -85,43 +85,44 @@ const CARD* LANGUAGE::find_card(string name, CARD_LIST* Scope, bool nondevice) {
 }
 /*--------------------------------------------------------------------------*/
 const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
-{
-  trace1("LANGUAGE::find_proto", Name);
+{ untested();
+  trace2("LANGUAGE::find_proto", Name, Scope);
   const CARD* p = NULL;
-  if (Scope) {
-    try {
+  if (Scope) { untested();
+    try { untested();
       p = Scope->find_looking_out(Name);
-    }catch (Exception_Cant_Find& e) {
+    }catch (Exception_Cant_Find& e) { untested();
       assert(!p);
     }
-  }else{
+  }else{ untested();
     CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(Name);
-    if (i != CARD_LIST::card_list.end()) {
+    if (i != CARD_LIST::card_list.end()) { untested();
       p = *i;
-    }else{
+    }else{ untested();
       assert(!p);
     }
   }
   
-  if (p) {
+  trace2("lookout", Name, model_dispatcher.size());
+  if (p) { untested();
     trace1("LANGUAGE::find_proto found something", prechecked_cast<const COMPONENT*>(p));
     trace1("LANGUAGE::find_proto found something", prechecked_cast<const MODEL_CARD*>(p));
     return p;
-  }else if ((command_dispatcher[Name])) {
+  }else if ((command_dispatcher[Name])) { untested();
     trace1("command_dispatcher", Name);
     return new DEV_DOT;	//BUG// memory leak
-  }else if ((p = device_dispatcher[Name])) {
+  }else if ((p = device_dispatcher[Name])) { untested();
     trace0("LANGUAGE::find_proto found device " +Name);
     return p;
-  }else if ((p = model_dispatcher[Name])) {
+  }else if ((p = model_dispatcher[Name])) { untested();
     trace0("LANGUAGE::find_proto found model " +Name);
     return p;
-  }else{
+  }else{ untested();
     assert(!p);
-    std::string s;
-    /* */if (Umatch(Name, "b{uild} "))      {itested();  s = "build";}
-    else if (Umatch(Name, "del{ete} "))     {            s = "delete";}
-    else if (Umatch(Name, "fo{urier} "))    {            s = "fourier";}
+    IString s;
+    /* */if (Umatch(Name, "b{uild} "))      {untested(); s = "build";}
+    else if (Umatch(Name, "del{ete} "))     {untested(); s = "delete";}
+    else if (Umatch(Name, "fo{urier} "))    {untested(); s = "fourier";}
     else if (Umatch(Name, "gen{erator} "))  {		 s = "generator";}
     else if (Umatch(Name, "inc{lude} "))    {itested();  s = "include";}
     else if (Umatch(Name, "l{ist} "))       {            s = "list";}
@@ -141,24 +142,31 @@ const CARD* LANGUAGE::find_proto(const IString& Name, const CARD* Scope)
     else{ /* no shortcut available */
       s = Name;
     }
-    if ((command_dispatcher[s])) {
+    if ((command_dispatcher[s])) { untested();
       trace1("command_dispatcher", Name);
       return new DEV_DOT; //BUG// we will look it up twice, //BUG// memory leak
     }else{
+#ifndef NDEBUG
+      trace1("notmodel ", model_dispatcher.size());
+      for(DISPATCHER<CARD*>::const_iterator i=model_dispatcher.begin();
+	  i!=model_dispatcher.end(); ++i)
+      {
+	trace2("notmodel ", Name, i->first);
+      }
+#endif
       return NULL;
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
-{
+{ untested();
   trace4("LANGUAGE::new__instance", cmd.fullstring(), name(), hp(Scope), owner);
 
   if (cmd.is_end()) {
     // nothing
   }else{
-    std::string type = find_type_in_string(cmd);
-
+    IString type = IString(find_type_in_string(cmd));
     if (const CARD* proto = find_proto(type, owner)) {
       trace3("LANGUAGE::new__instance", type, name(), prechecked_cast<const DEV_DOT*>(proto));
       CARD* new_instance = proto->clone_instance();
@@ -239,7 +247,16 @@ void LANGUAGE::print_item(OMSTREAM& o, const CARD* c)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool Get(CS& cmd, const std::string& key, LANGUAGE** val)
+OMSTREAM& operator<<(OMSTREAM& o, LANGUAGE* x)
+{
+  if (x) {
+    return (o << x->name());
+  }else{untested();
+    return (o << "none");
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool Get(CS& cmd, const IString& key, LANGUAGE** val)
 {
   if (cmd.umatch(key + " {=}")) {
     LANGUAGE* lang = language_dispatcher[cmd];

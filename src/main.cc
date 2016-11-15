@@ -98,13 +98,23 @@ void read_startup_files(void)
   } catch(Exception e){
     error(bDANGER, "%s\n",e.message().c_str());
   }
+  //CMD::command("clear", &CARD_LIST::card_list);
   if (!OPT::language) {
-      try{
-        CMD::command(std::string("options lang=") + DEFAULT_LANGUAGE, &CARD_LIST::card_list);
-      } catch(Exception e){
-        error(bDANGER, "%s\n",e.message().c_str());
-      }
-  }else{
+    OPT::language = language_dispatcher[DEFAULT_LANGUAGE];
+    
+    for(DISPATCHER<LANGUAGE>::const_iterator
+	  i=language_dispatcher.begin(); !OPT::language && i!=language_dispatcher.end(); ++i) {untested();
+      OPT::language = prechecked_cast<LANGUAGE*>(i->second);
+    }
+  }else{untested();
+    // already have a language specified in a startup file
+  }
+  if (OPT::language) {untested();
+    OPT::case_insensitive = OPT::language->case_insensitive();
+    OPT::units            = OPT::language->units();
+  }else{untested();
+    OPT::case_insensitive = false;
+    OPT::units            = uSI;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -291,8 +301,8 @@ int main(int argc, char * const * argv)
   //
   // FIXME: use getopt
   //
-  CMD::command("options lang=acs", &CARD_LIST::card_list);
-  assert(OPT::language);
+//  CMD::command("options lang=acs", &CARD_LIST::card_list);
+//  assert(OPT::language);
   read_startup_files();
   sign_on();
 

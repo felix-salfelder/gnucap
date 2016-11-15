@@ -79,7 +79,7 @@ public: // tt
   void tt_advance();
   void tt_regress();
 
-  int order()const		{return min(ELEMENT::order(), 1);}
+  int order()const		{return std::min(ELEMENT::order(), 1);}
   double error_factor()const	{return err*OPT::trstepcoef[3];}
 protected:
   hp_float_t   tr_involts_limited()const {return tr_outvolts_limited();}

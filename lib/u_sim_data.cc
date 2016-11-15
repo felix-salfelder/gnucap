@@ -387,9 +387,9 @@ void SIM_DATA::order_auto()
 // component wise node sort. depth-first
 void SIM_DATA::order_comp( const CARD_LIST* scope )
 {
-  if(scope==NULL){ untested();
+  if(scope==NULL){
     scope=&CARD_LIST::card_list;
-  }else{ untested();
+  }else{
   }
   static unsigned c;
   static bool* d;
@@ -447,9 +447,9 @@ void SIM_DATA::order_comp( const CARD_LIST* scope )
 // based on NODE_MAP
 void SIM_DATA::order_tree_bf( const CARD_LIST* scope)
 {
-  if(scope==NULL){ untested();
+  if(scope==NULL){
     scope=&CARD_LIST::card_list;
-  }else{ untested();
+  }else{
   }
 
   static unsigned c;

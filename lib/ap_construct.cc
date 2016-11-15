@@ -44,7 +44,7 @@
   #include <readline/history.h>
 #endif
 /*--------------------------------------------------------------------------*/
-// static std::string getlines(FILE*);
+static std::string getlines(FILE*);
 OMSTREAM mout; // > file bitmap //BUG//encapsulation
 OMSTREAM mlog; // log file bitmap
 /*--------------------------------------------------------------------------*/
@@ -178,7 +178,7 @@ CS::CS(CS::WHOLE_FILE, const std::string& name)
   close(f);
 }
 /*--------------------------------------------------------------------------*/
-CS::CS(CS::STRING, const IString& s)
+CS::CS(CS::STRING, const std::string& s)
   :_file(NULL),
    _name(),
    _cmd(s),
@@ -207,7 +207,7 @@ CS::CS(const CS& p)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-CS& CS::operator=(const IString& s)
+CS& CS::operator=(const std::string& s)
 {untested();
   assert(!_file);
   _cmd = s;
@@ -255,16 +255,19 @@ CS& CS::get_line(const std::string& prompt)
     _cnt = 0;
     _length = 0;
     throw Exception_End_Of_Input("EOF on string/whatever");
-  }else if (is_file() ) {
-    assert(OPT::language);
-    // BUG!?
+  }else if (is_file() ) { untested();
     // CS must know its language.
-    _cmd = OPT::language->getlines(_file);
+    if(0 && OPT::language){
+      // not yet.
+      _cmd = OPT::language->getlines(_file);
+    }else{
+      _cmd = getlines(_file);
+    }
     trace2("getlines got", _cmd, OPT::language->name());
     _cnt = 0;
     _length = static_cast<unsigned>(_cmd.length());
     _ok = true;
-  }else{itested();
+  }else{untested();
     trace1("", _file);
     assert(_file == stdin);
     char cmdbuf[BUFLEN];

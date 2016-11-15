@@ -46,7 +46,7 @@ private:
   PARAMETER<double> _tau2;	// fall time constant
   PARAMETER<double> _period;	// repeat period
   PARAMETER<double> _end;	// marks the end of the list
-  static map<string, PARA_BASE EVAL_BM_EXP::*> param_dict;
+  static std::map<string, PARA_BASE EVAL_BM_EXP::*> param_dict;
   explicit	EVAL_BM_EXP(const EVAL_BM_EXP& p);
 public:
   explicit      EVAL_BM_EXP(int c=0);
@@ -108,7 +108,7 @@ bool EVAL_BM_EXP::operator==(const COMMON_COMPONENT& x)const
   return rv;
 }
 /*--------------------------------------------------------------------------*/
-map<string, PARA_BASE EVAL_BM_EXP::*> EVAL_BM_EXP::param_dict = 
+std::map<string, PARA_BASE EVAL_BM_EXP::*> EVAL_BM_EXP::param_dict = 
   boost::assign::map_list_of
     ("iv",    (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_iv)
     ("pv",    (PARA_BASE EVAL_BM_EXP::*) &EVAL_BM_EXP::_pv)

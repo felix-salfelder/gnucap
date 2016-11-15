@@ -52,10 +52,10 @@ public:
   uint_t 	_net_nodes;	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
 public:   				// traversal functions
-  CARD* find_in_my_scope(const std::string& name);
-  const CARD* find_in_my_scope(const std::string& name)const;
-  const CARD* find_in_parent_scope(const std::string& name)const;
-  const CARD* find_looking_out(const std::string& name)const;
+  CARD* find_in_my_scope(const IString& name);
+  const CARD* find_in_my_scope(const IString& name)const;
+  const CARD* find_in_parent_scope(const IString& name)const;
+  const CARD* find_looking_out(const IString& name)const;
   //--------------------------------------------------------------------
 protected: // create and destroy.
   explicit CARD();
@@ -148,7 +148,7 @@ public:	// type
 public:	// label -- in CKT_BASE
   // non-virtual void set_label(const std::string& s) //BASE
   // non-virtual const std::string& short_label()const //BASE
-  /*virtual*/ const std::string long_label()const; // no further override
+  /*virtual*/ std::string long_label()const; // no further override
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
   node_t& n_(unsigned i)const;
