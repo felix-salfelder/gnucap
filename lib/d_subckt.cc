@@ -125,6 +125,11 @@ private: // no-ops for prototype
   void tr_advance(){}
   void tr_restore(){}
   void tr_regress(){}
+  void tt_begin(){untested();}
+  void tt_accept(){untested();}
+  void tt_advance(){untested();}
+  void tt_regress(){untested();}
+  TIME_PAIR tt_review(){ return TIME_PAIR(NEVER, NEVER);}
   void dc_advance(){}
   void ac_begin(){}
   void do_ac(){}
