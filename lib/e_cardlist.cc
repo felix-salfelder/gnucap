@@ -768,7 +768,6 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
         }else{
 	}
 
-        assert(this);
         unsigned k = CKT_BASE::_sim->_total_nodes;
         NODE_MAP* Map = nodes();
         CKT_NODE* n = Map->new_node(label, this); // should increase counter

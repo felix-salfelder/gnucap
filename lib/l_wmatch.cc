@@ -32,8 +32,19 @@
 #include "l_lib.h"
 #include "l_istring.h"
 /*--------------------------------------------------------------------------*/
-bool wmatch_by_ptr(const Ichar *s2, const Ichar *s1)
+bool wmatch_by_ptr(const char *, const char *);
+/*--------------------------------------------------------------------------*/
+static bool wmatch_by_ptr(const Ichar *s2_, const Ichar *s1_)
 {
+  char const* s1 = (char const*)s1_;
+  char const* s2 = (char const*)s2_;
+  return wmatch_by_ptr(s2, s1);
+}
+/*--------------------------------------------------------------------------*/
+bool wmatch_by_ptr(const char *s2_, const char *s1_)
+{
+  Ichar const* s1 = (Ichar const*)s1_;
+  Ichar const* s2 = (Ichar const*)s2_;
   if (!*s2 && !*s1) {			// both end together -- match
     return true;
   }else if (!*s2 || !*s1) {		// ends don't match
@@ -55,7 +66,7 @@ bool wmatch_by_ptr(const Ichar *s2, const Ichar *s1)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool wmatch(const IString& s1, const IString& s2)
+bool wmatch(const std::string& s1, const std::string& s2)
 {
   return wmatch_by_ptr(s1.c_str(), s2.c_str());
 }
