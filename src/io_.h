@@ -163,7 +163,7 @@ inline OMSTREAM& OMSTREAM::operator<< <>(const std::string& s) {untested(); retu
 template<class T>
 inline OMSTREAM& OMSTREAM::operator<< (T t)
 {
-  incomplete();
+//  incomplete(); still used :/
 	stringstream a;
 	a << t;
 	return *this << a.str().c_str();
