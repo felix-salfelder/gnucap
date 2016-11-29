@@ -701,6 +701,7 @@ GC_TESTS = \
     poly1_parse.gc \
     pulse.gc \
     ring.gc \
+    s_dc.bug.gc \
     s_sock.1.gc \
     s_sock.1b.gc \
     s_sock.1.preq.gc \
@@ -746,6 +747,9 @@ GC_TESTS = \
     vrc_evt.gc \
     Xnodeorder.gc \
     Xprobes.gc
+
+# corner case bug
+XFAIL_TESTS+= s_dc.bug.gc
 
 #this is not ready yet.
 XFAIL_TESTS+= s_tr.cont.gc
