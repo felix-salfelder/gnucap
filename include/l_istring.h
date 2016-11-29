@@ -235,8 +235,6 @@ public: // more compare logic
     const size_type len = std::min(tsize, osize);
 
     int r = traits_type::compare(data(), str.data(), len);
-    trace1("strcmp", *this);
-    trace3("strcmp", str, len, r);
     if (r == 2 || r == -2){
       // traits_type::compare is really sure
       return r;
