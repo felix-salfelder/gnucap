@@ -92,17 +92,17 @@ private:
 } p1;
 int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
-class INTERFACE DEV_SUBCKT_PROTO : public DEV_SUBCKT {
+class DEV_SUBCKT_PROTO : public DEV_SUBCKT {
 private:
   explicit	DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO&p);
 public:
   explicit	DEV_SUBCKT_PROTO();
 		~DEV_SUBCKT_PROTO(){}
 public: // override virtual
-  char		id_letter()const	{untested();untested();return '\0';}
+  char		id_letter()const	{untested();return '\0';}
   CARD*		clone_instance()const;
   bool		print_type_in_spice()const {unreachable(); return false;}
-  std::string   value_name()const	{incomplete(); return "";}
+  std::string   value_name()const	{untested();incomplete(); return "";}
   std::string   dev_type()const		{untested(); return "";}
   unsigned	max_nodes()const	{return PORTS_PER_SUBCKT;}
   unsigned	min_nodes()const	{return 0;}
@@ -137,7 +137,7 @@ private: // no-ops for prototype
   bool do_tr(){ return true;}
   bool tr_needs_eval()const{itested(); return false;}
   void tr_queue_eval(){}
-  std::string port_name(unsigned)const {return "";}
+  std::string port_name(int)const {untested();return "";}
 public:
   static int	count()			{return _count;}
 private:
@@ -203,7 +203,7 @@ std::string DEV_SUBCKT::port_name(unsigned i)const
   if (const DEV_SUBCKT* p=dynamic_cast<const DEV_SUBCKT*>(_parent)) {
     if (i<p->net_nodes()){
       return p->port_value(i);
-    }else{ 
+    }else{untested(); 
       return "";
     }
   }else if(_parent){untested(); untested();

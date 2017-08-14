@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Reconstructs an infix expression from the RPN.
+ * Constructs a simplified (reduced) version of an expression.
  * Incomplete:
  *	Expressions in arg-lists print as ####false####
  *	Not sure what should happen when expression is empty
@@ -280,7 +280,8 @@ void Token_UNARY::stack_op(Expression* E)const
 void Token_CONSTANT::stack_op(Expression* E)const
 {
   unreachable();
-  assert(E); USE(E);
+  (void)(E);
+  assert(E);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

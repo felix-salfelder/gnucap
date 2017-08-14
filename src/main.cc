@@ -1,4 +1,4 @@
-/*$Id: main.cc 2016/09/11 al $ -*- C++ -*-
+/*$Id: main.cc  $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -22,6 +22,7 @@
  * top level module
  * it all starts here
  */
+#include "config.h"
 #include "globals.h"
 #include "u_prblst.h"
 #include "u_sim_data.h"
@@ -66,7 +67,21 @@ static void sign_on(void)
     "core-lib version: " << lib_version() << "\n";  
 }
 /*--------------------------------------------------------------------------*/
-void read_startup_files(void)
+static void prepare_env()
+{
+  static const char* plugpath="PLUGPATH=" GNUCAP_PLUGPATH
+                              "\0         (reserved space)                 ";
+
+  std::string ldlpath = OS::getenv("LD_LIBRARY_PATH");
+  if (ldlpath != "") {untested();
+    ldlpath += ":";
+  }else{
+  }
+  assert(strlen("PLUGPATH=") == 9);
+  OS::setenv("GNUCAP_PLUGPATH", ldlpath + (plugpath+9), false);
+}
+/*--------------------------------------------------------------------------*/
+static void read_startup_files(void)
 {
   trace0("read_startup_files");
   string name = findfile(SYSTEMSTARTFILE, SYSTEMSTARTPATH, R_OK);
@@ -291,6 +306,7 @@ static void process_cmd_line(int argc, char *const  *argv)
 /*--------------------------------------------------------------------------*/
 int main(int argc, char * const * argv)
 {
+  prepare_env();
   CKT_BASE::_sim = new SIM_DATA;
   CKT_BASE::_probe_lists = new PROBE_LISTS;
   ENV::error = 0;

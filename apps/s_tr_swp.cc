@@ -1,4 +1,4 @@
-/*$Id: s_tr_swp.cc 2016/09/22 al $ -*- C++ -*-
+/*$Id: s_tr_swp.cc 2016/09/26 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -241,7 +241,6 @@ void TRANSIENT::sweep()
       if (printnow) {
 	outflags = ofPRINT | ofSTORE | ofKEEP;
       }else if (_accepted) {
-	// ++::status.hidden_steps;
 	outflags = ofSTORE;
       }else{
       }

@@ -60,6 +60,7 @@ public:
   }
 
   typedef std::map<IString, CKT_BASE*>::const_iterator const_iterator;
+  //class const_iterator : public std::map<IString, CKT_BASE*>::const_iterator {};
 
   const_iterator begin()const		{assert(_map); return _map->begin();}
   const_iterator end()const		{assert(_map); return _map->end();}

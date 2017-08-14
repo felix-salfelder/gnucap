@@ -1,4 +1,4 @@
-/*                                -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -488,7 +488,7 @@ double BSMATRIX<T>::density()
 template <class T>
 T BSMATRIX<T>::d(unsigned r, unsigned c) const
 {
-  USE(c);
+  (void)c;
   assert(_diaptr);
   assert(r == c);
   assert(0 <= r);
@@ -501,7 +501,7 @@ T BSMATRIX<T>::d(unsigned r, unsigned c) const
 template <class T>
 T& BSMATRIX<T>::d(unsigned r, unsigned c)
 {
-  USE(c);
+  (void)c;
   assert(_diaptr);
   assert(r == c); USE(c);
   assert(r);
@@ -706,7 +706,7 @@ T& BSMATRIX<T>::s(unsigned row, unsigned col)
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::load_point(unsigned i, unsigned j, T value)
+void BSMATRIX<T>::load_point(uint_t i, uint_t j, T value)
 {itested();
   if (i > 0 && j > 0) {itested();
     set_changed(j);

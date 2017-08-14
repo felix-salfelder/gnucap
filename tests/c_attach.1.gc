@@ -1,21 +1,5 @@
-spice
-.attach aaa
-.unload aaa
-* comment
-.attach gnucap_default_plugins.so
-.detach_all
-.clear
-.attach gnucap_default_plugins.so
-.detach_all
-.attach ./bogus.so
-.attach force ./bogus.so
-.attach empty.cc
-.attach d_vs.cc
-.attach force d_vs.cc
-.attach gnucap_default_plugins.so
-.attach ../apps/.libs/gnucap_default_plugins.so
-.attach loadtestdir/d_cccs.cc
-.load
-.detach_all
-.load
-.end
+help load
+load
+help unload
+unload
+end
