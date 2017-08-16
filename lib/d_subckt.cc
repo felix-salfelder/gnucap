@@ -137,7 +137,7 @@ private: // no-ops for prototype
   bool do_tr(){ return true;}
   bool tr_needs_eval()const{itested(); return false;}
   void tr_queue_eval(){}
-  std::string port_name(int)const {untested();return "";}
+  std::string port_name(uint_t)const {untested();return "";}
 public:
   static int	count()			{return _count;}
 private:

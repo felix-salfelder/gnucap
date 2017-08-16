@@ -1,6 +1,10 @@
 #ifndef GNUCAP_MAIN_CONFIG_H
 #define GNUCAP_MAIN_CONFIG_H
 /*--------------------------------------------------------------------------*/
+/* package */
+#define PACKAGE "@PACKAGE@"
+#define VERSION "@VERSION@"
+/*--------------------------------------------------------------------------*/
 /* configuration */
 #define GNUCAP_PLUGPATH "@pkglibdir@"
 /*--------------------------------------------------------------------------*/

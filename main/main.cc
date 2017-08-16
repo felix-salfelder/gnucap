@@ -47,7 +47,7 @@ struct JMP_BUF{
 } env;
 /*--------------------------------------------------------------------------*/
 static void sign_on(void)
-{
+{ untested();
   if (OPT::quiet) return;
   IO::mstdout <<
     "Gnucap : The Gnu Circuit Analysis Package\n"
@@ -68,53 +68,53 @@ static void sign_on(void)
 }
 /*--------------------------------------------------------------------------*/
 static void prepare_env()
-{
+{ untested();
   static const char* plugpath="PLUGPATH=" GNUCAP_PLUGPATH
                               "\0         (reserved space)                 ";
 
   std::string ldlpath = OS::getenv("LD_LIBRARY_PATH");
   if (ldlpath != "") {untested();
     ldlpath += ":";
-  }else{
+  }else{ untested();
   }
   assert(strlen("PLUGPATH=") == 9);
   OS::setenv("GNUCAP_PLUGPATH", ldlpath + (plugpath+9), false);
 }
 /*--------------------------------------------------------------------------*/
 static void read_startup_files(void)
-{
+{ untested();
   trace0("read_startup_files");
   string name = findfile(SYSTEMSTARTFILE, SYSTEMSTARTPATH, R_OK);
   if (name != "") {untested();
     trace1("read_startup_files", name);
-    try{
+    try{ untested();
       CMD::command("get " + name, &CARD_LIST::card_list);
-    } catch(Exception e){
+    } catch(Exception e){ untested();
       error(bDANGER, "%s\n",e.message().c_str());
     }
-  }else{ itested();
+  }else{ untested();
     CMD::command(std::string("load " DEFAULT_PLUGINS), &CARD_LIST::card_list);
   }
-  if (!startup_recursive()) {
+  if (!startup_recursive()) { untested();
     trace1("read_startup_files, no cwd", name);
     name = findfile(USERSTARTFILE, USERSTARTPATH, R_OK);
-    if (name != "") {
-      try{
+    if (name != "") { untested();
+      try{ untested();
         CMD::command("get " + name, &CARD_LIST::card_list);
-      } catch(Exception e){
+      } catch(Exception e){ untested();
         error(bDANGER, "%s\n",e.message().c_str());
       }
-    }else{
+    }else{ untested();
     }
   }
   trace0("clear");
-  try{
+  try{ untested();
     CMD::command("clear", &CARD_LIST::card_list);
-  } catch(Exception e){
+  } catch(Exception e){ untested();
     error(bDANGER, "%s\n",e.message().c_str());
   }
   //CMD::command("clear", &CARD_LIST::card_list);
-  if (!OPT::language) {
+  if (!OPT::language) { untested();
     OPT::language = language_dispatcher[DEFAULT_LANGUAGE];
     
     for(DISPATCHER<LANGUAGE>::const_iterator
@@ -124,7 +124,7 @@ static void read_startup_files(void)
   }else{untested();
     // already have a language specified in a startup file
   }
-  if (OPT::language) {
+  if (OPT::language) { untested();
     OPT::case_insensitive = OPT::language->case_insensitive();
     OPT::units            = OPT::language->units();
   }else{untested();
@@ -137,10 +137,10 @@ static void read_startup_files(void)
  */
 extern "C" {
   static void sig_abrt(SIGNALARGS)
-  {
+  { untested();
     signal(SIGINT,sig_abrt);
     static int count = 10;
-    if (--count > 0) {
+    if (--count > 0) { untested();
       error(bDANGER, "\n");
     }else{untested();
       exit(1);
@@ -154,11 +154,11 @@ extern "C" {
  */
 extern "C" {
   static void sig_int(SIGNALARGS)
-  {
+  { untested();
     signal(SIGINT,sig_int);
-    if (ENV::run_mode == rBATCH) {
+    if (ENV::run_mode == rBATCH) { untested();
       exit(1);
-    }else{
+    }else{ untested();
       IO::error << '\n';
       siglongjmp(env.p,1);
     }
@@ -167,7 +167,7 @@ extern "C" {
 /*--------------------------------------------------------------------------*/
 extern "C" {
   static void sig_fpe(SIGNALARGS)
-  {
+  { untested();
     untested();
     signal(SIGFPE,sig_fpe);
     error(bDANGER, "floating point error\n");
@@ -175,7 +175,7 @@ extern "C" {
 }
 /*--------------------------------------------------------------------------*/
 static void setup_traps(void)
-{
+{ untested();
   signal(SIGFPE,sig_fpe);
   signal(SIGINT,sig_int);
   signal(SIGABRT,sig_abrt);
@@ -189,20 +189,20 @@ static void setup_traps(void)
  * Should be in a destructor, so it doesn't need to be explicitly called.
  */
 static void finish(void)
-{
+{ untested();
   plclose();
   IO::mstdout.outreset();
 }
 /*--------------------------------------------------------------------------*/
 
 static void do_getopt(int argc,  char * const * argv)
-{
+{ untested();
   int opt;
   int nsecs, tfnd=0;
 
   nsecs = 0;
-  while ((opt = getopt(argc, argv, "a:c:b:i:qt:")) != -1) {
-    switch (opt) {
+  while ((opt = getopt(argc, argv, "a:c:b:i:qt:")) != -1) { untested();
+    switch (opt) { untested();
       case 'q':
         OPT::quiet = true;
         break;
@@ -221,7 +221,7 @@ static void do_getopt(int argc,  char * const * argv)
 
 //  printf("flags=%d; tfnd=%d; optind=%d, argc=%i\n", flags, tfnd, optind, argc);
 
-  if (optind > argc) {
+  if (optind > argc) { untested();
     fprintf(stderr, "Expected argument after options\n");
     exit(EXIT_FAILURE);
   }
@@ -230,32 +230,32 @@ static void do_getopt(int argc,  char * const * argv)
 }
 /*--------------------------------------------------------------------------*/
 static void process_cmd_line(int argc, char *const  *argv)
-{
-  for (int ii = 1;  ii < argc;  /*inside*/) {
-    try {
-      if (   !strcasecmp(argv[ii], "-v")  ){
+{ untested();
+  for (int ii = 1;  ii < argc;  /*inside*/) { untested();
+    try { untested();
+      if (   !strcasecmp(argv[ii], "-v")  ){ untested();
         // FIXME. use git hash for development versions.
         cout << PACKAGE << " " << VERSION << endl;
         exit(1);
       } else if (   !strcasecmp(argv[ii], "-E")  
-          || !strcasecmp(argv[ii], "-e") ) {
+          || !strcasecmp(argv[ii], "-e") ) { untested();
         ++ii;
 
-        if (ii < argc) {
+        if (ii < argc) { untested();
           string v = "";
           if (   !strcasecmp(argv[ii], "-E") )  
             v="verbose ";
             // dashier startet den OPT::language modus
 	    CMD::command(string("expect ") + v + argv[ii++], &CARD_LIST::card_list);
-        } else {
+        } else { untested();
           incomplete();
         }
-      }else if (strcasecmp(argv[ii], "-q") == 0) {
+      }else if (strcasecmp(argv[ii], "-q") == 0) { untested();
         ++ii;
           // doesnt do anything.
-      }else if (strcasecmp(argv[ii], "-i") == 0) {
+      }else if (strcasecmp(argv[ii], "-i") == 0) { untested();
 	++ii;
-	if (ii < argc) {
+	if (ii < argc) { untested();
 	  CMD::command(std::string("include ") + argv[ii++], &CARD_LIST::card_list);
 	}else{untested();
 	}
@@ -266,25 +266,25 @@ static void process_cmd_line(int argc, char *const  *argv)
 	  CMD::cmdproc(cmd, &CARD_LIST::card_list); 
 	}else{untested();
 	}
-      }else if (strcasecmp(argv[ii], "-b") == 0) {
-	try {
+      }else if (strcasecmp(argv[ii], "-b") == 0) { untested();
+	try { untested();
 	  ++ii;
           // set languacge to spice (since we have defined acs as default.
           // this is a hack and might be a bug as well.
           CMD::command("spice", &CARD_LIST::card_list);
-	  if (ii < argc) {
+	  if (ii < argc) { untested();
             // dashier startet den OPT::language modus
             trace2("-b...", OPT::language, argv[ii]);
 	    CMD::command(std::string("< ") + argv[ii++], &CARD_LIST::card_list);
 	  }else{untested();
 	    CMD::command(std::string("< /dev/stdin"), &CARD_LIST::card_list);
 	  }
-	}catch (Exception& e) {
+	}catch (Exception& e) { untested();
           error(bDANGER, e.message() + '\n');
           throw(Exception("error processing batch file"));
 	  finish();
 	}
-	if (ii >= argc) {
+	if (ii >= argc) { untested();
 	  CMD::command("end", &CARD_LIST::card_list);
 	}else{untested();
 	}
@@ -294,10 +294,10 @@ static void process_cmd_line(int argc, char *const  *argv)
 	  CMD::command(std::string("attach ") + argv[ii++], &CARD_LIST::card_list);
 	}else{untested();
 	}
-      }else{
+      }else{ untested();
 	CMD::command(std::string("include ") + argv[ii++], &CARD_LIST::card_list);
       }
-    }catch (Exception& e) {
+    }catch (Exception& e) { untested();
       // hmmm
       throw(e);
     }
@@ -305,7 +305,7 @@ static void process_cmd_line(int argc, char *const  *argv)
 }
 /*--------------------------------------------------------------------------*/
 int main(int argc, char * const * argv)
-{
+{ untested();
   prepare_env();
   CKT_BASE::_sim = new SIM_DATA;
   CKT_BASE::_probe_lists = new PROBE_LISTS;
@@ -322,17 +322,17 @@ int main(int argc, char * const * argv)
   read_startup_files();
   sign_on();
 
-  {
+  { untested();
     SET_RUN_MODE xx(rBATCH);
     trace0("batch mode");
-    if (!sigsetjmp(env.p, true)) {
-      try {
+    if (!sigsetjmp(env.p, true)) { untested();
+      try { untested();
         trace0("... ");
 	setup_traps();
         trace0("done traps");
 	process_cmd_line(argc,argv);
         trace0("done cmdline  mode");
-      }catch (Exception& e) {
+      }catch (Exception& e) { untested();
         ENV::error++;
         std::cerr << e.message() << std::endl;
 	finish();		/* error clean up (from longjmp()) */
@@ -340,36 +340,36 @@ int main(int argc, char * const * argv)
 	unreachable();
 	exit(1);
       }
-    }else{
+    }else{ untested();
       trace0("finish batch");
       finish();		/* error clean up (from longjmp()) */
       CMD::command("quit", &CARD_LIST::card_list);
       exit(0);
     }
   }
-  {
+  { untested();
     SET_RUN_MODE xx(rINTERACTIVE);
     trace0("interactive mode");
     CS cmd(CS::_STDIN);
-    for (;;) {
-      if (!sigsetjmp(env.p, true)) {
-	try {
-	  if (OPT::language) {
+    for (;;) { untested();
+      if (!sigsetjmp(env.p, true)) { untested();
+	try { untested();
+	  if (OPT::language) { untested();
 	    OPT::language->parse_top_item(cmd, &CARD_LIST::card_list);
-	  }else{
+	  }else{ untested();
 	    CMD::cmdproc(cmd.get_line(I_PROMPT), &CARD_LIST::card_list);
 	  }
-	}catch (Exception_End_Of_Input& e) {
+	}catch (Exception_End_Of_Input& e) { untested();
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	  CMD::command("quit", &CARD_LIST::card_list);
 	  exit(0);
-	}catch (Exception& e) {
+	}catch (Exception& e) { untested();
 	  error(bDANGER, e.message() + '\n');
           ENV::error++;
 	  finish();
 	}
-      }else{
+      }else{ untested();
 	finish();		/* error clean up (from longjmp()) */
       }
     }

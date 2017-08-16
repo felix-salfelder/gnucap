@@ -10,6 +10,10 @@
 #include "io_.h"
 #include "e_cardlist.h"
 
+// hack...
+#define CWDSTARTFILE   "gnucap.rc"
+
+
 using std::string;
 
 bool startup_recursive()

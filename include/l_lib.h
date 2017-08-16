@@ -112,6 +112,9 @@ namespace OS {
       return def;
     } else { untested();
       return strcmp(ev,"no") && strcmp(ev,"0");
+    }
+  }
+
   inline void setenv(const std::string& Name, const std::string& Value, bool Overwrite=true) {
     if (Name == "") {untested();
       throw Exception("setenv: bad name " + Name);

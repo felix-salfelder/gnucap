@@ -777,9 +777,11 @@ void node_t::new_model_node(const std::string& s_in, CARD* d)
   }
   assert( is_electrical() );
 
-  if (d->subckt()){
+  if (d->subckt()){ untested();
+    // this is a hack.
     new_node(s, d->subckt());
-  } else { // happens in spice wrapper and in inductance.
+  } else { untested();
+    // happens in spice wrapper and in inductance.
     assert(d->scope());
     new_node(s, d->scope());
   }

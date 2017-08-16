@@ -3,7 +3,13 @@ load test, module built as intended
 kernel newer
 module built against higher revision: 999, loading into 1
 bogus4: built against 1 revision 999
+module built against higher revision: 999, loading into 1
+bogus4: built against 1 revision 999
 kernel newer (lazy)
+module built against higher revision: 999, loading into 1
+bogus4: built against 1 revision 999
+load lazy ./bogus4.so 
+          ^ ? "./bogus4.so": already loaded, replacing
 module built against higher revision: 999, loading into 1
 bogus4: built against 1 revision 999
 done

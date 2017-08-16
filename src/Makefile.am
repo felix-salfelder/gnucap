@@ -29,25 +29,8 @@
 # These source files can be omitted, and supplied as plugins.
 # device models defined in high level .model files
 
-
 #------------------------------------------------------------------------
-RAW_SRCS = \
-$(C_SRCS) \
-$(S_SRCS) \
-$(LANG_SRCS)
-
-#------------------------------------------------------------------------
-RAW_HDRS = \
-startup.h md.h ap.h mode.h constant.h declare.h \
-m_cpoly.h m_divdiff.h m_interp.h m_matrix.h m_spline.h m_wave.h \
-m_base.h m_expression.h m_phase.h \
-io_.h io_error.h io_matrix.h io_misc.h \
-s__.h s_tr.h e_adp.h s_tt.h\
-m_matrix_extra.h \
-e_adplist.h \
-d_cap.h \
-extlib.h \
-u_sock.h s_ddc.h u_atlas.h
+RAW_HDRS =
 
 noinst_HEADERS = d_coil.h
 #------------------------------------------------------------------------ 
@@ -67,7 +50,6 @@ m_matrix_example_SOURCES = m_matrix_example.cc # io.cc io_error.cc
 m_matrix_example_CPPFLAGS = $(AM_CPPFLAGS)
 
 
-SRCS1= 
 SRCS2= ${RAW_SRCS} 
 
 
@@ -80,18 +62,6 @@ Makefile.am
 
 GNUCAP_MAKE=$(shell echo gnucap.mk | sed -e '$(transform)')
 
-noinst_SCRIPTS = gnucap
-bin_PROGRAMS = gnucap.real
-transform=s&\.real$$&&;$(program_transform_name)
-gnucap_real_SOURCES = ${SRCS2} startup.cc main.cc ${SRCS1}
-
-gnucap_real_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include
-gnucap_real_CPPFLAGS+= $(AM_CPPFLAGS) -DGNUCAP_MAKE=\"$(GNUCAP_MAKE)\"
-
-#for now (ddc). fix later
-gnucap_real_LDFLAGS = $(LAPACK_LIBS)
-
-gnucap_real_LDADD = ../lib/libgnucap-uf.la
 #libgnucap_la_CFLAGS = $(AM_CFLAGS)
 
 
@@ -144,6 +114,9 @@ EXTRA_DIST+= \
  e_ivl_compile.h \
  extlib.cc \
  pointers.h
+
+install-exec-hook:
+	@echo hello world
 
 
 AM_DEFAULT_SOURCE_EXT = .cc

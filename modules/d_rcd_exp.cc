@@ -271,9 +271,8 @@ void MODEL_BUILT_IN_RCD_EXP::do_precalc_last(COMMON_COMPONENT* ccc, const CARD_L
   cc->_wcorr = 1;
   cc->_weight = cc->weight;
 
-
-  assert( cc->weight != 0 );
-  assert( cc->_weight != 0 );
+  // assert( cc->weight != 0 );
+  // assert( cc->_weight != 0 );
   assert( is_number( cc->_Rc1 ) );
   assert( is_number( cc->_Rc0 ) );
   assert( is_number( cc->_Re1 ) );

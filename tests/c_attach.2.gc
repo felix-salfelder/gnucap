@@ -7,7 +7,10 @@ echo
 echo kernel newer
 load ./bogus4.so
 detach ./bogus4.so
+load ./bogus4.so
+detach ./bogus4.so
 echo kernel newer (lazy)
+load lazy ./bogus4.so
 load lazy ./bogus4.so
 echo done
 

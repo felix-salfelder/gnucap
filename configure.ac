@@ -31,7 +31,7 @@ AM_INIT_AUTOMAKE([-Wno-portability silent-rules])
 AC_PROG_CXX
 AC_PROG_MAKE_SET
 
-AC_CONFIG_SRCDIR([src/main.cc])
+AC_CONFIG_SRCDIR([main/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([src/config.h])
 AC_LANG(C++)
@@ -64,6 +64,7 @@ fi
 	AC_MSG_RESULT([no])
 	enable_doc=no
 ])
+AC_OUTPUT([main/config.h])
 AC_OUTPUT([doc/Makefile])
 AM_CONDITIONAL([DOC], [test x$enable_doc != xno] )
 dnl ----------------- man ------------------
@@ -334,7 +335,7 @@ if test "x$GCC" = "xyes" -a "$enable_debug" = "yes"; then
 	for flag in -DTRACE_UNTESTED -Wall -W -Wno-sign-compare \
 		-Wpointer-arith -Wcast-qual \
 		-Wwrite-strings -Wconversion \
-		-Woverloaded-virtual -O2 -Wlong-long \
+		-Woverloaded-virtual -O0 -Wlong-long \
 		-Wsign-compare -Wcast-align ; do
 		case " ${CFLAGS} " in
 			*\ ${flag}\ *)
@@ -397,14 +398,19 @@ LDFLAGS="$LDFLAGS -rdynamic"
 
 # stupid hack (needed?)
 if test "x${prefix}" = "xNONE"; then
+		PREFIX="${ac_default_prefix}"
 		AC_DEFINE_UNQUOTED( PREFIX, "${ac_default_prefix}", "Prefix")
 		AC_DEFINE_UNQUOTED( LIBDIR, "${ac_default_prefix}/lib", "Libdir")
 		AC_DEFINE_UNQUOTED( SODIR, "${ac_default_prefix}/lib", "Sodir")
 else
+		PREFIX="${prefix}"
 		AC_DEFINE_UNQUOTED( PREFIX, "${prefix}", "Prefix")
 		AC_DEFINE_UNQUOTED( LIBDIR, "${prefix}/lib", "Libdir")
 		AC_DEFINE_UNQUOTED( SODIR, "${prefix}/lib", "Sodir")
 fi
+
+pkglibdir="${PREFIX}/lib/gnucap"
+AC_SUBST([pkglibdir])
 
 # todo
 #if test "X$enable_man" = "Xyes"; then
@@ -440,7 +446,7 @@ done
 
 AC_CONFIG_FILES([main/gnucap-conf], [chmod +x main/gnucap-conf])
 AC_CONFIG_FILES([main/gnucap.mk], [chmod +x main/gnucap.mk])
-AC_CONFIG_FILES([src/gnucap], [chmod +x src/gnucap])
+AC_CONFIG_FILES([main/gnucap], [chmod +x main/gnucap])
 
 AC_OUTPUT([
 	Makefile

@@ -2,11 +2,11 @@
 # (c) 2013 Felix Salfelder
 # License: GPLv3
 #
-GNUCAP = $(top_builddir)/src/gnucap
+GNUCAP = $(top_builddir)/main/gnucap
 
 # needed for gnucap-run.sh
 AM_TESTS_ENVIRONMENT = \
-    export PATH='../src:$(PATH)'\
+    export PATH='../main:$(PATH)'\
            GNUCAP='gnucap'\
            REDIRECT='exec 2>&9'\
            MAKEFLAGS=--no-print-directory \
@@ -879,7 +879,7 @@ trcurve.ckt.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
 
 $(CKT_TESTS:%=%.out) $(LOGIC_TESTS:%=%.out): %.ckt.out: %.ckt
 	@LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
-	    ../src/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
+	    ../main/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
 	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.ckt.out
 
