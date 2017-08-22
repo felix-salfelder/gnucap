@@ -73,15 +73,11 @@ void PARAM_LIST::parse(CS& cmd)
       break;
     }else{
     }
-    std::string Name;
+    IString Name;
     PARAMETER<double> Value;
     cmd >> Name >> '=' >> Value;
     if (cmd.stuck(&here)) {untested();
       break;
-    }else{
-    }
-    if (OPT::case_insensitive) {
-      notstd::to_lower(&Name);
     }else{
     }
     _pl[Name] = Value;
@@ -144,7 +140,7 @@ bool PARAM_LIST::is_printable(int i)const
   return false;
 }
 /*--------------------------------------------------------------------------*/
-std::string PARAM_LIST::name(int i)const
+IString PARAM_LIST::name(int i)const
 {
   //BUG// ugly linear search
   int i_try = 0;
@@ -193,13 +189,11 @@ void PARAM_LIST_MAP::eval_copy(PARAM_LIST_BASE& p, const CARD_LIST* scope)
   trace1("PARAM_LIST::eval_copy done", *this);
 }
 /*--------------------------------------------------------------------------*/
-const PARAMETER<double>& PARAM_LIST_BASE::deep_lookup(std::string Name) const
+const PARAMETER<double>& PARAM_LIST_BASE::deep_lookup(IString Name)const
 {
   trace2("PARAM_LIST::deep_lookup adding", Name, *this);
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
+
+  // hmm, report close misses and ambiguities?
   PARAMETER<double> & rv = pl()[Name];
   if (rv.has_hard_value()) {
     // found a value, return it
@@ -219,14 +213,9 @@ const PARAMETER<double>& PARAM_LIST_BASE::deep_lookup(std::string Name) const
   }
 }
 /*--------------------------------------------------------------------------*/
-PARAMETER<double>& PARAM_LIST_BASE::find(std::string Name)
+PARAMETER<double>& PARAM_LIST_BASE::find(IString Name)
 {
   trace2("PARAM_LIST::deep_lookup adding", Name, *this);
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{ untested();
-  }
-
   iterator i = pl().find(Name);
   if (i != pl().end()) {
     return i->second;
@@ -235,23 +224,14 @@ PARAMETER<double>& PARAM_LIST_BASE::find(std::string Name)
   }
 }
 /*--------------------------------------------------------------------------*/
-void PARAM_LIST::set(std::string Name, const double value)
+void PARAM_LIST::set(IString Name, const double value)
 {
   trace2("PARAM_LIST::set", Name, value);
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
   _pl[Name] = value;
 }
 /*--------------------------------------------------------------------------*/
-void PARAM_LIST::set(std::string Name, const std::string& Value)
+void PARAM_LIST::set(IString Name, const IString& Value)
 {
-  trace2("PARAM_LIST::set", Name, Value);
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
   _pl[Name] = Value;
 }
 /*--------------------------------------------------------------------------*/
@@ -297,7 +277,7 @@ bool PARAMETER<bool>::e_val(const bool& def, const CARD_LIST* scope, bool try_)c
   assert(scope);
 
   static int recursion=0;
-  static const std::string* first_name = NULL;
+  static const IString* first_name = NULL;
   if (recursion == 0) {
     first_name = &_s;
   }else{
@@ -336,13 +316,13 @@ bool PARAMETER<bool>::e_val(const bool& def, const CARD_LIST* scope, bool try_)c
   return _v;
 }
 /*--------------------------------------------------------------------------*/
-string PARAMETER<string>::e_val(const std::string& def, const CARD_LIST* scope, bool try_)const
+string PARAMETER<std::string>::e_val(const std::string& def, const CARD_LIST* scope, bool try_)const
 {
   trace1("PARAMETER<string>::e_val " + _s + " default: >" + def + "<",_v);
   assert(scope);
 
   static int recursion=0;
-  static const std::string* first_name = NULL;
+  static const IString* first_name = NULL;
   if (recursion == 0) {
     first_name = &_s;
   }else{
@@ -380,9 +360,9 @@ string PARAMETER<string>::e_val(const std::string& def, const CARD_LIST* scope, 
       _v = def;
       error(bDANGER, "parameter " + *first_name + " recursion too deep\n");
     }
-  }else{
+  }else{ untested();
     // start with # means we have a final value
-    _v=_s;
+    _v = _s.to_string();
   }
   --recursion;
   trace1("PARAMETER<string>::e_val done:", _v);
@@ -397,9 +377,10 @@ string PARAMETER<string>::value()const {
   return to_string(_v);
 }
 /*--------------------------------------------------------------------------*/
-string PARAMETER<string>::string()const {
+string PARAMETER<std::string>::string()const
+{
   trace0(("PARAMETER<string>::string " + _s + " -> " + _v ).c_str());
-  return to_string(_s);
+  return _s.to_string();
 }
 /*--------------------------------------------------------------------------*/
 bool PARAMETER<string>::operator==(const PARAMETER& p)const

@@ -24,10 +24,31 @@
 includedir_transformed = ${includedir}/$(shell echo gnucap | sed -e "$(transform)")
 libgnucap_includedir = $(includedir_transformed)
 libgnucap_include_HEADERS = \
+l_compar.h l_dispatcher.h l_denoise.h \
+l_lib.h l_stlextra.h l_timer.h \
+l_istring.h \
+u_probe.h \
 	patchlev.h m_mvpoly.h io_trace.h \
 	d_coment.h d_dot.h d_logic.h d_subckt.h \
 	e_paramlist.h \
-	u_cardst.h u_function.h u_lang.h u_limit.h u_nodemap.h u_opt.h u_parameter.h
+u_prblst.h u_sim_data.h u_sdp.h u_status.h u_time_pair.h u_xprobe.h \
+e_base.h e_card.h e_node.h e_aux.h e_model.h e_compon.h e_subckt.h \
+e_elemnt.h e_ccsrc.h e_storag.h e_cardlist.h \
+bm.h \
+c_comand.h globals.h \
+	u_cardst.h u_function.h u_lang.h u_limit.h u_nodemap.h u_opt.h u_parameter.h \
+md.h ap.h mode.h constant.h declare.h \
+m_cpoly.h m_divdiff.h m_interp.h m_matrix.h m_spline.h m_wave.h \
+m_base.h m_expression.h m_phase.h \
+io_.h io_error.h io_matrix.h io_misc.h \
+s__.h s_tr.h e_adp.h s_tt.h\
+m_matrix_extra.h \
+e_adplist.h \
+d_cap.h \
+u_sock.h s_ddc.h u_atlas.h
+
+# TODO: what's this?
+# extlib.h
 
 EXTRA_DIST = patchlev.h.in
 BUILT_SOURCES = patchlev.h

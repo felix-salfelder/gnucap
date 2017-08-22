@@ -20,6 +20,7 @@
  *------------------------------------------------------------------
  * a remote control socket. used by verification tools
  */
+#define ADD_VERSION // signon?
 #include "globals.h"
 #include "u_status.h"
 #include <unistd.h>
@@ -43,7 +44,6 @@
 /*--------------------------------------------------------------------------*/
 #define userinfo( a,b,c,d,e,f )
 /*--------------------------------------------------------------------------*/
-using namespace std;
 using namespace SOME_CAP_HACK; // FIXME. (maybe use STORAGE device interface?)
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -54,7 +54,7 @@ typedef union {
 } di_union_t;
 
 /*--------------------------------------------------------------------------*/
-class SOCK : public DDC_BASE {
+class SOCK : public DDC_BASE { //
 public:
   explicit SOCK();
   ~SOCK();
@@ -96,8 +96,8 @@ private:
   void findcaps( CARD_LIST* scope);
   void cap_prepare();
   void cap_reset();
-  vector<string> var_namen_arr;
-  vector<COMPONENT*> _caplist; // FIXME: use cardlist
+  std::vector<IString> var_namen_arr;
+  std::vector<COMPONENT*> _caplist; // FIXME: use cardlist
   CARDSTASH* _capstash;
   uint16_t var_namen_total_size;
 
@@ -115,13 +115,13 @@ private: //vera stuff.
   void transtep_reply(unsigned, bool eol=true);
   void transtep_gc_reply(unsigned);
 
-  char* var_names_buf;
+  Ichar* var_names_buf;
 
   unsigned _verbose;
   size_t total;
   size_t n_inputs() const{return _input_names.size();}
-  vector<string> _input_names;
-  vector<ELEMENT*> _input_devs;
+  std::vector<IString> _input_names;
+  std::vector<ELEMENT*> _input_devs;
   unsigned n_vars;
   unsigned n_vars_square;
   uint16_t n_eingaenge;
@@ -154,7 +154,6 @@ private: //vera stuff.
   double *matrixg, *matrixc,*vectorq;
 
   static const int printlevel=0;
-
 };
 /*--------------------------------------------------------------------------*/
 unsigned SOCK::tr_steps_rejected_ = 0;
@@ -163,8 +162,6 @@ double	SOCK::temp_c_in = 0.;
 void SOCK::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   trace0("SOCK::do_it");
-  IO::error.detach(stdout);
-  IO::error.attach(stderr);
   _scope = Scope;
   _sim->_time0 = 0.;
   //_sim->set_command_ddc();
@@ -250,11 +247,14 @@ void SOCK::setup(CS& Cmd)
   _sim->_freq = 0;
 
   // not implemented. need to queue sources properly (CARDLIST::q_hack..?)
-  if(OPT::prequeue) { // incomplete();
-    error(bDANGER, "prequeueing is experimental, this might not work\n");
-    OPT::prequeue=false;
+  if(OPT::prequeue) { incomplete();
+    error(bDANGER, "prequeueing is incomplete, disabling\n");
+    OPT::prequeue = false;
   }else{
   }
+
+  IO::error.detach(stdout);
+  IO::error.attach(stderr);
 }
 /*--------------------------------------------------------------------------*/
 void SOCK::options(CS& Cmd, int Nest)
@@ -336,24 +336,30 @@ void SOCK::sweep()
 
     trace0("SOCK::do_it waiting");
     stream = sock->listen();
-  } else {
+  }else{
     fflush( stdout );
     fflush( stdin );
     trace0("SOCK::sweep simple i/o");
-    socket=0;
+    socket = NULL;
     trace1("bufsize Stdin ", _bufsize);
-    if (!_binout) {
-      int  devnull=open("/dev/null",O_WRONLY);
+    if (!_binout){
+      int devnull=open("/dev/null", O_WRONLY);
       trace2("Socket stream for dev null" ,devnull, STDIN_FILENO);
       stream = SocketStream( devnull, STDIN_FILENO, _bufsize);
-    } else {
+    }else{
       stream = SocketStream( STDOUT_FILENO, STDIN_FILENO, _bufsize);
     }
     stream << "gnucap sock ready";
   }
 
   main_loop();
+
   delete socket;
+
+  _out << "\n"; // (good idea?)
+
+  IO::error.detach(stderr);
+  IO::error.attach(stdout); // BUG. does not seem to work?!
   return;
 }
 /*--------------------------------------------------------------------------*/
@@ -377,7 +383,7 @@ void SOCK::fillnames( const CARD_LIST* scope){
     if (i->first != "0") {
       if (const NODE* a= dynamic_cast<const NODE*>(i->second)){
         stringstream s;
-        string myname(a->long_label());
+        IString myname(a->long_label());
         var_namen_arr[a->matrix_number()-1] = myname;
         var_namen_total_size = static_cast<uint16_t>( var_namen_total_size + static_cast<uint16_t>(myname.length()) + 1 );
       }
@@ -415,13 +421,11 @@ void SOCK::findcaps( CARD_LIST* scope){
 static SOCK p2;
 static DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "sock", &p2);
 /*--------------------------------------------------------------------------*/
+DISPATCHER<CKT_BASE>::INSTALL* _status=NULL;
 static void register_status()
 {
-  static bool done;
-
-  if(!done) {
-    new DISPATCHER<CKT_BASE>::INSTALL(&status_dispatcher, "sock", &p2);
-    done = true;
+  if(!_status){
+    _status = new DISPATCHER<CKT_BASE>::INSTALL(&status_dispatcher, "sock", &p2);
   }else{ untested();
   }
 }
@@ -483,9 +487,8 @@ void SOCK::main_loop()
     double dt;
     unsigned status;
     switch (opcode) {
-      case '\0': // 0
+      case '\0':
         return;
-        break;
       case '3': // 51
         if(init_done) throw Exception("init twice??");
         verainit(arg[0], arg[1], arg[2]);
@@ -527,12 +530,19 @@ void SOCK::main_loop()
 }
 /*--------------------------------------------------------------------------*/
 // very clever way to transfer strings.
-static void putstring8(SocketStream* s, const string x)
+static void putstring8(SocketStream* s, const IString x)
 {
-  const char* A = x.c_str();
+  const Ichar* A = x.c_str();
 
-  while(*A){
-    *s<<*A<<*A<<*A<<*A<<*A<<*A<<*A<<*A;
+  while(*A!='\0'){
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
+    *s << A->to_char();
     A++;
   }
 }
@@ -587,13 +597,13 @@ void SOCK::verainit(unsigned verbose, unsigned n_in, unsigned length)
   assert(stream.bufsize() >= total);
 
   assert(!var_names_buf);
-  var_names_buf = (char*) malloc( n_vars * 128 * sizeof(char));
-  strcpy(var_names_buf,"");
+  var_names_buf = (Ichar*) malloc( n_vars * 128 * sizeof(char));
+  strcpy((char*)var_names_buf, "");
   for (unsigned i=0; i < n_vars; i++)
   {
     trace1("SOCK::verainit ", var_namen_arr[i]);
-    strcat(var_names_buf, var_namen_arr[i].c_str());
-    strcat(var_names_buf, "\t");
+    strcat((char*)var_names_buf, (const char*)var_namen_arr[i].c_str());
+    strcat((char*)var_names_buf, "\t");
   }
   //length = static_cast<uint16_t>( strlen(var_names_buf) );
   // userinfo(1,"vera_titan_ak","Variablennamen %s\n",var_names_buf);
@@ -696,7 +706,7 @@ void SOCK::verakons()
     //    trace2("SOCK::kons start ", i,  _sim->_v0[i] );
   }
   if (printlist().size()) {
-    outdata(0.);
+    outdata(0., ofPRINT);
   }
   _sim->keep_voltages(); // v0->vdc
 
@@ -734,17 +744,16 @@ void SOCK::verakons()
     //    solve_with_homotopy(itl,_trace);
     // homotopy is to much effort calling
     // procedures must catch problems with convergence.
-  }catch( Exception e) {
-    ::error(bDANGER, "hot failed\n");
+  }catch(Exception e) { untested();
+    ::error(bDANGER, "solve failed in verakons\n");
     throw e;
   }
-  if (!converged) {
+  if(!converged){
     ::error(bWARNING, "s_sock::verakons: solve did not converge\n");
     converged = solve_with_homotopy(itl,_trace);
-    if (!converged) {
-      ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
-      _error = 1;
-    }
+  }
+  if(!converged){
+    _error = 1;
   }
   ::status.accept.start();
   assert(_sim->_uic);
@@ -753,7 +762,7 @@ void SOCK::verakons()
 
   //  assert(_sim->_mode==s_SOCK);
   if (printlist().size()) {
-    outdata(_sim->_time0);
+    outdata(_sim->_time0, ofPRINT);
   }
   _sim->_mode = s_SOCK; // for now.
 
@@ -762,19 +771,31 @@ void SOCK::verakons()
   _sim->set_inc_mode_no();
 
   // vera wants just cap stamps
-  for (unsigned i = 0; i < _caplist.size(); i++) { itested();
-    CARD* c = prechecked_cast<CARD*>(_caplist[i]);
-    assert(c);
-    trace1("verakons, loading cap", c->long_label());
-    _sim->_damp = 1.; // need raw stamps
-    c->tr_load();
+  if(converged) {
+    //   final step of solve() will call evaluate models() which
+    //   calculates with do_tr the values of the caps and
+    //   the tr_load() here will stamp the values in the matrix.  
+    for (unsigned i = 0; i < _caplist.size(); i++) { itested();
+      CARD* c = prechecked_cast<CARD*>(_caplist[i]);
+      assert(c);
+      trace1("verakons, loading cap", c->long_label());
+      _sim->_damp = 1.; // need raw stamps
+      c->tr_load(); // this can be done only when converged
+    }
+  }else{untested();
+    ::error(bWARNING, "s_sock::verakons: solve did not converge even with homotopy\n");
+    // avoid double loads. in case of _error
+	  // If solve or solve with homotopy did not converge,
+	  // it will not increment the iTOTAL counter and
+	  // we would get a double tr_load_source if this is executed.
   }
-
+	
   for( unsigned i = 0; i < _caplist.size(); i++) {
-    /// oops. maybe the next command is tran?!
-    // (this is a hack!!)
-    _caplist[i]->set_constant(false);
+	/// oops. maybe the next command is tran?!
+	// (this is a hack!!)
+	_caplist[i]->set_constant(false);
   }
+	
 }
 /*--------------------------------------------------------------------------*/
 #undef rescale
@@ -957,7 +978,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
   _sim->set_command_tran();
 
   if (printlist().size()) {
-    outdata(reftime);
+    outdata(reftime, ofPRINT);
   }
 
   _sim->_phase = p_TRAN;
@@ -1006,7 +1027,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
       ::status.accept.stop();
     }
     if (printlist().size()) {
-      outdata(_sim->_time0);
+      outdata(_sim->_time0, ofPRINT);
     }
     if(i>1){
       _sim->_time0 += _sim->_dt0;
@@ -1041,7 +1062,7 @@ unsigned SOCK::transtep(unsigned init, double dt)
 
 #ifndef NDEBUG
   for (unsigned i=1; i <= n_vars; i++) {
-    if(isnan(_sim->_i[i])||isnan(_sim->_vdcstack.top()[i]) ) {
+    if(std::isnan(_sim->_i[i])||std::isnan(_sim->_vdcstack.top()[i]) ) {
       _error = 1;
       assert(!tr_converged);
     }
@@ -1289,6 +1310,10 @@ void SOCK::cap_reset(void)
 SOCK::~SOCK()
 {
   trace0("SOCK::~SOCK()");
+  if(_status){
+    delete(_status);
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

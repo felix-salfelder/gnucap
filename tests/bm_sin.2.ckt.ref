@@ -13,7 +13,7 @@
  20.n       0.         21.826n    0.        
 V1 ( 1 0 ) sin offset= 0. amplitude= 1. frequency= 100.Meg delay= 0. damping= 0.
 Gnucap   System status
-iterations: op=0, dc=0, tran=~~, fourier=0, total=~~
-transient timesteps: accepted=~~, rejected=0, total=~~
+iterations: op=0, dc=0, tran=32, fourier=0, total=43
+transient timesteps: accepted=11, rejected=0, total=11
 nodes: user=1, subckt=0, model=0, total=1
 dctran density=100.0%, ac density=100.0%

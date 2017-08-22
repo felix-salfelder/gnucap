@@ -99,7 +99,8 @@ class CMD_NODESET : public CMD { //
 				ADP_NODE* a = dynamic_cast<ADP_NODE*>(n);
 				if (!a){ untested();
 					cmd.warn(bWARNING, "not an adp node:  " + name + "\n");
-					throw(Exception_Type_Mismatch("nodeset:", n->long_label(), "adpnode"));
+					throw(Exception_Type_Mismatch("nodeset:",
+								n->long_label(), "adpnode"));
 				}
 
 				cmd.skip1b('=');

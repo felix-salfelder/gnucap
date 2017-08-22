@@ -1,4 +1,4 @@
-/*                               -*- C++ -*-
+/*                   -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -39,7 +39,7 @@
 namespace {
 
 #if 0
-  bool search_file( std::string &name ){
+  bool search_file( std::string &name ){ untested();
     const char* h ="HOME";
     const char* home= getenv(h);
 
@@ -50,8 +50,8 @@ namespace {
 
     // FIXME. use libpath 
 
-    for(int i=1; i<4 ; i++) {
-      if ( FILE* tmp = fopen( (pathlist[i] + "/" + name).c_str(), "r" ) ) {
+    for(int i=1; i<4 ; i++) { untested();
+      if ( FILE* tmp = fopen( (pathlist[i] + "/" + name).c_str(), "r" ) ) { untested();
         fclose(tmp);
         name = pathlist[i]+"/"+name;
         return true;
@@ -67,6 +67,22 @@ using std::string;
 /*--------------------------------------------------------------------------*/
 std::map<const std::string, void*> attach_list;
 /*--------------------------------------------------------------------------*/
+std::string plug_path()
+{
+  return OS::getenv("GNUCAP_PLUGPATH");
+}  
+/*--------------------------------------------------------------------------*/
+void list()
+{
+  for (std::map<std::string, void*>::iterator
+	 ii = attach_list.begin(); ii != attach_list.end(); ++ii) {
+    if (ii->second) {
+      IO::mstdout << ii->first << '\n';
+    }else{itested();
+      error(bTRACE,  ii->first + " (unloaded)\n");
+    }
+  }
+}
 /*--------------------------------------------------------------------------*/
 class CMD_ATTACH : public CMD {
   static void compile(string& filename, string source, string make);
@@ -96,78 +112,99 @@ public:
     } while (cmd.more() && !cmd.stuck(&here));
     trace1("attach::do_it", make);
 
-    string file_name;
-    cmd >> file_name;
+    std::string short_file_name;
+    cmd >> short_file_name;
+    
+    if (short_file_name == "") {
+      // nothing, list what we have
+      list();
+    }else{
+      // a name to look for
+      // check if already loaded
+      if (void* handle = attach_list[short_file_name]) {itested();
+	if (CARD_LIST::card_list.is_empty()) {itested();
+	  cmd.warn(bDANGER, here, "\"" + short_file_name + "\": already loaded, replacing");
+	  dlclose(handle);
+	  attach_list[short_file_name] = NULL;
+	}else{itested();
+	  cmd.reset(here);
+	  throw Exception_CS("already loaded, cannot replace when there is a circuit", cmd);
+	}
+      }else{
+      }
 
-    OMSTREAM _out = IO::mstdout;
-    _out.outset(cmd);
+      string source_filename(short_file_name);
+      // FIXME: incomplete... some more control...
+      // global list of supported suffixes?
+      if(short_file_name.size()>3
+	  && !strcmp(short_file_name.c_str()+short_file_name.size()-3,".so")) {
+	source_filename = "";
+      }else if (short_file_name.size()>3
+	  && short_file_name.c_str()[short_file_name.size()-3] == '.') {
+	short_file_name[short_file_name.size()-2]='s';
+	short_file_name[short_file_name.size()-1]='o';
 
-    if(file_name==""){
-      string comma;
-      for (std::map<std::string, void*>::iterator
-	  ii = attach_list.begin(); ii != attach_list.end(); ++ii) {
-	if (ii->second) {
-	  _out << comma << ii->first;
-	  comma = ",\n";
-	}else{
+	if(short_file_name[0]=='/') { itested();
+	} else {
+	  char* cwd = get_current_dir_name(); // POSIX, no C++ implementation available
+	  source_filename = string(cwd) + "/" + source_filename;
+	  free(cwd);
+	}
+      } else { untested();
+	source_filename = "";
+      }
+
+      std::string full_file_name;
+      if (source_filename!="") {
+	error(bDEBUG, "attach from source %s\n", source_filename.c_str());
+	assert(source_filename[0]=='/');
+	try {
+	  compile(short_file_name, source_filename, make);
+	  full_file_name = short_file_name;
+	}catch(Exception& e){ untested();
+	  cmd.reset(here);
+	  throw Exception_CS(e.message(), cmd);
+	}
+      }else if (short_file_name[0]=='/' || short_file_name[0]=='.'){
+	if (OS::access_ok(short_file_name, R_OK)) {
+	  // found it, local or root
+	  full_file_name = short_file_name;
+	}else{untested();
+	  cmd.reset(here);
+	  throw Exception_CS("plugin not found in " + short_file_name[0], cmd);
+	}
+      }else{
+	std::string path = plug_path();
+	full_file_name = findfile(short_file_name, path, R_OK);
+	if (full_file_name != "") {
+	  // found it, with search
+	}else{untested();
+	  cmd.reset(here);
+	  throw Exception_CS("plugin not found in " + path, cmd);
 	}
       }
-      _out << "\n";
-      return;
-    }
+	  
+      std::cerr << full_file_name << "\n";
+      assert(OS::access_ok(full_file_name, R_OK));
 
-    void*& handle = attach_list[file_name];
-    trace2("...", file_name, handle);
-    if (handle) {
-      if (CARD_LIST::card_list.is_empty()) {
-	cmd.warn(bDANGER, here, "\"" + file_name + "\": already loaded, replacing");
-	dlclose(handle);
-	handle = NULL;
+#if 0
+      if (void* handle = dlopen(full_file_name.c_str(), check | dl_scope)) { untested();
+	attach_list[short_file_name] = handle;
       }else{untested();
 	cmd.reset(here);
-	throw Exception_CS("already loaded, cannot replace when there is a circuit", cmd);
+	throw Exception_CS(dlerror(), cmd);
       }
-    }else{
-    }
+#endif
 
-    string source_filename(file_name);
-    // FIXME: incomplete... some more control...
-    // global list of supported suffixes?
-    if (file_name.size()>3 && !strcmp(file_name.c_str()+file_name.size()-3,".so")) {
-      source_filename = "";
-    }else if (file_name.size()>3 && file_name.c_str()[file_name.size()-3] == '.') {
-      file_name[file_name.size()-2]='s';
-      file_name[file_name.size()-1]='o';
-
-      if(file_name[0]=='/') { itested();
-      } else {
-	char* cwd = get_current_dir_name(); // POSIX, no C++ implementation available
-	source_filename = string(cwd) + "/" + source_filename;
-	free(cwd);
-      }
-    } else {
-      source_filename = "";
-    }
-
-    if (source_filename!="") {
-      trace1("attach", source_filename);
-      assert(source_filename[0]=='/');
-      try {
-	compile(file_name, source_filename, make);
-      }catch(Exception& e){
-	cmd.reset(here);
-	throw Exception_CS(e.message(), cmd);
-      }
-    }else{
-    }
-
-    handle = dlopen(file_name.c_str(), check | dl_scope);
+    void* handle = dlopen(full_file_name.c_str(), check | dl_scope);
     const char* e = dlerror();
     if (check == RTLD_LAZY) {
+      attach_list[short_file_name] = handle;
     }else if (handle) {
       const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
       if (name){
-      }else{
+	attach_list[short_file_name] = handle;
+      }else{ untested();
 	dlclose(handle);
 	handle = NULL;
 	throw Exception_CS("missing interface", cmd);
@@ -177,11 +214,12 @@ public:
       cmd.reset(here);
       throw Exception_CS(e, cmd);
     }
+    }
 #if 0
-    try {
+    try { untested();
       assert(!handle);
       handle = do_attach(file_name, check | dl_scope, force);
-    } catch (Exception& e) {
+    } catch (Exception& e) { untested();
       trace0("do_attach threw");
       cmd.reset(here);
       throw Exception_CS(e.message(), cmd);
@@ -189,9 +227,21 @@ public:
 #endif
     trace0("done attach");
   }
+
+  std::string help_text()const
+  {
+    return 
+      "load command\n"
+      "Loads plugins\n"
+      "Syntax: load plugin\n"
+      "Plugin search path is: " + plug_path() + " \n"
+      "Path is set by GNUCAP_PLUGPATH environment variable\n"
+      "With no arg, it lists plugins already loaded\n\n";
+  }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "attach|load", &p1);
 /*--------------------------------------------------------------------------*/
+#if 0
 // overengineered gncap-uf approach
 void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
 { untested();
@@ -215,16 +265,16 @@ void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
 
     unsigned (*version)() = (unsigned(*)()) dlsym(handle, "interface_version");
     e = dlerror();
-    if (force) {
+    if (force) { untested();
     } else if ((e || !version) && !force) { untested();
       dlclose(handle);
       throw Exception("lacks interface version");
-    } else if (strcmp(name(), interface_name())) {
+    } else if (strcmp(name(), interface_name())) { untested();
       string n(name());
       dlclose(handle);
       throw Exception(file_name + ": wrong interface ("+ n +
 				", not " + string(interface_name()) + ")");
-    } else if (interface_version() == version()) {
+    } else if (interface_version() == version()) { untested();
     } else if (HAVE_GIT_REPO) { untested();
       throw Exception("loading " + file_name + ": plugin (" + to_string(version()) +
            ") doesnt match git revision (" + to_string(interface_version()) + ")");
@@ -237,12 +287,13 @@ void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
     throw Exception(dlerror());
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 {
   struct stat ccattrib;
   int ccstat = stat(source_filename.c_str(), &ccattrib);
-  if (ccstat) {
+  if (ccstat) { untested();
     throw Exception("cannot compile: " + source_filename +
 		    " does not exist (" + to_string(ccstat) + ")\n");
   } else {
@@ -262,13 +313,13 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
     filename = "./" + filename;
   }
 
-  if (!sostat && ccattrib.st_mtime < soattrib.st_mtime) {
+  if (!sostat && ccattrib.st_mtime < soattrib.st_mtime) { untested();
     trace0("so exists and is newer");
     return;
-  } else if(!sostat) {
+  } else if(!sostat) { untested();
     trace0("so needs to be refreshed");
     f = fopen(filename.c_str(),"a");
-    if (f) {
+    if (f) { untested();
       trace0("so is writable");
       fclose(f);
     } else { untested();
@@ -306,7 +357,7 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 //    // rm -r t;
 //  }
 
-  if(childret){
+  if(childret){ untested();
     throw Exception("cannot make " + filename + "(" + to_string(childret) + ")");
   }
 }
@@ -316,22 +367,38 @@ class CMD_DETACH : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)
   {
-    if (CARD_LIST::card_list.is_empty()) {
-      unsigned here = cmd.cursor();
-      std::string file_name;
-      cmd >> file_name;
-      
-      void* handle = attach_list[file_name];
-      if (handle) {
-	dlclose(handle);
-	attach_list[file_name] = NULL;
-      }else{
-	cmd.reset(here);
-	throw Exception_CS("plugin not attached", cmd);
+    unsigned here = cmd.cursor();	//BUG// due to the way dlopen and dlclose work
+    std::string file_name;		// it doesn't really work.
+    cmd >> file_name;			// the dispatcher's active instance blocks unload
+    
+    if (file_name == "") {
+      // nothing, list what we have
+      list();
+    }else{
+      if (CARD_LIST::card_list.is_empty()) {
+	void* handle = attach_list[file_name];
+	if (handle) {
+	  dlclose(handle);
+	  attach_list[file_name] = NULL;
+	}else{
+	  cmd.reset(here);
+	  throw Exception_CS("plugin not attached", cmd);
+	}
+      }else{untested();
+	throw Exception_CS("detach prohibited when there is a circuit", cmd);
       }
-    }else{itested();
-      throw Exception_CS("detach prohibited when there is a circuit", cmd);
     }
+  }
+
+  std::string help_text()const
+  {
+    return 
+      "unload command\n"
+      "Unloads plugins\n"
+      "Syntax: unload plugin\n"
+      "The name must match the name you loaded it with.\n"
+      "Prohibited when there is a circuit\n"
+      "With no arg, it lists plugins already loaded\n\n";
   }
 } p2;
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "detach|unload", &p2);
@@ -339,18 +406,19 @@ DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "detach|unload", &p2);
 class CMD_DETACH_ALL : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)
-  {
-    if (CARD_LIST::card_list.is_empty()) {
+  { untested();
+    if (CARD_LIST::card_list.is_empty()) { untested();
       for (std::map<std::string, void*>::iterator
-	     ii = attach_list.begin(); ii != attach_list.end(); ++ii) {
+	     ii = attach_list.begin(); ii != attach_list.end(); ++ii) { untested();
 	void* handle = ii->second;
-	if (handle) {
+	if (handle) { untested();
 	  dlclose(handle);
 	  ii->second = NULL;
-	}else{
+	}else{itested();
+	  // name still in list, but has been detached already
 	}
       }
-    } else {
+    } else { untested();
       throw Exception_CS("detach prohibited when there is a circuit", cmd);
     }
   }

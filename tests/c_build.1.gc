@@ -1,0 +1,8 @@
+options trace
+
+build
+R1 nosc nl .001
+.
+
+list
+end

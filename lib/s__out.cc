@@ -1,5 +1,4 @@
-/*$Id: s__out.cc,v 1.8 2010-09-07 07:46:24 felix Exp $ -*- C++ -*-
- * vim:sw=2:ts=8:et:
+/*                            -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -110,21 +109,34 @@ void SIM::expect_results(double t){
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::out: output the data, "keep" for ac reference
+ * x = the x coordinate
+ * print = selected points, "print" to screen, files, etc.
+ * store = all points, for internal postprocessing, measure
+ * keep = after the command is done, dcop for ac
  */
-void SIM::outdata(double x)
+void SIM::outdata(double x, int outflags)
 {
 
   trace1("SIM::outdata ", x);
 
-  expect_results(x);
   ::status.output.start();
-  plottr(x, plotlist());
-  print_results(x);
-  
-  alarm();
-  store_results(x);
-  _sim->reset_iteration_counter(iPRINTSTEP);
-  ::status.hidden_steps = 0;
+  if (outflags & ofKEEP) {
+    _sim->keep_voltages();
+  }else{
+  }
+  if (outflags & ofPRINT) {
+    plottr(x, plotlist());
+    print_results(x);
+    _sim->reset_iteration_counter(iPRINTSTEP);
+    ::status.hidden_steps = 0;
+  }else{
+    ++::status.hidden_steps;
+  }
+  if (outflags & ofSTORE) {
+    alarm();
+    store_results(x);
+  }else{
+  }
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -143,10 +155,7 @@ void SIM::head(double start, double stop, const std::string& col1)
   unsigned ii = 0;
   for (PROBELIST::const_iterator
 	 p=storelist().begin();  p!=storelist().end();  ++p) {
-    string l = (*p)->label();
-    if (OPT::case_insensitive) {
-      notstd::to_upper(&l);
-    }
+    IString l = (*p)->label();
     WAVE* newwave = &(_sim->_waves[_sim->_label][l]);
 
     // UGLY: linear.

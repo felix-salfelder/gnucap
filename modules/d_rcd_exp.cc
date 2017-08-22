@@ -34,7 +34,6 @@ class MODEL_BUILT_IN_RCD_EXP : public MODEL_BUILT_IN_RCD_SYM { //
     std::string dev_type()const ;
     void      set_dev_type(const std::string& nt )
     {
-      assert(&nt);
      trace0(("MODEL_BUILT_IN_RCD_EXP::set_dev_type() " + nt).c_str()); 
     };
     CARD* clone()const {return new MODEL_BUILT_IN_RCD_EXP(*this);}
@@ -248,7 +247,7 @@ void MODEL_BUILT_IN_RCD_EXP::do_precalc_last(COMMON_COMPONENT* ccc, const CARD_L
   assert(cc);
   //const MODEL_BUILT_IN_RCD_EXP* m=this;
 
-  cc->Uref=0;
+  cc->Uref = 0.;
 
   trace5("MODEL_BUILT_IN_RCD_EXP::do_precalc_last", cc->Uref,
       c->Recommon1,
@@ -272,9 +271,8 @@ void MODEL_BUILT_IN_RCD_EXP::do_precalc_last(COMMON_COMPONENT* ccc, const CARD_L
   cc->_wcorr = 1;
   cc->_weight = cc->weight;
 
-
-  assert( cc->weight != 0 );
-  assert( cc->_weight != 0 );
+  // assert( cc->weight != 0 );
+  // assert( cc->_weight != 0 );
   assert( is_number( cc->_Rc1 ) );
   assert( is_number( cc->_Rc0 ) );
   assert( is_number( cc->_Re1 ) );

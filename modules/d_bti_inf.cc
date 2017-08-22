@@ -93,10 +93,10 @@ std::string MODEL_BUILT_IN_BTI_INF::param_value(int i)const
 {
   switch (param_count() - 1 - i) {
     case 0: return "...";
-    case 1: return to_string(rows);
-    case 2: return to_string(cols);
-    case 3: return string(matrix);
-    case 4: return to_string(base);
+    case 1: return rows.string();
+    case 2: return cols.string();
+    case 3: return matrix.string();
+    case 4: return base.string();
   }
   return MODEL_BUILT_IN_BTI::param_value(i);
 }

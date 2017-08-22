@@ -7,7 +7,7 @@ spice
 .param pp=0
 .param pw=.1
 V1 nin 0 pulse iv=0 pv=stress width=pw delay=0 period=pp
-.print tran v(nodes)
+.print tran v(nodes) control(0) hidden(0) next(V1) event(V1)
 
 * this should make a difference
 .param pp=.5

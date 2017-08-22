@@ -48,8 +48,8 @@ public:
   { 
     before = BIGBIG;
     after = -BIGBIG;
-    cross = 0;
-    slope = 1;
+    cross = 0.;
+    slope = 1.;
     last = false;
     unsigned here = Cmd.cursor();
     Cmd >> probe_name;
@@ -124,7 +124,7 @@ public:
 
       return to_fun_t(x_time);
     }else{
-      throw Exception_No_Match(probe_name);
+      throw Exception_No_Match(probe_name.to_string());
     }
   }
 } p4;

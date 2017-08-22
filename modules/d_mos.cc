@@ -717,7 +717,7 @@ void DEV_BUILT_IN_MOS::expand()
   assert(s);
   if (!subckt()) {
     new_subckt(scope()->params());
-  }else{
+  }else{ untested();
   }
 
   if (_sim->is_first_expand()) {
@@ -2034,7 +2034,7 @@ void DEV_BUILT_IN_MOS::do_tt()
   }
   if (adp()) {
     adp()->apply(this);
-  } else { untested();
+  } else {
   }
 }
 /*-------------------------------------------------------*/

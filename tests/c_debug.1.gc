@@ -1,0 +1,9 @@
+load c_debug.so
+
+spice
+
+R1 1 2 3
+R1 2 3 4
+
+.listnodes
+.end

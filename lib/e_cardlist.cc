@@ -104,14 +104,14 @@ PARAM_LIST* CARD_LIST::params()const
   }
 }
 /*--------------------------------------------------------------------------*/
-CARD_LIST::iterator CARD_LIST::find_again(const std::string& short_name,
+CARD_LIST::iterator CARD_LIST::find_again(const IString& short_name,
 					  CARD_LIST::iterator Begin)
 {
   trace0(("CARD_LIST::find_ name=" + short_name).c_str());
   return notstd::find_ptr(Begin, end(), short_name);
 }
 /*--------------------------------------------------------------------------*/
-CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
+CARD_LIST::const_iterator CARD_LIST::find_again(const IString& short_name,
 						CARD_LIST::const_iterator Begin)const
 {
   return notstd::find_ptr(Begin, end(), short_name);
@@ -287,7 +287,7 @@ unsigned CARD_LIST::total_nodes()const{
 //
 //}
 /*--------------------------------------------------------------------------*/
-NODE_BASE* CARD_LIST::node(string s) const{
+NODE_BASE* CARD_LIST::node(IString s) const{
   trace1("CARD_LIST::node", s);
 
   NODE_MAP* NM = nodes();
@@ -762,12 +762,12 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
           labelnumber++;
         }
         NODE_BASE* node = (*(model->subckt()->nodes()))[labelnumber];
-        string label = node->short_label();
-        if (!node){
+        IString label = node->short_label();
+        if (!node){ untested();
           label = "errornode";
-        }
+        }else{
+	}
 
-        assert(this);
         unsigned k = CKT_BASE::_sim->_total_nodes;
         NODE_MAP* Map = nodes();
         CKT_NODE* n = Map->new_node(label, this); // should increase counter
@@ -821,7 +821,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* here)
           c->n_(ii) = here->n_( map[n]-1 );
           trace1("CARD_LIST::map_subckt_nodes now", c->n_(ii).n_());
         } else { // internal node
-          string nodelabel =  c->n_(ii).n_()->short_label() ;
+          IString nodelabel =  c->n_(ii).n_()->short_label() ;
           trace4("CARD_LIST::map_subckt_nodes int", ii, n, nodelabel, here->net_nodes());
         // if a string is the key, a string is the key :|
           nn = prechecked_cast<CKT_NODE*>((*(nodes()))[nodelabel]);

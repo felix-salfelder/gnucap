@@ -62,7 +62,7 @@ void EVAL_BM_VALUE::precalc_first(const CARD_LIST* Scope)
     trace2("EVAL_BM_VALUE::precalc_first hard.", _value, modelname());
   }else if (modelname() != "") {
     trace2("EVAL_BM_VALUE::precalc_first", _value, modelname());
-    _value = modelname();
+    _value = IString(modelname());
   }else{
   }
   EVAL_BM_ACTION_BASE::precalc_first(Scope);

@@ -2,11 +2,11 @@
 # (c) 2013 Felix Salfelder
 # License: GPLv3
 #
-GNUCAP = $(top_builddir)/src/gnucap
+GNUCAP = $(top_builddir)/main/gnucap
 
 # needed for gnucap-run.sh
 AM_TESTS_ENVIRONMENT = \
-    export PATH='../src:$(PATH)'\
+    export PATH='../main:$(PATH)'\
            GNUCAP='gnucap'\
            REDIRECT='exec 2>&9'\
            MAKEFLAGS=--no-print-directory \
@@ -92,8 +92,11 @@ CKT_TESTS = \
     bm_poly.1.ckt \
     bm_poly.2.ckt \
     bm_posy.1.ckt \
+    bm_pulse.1a.ckt \
     bm_pulse.1.ckt \
+    bm_pulse.2a.ckt \
     bm_pulse.2.ckt \
+    bm_pulse.3a.ckt \
     bm_pulse.3.ckt \
     bm_pulse.4.ckt \
     bm_pwl.1.ckt \
@@ -143,8 +146,8 @@ CKT_TESTS = \
     charge-cons.ckt \
     c_help.1.ckt \
     c_lib.1.ckt \
-    c_list.ckt \
     c_list.1.ckt \
+    c_list.ckt \
     c_measure.1.ckt \
     c_measure.2.ckt \
     c_modify.ckt \
@@ -159,9 +162,9 @@ CKT_TESTS = \
     d_bjt-diffpair-dc.ckt \
     d_bjt-diffpair-nocap.ckt \
     d_bjt-diffpair-tf.ckt \
+    d_bjt-diffpair-tr2.ckt \
     d_bjt-diffpair-tran.ckt \
     d_bjt-diffpair-tr.ckt \
-    d_bjt-diffpair-tr2.ckt \
     d_bjt.error1.ckt \
     d_bjt-pnp.ckt \
     d_bjt-rca3040.ckt \
@@ -204,6 +207,9 @@ CKT_TESTS = \
     d_coil.error5.ckt \
     d_coil.m3a.ckt \
     d_coil.m3.ckt \
+    d_coil.m3r.ckt \
+    dcsweep.ckt \
+    dc_temp.ckt \
     d_diode.10a.ckt \
     d_diode.10.ckt \
     d_diode.11a.ckt \
@@ -222,8 +228,8 @@ CKT_TESTS = \
     d_diode.8.ckt \
     d_diode.9.ckt \
     d_diode.error1.ckt \
-    d_logic.1.ckt \
     d_logic.1a.ckt \
+    d_logic.1.ckt \
     d_logic.2.ckt \
     d_logic.3.ckt \
     d_logic.4.ckt \
@@ -250,6 +256,7 @@ CKT_TESTS = \
     d_mos1.n+1.ckt \
     d_mos1.nand1.ckt \
     d_mos1.nand2.ckt \
+    d_mos1.nand3.ckt \
     d_mos1.p0.ckt \
     d_mos1.p-1.ckt \
     d_mos1.p+1.ckt \
@@ -394,8 +401,8 @@ CKT_TESTS = \
     d_subckt.9.ckt \
     d_subckt.error1.ckt \
     d_subckt.error2.ckt \
-    d_subckt.error3.ckt \
     d_subckt.error3b.ckt \
+    d_subckt.error3.ckt \
     d_subckt.error4.ckt \
     d_switch.c0.ckt \
     d_switch.c1a.ckt \
@@ -414,12 +421,13 @@ CKT_TESTS = \
     d_switch.nro.1e.ckt \
     d_switch.nro.1g.ckt \
     d_switch.nro.1gr.ckt \
+    d_switch.nro.2.auto.ckt \
     d_switch.nro.2.ckt \
     d_switch.nro.3.ckt \
     d_switch.nro.3h.ckt \
     d_switch.nro.4.ckt \
-    d_switch.v.cont.ckt \
     d_switch.v.ckt \
+    d_switch.v.cont.ckt \
     d_switch.vr.ckt \
     d_tcap.1.ckt \
     d_tcap.2.ckt \
@@ -447,8 +455,6 @@ CKT_TESTS = \
     d_vcr.4.ckt \
     d_vcr.5.ckt \
     d_vcvs.1.ckt \
-    dc_temp.ckt \
-    dcsweep.ckt \
     e_ccsrc.1.ckt \
     e_ccsrc.2.ckt \
     e_node_probes.ckt \
@@ -465,9 +471,9 @@ CKT_TESTS = \
     eqflat.ckt \
     eqmodify.ckt \
     e_storag.1.ckt \
-    list.1.ckt \
     l2.ckt \
     l.ckt \
+    list.1.ckt \
     ll1.ckt \
     ll.ckt \
     lll.ckt \
@@ -611,6 +617,9 @@ GC_TESTS = \
     bm_pulse.periodic.gc \
     c_attach.1.gc \
     c_attach.2.gc \
+    c_build.1.gc \
+    c_debug.1.gc \
+    c_debug.2.gc \
     c_echo.1.gc \
     c_for.1.gc \
     c_for.2.gc \
@@ -692,6 +701,7 @@ GC_TESTS = \
     poly1_parse.gc \
     pulse.gc \
     ring.gc \
+    s_dc.bug.gc \
     s_sock.1.gc \
     s_sock.1b.gc \
     s_sock.1.preq.gc \
@@ -699,6 +709,7 @@ GC_TESTS = \
     s_sock.2.gc \
     s_sock.3.gc \
     s_sock.4.gc \
+    s_sock.load.gc \
     s_tr.2.gc \
     s_tr.3.gc \
     s_tr.4.gc \
@@ -736,6 +747,9 @@ GC_TESTS = \
     vrc_evt.gc \
     Xnodeorder.gc \
     Xprobes.gc
+
+# corner case bug
+XFAIL_TESTS+= s_dc.bug.gc
 
 #this is not ready yet.
 XFAIL_TESTS+= s_tr.cont.gc
@@ -865,7 +879,7 @@ trcurve.ckt.out: POSTDIFF+= '54·s/-196\.E-24/·0.······/g' \
 
 $(CKT_TESTS:%=%.out) $(LOGIC_TESTS:%=%.out): %.ckt.out: %.ckt
 	@LD_LIBRARY_PATH='../plugins/.libs$(LD_LIBRARY_PATH:%=:$(LD_LIBRARY_PATH))' \
-	    ../src/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
+	    ../main/gnucap $(GNUCAP_PLUGINS:%=-a %) $(GNUCAP_ARGS) -b $< | \
 	    sed $(subst ·, ,$(PREDIFF:%=-e %)) \
 	    $(if $(POSTDIFF),| sed) $(subst ·, ,$(POSTDIFF:%=-e %)) > $*.ckt.out
 
@@ -971,6 +985,7 @@ EXTRA_DIST = gnucap_run.sh \
              $(UF_TESTS) $(UF_TESTS:%.gc=%.ref) \
              c_attach.1.gc \
              bm_wrapper.cc \
+             disp_test.cc \
              bm_generator.doc bm_pulse.doc bm_pwl.doc bm_sin.doc d_cap.doc d_diode.doc \
              d_.doc d_subckt.doc u_.doc \
              d_coil.5.spice \
@@ -1002,12 +1017,16 @@ AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include \
               -I$(top_builddir)/src -I$(top_srcdir)/src
 AM_DEFAULT_SOURCE_EXT = .cc
 AM_LDFLAGS = -module -avoid-version -rpath /dev/null
-check_LTLIBRARIES = bogus.la bogus1.la bogus2.la bogus3.la bogus4.la
+check_LTLIBRARIES = \
+	disp_test.la \
+	bogus.la bogus1.la bogus2.la bogus3.la bogus4.la
 
 # $(CUSTOM_TESTS:%.sh=%.log): %.log: %.out
 	
 c_attach.1.out: empty.cc bogus.so d_vs.cc loadtestdir loadtestdirro attachclean
 c_attach.2.out c_attach.2.log: bogus.so bogus1.so bogus2.so bogus3.so bogus4.so
+
+c_debug.2.gc.out: disp_test.so
 
 attachclean:
 	rm -f d_vs.so load*/*.so empty.so
@@ -1027,7 +1046,11 @@ empty.cc:
 d_vs.cc: | $(top_srcdir)/src/d_vs.cc
 	$(LN_S) $| .
 
-bogus.so bogus1.so bogus2.so bogus3.so bogus4.so: %.so: %.la
+check_SO = \
+	disp_test.so \
+	bogus.so bogus1.so bogus2.so bogus3.so bogus4.so
+
+$(check_SO): %.so: %.la
 	[ -f $@ ] || $(LN_S) .libs/$@ .
 
 .PHONY: c_attach.1.out attachclean soclean

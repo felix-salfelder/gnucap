@@ -23,6 +23,7 @@
 #define U_LANG_H
 #include "e_base.h"
 #include "u_opt.h"
+#include "l_istring.h"
 /*--------------------------------------------------------------------------*/
 #define MODEL_SUBCKT BASE_SUBCKT
 /*--------------------------------------------------------------------------*/
@@ -36,7 +37,7 @@ class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LANGUAGE : public CKT_BASE {
 public:
-  static const CARD* find_proto(const std::string&, const CARD*);
+  static const CARD* find_proto(const IString&, const CARD*);
 public:
   void new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope);
 
@@ -76,7 +77,6 @@ private: // called by print_item
 protected:
   static const CARD* find_card(string name, CARD_LIST* Scope, bool nondevice);
 };
-
 /*--------------------------------------------------------------------------*/
 template<class T>
 inline T& operator<<(T& o, LANGUAGE* x)
@@ -88,19 +88,18 @@ inline T& operator<<(T& o, LANGUAGE* x)
   }
 }
 /*--------------------------------------------------------------------------*/
-
-bool Get(CS&, const std::string& key, LANGUAGE** val);
+bool Get(CS&, const IString& key, LANGUAGE** val);
 /*--------------------------------------------------------------------------*/
 // This is for backward compatibility only.
 // It will be removed in the future.
 // Do not use in new code.
 template <class T>
-void print_pair(OMSTREAM& o, LANGUAGE* lang, const std::string& name,
+void print_pair(OMSTREAM& o, LANGUAGE* lang, const IString& name,
 		T value, bool test=true)
 {
   if (test) {
     if (lang) {
-      std::string front = lang->arg_front() + name + lang->arg_mid();
+      IString front = lang->arg_front() + name + lang->arg_mid();
       o << front << value << lang->arg_back();
     }else{
       o << ' ' + name + '=' << value;

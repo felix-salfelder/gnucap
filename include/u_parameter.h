@@ -26,14 +26,14 @@
 #ifndef U_PARAMETER_H
 #define U_PARAMETER_H
 #define PARAM_LIST PARAM_LIST_MAP
-#include "md.h"
-#include "globals.h"
-#include "m_expression.h"
+#include "l_istring.h"
 #include "u_opt.h"
+#include "io_.h"
+#include "m_expression.h"
 #include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
 class LANGUAGE;
-class PARAM_LIST; //unnnec?
+class PARAM_LIST_MAP; //unnnec?
 //class MODEL_BUILT_IN_RCD;
 //class MODEL_BUILT_IN_BTI;
 /*--------------------------------------------------------------------------*/
@@ -48,23 +48,27 @@ namespace PARM{
 #define HAVE_PARA_VEC
 class PARA_BASE {
 protected:
-  std::string _s;
-
+  IString _s;
+  
 public:
   PARA_BASE( ): _s(){}
   PARA_BASE(const PARA_BASE& p): _s(p._s) {}
-  PARA_BASE(const std::string s): _s(s){}
+  PARA_BASE(const IString& s): _s(s){}
   virtual ~PARA_BASE(){}
 
   bool	has_hard_value()const {return (_s != "");}
   virtual bool	has_good_value()const = 0;
 
   virtual void	parse(CS& cmd) = 0;
-  virtual void	operator=(const std::string& s) = 0;
+  virtual void	operator=(const IString& s) = 0;
 
-  void	print(OMSTREAM& o)const		{o << string(*this);}
-  void	print(ostream& o)const		{o << string(*this);}
-  virtual operator std::string()const = 0;
+  void	print(OMSTREAM& o)const		{o << string();}
+  void	print(ostream& o)const		{o << string();}
+  virtual std::string string()const = 0;
+
+  void	operator=(const std::string& s)	{
+    operator=(IString(s));
+  }
 };
 /*--------------------------------------------------------------------------*/
 template <class T>
@@ -92,21 +96,25 @@ public:
   T	e_val(const T& def, const CARD_LIST* scope, bool try_=false)const;
   void	parse(CS& cmd);
 
-  std::string debugstring()const {
-    return(_s + " -> " + to_string(_v));
+  std::string string()const {
+    if (_s == "#") {
+      return to_string(_v);
+    }else if (_s == "") {
+      return "NA(" + to_string(_v) + ")";
+    }else{
+      return _s.to_string();
+    }
   }
-  virtual std::string string( )const {return *this;}
-  operator std::string()const;
+  //virtual std::string string( )const {return *this;}
+  //operator std::string()const;
   void	print(OMSTREAM& o)const		{o << string();}
   void	print(ostream& o)const		{o << string();}
   void	set_default(const T& v)		{_v = v; _s = "";}
   void	operator=(const PARAMETER& p)	{_v = p._v; _s = p._s;}
   void	operator=(const T& v)		{_v = v; _s = "#";}
-  //void	operator=(const std::string& s)	{untested();_s = s;}
-
-  void	operator=(const std::string& s) {
-    if (strchr("'\"{", s[0])) {
-      CS cmd(CS::_STRING, s);
+  void	operator=(const IString& s)	{
+    if (strchr("'\"{", s[0].to_char())) {
+      CS cmd(CS::_STRING, s.to_string());
       _s = cmd.ctos("", "'\"{", "'\"}");
     }else if (s == "NA") {
       _s = "";
@@ -148,6 +156,7 @@ PARAMETER<double>::PARAMETER(const PARAMETER<double>& p);
 //  }
 //}
 /*=========================*/
+#if 0
 template <class T>
 inline  PARAMETER<T>::operator std::string()const {
   if (_s == "#") {
@@ -158,6 +167,7 @@ inline  PARAMETER<T>::operator std::string()const {
     return _s;
   }
 }
+#endif
 /*=========================*/
 /*--------------------------------------------------------------------------*/
 template<>
@@ -186,9 +196,10 @@ inline std::list<double> PARAMETER< std::list<double> >::_NOT_INPUT() const {
 }
 /*--------------------------------------------------------------------------*/
 
-// ugly hack, probably
+// ugly hack, probably.
+// anyway: this is not an insensitive string.
 template <>
-class PARAMETER<string> : public PARA_BASE {
+class PARAMETER<std::string> : public PARA_BASE {
 private:
   mutable std::string _v; //value
   std::string my_infty() const;
@@ -197,19 +208,19 @@ private:
 public:
   explicit PARAMETER() :_v("") {}
   PARAMETER(const PARAMETER<std::string>& p) : PARA_BASE(p), _v(p._v) {}
-  explicit PARAMETER(std::string v) :PARA_BASE(v) {}
+  explicit PARAMETER(IString v) :PARA_BASE(v) {}
   //explicit PARAMETER(T v, const std::string& s) :_v(v), _s(s) {untested();}
   ~PARAMETER() {}
 
   bool	has_good_value()const {return (true);}
 
-  operator std::string()const {
-    trace0(("PARAMETER::string " + _s + " -> " + _v ).c_str());
-    return _v;
-  }
+  //std::string string() const{
+  //  return _v.to_string();
+  //}
+  operator std::string()const {return _v;}
 
   std::string e_val(const std::string& def, const CARD_LIST* scope, bool try_=false)const;
-  std::string e_val_strange(const std::string& def, const CARD_LIST* scope)const;
+  std::string e_val_strange(const IString& def, const CARD_LIST* scope)const;
   void	parse(CS& cmd);
 
   std::string value()const;
@@ -218,9 +229,9 @@ public:
   void	set_default(const std::string& v)		{_v = v;}
   void	operator=(const PARAMETER& p)	{ _v = p._v; _s = p._s; }
  // argh
-  void	operator=(const std::string& s)	{
-    if (strchr("'\"{", s[0])) {
-      CS cmd(CS::_STRING, s);
+  void	operator=(const IString& s)	{
+    if (strchr("'\"{", s[0].to_char())) {
+      CS cmd(CS::_STRING, s.to_string());
       _s = cmd.ctos("", "'\"{", "'\"}");
     }else if (s == "NA") {
       _s = "";
@@ -363,23 +374,25 @@ class PARAM_LIST_COPY;
 // base class for param lists
 class PARAM_LIST_BASE {
 public:
-  typedef std::map<const std::string, PARAMETER<double> >::const_iterator
+  typedef std::map< IString, PARAMETER<double> >::const_iterator
 		const_iterator;
-  typedef std::map<const std::string, PARAMETER<double> >::iterator
+  typedef std::map< IString, PARAMETER<double> >::iterator
 		iterator;
 protected:
   PARAM_LIST_BASE(): _try_again(NULL) {}
   PARAM_LIST_BASE* _try_again; // if you don't find it, also look here
 protected:
-  virtual std::map<const std::string, PARAMETER<double> >& pl() const = 0;
-  virtual std::map<const std::string, PARAMETER<double> >& pl() = 0;
+  virtual std::map<IString, PARAMETER<double> >& pl() const = 0;
+  virtual std::map<IString, PARAMETER<double> >& pl() = 0;
 public:
   virtual PARAM_LIST_BASE* try_again()const {return _try_again;}
   virtual bool operator==(const PARAM_LIST_BASE& )const {return 0;}
   void set_try_again(PARAM_LIST_BASE* t) {_try_again = t;}
-  const PARAMETER<double>& deep_lookup(std::string)const;
-  const PARAMETER<double>& operator[](std::string i)const {return deep_lookup(i);}
-  PARAMETER<double>& find(std::string); // hack?
+  const PARAMETER<double>& deep_lookup(IString)const;
+  const PARAMETER<double>& operator[](IString i)const {
+    return deep_lookup(i);
+  }
+  PARAMETER<double>& find(IString); // hack?
 
   //ddc? PARAMETER<double>& deep_lookup(std::string);
   //ddc? PARAMETER<double>& operator[](std::string i) {return deep_lookup(i);}
@@ -399,11 +412,11 @@ public:
 // actual map
 class PARAM_LIST_MAP : public PARAM_LIST_BASE {
 private:
-  mutable std::map<const std::string, PARAMETER<double> > _pl;
+  mutable std::map<IString, PARAMETER<double> > _pl;
 protected:
-  std::map<const std::string, PARAMETER<double> >& pl() {return _pl;}
+  std::map<IString, PARAMETER<double> >& pl() {return _pl;}
 public:
-  std::map<const std::string, PARAMETER<double> >& pl() const {return _pl;}
+  std::map<IString, PARAMETER<double> >& pl() const {return _pl;}
   explicit PARAM_LIST() : PARAM_LIST_BASE() {}
   explicit PARAM_LIST(const PARAM_LIST& p)
 				:_pl(p._pl){ _try_again=(p._try_again);};
@@ -415,7 +428,7 @@ public:
   size_t size()const {return _pl.size();}
   bool	 is_empty()const {return _pl.empty();}
   bool	 is_printable(int)const;
-  std::string name(int)const;
+  IString name(int)const;
   std::string value(int)const;
 
   void	eval_copy(PARAM_LIST&, const CARD_LIST*);
@@ -428,8 +441,8 @@ public:
 
 //  const PARAMETER<std::string>& operator[](std::string i)const {return string_lookup(i);}
 
-  void set(std::string, const std::string&);
-  void set(std::string, const double);
+  void set(IString, const IString&);
+  void set(IString, const double);
 
 public:
   // return a lined up copy of *this
@@ -443,14 +456,14 @@ public:
   _parent(x._parent){}
   PARAM_LIST_COPY( const PARAM_LIST* x );
   ~PARAM_LIST_COPY() {}
-  virtual std::map<const std::string, PARAMETER<double> >& pl() const
+  virtual std::map<IString, PARAMETER<double> >& pl() const
   {
     assert(_parent);
     return _parent->pl();
   }
   PARAM_LIST_COPY& operator=(const PARAM_LIST* c) {_parent=c; return *this;}
 protected:
-  virtual std::map<const std::string, PARAMETER<double> >& pl()
+  virtual std::map<IString, PARAMETER<double> >& pl()
   {
     assert(_parent);
     return _parent->pl();
@@ -469,14 +482,14 @@ PARAM_LIST_COPY::PARAM_LIST_COPY( const PARAM_LIST* x ) : PARAM_LIST_BASE(), _pa
   }
 }
 /*--------------------------------------------------------------------------*/
-inline string PARAMETER<string>::lookup_solve(const std::string& def,
+inline std::string PARAMETER<std::string>::lookup_solve(const std::string& def,
     const CARD_LIST* scope, bool )const
 {
-  CS cmd(CS::_STRING, _s);
+  CS cmd(CS::_STRING, _s.to_string());
   trace1("lookup_solve ", _s);
   const PARAM_LIST_MAP* pl = scope->params();
   PARAMETER<double> x =  (pl->deep_lookup(_s));
-  return ::string(x);
+  return x.string();
 
   return def;
 }
@@ -485,7 +498,7 @@ inline string PARAMETER<string>::lookup_solve(const std::string& def,
 template <>
 inline bool PARAMETER<bool>::lookup_solve(const bool&, const CARD_LIST*, bool)const
 {
-  CS cmd(CS::_STRING, _s);
+  CS cmd(CS::_STRING, _s.to_string());
   return cmd.ctob();
 }
 /*--------------------------------------------------------------------------*/
@@ -494,7 +507,7 @@ template <class T>
 inline T PARAMETER<T>::lookup_solve(const T& def, const CARD_LIST* scope, bool try_)const
 {
   trace1("PARAMETER<T>::lookup_solve", def);
-  CS cmd(CS::_STRING, _s);
+  CS cmd(CS::_STRING, _s.to_string());
   Expression e(cmd);
   Expression reduced(e, scope);
   T v = T(reduced.eval());
@@ -534,7 +547,7 @@ inline std::list<double> PARAMETER<std::list<double> >::e_val(const
   trace1("PARAMETER<std::list<double> >::e_val", _s);
   double d;
 
-  CS c(CS::_STRING,_s);
+  CS c(CS::_STRING, _s.to_string());
   std::list<double>::iterator a;
 
   if (_v.size()!=0){
@@ -560,7 +573,7 @@ T PARAMETER<T>::e_val(const T& def, const CARD_LIST* scope, bool try_)const
   assert(scope);
 
   static int recursion=0;
-  static const std::string* first_name = NULL;
+  static const IString* first_name = NULL;
   if (recursion == 0) {
     first_name = &_s;
   }else{
@@ -672,13 +685,13 @@ inline void PARAMETER<T>::parse(CS& cmd)
 }
 /*--------------------------------------------------------------------------*/
 // hacked e_val. does strange things
-inline std::string PARAMETER<std::string>::e_val_strange(const std::string& /*def*/, const CARD_LIST* scope)const
+inline std::string PARAMETER<std::string>::e_val_strange(const IString& /*def*/, const CARD_LIST* scope)const
 {
   trace0("PARAMETER<std::string>::e_val_strange");
   assert(scope);
 
   static int recursion=0;
-  static const std::string* first_name = NULL;
+  static const IString* first_name = NULL;
   if (recursion == 0) {
     first_name = &_s;
   }else{
@@ -688,7 +701,7 @@ inline std::string PARAMETER<std::string>::e_val_strange(const std::string& /*de
   ++recursion;
   if (_s == "") {
     // blank string means to use default value
-    _v = _s; // where does it come from?
+    _v = _s.to_string(); // where does it come from?
     if (recursion > 1) {
       error(bWARNING, "parameter " + *first_name + " not specified, using default\n");
     }else{
@@ -697,13 +710,13 @@ inline std::string PARAMETER<std::string>::e_val_strange(const std::string& /*de
     // anything else means look up the value
     trace0(("looking up value for "+_s).c_str());
     if (recursion <= OPT::recursion) {
-      _v = lookup_solve(_s, scope);
+      _v = lookup_solve(_s.to_string(), scope);
       if (_v == "") {untested();itested();
         error(bDANGER, "parameter " + *first_name + " has no value\n");
       }else{
       }
     }else{untested();
-      _v = _s;
+      _v = _s.to_string();
       error(bDANGER, "parameter " + *first_name + " recursion too deep\n");
     }
   }else{
@@ -713,11 +726,19 @@ inline std::string PARAMETER<std::string>::e_val_strange(const std::string& /*de
 
   // ARGH?
   // // cleanup needed
-  if (_v=="NA") _v=_s;
-  if (_v=="NA( NA)") _v=_s;
+  if (_v=="NA"){untested();
+    _v = _s.to_string();
+  }else if (_v=="NA( NA)"){
+    _v = _s.to_string();
+  }else{
+  }
 
-  if (_v=="empty") _v="";
-  if (_v=="none") _v="";
+  if (_v=="empty"){ untested();
+    _v="";
+  }else if (_v=="none") {
+    _v="";
+  }else{
+  }
 
   trace0(("Evaluated " +_s + " to " + _v).c_str());
   return _v;
@@ -786,9 +807,13 @@ class PARAMETER<std::vector<PARAMETER<T> > > : public PARA_BASE{
 
     std::string string()const;
     //std::vector<PARAMETER<T> >  _NOT_INPUT() const;
-    void	operator=(const std::string& s);
-    void	operator=(const PARAMETER<std::vector<PARAMETER<T> > >& p)	{_v = p._v; _s = p._s;}
-    void	operator=(const std::vector<PARAMETER<T> >& v)		{_v = v; _s = "#";}
+    void	operator=(const IString& s);
+    void	operator=(const PARAMETER<std::vector<PARAMETER<T> > >& p){ untested();
+      _v = p._v; _s = p._s;
+    }
+    void	operator=(const std::vector<PARAMETER<T> >& v) {
+      _v = v; _s = "#";
+    }
     bool operator==(const PARAMETER<std::vector<PARAMETER<double> > >& p)const;
     std::vector<PARAMETER<T> >	e_val(const std::vector<PARAMETER<T> >& def,
         const CARD_LIST* scope)const;
@@ -814,12 +839,12 @@ inline std::string PARAMETER<std::vector<PARAMETER<T> > >::string()const{
     ret+= "(";
   }else if (_s == "") {
     ret+= "NA(";
-  }else{
-    return _s;
+  }else{ untested();
+    return _s.to_string();
   }
   for(unsigned  i=0; i<_v.size(); i++){
     ret+= (i)?",":"";
-    ret+= std::string(_v[i]);
+    ret+= _v[i].string();
   }
   ret+=")";
   return ret;
@@ -833,10 +858,10 @@ inline std::vector<PARAMETER<T> > PARAMETER<std::vector<PARAMETER<T> > >::_NOT_I
 }
 /*--------------------------------------------------------------------------*/
 template<class T>
-void PARAMETER<std::vector<PARAMETER<T> > >::operator=(const std::string& s){
+void PARAMETER<std::vector<PARAMETER<T> > >::operator=(const IString& s){
   trace1("PARAMETER dv::operator=" , s);
 
-  CS cmd(CS::_STRING, s);
+  CS cmd(CS::_STRING, s.to_string());
   _v.clear();
   std::string compon;
 

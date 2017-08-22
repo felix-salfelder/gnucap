@@ -629,71 +629,71 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
 /*--------------------------------------------------------------------------*/
 double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
 {
-  int error_deriv;
-  if (order() >= OPT::_keep_time_steps - 2) {
-    error_deriv = OPT::_keep_time_steps - 1;
-  }else if (order() < 0) {itested();
-    error_deriv = 1;
-  }else{
-    error_deriv = order()+1;
-  }
-
   double timestep;
-  trace1("ELEMENT::tr_review_trunc_error", error_deriv);
-  trace2("ELEMENT::tr_review_trunc_error", _time[0], error_deriv);
   // if (_time[0] <= _sim->_time0)
   if (_sim->analysis_is_tran_restore()) {
     timestep = NEVER;
-  }else if (_time[0] == 0.) {
+  }else if (_time[0] <= 0.) {
     // DC, I know nothing
     timestep = NEVER;
-  }else if (error_deriv - 1 - OPT::initsc < 0 || _time[error_deriv - 1 - OPT::initsc] <= 0 ) {
+  }else{
+    int error_deriv;
+    if (order() >= OPT::_keep_time_steps - 2) {
+      error_deriv = OPT::_keep_time_steps - 1;
+    }else if (order() < 0) {itested();
+      error_deriv = 1;
+    }else{
+      error_deriv = order()+1;
+    }
+    while (_time[error_deriv-1] <= 0.) {
+      // not enough info to use that derivative, use a lower order derivative
+      --error_deriv;
+    }
+    trace2("ELEMENT::tr_review_trunc_error", _time[0], error_deriv);
+    if (error_deriv - 1 - OPT::initsc < 0 || _time[error_deriv - 1 - OPT::initsc] <= 0 ) {
+      incomplete();
     // first few steps, I still know nothing
     // repeat whatever step was used the first time
-    timestep = _dt;
-  }else{
-    for (int i=error_deriv-1; i>0; --i) {
-      assert(_time[i] < _time[i-1]); // || _time[i] == 0.);
+      return _dt;
     }
-
+    assert(error_deriv > 0);
+    assert(error_deriv < OPT::_keep_time_steps);
+    for (int i=error_deriv; i>0; --i) {
+      assert(_time[i] < _time[i-1]);
+    }
+    
     double c[OPT::_keep_time_steps];
     for (int i=0; i<OPT::_keep_time_steps; ++i) {
       c[i] = q[i].f0;
     }
     assert(error_deriv < OPT::_keep_time_steps);
-
     // better use divdiff.
     // better, only compute up to error_div
-    if (error_deriv && 0. == _time[error_deriv-1]) {
-      // vile hack, probably not a good idea
-      _time[error_deriv] = -_time[error_deriv-2];
-      derivatives(c, OPT::_keep_time_steps, _time);
-      _time[error_deriv] = 0;
-    } else {
-      derivatives(c, OPT::_keep_time_steps, _time);
-    }
+    derivatives(c, OPT::_keep_time_steps, _time);
     // now c[i] is i'th derivative
     
     assert(OPT::_keep_time_steps >= 5);
-    trace0(("ts" + long_label()).c_str());
+    trace4(("ts " + long_label()).c_str(), error_deriv, error_factor(),
+	   OPT::trsteporder, OPT::trstepcoef[OPT::trsteporder] );
     trace5("time", _time[0], _time[1], _time[2], _time[3], _time[4]);
     trace5("charge", q[0].f0, q[1].f0, q[2].f0, q[3].f0, q[4].f0);
     trace5("deriv", c[0], c[1], c[2], c[3], c[4]);
     
     if (c[error_deriv] == 0) {
+      // avoid divide by zero
       timestep = NEVER;
     }else{
       double chargetol = std::max(OPT::chgtol,
-				OPT::reltol * std::max((double)std::abs(q[0].f0), (double) std::abs(q[1].f0)));
+				  OPT::reltol * std::max(std::abs(q[0].f0), std::abs(q[1].f0)));
       double tol = OPT::trtol * chargetol;
       double denom = error_factor() * std::abs(c[error_deriv]);
       assert(tol > 0.);
       assert(denom > 0.);
       switch (error_deriv) { // pow is slow.
-      case 1:	timestep = tol / denom;		break;
-      case 2:	timestep = sqrt(tol / denom);	break;
-      case 3:	timestep = cbrt(tol / denom);	break;
-      default:	timestep = pow((tol / denom), 1./(error_deriv)); break;
+      case 1:  timestep = tol / denom; break;
+      case 2:  timestep = sqrt(tol / denom); break;
+      case 3:  timestep = cbrt(tol / denom); break;
+      default: timestep = pow((tol / denom), 1./(error_deriv)); break;
       }
       trace4("", chargetol, tol, denom, timestep);
     }
@@ -715,8 +715,8 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
 
     if (timestep < _dt * OPT::trreject) {
       if (_time[order()] == 0) {
-	error(bTRACE, "initial step rejected:" + long_label() + '\n');
-	error(bTRACE, "new=%g  old=%g  required=%g\n",
+	error(bWARNING, "initial step rejected:" + long_label() + '\n');
+	error(bWARNING, "new=%g  old=%g  required=%g\n",
 	      timestep, _dt, _dt * OPT::trreject);
       }else{
 	error(bTRACE, "step rejected:" + long_label() + '\n');

@@ -44,7 +44,7 @@
   #include <readline/history.h>
 #endif
 /*--------------------------------------------------------------------------*/
-// static std::string getlines(FILE*);
+static std::string getlines(FILE*);
 OMSTREAM mout; // > file bitmap //BUG//encapsulation
 OMSTREAM mlog; // log file bitmap
 /*--------------------------------------------------------------------------*/
@@ -256,15 +256,18 @@ CS& CS::get_line(const std::string& prompt)
     _length = 0;
     throw Exception_End_Of_Input("EOF on string/whatever");
   }else if (is_file() ) {
-    assert(OPT::language);
-    // BUG!?
     // CS must know its language.
-    _cmd = OPT::language->getlines(_file);
+    if(0 && OPT::language){
+      // not yet.
+      _cmd = OPT::language->getlines(_file);
+    }else{
+      _cmd = getlines(_file);
+    }
     trace2("getlines got", _cmd, OPT::language->name());
     _cnt = 0;
     _length = static_cast<unsigned>(_cmd.length());
     _ok = true;
-  }else{itested();
+  }else{untested();
     trace1("", _file);
     assert(_file == stdin);
     char cmdbuf[BUFLEN];

@@ -53,8 +53,8 @@
 waves 
 tran (0), *tt (2)
 tt waves 
-HIDDEN(0) (51),
-P(Z3) (51)
+hidden(0) (51),
+P(z3) (51)
 tran waves 
 
 P1= 44.5~   

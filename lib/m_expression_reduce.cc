@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * Reconstructs an infix expression from the RPN.
+ * Constructs a simplified (reduced) version of an expression.
  * Incomplete:
  *	Expressions in arg-lists print as ####false####
  *	Not sure what should happen when expression is empty
@@ -27,6 +27,7 @@
 //testing=script,sparse 2009.08.12
 #include "u_function.h"
 #include "u_parameter.h"
+#include "globals.h"
 /*--------------------------------------------------------------------------*/
 Token* Token_BINOP::op(const Token* T1, const Token* T2)const
 {
@@ -122,19 +123,19 @@ void Token_SYMBOL::stack_op(Expression* E)const
     if (FUNCTION* f = function_dispatcher[name()]) {
       const Token* T1 = E->back(); // arglist
       E->pop_back();
-      CS cmd(CS::_STRING, T1->name());      
+      CS cmd(CS::_STRING, T1->name().to_string());      
       fun_t value = f->eval(cmd, E->_scope);
       const Float* v = new Float(value);
       E->push_back(new Token_CONSTANT( to_string(value), v, ""));
       delete T1;
     }else{
-      throw Exception_No_Match(name()); //BUG// memory leak
+      throw Exception_No_Match(name().to_string()); //BUG// memory leak
       unreachable();
       E->push_back(clone());
     }
   }else{
     // has no parameters (scalar)
-    if (strchr("0123456789.", name()[0])) {
+    if (strchr("0123456789.", name()[0].to_char())) {
       // a number
       Float* n = new Float(name());
       E->push_back(new Token_CONSTANT(name(), n, ""));
@@ -148,7 +149,7 @@ void Token_SYMBOL::stack_op(Expression* E)const
 	E->push_back(new Token_CONSTANT(n->val_string(), n, ""));
       }else{
 	// no value - push name (and accept incomplete solution later)
-	String* s = new String(name());
+	String* s = new String(name().to_string());
 	E->push_back(new Token_CONSTANT(name(), s, ""));	
       }
     }
@@ -175,7 +176,8 @@ void Token_BINOP::stack_op(Expression* E)const
 	delete t1;
       }else{
 	// fail - one arg is unknown, push back args
-	if (strchr("+*", name()[0]) && !dynamic_cast<const Float*>(t1->data())) {
+	if (strchr("+*", name()[0].to_char())
+	    && !dynamic_cast<const Float*>(t1->data())) {
 	  // change order to enable later optimization
 	  E->push_back(t1);
 	  E->push_back(t2);
@@ -186,7 +188,7 @@ void Token_BINOP::stack_op(Expression* E)const
 	E->push_back(clone()); //op
 	delete t;
       }
-    }else if (((*t2) == (*this)) && strchr("+*", name()[0])
+    }else if (((*t2) == (*this)) && strchr("+*", name()[0].to_char())
 	      && dynamic_cast<Token_CONSTANT*>(E->back())) {
       // have # + # + .. becomes result + (previous unknown, try to optimize)
       Token* t3 = E->back();
@@ -278,7 +280,8 @@ void Token_UNARY::stack_op(Expression* E)const
 void Token_CONSTANT::stack_op(Expression* E)const
 {
   unreachable();
-  assert(E); USE(E);
+  (void)(E);
+  assert(E);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

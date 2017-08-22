@@ -25,7 +25,7 @@
 #include "globals.h"
 #include "u_prblst.h"
 #include "e_cardlist.h"
-#include "e_adplist.h"
+#include "e_adplist.h" // obsolete. probably
 #include "u_status.h"
 
 /*--------------------------------------------------------------------------*/

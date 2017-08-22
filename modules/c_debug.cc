@@ -74,7 +74,7 @@ void volts_load( fstream *in, CARD_LIST* )
     } else {
       //*in >> skipws >> inss;
       inss = (char) in->get();
-      trace1((" garbage ->" + inss + "<- ").c_str(), (int)inss[0]);
+      trace2(" garbage ->", inss, (int)inss[0]);
     }
   }
 }
@@ -234,7 +234,24 @@ public:
 } p5;
 DISPATCHER<CMD>::INSTALL d5(&command_dispatcher, "acx", &p5);
 /*--------------------------------------------------------------------------*/
-/*----*/
+class CMD_ML : public CMD {
+public:
+  void print(OMSTREAM, const CARD_LIST*);
+  void do_it(CS& cmd, CARD_LIST* )
+  {
+    OMSTREAM _out = IO::mstdout;
+    USE(cmd);
+
+    for(DISPATCHER<CARD*>::const_iterator i=model_dispatcher.begin();
+        i!=model_dispatcher.end(); ++i)
+    {
+      _out << i->first;
+      _out << "\n";
+    }
+  }
+} plm;
+DISPATCHER<CMD>::INSTALL dlm(&command_dispatcher, "listmodels", &plm);
+/*--------------------------------------------------------------------------*/
 class CMD_NL : public CMD {
 public:
   void print(OMSTREAM, const CARD_LIST*);

@@ -45,7 +45,6 @@ SIM_DATA::SIM_DATA()
    _last_time(0.),
    _last_Time(0.),
    _freezetime(false),
-   //_iter(),		//BUG// does not init non-static instances
    _user_nodes(0),
    _subckt_nodes(0),
    _model_nodes(0),
@@ -65,6 +64,7 @@ SIM_DATA::SIM_DATA()
    _v0(NULL),
    _vt1(NULL),
    _ac(NULL),
+   _sens(NULL),
    _nstat(NULL),
    _aa(),
    _lu(),
@@ -79,11 +79,10 @@ SIM_DATA::SIM_DATA()
    _evalq_uc(NULL),
    _has_op(s_NONE)
 {
+  _tr=_tr1=_tt1=_tr2=_tr3=NULL; // yikes.
   _evalq = &_evalq1;
   _evalq_uc = &_evalq2;
-  for (unsigned i=0; i<(unsigned)iCOUNT; ++i) {
-    _iter[i]=0;
-  }
+  std::fill_n(_iter, iCOUNT, 0);
 }
 /*--------------------------------------------------------------------------*/
 SIM_DATA::~SIM_DATA()
@@ -387,6 +386,10 @@ void SIM_DATA::order_auto()
 // component wise node sort. depth-first
 void SIM_DATA::order_comp( const CARD_LIST* scope )
 {
+  if(scope==NULL){
+    scope=&CARD_LIST::card_list;
+  }else{
+  }
   static unsigned c;
   static bool* d;
   unsigned t = CKT_BASE::_sim->_total_nodes;
@@ -443,6 +446,11 @@ void SIM_DATA::order_comp( const CARD_LIST* scope )
 // based on NODE_MAP
 void SIM_DATA::order_tree_bf( const CARD_LIST* scope)
 {
+  if(scope==NULL){
+    scope=&CARD_LIST::card_list;
+  }else{
+  }
+
   static unsigned c;
   static bool* d;
   unsigned t = CKT_BASE::_sim->_total_nodes;
@@ -489,6 +497,11 @@ void SIM_DATA::order_tree_bf( const CARD_LIST* scope)
 // depth-first tree
 void SIM_DATA::order_tree_df( const CARD_LIST* scope)
 { untested();
+  if(scope==NULL){ untested();
+    scope=&CARD_LIST::card_list;
+  }else{ untested();
+  }
+
   static unsigned c;
   static bool* d;
   unsigned t = CKT_BASE::_sim->_total_nodes;

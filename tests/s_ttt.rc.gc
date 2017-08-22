@@ -6,6 +6,7 @@ param q=1
 build
 R1 1 0 100k
 .ttcap C1 1 0 .01m ic=1
+.
 
 options ttsteporder=4
 options ttstepgrow 1e99

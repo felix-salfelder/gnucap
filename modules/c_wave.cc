@@ -24,8 +24,9 @@
 #include "u_parameter.h"
 #include "globals.h"
 #include "m_wave.h"
+#include "l_istring.h"
 /*--------------------------------------------------------------------------*/
-namespace {
+namespace { //
 
 using std::map;
 using std::string;
@@ -38,7 +39,7 @@ public:
   {
     string stash = "stash";
     if (cmd.is_end()) { untested();
-      for(auto x : _sim->_waves){
+      for(auto x : _sim->_waves){ untested();
 	IO::mstdout << x.first << endl;
       }
     }else{
@@ -181,7 +182,7 @@ public:
 } p4;
 DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "wwarp", &p4);
 /*--------------------------------------------------------------------------*/
-class CMD_SCALE : public CMD {
+class CMD_SCALE : public CMD { //
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
@@ -205,19 +206,21 @@ class CMD_WAVE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* scope)
   {
-    string what;
+    IString what;
     cmd >> what;
 
     auto w = _what.find(what);
     if(w != _what.end()){
+      error(bDEBUG, "wave " + what + "\n");
       auto c = w->second;
-      (this->*c)(cmd,scope);
+      (this->*c)(cmd, scope);
+      error(bDEBUG, "wave " + what + " done\n");
     }else{ untested();
       cmd.warn(bDANGER, "what's this?");
     }
   }
 private:
-  static map<string, void (CMD_WAVE::*)(CS&, CARD_LIST*)> _what;
+  static map<IString, void (CMD_WAVE::*)(CS&, CARD_LIST*)> _what;
   // umm use output plugins to do this?!
   void dumpwaves(CS& cmd, const WAVE_LIST* wl)
   {
@@ -356,10 +359,6 @@ private:
       *input >> name; // discard
       name = input->ctos("","","","");
       while(*input){
-	if (OPT::case_insensitive) {
-	  notstd::to_upper(&name);
-	}else{untested();
-	}
 	wp.insert_after(before_end, &wl[name]);
 	++before_end;
 	name = input->ctos("","","","");
@@ -378,7 +377,7 @@ private:
       }
     }
     input->get_line("wave>");
-
+    error(bTRACE, ">w1> " +  input->fullstring() + " " + to_string(input->is_end()) + "\n");
 
     while(!input->is_end()){
       double key, data;
@@ -396,16 +395,24 @@ private:
       }
       try{
 	input->get_line("wave>");
-      }catch (Exception_End_Of_Input& e) { itested();
+	error(bTRACE, ">w>> " +  input->fullstring() + " " + to_string(input->is_end()) + "\n");
+      }catch (Exception_End_Of_Input& e) { untested();
 	break;
       }
+      if(cmd.umatch(". ")){
+	break;
+      }else if(cmd.is_end()){ untested();
+	break;
+      }else{
+      }
     }
-    if(file){itested();
+    if(file){untested();
       delete input;
       itested();
+    }else{
     }
   }
-  typedef enum {
+  typedef enum { //
     mHD,  // hausdorff
     mDHD, // discrete hausdorff
     mSUP
@@ -415,13 +422,13 @@ private:
     string s1, s2;
     cmd >> s1;
     const WAVE* w1 = CKT_BASE::find_wave(s1);
-    if(!w1){
+    if(!w1){ untested();
       cmd.warn(bDANGER, "no wave " + s1);
       return;
     }
     cmd >> s2;
     const WAVE* w2 = CKT_BASE::find_wave(s2);
-    if(!w2){
+    if(!w2){ untested();
       cmd.warn(bDANGER, "no wave " + s2);
       return;
     }
@@ -457,11 +464,11 @@ private:
     auto bak = where;
     double dd;
     string to = "to";
-    switch(method){
+    switch(method){ untested();
       case mHD:
 	ret = w1->dhd_linear(*w2, wherep);
 	bak = where;
-	if(!directed){
+	if(!directed){ untested();
 	  dd = w2->dhd_linear(*w1, wherep);
 	  if(dd>ret){ untested();
 	    ret = dd;
@@ -506,7 +513,7 @@ private:
   }
 } p5;
 /*--------------------------------------------------------------------------*/
-map<string, void (CMD_WAVE::*)(CS&, CARD_LIST*)> CMD_WAVE::_what =
+map<IString, void (CMD_WAVE::*)(CS&, CARD_LIST*)> CMD_WAVE::_what =
   boost::assign::map_list_of
       ("build",  &CMD_WAVE::build)
       ("list",   &CMD_WAVE::list)

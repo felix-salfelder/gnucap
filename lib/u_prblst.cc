@@ -44,7 +44,7 @@ void PROBE_LISTS::purge(CKT_BASE* brh)
   }
 }
 /*--------------------------------------------------------------------------*/
-void PROBELIST::listing(const std::string& label)const
+void PROBELIST::listing(const IString& label)const
 {
   IO::mstdout.form("%-7s", label.c_str());
   for (const_iterator p = begin();  p != end();  ++p) {
@@ -87,16 +87,20 @@ void     PROBELIST::erase(PROBELIST::iterator b, PROBELIST::iterator e)
  * called by STL remove, below
  * both are needed to support different versions of STL
  */
-bool operator==(const PROBE* prb, const std::string& par)
-{ return *prb == par; }
-bool operator!=(const PROBE* prb, const std::string& par)
-{ return *prb != par; }
+bool operator==(const PROBE& prb, const IString& par)
+{
+  return wmatch(prb.label(), par);
+}
+bool operator!=(const PROBE& prb, const IString& par)
+{untested();
+  //return !wmatch(prb.label(), par);
+  return !(prb == par);
+}
 bool operator==(const PROBE* prb, const CKT_BASE& brh)
 { trace2("ph", hp(prb), brh.long_label());
   return *prb == brh; }
 bool operator!=(const PROBE* prb, const CKT_BASE& brh)
 { return *prb != brh; }
-
 /*--------------------------------------------------------------------------*/
 /* remove a complete probe, extract from CS
  * wild card match  ex:  vds(m*)
@@ -104,7 +108,7 @@ bool operator!=(const PROBE* prb, const CKT_BASE& brh)
 void PROBELIST::remove_list(CS& cmd)
 { 
   unsigned mark = cmd.cursor();
-  std::string parameter(cmd.ctos(TOKENTERM) + '(');
+  IString parameter(cmd.ctos(TOKENTERM) + '(');
   int paren = cmd.skip1b('(');
   parameter += cmd.ctos(TOKENTERM) + ')';
   paren -= cmd.skip1b(')');
@@ -193,7 +197,7 @@ PROBE* PROBELIST::add_list(CS& cmd, const CARD_LIST* scope)
   trace0("PROBELIST::add_list() ");
   PROBE* found_something = NULL;
   int oldcount = size();
-  std::string what(cmd.ctos(TOKENTERM));/* parameter */
+  IString what(cmd.ctos(TOKENTERM));/* parameter */
   trace0( ( "PROBELIST::add_list " + what ).c_str());
 
   if (what.empty()) {untested();
@@ -201,8 +205,9 @@ PROBE* PROBELIST::add_list(CS& cmd, const CARD_LIST* scope)
   }else{
   }
 
-  MATH_OP op;
   int paren;
+#if 0
+  MATH_OP op;
   if ( (bool) ( op = strtotype(what) ) ) {
 
         // switch arity...
@@ -218,7 +223,9 @@ PROBE* PROBELIST::add_list(CS& cmd, const CARD_LIST* scope)
 
     paren -= cmd.skip1b(')');
 
-  } else if( ( paren = cmd.skip1b('(')) ) {
+  } else
+#endif
+  if( ( paren = cmd.skip1b('(')) ) {
     trace1("PROBELIST::add_list " + what, paren );
     if (cmd.umatch("nodes ")) {
       // all nodes
@@ -271,7 +278,7 @@ PROBE* PROBELIST::add_list(CS& cmd, const CARD_LIST* scope)
     }
   } else {
     trace1( ( "PROBELIST::add_list eval?"), paren );
-    EVAL_PROBE* p = new EVAL_PROBE(what,scope);
+    EVAL_PROBE* p = new EVAL_PROBE(what, scope);
     bag.push_back(p);
   }
 
@@ -309,7 +316,7 @@ PROBE* PROBELIST::merge_probe( PROBE* &m )
   return m;
 }
 /*--------------------------------------------------------------------------*/
-PROBE* PROBELIST::push_new_probe(const std::string& param, const CKT_BASE* object)
+PROBE* PROBELIST::push_new_probe(const IString& param, const CKT_BASE* object)
 {
   trace3("PROBELIST::push_new_probe ", param, object, (object?object->long_label():"0"));
   if( dynamic_cast<const NODE*>(object) ){
@@ -324,23 +331,24 @@ PROBE* PROBELIST::push_new_probe(const std::string& param, const CKT_BASE* objec
   return p;
 }
 /*--------------------------------------------------------------------------*/
-void PROBELIST::add_all_nodes(const std::string& what, const CARD_LIST* scope)
+void PROBELIST::add_all_nodes(const IString& what, const CARD_LIST* scope)
 {
-
-  string devname="";
-  if( scope->owner())
-    devname= scope->owner()->long_label();
+  IString devname="";
+  if( scope->owner()) {
+    devname = scope->owner()->long_label();
+  }else{
+  }
 
   for (NODE_MAP::const_iterator i = scope->nodes()->begin();
        //i != CARD_LIST::card_list.nodes()->end();
        i != scope->nodes()->end();
        ++i) {
-    if ((i->first != "0") && (i->first.find('.') == std::string::npos)) {
-
+    if ((i->first != "0") && (i->first.find('.') == IString::npos)) {
       NODE* node = dynamic_cast<NODE*>(i->second);
       if (node){
         trace0("PROBELIST::add_all_nodes " + what + " i " + i->second->long_label() );
         push_new_probe(what, node);
+      }else{untested();
       }
     }else{
     }
@@ -354,7 +362,8 @@ void PROBELIST::add_all_nodes(const std::string& what, const CARD_LIST* scope)
   //untested();
 }
 /*--------------------------------------------------------------------------*/
-MATH_OP strtotype(std::string s)
+#if 0
+MATH_OP strtotype(IString s)
 {
   trace0(( "MATH_OP::strtorype " + s).c_str() );
 
@@ -379,6 +388,7 @@ MATH_OP strtotype(std::string s)
 
   return op_null;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /* add_expr add things to list
@@ -424,20 +434,20 @@ PROBE* PROBELIST::add_expr(const std::string& ,
 /* add_branches: add net elements to probe list
  * 	all matching a label with wildcards
  */
-PROBE* PROBELIST::add_branches(const std::string&device, 
-                               const std::string&param,
+PROBE* PROBELIST::add_branches(const IString& device,
+                               const IString& param,
                                const CARD_LIST* scope)
 {
   trace0( "PROBELIST::add_branches " + param + " for " + device  );
   assert(scope);
   PROBE* found_something = NULL;
 
-  std::string::size_type dotplace = device.find_first_of(".");
-  if (dotplace != std::string::npos) {
+  IString::size_type dotplace = device.find_first_of(".");
+  if (dotplace != IString::npos) {
     // has a dot, look deeper
     { // forward (Verilog style)
-      std::string dev = device.substr(dotplace+1, std::string::npos);
-      std::string container = device.substr(0, dotplace);
+      IString dev = device.substr(dotplace+1, IString::npos);
+      IString container = device.substr(0, dotplace);
       for (CARD_LIST::const_iterator
              i = scope->begin();  i != scope->end();  ++i) {
         CARD* card = *i;
@@ -456,9 +466,9 @@ PROBE* PROBELIST::add_branches(const std::string&device,
     }
 #if 0  // disabled by felix (for some reason)
     { // reverse (ACS style)
-      dotplace = device.find_last_of(".");
-      std::string container = device.substr(dotplace+1, std::string::npos);
-      std::string dev = device.substr(0, dotplace);
+      dotplace = device.find_last_of(Ichar('.'));
+      IString container = device.substr(dotplace+1, IString::npos);
+      IString dev = device.substr(0, dotplace);
       for (CARD_LIST::const_iterator
              i = scope->begin();  i != scope->end();  ++i) {
         CARD* card = *i;
@@ -481,7 +491,7 @@ PROBE* PROBELIST::add_branches(const std::string&device,
       add_all_nodes(param, scope);
       trace0("added all nodes");
       found_something=(PROBE*)-1;
-    } else if (device.find_first_of("*?") != std::string::npos) {
+    } else if (device.find_first_of("*?") != IString::npos) {
       // there's a wild card.  do linear search for all
       { // nodes
         for (NODE_MAP::const_iterator 
@@ -496,10 +506,11 @@ PROBE* PROBELIST::add_branches(const std::string&device,
             CKT_NODE* node = dynamic_cast<CKT_NODE*>(i->second);
             if (node){
 
-              string paramn(param);
-              if (param=="V?") {
+              IString paramn(param);
+              if (param=="V?") { untested();
                 paramn="V";
-              }
+              }else{
+	      }
 
               trace0(( "Node match " +  node->short_label()).c_str() );
               if (wmatch(node->short_label(), device)) {
@@ -537,7 +548,7 @@ PROBE* PROBELIST::add_branches(const std::string&device,
                     string paramipn(str);
                     if ( (*card).owner() != NULL  && (*card).owner()->owner()  != NULL )
                     {
-                      string subckt_node( "V(" + (*card).owner()->owner()->long_label() +"."
+                      IString subckt_node( "V(" + (*card).owner()->owner()->long_label() +"."
                                           +(*card).n_(ii).short_label() + ")" );
 //                       cerr << "FFFFFFFFound "+  subckt_node + 
 //                         "  that is Port "+paramipn+ " of  device  "

@@ -34,6 +34,7 @@
 //testing=script 2016.09.16
 #include "e_node.h"
 #include "globals.h"
+#include "u_parameter.h"
 #include "e_paramlist.h"
 #include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
@@ -91,17 +92,17 @@ private:
 } p1;
 int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
-class INTERFACE DEV_SUBCKT_PROTO : public DEV_SUBCKT {
+class DEV_SUBCKT_PROTO : public DEV_SUBCKT {
 private:
   explicit	DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO&p);
 public:
   explicit	DEV_SUBCKT_PROTO();
 		~DEV_SUBCKT_PROTO(){}
 public: // override virtual
-  char		id_letter()const	{untested();untested();return '\0';}
+  char		id_letter()const	{untested();return '\0';}
   CARD*		clone_instance()const;
   bool		print_type_in_spice()const {unreachable(); return false;}
-  std::string   value_name()const	{incomplete(); return "";}
+  std::string   value_name()const	{untested();incomplete(); return "";}
   std::string   dev_type()const		{untested(); return "";}
   unsigned	max_nodes()const	{return PORTS_PER_SUBCKT;}
   unsigned	min_nodes()const	{return 0;}
@@ -124,6 +125,11 @@ private: // no-ops for prototype
   void tr_advance(){}
   void tr_restore(){}
   void tr_regress(){}
+  void tt_begin(){untested();}
+  void tt_accept(){untested();}
+  void tt_advance(){untested();}
+  void tt_regress(){untested();}
+  TIME_PAIR tt_review(){ return TIME_PAIR(NEVER, NEVER);}
   void dc_advance(){}
   void ac_begin(){}
   void do_ac(){}
@@ -131,7 +137,7 @@ private: // no-ops for prototype
   bool do_tr(){ return true;}
   bool tr_needs_eval()const{itested(); return false;}
   void tr_queue_eval(){}
-  std::string port_name(unsigned)const {return "";}
+  std::string port_name(uint_t)const {untested();return "";}
 public:
   static int	count()			{return _count;}
 private:
@@ -197,7 +203,7 @@ std::string DEV_SUBCKT::port_name(unsigned i)const
   if (const DEV_SUBCKT* p=dynamic_cast<const DEV_SUBCKT*>(_parent)) {
     if (i<p->net_nodes()){
       return p->port_value(i);
-    }else{ 
+    }else{untested(); 
       return "";
     }
   }else if(_parent){untested(); untested();
@@ -247,7 +253,7 @@ void DEV_SUBCKT::expand()
   subckt()->params()->set_try_again(&(c->_params));
   assert(scope());
 
-  trace1("DEV_SUBCKT::expand sckt expand ...", *(subckt()->params()));
+  // trace1("DEV_SUBCKT::expand sckt expand ...", *(subckt()->params()));
   subckt()->expand();
 //  subckt()->set_(model);
   trace1("",model->subckt());
@@ -264,7 +270,7 @@ void DEV_SUBCKT::precalc_first()
     COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
     assert(c);
     subckt()->attach_params(&(c->_params), scope());
-    trace2("DEV_SUBCKT::precalc_first", long_label(), _params);
+    // trace2("DEV_SUBCKT::precalc_first", long_label(), _params);
     subckt()->precalc_first();
   }else{
   }

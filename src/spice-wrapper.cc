@@ -28,6 +28,7 @@ extern "C" {
   #define public PubliC
   #define bool BooL
   #define main MaiN
+  #define setenv SetenV
   #include "capabil.h"
   #include "const.h"
   #include "iferrmsg.h"
@@ -39,6 +40,7 @@ extern "C" {
   #include "inpdefs.h"
   #include "tskdefs.h"
 #endif
+  #undef setenv
   #undef main
   #undef bool
   #undef public
@@ -194,8 +196,8 @@ private:
   const MODEL_SPICE* _model;
   const SPICE_MODEL_DATA* _spice_model;
   node_t _nodes[MATRIX_NODES];
-  COMPLEX* _matrix[MATRIX_NODES+OFFSET];	// For tran, real is now, imag is saved.
-  COMPLEX _matrix_core[MATRIX_NODES+OFFSET][MATRIX_NODES+OFFSET];
+  DPAIR* _matrix[MATRIX_NODES+OFFSET];	// For tran, real is now, imag is saved.
+  DPAIR _matrix_core[MATRIX_NODES+OFFSET][MATRIX_NODES+OFFSET];
 public:
   double _i0[MATRIX_NODES+OFFSET];	// right side - current offsets or ac real part
   double _i1[MATRIX_NODES+OFFSET];	// right side - saved ......... or ac imag part
@@ -598,10 +600,6 @@ void MODEL_SPICE::Set_param_by_name(std::string Name, std::string new_value)
 /*--------------------------------------------------------------------------*/
 void MODEL_SPICE::set_param_by_name(std::string Name, std::string Value)
 {
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
   _params.set(Name, Value);
   Set_param_by_name(Name, ::to_string(_params[Name].e_val(1,scope())));
 }
@@ -839,10 +837,6 @@ void DEV_SPICE::Set_param_by_name(std::string Name, std::string new_value)
 /*--------------------------------------------------------------------------*/
 void DEV_SPICE::set_param_by_name(std::string Name, std::string Value)
 {
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
   COMPONENT::set_param_by_name(Name, Value);
   COMMON_PARAMLIST* c = dynamic_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
@@ -1233,7 +1227,7 @@ bool DEV_SPICE::do_tr()
 
     for (uint_t ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
       for (uint_t jj = 0; jj < matrix_nodes()+OFFSET; ++jj) {
-	_matrix[ii][jj].real(0.);
+	_matrix[ii][jj].first = 0.;
       }
     }
   }
@@ -1263,7 +1257,8 @@ bool DEV_SPICE::do_tr()
   }
   for (uint_t ii = 0; converged() && ii < matrix_nodes()+OFFSET; ++ii) {
     for (uint_t jj = 0; converged() && jj < matrix_nodes()+OFFSET; ++jj) {
-      bool c = conchk(_matrix[ii][jj].real(), _matrix[ii][jj].imag(), OPT::abstol*ramptol);
+      // set_converged(conchk(_matrix[ii][jj].first, _matrix[ii][jj].second));
+      bool c = conchk(_matrix[ii][jj].first, _matrix[ii][jj].second, OPT::abstol*ramptol);
       if(!c) trouble = 30;
       set_converged(c);
     }
@@ -1289,7 +1284,7 @@ bool DEV_SPICE::do_tr()
   }
   for (uint_t ii = 0; !needs_load && ii < matrix_nodes()+OFFSET; ++ii) {
     for (uint_t jj = 0; !needs_load && jj < matrix_nodes()+OFFSET; ++jj) {
-      needs_load = !conchk(_matrix[ii][jj].real(), _matrix[ii][jj].imag(),
+      needs_load = !conchk(_matrix[ii][jj].first, _matrix[ii][jj].second,
 			   0, OPT::reltol*OPT::loadtol);
     }
   }
@@ -1334,8 +1329,8 @@ void DEV_SPICE::tr_load()
 	  jhit[nj] = ni;
 	  int njj = nj-OFFSET;
 	  trace2("", jj, nj);
-	  trace2("", _matrix[nii][njj].real(), _matrix[nii][njj].imag());
-	  tr_load_point(_n[ii], _n[jj], &reinterpret_cast<double(&)[2]>(_matrix[nii][njj])[0] , &reinterpret_cast<double(&)[2]>(_matrix[nii][njj])[1]);
+	  trace2("", _matrix[nii][njj].first, _matrix[nii][njj].second);
+	  tr_load_point(_n[ii], _n[jj], &(_matrix[nii][njj].first), &(_matrix[nii][njj].second));
 	}else{
 	  trace2("skip", jj, nj);
 	}
@@ -1351,7 +1346,7 @@ void DEV_SPICE::tr_unload()
 
   for (uint_t ii = 0; ii < matrix_nodes(); ++ii) {untested();
     for (uint_t jj = 0; jj < matrix_nodes(); ++jj) {untested();
-      _matrix[ii][jj].real(0);
+      _matrix[ii][jj].first = 0.;
     }
   }
   _sim->mark_inc_mode_bad();
@@ -1505,7 +1500,7 @@ void DEV_SPICE::do_ac()
     std::fill_n(_i1, matrix_nodes()+OFFSET, 0);
     for (uint_t ii = 0; ii < matrix_nodes()+OFFSET; ++ii) {
       for (uint_t jj = 0; jj < matrix_nodes()+OFFSET; ++jj) {
-	_matrix[ii][jj] = 0;
+	_matrix[ii][jj] = DPAIR(0.,0.);
       }
     }
     
@@ -1550,8 +1545,10 @@ void DEV_SPICE::ac_load()
 	    jhit[nj] = ni;
 	    int njj = nj-OFFSET;
 	    trace3("", jj, nj, njj);
-	    trace2("", _matrix[nii][njj].real(), _matrix[nii][njj].imag());
-	    ac_load_point(_n[ii], _n[jj], _matrix[nii][njj]);
+	    trace2("", _matrix[nii][njj].first, _matrix[nii][njj].second);
+	    //ac_load_point(_n[ii], _n[jj], _matrix[nii][njj]);
+	    DPAIR& dp = _matrix[nii][njj];
+	    ac_load_point(_n[ii], _n[jj], COMPLEX(dp.first, dp.second));
 	  }else{
 	    trace2("skip", jj, nj);
 	  }
@@ -1866,7 +1863,7 @@ extern "C" {
       assert(r < int(MATRIX_NODES)+OFFSET);
       assert(c >= 0+OFFSET);
       assert(c < int(MATRIX_NODES)+OFFSET);
-      COMPLEX** m = reinterpret_cast<COMPLEX**>(mm);
+      DPAIR** m = reinterpret_cast<DPAIR**>(mm);
       assert(m);
       assert(m[r-OFFSET]);
       return reinterpret_cast<double*>(&(m[r-OFFSET][c-OFFSET]));
@@ -1899,10 +1896,10 @@ extern "C" {
 // This is not guaranteed by the standard, but is believed to always be true.
 static struct COMPLEX_TEST {
   COMPLEX_TEST() {
-    COMPLEX x;
-    COMPLEX* px = &x;
-    double* prx = &reinterpret_cast<double(&)[2]>(x)[0];
-    double* pix = &reinterpret_cast<double(&)[2]>(x)[1];
+    DPAIR x;
+    DPAIR* px = &x;
+    double* prx = &x.first;
+    double* pix = &x.second;
     assert(reinterpret_cast<void*>(prx) == reinterpret_cast<void*>(px));
     assert(reinterpret_cast<void*>(pix-1) == reinterpret_cast<void*>(px));
   }

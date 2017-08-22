@@ -1,0 +1,47 @@
+Pmos8: already installed, replacing
+stashing as Pmos8:0
+paramset GG NmosTEST; 
+            ^ ? paramset: no match
+endparamset 
+^ ? endparamset: no match
+paramset GG Nmos2; 
+            ^ ? paramset: no match
+endparamset 
+^ ? endparamset: no match
+c
+cap
+csw
+d
+endparamset
+logic
+nmos
+nmos1
+Nmos2
+nmos2
+nmos3
+nmos4
+nmos49
+nmos5
+nmos6
+nmos7
+nmos8
+NmosTEST
+npn
+npn1
+pmos
+pmos1
+pmos2
+pmos3
+pmos4
+pmos49
+pmos5
+pmos6
+pmos7
+pmos8
+Pmos8:0
+pnp
+pnp1
+r
+res
+sw
+table

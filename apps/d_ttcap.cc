@@ -470,7 +470,7 @@ TIME_PAIR DEV_CAPACITANCE::tt_review()
       _ttstep = OPT::tttol / 7. *_sim->_dT0 * 1.3; // hack. necessary?
       if(denom != 0){
 	_ttstep1 = pow( tol / denom, 1/3. );
-	_ttstep = min(_ttstep, _ttstep1);
+	_ttstep = std::min(_ttstep, _ttstep1);
 	assert(is_number(_ttstep));
       }else{
 	assert(is_number(_ttstep));
@@ -485,9 +485,9 @@ TIME_PAIR DEV_CAPACITANCE::tt_review()
       chargetol = std::max(OPT::chgtol, OPT::reltol * std::max((double)std::abs(_corr), (double) std::abs(_pred)));
       _ttstep1 = pow( OPT::tttol * chargetol / denom, 1/2. );
 
-      _ttstep = min(_ttstep, _ttstep1);
-      _ttstep = min(_ttstep, _ttstep2);
-      _ttstep = min(_ttstep, _ttstep3);
+      _ttstep = std::min(_ttstep, _ttstep1);
+      _ttstep = std::min(_ttstep, _ttstep2);
+      _ttstep = std::min(_ttstep, _ttstep3);
 
       _ttfuture = tt_review_check_and_convert(_ttstep);
 
@@ -508,10 +508,10 @@ TIME_PAIR DEV_CAPACITANCE::tt_review()
       _ttstep3 = (fabs(1/_dv))*_sim->_dTmin;
 
 //      _ttstep = _sim->_dT0 * 1.3;
-      _ttstep = min(_ttstep, _ttstep3);
-      _ttstep = min(_ttstep, _ttstep2);
-      _ttstep = min(_ttstep, _ttstep1);
-      _ttstep = min(_ttstep, _ttstep0);
+      _ttstep = std::min(_ttstep, _ttstep3);
+      _ttstep = std::min(_ttstep, _ttstep2);
+      _ttstep = std::min(_ttstep, _ttstep1);
+      _ttstep = std::min(_ttstep, _ttstep0);
       _ttfuture = tt_review_check_and_convert(_ttstep);
       break;
     default:

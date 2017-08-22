@@ -245,12 +245,13 @@ void COMMON_COMPONENT::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lan
   print_pair(o, lang, "m",    _mfactor, _mfactor.has_hard_value());
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::set_param_by_index(int i, std::string& Value, int Offset)
+void COMMON_COMPONENT::set_param_by_index(int i, std::string& value, int Offset)
 {
+  IString Value(value);
   switch (i) {
-  case 0:untested();  _tnom_c = Value; break;
+  case 0:  _tnom_c = Value; break;
   case 1:untested();  _dtemp = Value; break;
-  case 2:untested();  _temp_c = Value; break;
+  case 2:  _temp_c = Value; break;
   case 3:  _mfactor = Value; break;
   default:untested();
 			 throw Exception_Too_Many(unsigned(i), 3u, Offset); break;
@@ -685,7 +686,7 @@ void COMPONENT::map_nodes()
     assert(_n[ii].m_() <= _sim->_total_nodes || _n[ii].m_() == INVALID_NODE || _n[ii].is_adp() );
     unsigned user_number = (_n[ii].n_())? _n[ii].n_()->user_number(): 0; USE(user_number);
     unsigned matrix_number = (_n[ii].n_())? _n[ii].n_()->matrix_number(): 0;
-    string node_label = (_n[ii].n_())? _n[ii].n_()->long_label(): "";
+    IString node_label = (_n[ii].n_())? _n[ii].n_()->long_label(): "";
     // matrix_number not initialized yet.
     USE(user_number); USE(matrix_number);
     trace5("COMPONENT::map_nodes done", long_label(), ii, _n[ii].t_(), _n[ii].m_(), _n[ii].is_adp() );
@@ -786,18 +787,19 @@ void COMPONENT::set_param_by_name(std::string Name, std::string Value)
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
+void COMPONENT::set_param_by_index(int i, std::string& value, int offset)
 {
+  IString Value(value);
   if (has_common()) {untested();
     COMMON_COMPONENT* c = common()->clone();
     assert(c);
-    c->set_param_by_index(i, Value, offset);
+    c->set_param_by_index(i, value, offset);
     attach_common(c);
   }else{
     switch (COMPONENT::param_count() - 1 - i) {
     case 0: _value = Value; break;
     case 1: _mfactor = Value; break;
-    default: CARD::set_param_by_index(i, Value, offset);
+    default:untested(); CARD::set_param_by_index(i, value, offset);
     }
   }
 }
@@ -861,7 +863,7 @@ const std::string COMPONENT::port_value(uint_t i)const
   assert(_n);
   assert(i !=INVALID_NODE);
   assert(i < net_nodes());
-  return _n[i].short_label();
+  return _n[i].short_label().to_string();
 }
 /*--------------------------------------------------------------------------*/
 const std::string COMPONENT::current_port_value(uint_t)const 

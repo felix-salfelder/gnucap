@@ -1,4 +1,4 @@
-/*                                -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -25,7 +25,7 @@
 #include "c_comand.h"
 #include "u_lang.h"
 #include "l_compar.h"
-#include "ap.h"
+#include "u_sim_data.h" // not in upstream!
 /*--------------------------------------------------------------------------*/
 void OPT::command(CS& cmd)
 {
@@ -181,7 +181,7 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "trstephold",    &trstephold,  mPOSITIVE)
       || Get(cmd, "trstepshrink",  &trstepshrink,mPOSITIVE)
       || Get(cmd, "trreject",      &trreject,	mPOSITIVE)
-      || Get(cmd, "trsteporder",   &trsteporder)
+      || (Get(cmd, "trsteporder",   &trsteporder) && (trsteporder = to_range(1u,trsteporder,3u)))
       || Get(cmd, "trstepcoef1",   &trstepcoef[1])
       || Get(cmd, "trstepcoef2",   &trstepcoef[2])
       || Get(cmd, "trstepcoef3",   &trstepcoef[3])
@@ -219,7 +219,7 @@ bool OPT::set_values(CS& cmd)
   }while (cmd.more() && changed);
 
   if (big_change) {
-    CKT_BASE::_sim->uninit();
+    CKT_BASE::_sim->uninit(); // not in upstream!
     //BUG// not sure if this is really working
     //regressions do go both ways, but not sure if it actually
     //makes the topology changes expected

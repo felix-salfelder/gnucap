@@ -36,9 +36,9 @@
 INTERFACE std::string findfile(const std::string& filename, const std::string& path, int mode)
 {
 #ifdef CHECK_LOCAL_FIRST
-  if (OS::access_ok(filename, mode)) { untested();
+  if (OS::access_ok(filename, mode)) {untested();
     return filename;
-  }else{ untested();
+  }else{untested();
   }
 #endif
 					// for each item in the path
@@ -55,7 +55,7 @@ INTERFACE std::string findfile(const std::string& filename, const std::string& p
     }
 
     target += filename;
-    if (OS::access_ok(target, mode)) {
+    if (OS::access_ok(target, mode)) {	// found it
       return target;
     }else if (p_ptr==path.end()) {	// ran out of path, didn't find it
       return "";
