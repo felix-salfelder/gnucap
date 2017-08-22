@@ -166,7 +166,7 @@ bool EVAL_BM_POLY::parse_numlist(CS& cmd)
       // no more, graceful finish
       break;
     }else{
-      if (cmd.match1('=')) { untested();
+      if (cmd.match1('=')) {
 	// got one that doesn't belong, back up
 	cmd.reset(old_here);
 	break;

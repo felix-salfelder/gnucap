@@ -291,7 +291,7 @@ private:
       for(auto pair : *w){
 	out << pair.first << pair.second << endl;
       }
-    }else{ untested();
+    }else{
       cmd.reset(here);
       cmd.warn(bWARNING, "what's this?");
     }

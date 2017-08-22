@@ -540,7 +540,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
       trace1("LANG_SPICE_BASE::parse_args simple", xx->value_name());
       IString value;
       cmd >> value;
-      if(xx->print_type_in_spice()){ untested();
+      if(xx->print_type_in_spice()){
 	 // D1   2  0  ddd   2.
 	xx->set_param_by_name(xx->value_name(), value.to_string());
       }else if(cc){
@@ -548,7 +548,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	std::string V=value.to_string();
 	cc->set_param_by_index(0, V, 0);
 	c->attach_common(cc);
-      }else{ untested();
+      }else{
 	x->set_param_by_name(xx->value_name(), value.to_string());
       }
     }else if (cmd.match1("'{")) {
@@ -561,7 +561,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	std::string V=value.to_string();
 	cc->set_param_by_index(0, V, 0);
 	c->attach_common(cc);
-      }else{ untested();
+      }else{
 	x->set_param_by_name(xx->value_name(), value.to_string());
       }
     }else{
@@ -613,14 +613,14 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	}
       }
     }
-  }else if (MODEL_CARD* pp = dynamic_cast<MODEL_CARD*>(x)) { untested();
+  }else if (MODEL_CARD* pp = dynamic_cast<MODEL_CARD*>(x)) {
     // used only for "table"
     int paren = cmd.skip1b('(');
     bool in_error = false;
-    for (;;) { untested();
+    for (;;) {
       unsigned here = cmd.cursor();
       pp->parse_params_obsolete_callback(cmd);  //BUG//callback//
-      if (!cmd.more()) { untested();
+      if (!cmd.more()) {
 	break;
       }else if (paren && cmd.skip1b(')')) {untested();
 	break;
@@ -634,7 +634,7 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 	  cmd.skiparg().skip1b("=");
 	  in_error = true;
 	}
-      }else{ untested();
+      }else{
 	in_error = false;
       }
     }
@@ -839,7 +839,7 @@ std::string LANG_SPICE_BASE::find_type_in_string(CS& cmd) const
   }else if(id_letter=='g'){
     here = cmd.cursor();
 
-    if (cmd.scan("vccap |vcg |vcr |vccs ")) { untested();
+    if (cmd.scan("vccap |vcg |vcr |vccs ")) {
       // stuff like Gv2  4  0  vcr 3  0  10k
       s = cmd.trimmed_last_match();
     }else if (cmd.scan("poly(0) |poly(1) |poly(2) |poly(3) ")) {
@@ -970,7 +970,7 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
   }else if (x->print_type_in_spice()) {
     // incomplete();
     o << " " << x->dev_type();
-  }else if (Ichar(x->short_label()[0]) != Ichar(x->id_letter())) {untested();
+  }else if (Ichar(x->short_label()[0]) != Ichar(x->id_letter())) {
     o << " " << x->dev_type();
   }else{
     // don't print type

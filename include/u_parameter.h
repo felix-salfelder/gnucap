@@ -112,7 +112,7 @@ public:
   void	set_default(const T& v)		{_v = v; _s = "";}
   void	operator=(const PARAMETER& p)	{_v = p._v; _s = p._s;}
   void	operator=(const T& v)		{_v = v; _s = "#";}
-  void	operator=(const IString& s)	{ untested();
+  void	operator=(const IString& s)	{
     if (strchr("'\"{", s[0].to_char())) {
       CS cmd(CS::_STRING, s.to_string());
       _s = cmd.ctos("", "'\"{", "'\"}");

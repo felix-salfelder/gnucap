@@ -68,15 +68,15 @@ using std::string;
 std::map<const std::string, void*> attach_list;
 /*--------------------------------------------------------------------------*/
 std::string plug_path()
-{ untested();
+{
   return OS::getenv("GNUCAP_PLUGPATH");
 }  
 /*--------------------------------------------------------------------------*/
 void list()
-{ untested();
+{
   for (std::map<std::string, void*>::iterator
-	 ii = attach_list.begin(); ii != attach_list.end(); ++ii) { untested();
-    if (ii->second) { untested();
+	 ii = attach_list.begin(); ii != attach_list.end(); ++ii) {
+    if (ii->second) {
       IO::mstdout << ii->first << '\n';
     }else{itested();
       error(bTRACE,  ii->first + " (unloaded)\n");
@@ -89,24 +89,24 @@ class CMD_ATTACH : public CMD {
   static void* do_attach(string filename, int flags, bool force=false);
 public:
   void do_it(CS& cmd, CARD_LIST*)
-  { untested();
+  {
     unsigned here = cmd.cursor();
     int dl_scope = RTLD_LOCAL;
     int check = RTLD_NOW;
     string make = OS::getenv("GNUCAP_MAKE", GNUCAP_MAKE);
     // RTLD_NOW means to resolve symbols on loading
     // RTLD_LOCAL means symbols defined in a plugin are local
-    do { untested();
-      if (cmd.umatch("public ")) {untested();
+    do {
+      if (cmd.umatch("public ")) {
 	dl_scope = RTLD_GLOBAL;
 	// RTLD_GLOBAL means symbols defined in a plugin are global
 	// Use this when a plugin depends on another.
-      }else if (cmd.umatch("lazy|force")) { untested();
+      }else if (cmd.umatch("lazy|force")) {
 	check = RTLD_LAZY;
 	// RTLD_LAZY means to defer resolving symbols until needed
 	// Use when a plugin will not load because of unresolved symbols,
 	// but it may work without it.
-      }else{ untested();
+      }else{
 	Get(cmd,"make{file}", &make);
       }
     } while (cmd.more() && !cmd.stuck(&here));
@@ -115,10 +115,10 @@ public:
     std::string short_file_name;
     cmd >> short_file_name;
     
-    if (short_file_name == "") { untested();
+    if (short_file_name == "") {
       // nothing, list what we have
       list();
-    }else{ untested();
+    }else{
       // a name to look for
       // check if already loaded
       if (void* handle = attach_list[short_file_name]) {itested();
@@ -130,22 +130,22 @@ public:
 	  cmd.reset(here);
 	  throw Exception_CS("already loaded, cannot replace when there is a circuit", cmd);
 	}
-      }else{ untested();
+      }else{
       }
 
       string source_filename(short_file_name);
       // FIXME: incomplete... some more control...
       // global list of supported suffixes?
       if(short_file_name.size()>3
-	  && !strcmp(short_file_name.c_str()+short_file_name.size()-3,".so")) { untested();
+	  && !strcmp(short_file_name.c_str()+short_file_name.size()-3,".so")) {
 	source_filename = "";
       }else if (short_file_name.size()>3
-	  && short_file_name.c_str()[short_file_name.size()-3] == '.') { untested();
+	  && short_file_name.c_str()[short_file_name.size()-3] == '.') {
 	short_file_name[short_file_name.size()-2]='s';
 	short_file_name[short_file_name.size()-1]='o';
 
 	if(short_file_name[0]=='/') { itested();
-	} else { untested();
+	} else {
 	  char* cwd = get_current_dir_name(); // POSIX, no C++ implementation available
 	  source_filename = string(cwd) + "/" + source_filename;
 	  free(cwd);
@@ -155,28 +155,28 @@ public:
       }
 
       std::string full_file_name;
-      if (source_filename!="") { untested();
+      if (source_filename!="") {
 	error(bDEBUG, "attach from source %s\n", source_filename.c_str());
 	assert(source_filename[0]=='/');
-	try { untested();
+	try {
 	  compile(short_file_name, source_filename, make);
 	  full_file_name = short_file_name;
 	}catch(Exception& e){ untested();
 	  cmd.reset(here);
 	  throw Exception_CS(e.message(), cmd);
 	}
-      }else if (short_file_name[0]=='/' || short_file_name[0]=='.'){untested();
-	if (OS::access_ok(short_file_name, R_OK)) {untested();
+      }else if (short_file_name[0]=='/' || short_file_name[0]=='.'){
+	if (OS::access_ok(short_file_name, R_OK)) {
 	  // found it, local or root
 	  full_file_name = short_file_name;
 	}else{untested();
 	  cmd.reset(here);
 	  throw Exception_CS("plugin not found in " + short_file_name[0], cmd);
 	}
-      }else{ untested();
+      }else{
 	std::string path = plug_path();
 	full_file_name = findfile(short_file_name, path, R_OK);
-	if (full_file_name != "") { untested();
+	if (full_file_name != "") {
 	  // found it, with search
 	}else{untested();
 	  cmd.reset(here);
@@ -198,11 +198,11 @@ public:
 
     void* handle = dlopen(full_file_name.c_str(), check | dl_scope);
     const char* e = dlerror();
-    if (check == RTLD_LAZY) { untested();
+    if (check == RTLD_LAZY) {
       attach_list[short_file_name] = handle;
-    }else if (handle) { untested();
+    }else if (handle) {
       const char* (*name)() = (const char*(*)()) dlsym(handle, "interface_name");
-      if (name){ untested();
+      if (name){
 	attach_list[short_file_name] = handle;
       }else{ untested();
 	dlclose(handle);
@@ -210,7 +210,7 @@ public:
 	throw Exception_CS("missing interface", cmd);
       }
     }
-    if (e){ untested();
+    if (e){
       cmd.reset(here);
       throw Exception_CS(e, cmd);
     }
@@ -229,7 +229,7 @@ public:
   }
 
   std::string help_text()const
-  { untested();
+  {
     return 
       "load command\n"
       "Loads plugins\n"
@@ -290,13 +290,13 @@ void* CMD_ATTACH::do_attach(string file_name, int flags, bool force)
 #endif
 /*--------------------------------------------------------------------------*/
 void CMD_ATTACH::compile(string &filename, string source_filename, string make)
-{ untested();
+{
   struct stat ccattrib;
   int ccstat = stat(source_filename.c_str(), &ccattrib);
   if (ccstat) { untested();
     throw Exception("cannot compile: " + source_filename +
 		    " does not exist (" + to_string(ccstat) + ")\n");
-  } else { untested();
+  } else {
   }
 
   struct stat soattrib;
@@ -309,7 +309,7 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
   char* tmplt = NULL;
   char* t = NULL;
 
-  if (filename[0]!='/') { untested();
+  if (filename[0]!='/') {
     filename = "./" + filename;
   }
 
@@ -328,7 +328,7 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
       if (!t) throw Exception("cannot create temporary file");
       filename = string(t) + "/" + f1;
     }
-  } else { untested();
+  } else {
   }
   free(tmplt);
   t = NULL;
@@ -340,9 +340,9 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 
   int childret;
   pid_t p = vfork();
-  if (p) { untested();
+  if (p) {
     waitpid(p, &childret, 0);
-  } else { untested();
+  } else {
     error(bDEBUG, "calling " + make + " -C" + d1 + " VPATH=" + d2 + " " + f1 + "\n");
     int ret = execlp( make.c_str(), make.c_str(),
 		      "-C", d1.c_str(),
@@ -366,21 +366,21 @@ void CMD_ATTACH::compile(string &filename, string source_filename, string make)
 class CMD_DETACH : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*)
-  { untested();
+  {
     unsigned here = cmd.cursor();	//BUG// due to the way dlopen and dlclose work
     std::string file_name;		// it doesn't really work.
     cmd >> file_name;			// the dispatcher's active instance blocks unload
     
-    if (file_name == "") { untested();
+    if (file_name == "") {
       // nothing, list what we have
       list();
-    }else{untested();
-      if (CARD_LIST::card_list.is_empty()) {untested();
+    }else{
+      if (CARD_LIST::card_list.is_empty()) {
 	void* handle = attach_list[file_name];
-	if (handle) {untested();
+	if (handle) {
 	  dlclose(handle);
 	  attach_list[file_name] = NULL;
-	}else{untested();
+	}else{
 	  cmd.reset(here);
 	  throw Exception_CS("plugin not attached", cmd);
 	}
@@ -391,7 +391,7 @@ public:
   }
 
   std::string help_text()const
-  { untested();
+  {
     return 
       "unload command\n"
       "Unloads plugins\n"

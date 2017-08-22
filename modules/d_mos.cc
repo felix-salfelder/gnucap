@@ -2034,7 +2034,7 @@ void DEV_BUILT_IN_MOS::do_tt()
   }
   if (adp()) {
     adp()->apply(this);
-  } else { untested();
+  } else {
   }
 }
 /*-------------------------------------------------------*/

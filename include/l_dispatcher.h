@@ -66,7 +66,7 @@ public:
   const_iterator end()const		{assert(_map); return _map->end();}
   size_t size()const		{assert(_map); return _map->size();}
 
-  CKT_BASE* operator[](IString s) { untested();
+  CKT_BASE* operator[](IString s) {
     assert(_map);
     CKT_BASE* rv = (*_map)[s];
     return rv;

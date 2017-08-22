@@ -159,7 +159,7 @@ public: // construct
   IString(const std::string& s) :
     base((const Ichar*)s.data(), s.size()) {}
 public: // ops
-  IString& operator=(Ichar s){ untested();
+  IString& operator=(Ichar s){
     base::operator=(s);
     return *this;
   }
