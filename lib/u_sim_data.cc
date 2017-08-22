@@ -64,6 +64,7 @@ SIM_DATA::SIM_DATA()
    _v0(NULL),
    _vt1(NULL),
    _ac(NULL),
+   _sens(NULL),
    _nstat(NULL),
    _aa(),
    _lu(),
@@ -78,6 +79,7 @@ SIM_DATA::SIM_DATA()
    _evalq_uc(NULL),
    _has_op(s_NONE)
 {
+  _tr=_tr1=_tt1=_tr2=_tr3=NULL; // yikes.
   _evalq = &_evalq1;
   _evalq_uc = &_evalq2;
   std::fill_n(_iter, iCOUNT, 0);
