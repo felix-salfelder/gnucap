@@ -156,21 +156,26 @@ void PROBELIST::remove_list(CS& cmd)
 #include <algorithm>
 #include <functional>
 
-static struct probe_finder_deleter
-{
-  CKT_BASE* b;
-  bool operator()(PROBE*& p) // important to take pointer by reference!
-  { 
-    if (p == *b) // there could be a variant just comparing pointers...
-    {
-      trace6("probe_deleter deleting", p->label(), hp(p->object()), b->long_label(), b->probes(), hp(p), hp(b));
+namespace detail{
+struct probe_finder_deleter {
+  probe_finder_deleter(const CKT_BASE* brh)
+    : _b(brh)
+  { untested();
+  }
+  bool operator()(PROBE*& p) { untested();
+  std::cerr << "rem " << p->label() << " " << _b->long_label() << "\n";
+    if (p == *_b) { untested();
+      trace2("probe_deleter deleting", p->label(), _b->long_label());
       delete p;
       p = NULL;
       return true;
+    }else{ untested();
+      return false;
     }
-    return false;
   }
-} d_;
+  CKT_BASE const* _b;
+};
+} // detail
 
 void PROBELIST::remove_one(CKT_BASE *brh)
 {
@@ -178,10 +183,8 @@ void PROBELIST::remove_one(CKT_BASE *brh)
   USE(c);
   assert(brh);
 
-  d_.b = brh;
-// for_each( begin(), end(), d_ );
-// iterator new_end = remove(begin(), end(), static_cast<PROBE*>(NULL));
-  iterator new_end = remove_if ( begin(), end(), d_ );
+  detail::probe_finder_deleter d(brh);
+  iterator new_end = remove_if ( begin(), end(), d );
   bag.erase( new_end, end());
 }
 /*--------------------------------------------------------------------------*/
