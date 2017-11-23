@@ -209,25 +209,6 @@ PROBE* PROBELIST::add_list(CS& cmd, const CARD_LIST* scope)
   }
 
   int paren;
-#if 0
-  MATH_OP op;
-  if ( (bool) ( op = strtotype(what) ) ) {
-
-        // switch arity...
-
-    trace3( "PROBELIST::add_list MATH_OP ", what, cmd.cursor(), (double) op);
-    int paren = cmd.skip1b('(');		/* device, node, etc. */
-
-    found_something = add_expr(what,op,&CARD_LIST::card_list, cmd, *this);
-    if(found_something) bag.push_back( found_something ); 
-
-    //delete(found_something);
-    //found_something=bag.back();
-
-    paren -= cmd.skip1b(')');
-
-  } else
-#endif
   if( ( paren = cmd.skip1b('(')) ) {
     trace1("PROBELIST::add_list " + what, paren );
     if (cmd.umatch("nodes ")) {
@@ -365,33 +346,6 @@ void PROBELIST::add_all_nodes(const IString& what, const CARD_LIST* scope)
   //untested();
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-MATH_OP strtotype(IString s)
-{
-  trace0(( "MATH_OP::strtorype " + s).c_str() );
-
-  if(Umatch(s,"sum ")) 
-    return op_sum;
-  if(Umatch(s,"exp "))
-    return op_exp;
-  if(Umatch(s,"diff "))
-    return op_diff;
-  if(Umatch(s,"neg "))
-    return op_neg;
-  if(Umatch(s,"quot "))
-    return op_quot;
-  if(Umatch(s,"abs ")){
-    trace0(( "MATH_OP::strtorype abs == " + s).c_str() );
-    return op_abs;
-  }
-  if(Umatch(s,"tan "))
-    return op_tan;
-
-  trace0(( "MATH_OP " + s + ": not implementei/ not a math_op").c_str());
-
-  return op_null;
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /* add_expr add things to list
@@ -403,35 +357,6 @@ PROBE* PROBELIST::add_expr(const std::string& ,
 {
   incomplete(); // obsolete
   return NULL;
-#if 0
-  assert(scope); USE(scope); // ?
-  trace2( "PROBELIST::add_expr ", cmd.cursor(), cmd.tail() );
-  //trace0(( std::string("PROBELIST::add_expr ") + cmd.fullstring()).c_str() );
-  //trace0(( std::string("PROBELIST::add_expr arg0 ") + cmd.cursor()).c_str() );
-
-  PROBE* arg0 = _probe_lists->expr[CKT_BASE::_sim->_mode].add_list(cmd);
-  trace2( "PROBELIST::add_expr added", typetochar(type), arg0->label()  );
-
-  int komma = cmd.skip1b(',');		/* device, node, etc. */
-  assert (komma); USE(komma); incomplete(); // throw exception
-
-  PROBE* arg1 = _probe_lists->expr[CKT_BASE::_sim->_mode].add_list(cmd);
-  trace2( "PROBELIST::add_expr added1", typetochar(type), arg1->label()  );
-
-  MATH_PROBE* ret = new MATH_PROBE(type);
-  ret->push(arg1);
-  ret->push(arg0);
-
-  trace0( "PROBELIST::add_expr returning");
-  trace1(" ", ret->label()  );
-
-  // hack. better put probes to expr[mode] and have expressions with pointers
-  // to those probes...
-//  _probe_lists->expr[CKT_BASE::_sim->_mode].clear();
-
-
-  return ret;
-#endif
 }
 /*--------------------------------------------------------------------------*/
 /* add_branches: add net elements to probe list
