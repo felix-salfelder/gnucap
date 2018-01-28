@@ -65,7 +65,7 @@ namespace {
 /*--------------------------------------------------------------------------*/
 using std::string;
 /*--------------------------------------------------------------------------*/
-std::map<const std::string, void*> attach_list;
+std::map<std::string, void*> attach_list;
 /*--------------------------------------------------------------------------*/
 std::string plug_path()
 {
@@ -171,7 +171,7 @@ public:
 	  full_file_name = short_file_name;
 	}else{untested();
 	  cmd.reset(here);
-	  throw Exception_CS("plugin not found in " + short_file_name[0], cmd);
+	  throw Exception_CS(std::string("plugin not found in ") + short_file_name[0], cmd);
 	}
       }else{
 	std::string path = plug_path();
