@@ -24,6 +24,7 @@
  */
 //testing=script 2006.07.17
 #include "e_elemnt.h"
+#include "u_xprobe.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -59,6 +60,7 @@ private: // override virtual
   void	   ac_load()		{ac_load_source();}
   COMPLEX  ac_involts()const	{untested();return 0.;}
   COMPLEX  ac_amps()const	{return _acg;}
+  XPROBE sens_probe_ext(const std::string& x)const;
 
   std::string port_name(uint_t i)const {
     assert(i != INVALID_NODE);
@@ -127,6 +129,20 @@ void DEV_CS::do_ac()
   }
 }
 /*--------------------------------------------------------------------------*/
+XPROBE DEV_CS::sens_probe_ext(const std::string& x)const
+{
+  unsigned n1 = _n[OUT1].m_();
+  unsigned n2 = _n[OUT2].m_();
+  COMPLEX a = CKT_BASE::_sim->_sens[n1];
+  COMPLEX b = CKT_BASE::_sim->_sens[n2];
+
+  if (Umatch(x, "i ")) {	
+    return XPROBE( a-b );
+  } else{
+  }
+
+  return ELEMENT::sens_probe_ext(x);
+}
 /*--------------------------------------------------------------------------*/
 DEV_CS p1;
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "I|csource|isource", &p1);

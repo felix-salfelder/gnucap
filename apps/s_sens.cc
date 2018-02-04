@@ -133,7 +133,7 @@ void SENS::setup(CS& Cmd)
 
       int paren = Cmd.skip1b('(');
       Cmd >> output;
-      t.label = "v("+output;
+      t.label = "v(" + output;
 
       CKT_NODE* node = dynamic_cast<CKT_NODE*>((*_scope).node(output));
       if(node)
@@ -172,6 +172,21 @@ void SENS::setup(CS& Cmd)
         newprobes = false;
       }
       _output.push_back(t);
+    }else if (Cmd.match1("'\"({") || Cmd.is_float()) { untested();
+      Cmd >> _start;
+      trace1("got start", _start);
+      if (Cmd.match1("'\"({") || Cmd.is_float()) { untested();
+        Cmd >> _stop;
+      }else{ untested();
+        _stop = _start;
+      }
+      if (Cmd.match1("'\"({") || Cmd.is_float()) { untested();
+        _stepmode = LIN_STEP;
+        Cmd >> _step_in;
+      }else{
+      }
+    }else{
+      incomplete();
     }
     //try{
     //  _output.add_list(Cmd);
@@ -179,6 +194,16 @@ void SENS::setup(CS& Cmd)
     //catch(Exception_Cant_Find)
     //{}
     ONE_OF
+      || (Get(Cmd, "*",		  &_step_in) && (_stepmode = TIMES))
+      || (Get(Cmd, "+",		  &_step_in) && (_stepmode = LIN_STEP))
+      || (Get(Cmd, "by",	  &_step_in) && (_stepmode = LIN_STEP))
+      || (Get(Cmd, "step",	  &_step_in) && (_stepmode = LIN_STEP))
+      || (Get(Cmd, "d{ecade}",	  &_step_in) && (_stepmode = DECADE))
+      || (Get(Cmd, "ti{mes}",	  &_step_in) && (_stepmode = TIMES))
+      || (Get(Cmd, "lin",	  &_step_in) && (_stepmode = LIN_PTS))
+      || (Get(Cmd, "o{ctave}",	  &_step_in) && (_stepmode = OCTAVE))
+      || Get(Cmd, "sta{rt}",	  &_start)
+      || Get(Cmd, "sto{p}",	  &_stop)
       || Get(Cmd, "dm",	          &_dump_matrix)
       || _out.outset(Cmd);
       ;
@@ -186,6 +211,7 @@ void SENS::setup(CS& Cmd)
   Cmd.check(bWARNING, "what's this??");
 
   _start.e_val(0., _scope);
+  trace1("eval start", _start);
   _stop.e_val(0., _scope);
   _step_in.e_val(0., _scope);
   _step = _step_in;
@@ -196,7 +222,7 @@ void SENS::setup(CS& Cmd)
     needslinfix = false;		// but step must be read first
   }else{			// for Spice compatibility
   }		
-  if (_step==0.) {
+  if (_step==0.) { untested();
     _step = _stop - _start;
     _linswp = true;
   }else{
@@ -208,6 +234,7 @@ void SENS::setup(CS& Cmd)
   if(!_output.size()){
     throw(Exception("no output specified"));
   }
+  trace2("eval done", _start, _stop);
 }
 /*--------------------------------------------------------------------------*/
 void SENS::solve()
@@ -280,20 +307,26 @@ void SENS::sweep()
   _out.form(format, '*', "param");
   sprintf(format, "%%-%us", width);
   head(_start, _stop, "@freq");
+  _sim->_jomega = 0; // COMPLEX(0., _sim->_freq * M_TWO_PI);
+//  _sim->_jomega = COMPLEX(0., M_TWO_PI);
+//
+  trace2("eval done", _start, _stop);
   first();
   CARD_LIST::card_list.ac_begin();
-  _sim->_jomega = 0; // COMPLEX(0., _sim->_freq * M_TWO_PI);
 
-  do {
-    solve();
-    _out.form(format, (*_output_iter).label.c_str() );
-    outdata(0, ofPRINT);
-  } while (next_output());
+  do { untested();
+    do { untested();
+      _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
+      solve();
+      _out.form(format, (*_output_iter).label.c_str() );
+      outdata(_sim->_freq, ofPRINT);
+    } while (next_output());
+  } while (next_freq());
 }
 /*--------------------------------------------------------------------------*/
 void SENS::first()
 {
-  _sim->_freq = 0; // _start;
+  _sim->_freq = _start;
   assert(_output.size());
   _output_iter = _output.begin();
 }
@@ -305,19 +338,20 @@ bool SENS::next_output()
 }
 /*--------------------------------------------------------------------------*/
 bool SENS::next_freq()
-{
+{ untested();
+  _output_iter = _output.begin();
   double realstop = (_linswp)
     ? _stop - _step/100.
     : _stop / pow(_step,.01);
-  if (!in_order(double(_start), _sim->_freq, realstop)) {
+  if (!in_order(double(_start), _sim->_freq, realstop)) { untested();
     return false;
-  }else{
+  }else{ untested();
   }
 
   _sim->_freq = (_linswp)
     ? _sim->_freq + _step
     : _sim->_freq * _step;
-  if (in_order(_sim->_freq, double(_start), double(_stop))) {
+  if (in_order(_sim->_freq, double(_start), double(_stop))) { untested();
     return false;
   }else{
     return true;

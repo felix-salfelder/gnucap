@@ -1,0 +1,31 @@
+spice
+
+*            T
+*            |
+*            |
+*            X  I
+*            |
+*            o---------------------------o
+*            |                            nout
+*            |
+*           [ ] Rlo
+*            |
+*            V
+
+I1 ndd nout  1
+Rlo nout 0 2
+
+* i1 0 ndd .5
+v1 ndd 0 2
+
+.print dc v(nodes) i(R*)
+.print ac v(nodes) i(R*)
+.print sens rr(R*) i(I1)
+
+.dc I1 0.9 1.1 .1
+
+*.listnodes
+
+*.ac
+.sens v(nout) v(ndd)
+.end

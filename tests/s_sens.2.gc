@@ -1,0 +1,26 @@
+spice
+
+*                          o--||------o
+*                          |          |
+*            o-----[ ]-----o--[ ]-----o
+*            |    R        |          |
+*            |            [ ]         I Iout
+*            I Iin         |          |
+*            |             V          V
+*            V
+
+Iout  nin  0 0
+Iin nout 0 0 ac 1
+
+Rout nout nm 1
+Rin nin nm 1
+Rg 0 nm 1
+C1 nout nm 1m
+
+.print dc v(nodes) i(R*)
+.print ac v(nout) vp(nout) vp(nin)
+.print sens i(I*) ip(I*)
+
+.ac start=1 stop=100 * 2
+.sens v(nout) v(nin) start=1 stop=100 * 2
+.end
