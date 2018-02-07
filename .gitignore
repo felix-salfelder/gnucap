@@ -128,6 +128,8 @@ gnucap-*.tar.gz
 /src/config.h.in
 /stamp-h1
 /depcomp
+/compile
+/test-driver
 /autom4te.cache
 /GNUmakefile
 /GNUmakefile.in
