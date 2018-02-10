@@ -1,0 +1,7 @@
+#           v(ndd)     v(nout)    i(Rlo)    
+ 0.9        2.         1.8        0.9       
+ 1.         2.         2.         1.        
+ 1.1        2.         2.2        1.1       
+*param     #@freq      rr(Rlo)    i(I1)     
+v(nout)    0.         1.1        2.        
+v(ndd)     0.         0.         10.u      

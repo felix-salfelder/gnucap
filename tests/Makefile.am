@@ -702,6 +702,8 @@ GC_TESTS = \
     pulse.gc \
     ring.gc \
     s_dc.bug.gc \
+    s_sens.1.gc \
+    s_sens.2.gc \
     s_sock.1.gc \
     s_sock.1b.gc \
     s_sock.1.preq.gc \
